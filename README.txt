@@ -45,7 +45,7 @@ the demos contained there and modify them.  Each one is "enabled" (so to say) by
 { demo code here }
 #endif
 
-COPYRIGHT
----------
-This software is, until being released, property of both Universidad Pontificia Bolivariana and Diego Velez.
+COPYRIGHT (2019)
+----------------
+This software is property of both Universidad Pontificia Bolivariana and Diego Velez.
 

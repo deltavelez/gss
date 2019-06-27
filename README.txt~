@@ -44,3 +44,8 @@ the demos contained there and modify them.  Each one is "enabled" (so to say) by
 #ifdef DEMO_LINE
 { demo code here }
 #endif
+
+COPYRIGHT
+---------
+This software is, until being released, property of both Universidad Pontificia Bolivariana and Diego Velez.
+
