@@ -4445,7 +4445,7 @@ void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel
 	  switch ((copymode & COPYMODE_PIXELMODE_MASK) >> COPYMODE_PIXELMODE_SHIFT)
 	    {
 	    case 0: /* solid rectangle */
-	      		printf("hola\r\n"); 
+	      //	      		printf("hola\r\n"); 
 
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
 	      lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x, y*scale_y, (x+1)*scale_x-1, (y+1)*scale_y-1,

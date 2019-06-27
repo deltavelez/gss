@@ -3,7 +3,6 @@
 #include <math.h>
 #include <string.h>
 #include "lb_types.h"
-#include "lb_fb.h"
 #include "lb_fonts.h"
 #include "lb_algebra.h"
 #include "lb_real.h"
