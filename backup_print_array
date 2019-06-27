@@ -1,0 +1,270 @@
+
+void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT_8_T len, S_INT_8_T dec)
+{
+  U_INT_16_T x, y, n_spaces, j[ARRAY_MAX_DIM], digsize[ARRAY_MAX_DIM];
+  S_INT_8_T  title_size, n;
+  char s[40];
+
+  for (x=0;x<ARRAY_MAX_DIM;x++)
+    digsize[x]=lb_re_ndigits((*M).dim[x]-1);
+
+  
+  n_spaces=1;
+  
+ 
+  switch ((*M).n)
+    {
+    case 1:
+     
+      break;
+    case 2:
+      n=strlen(text);
+      if (n>digsize[1])
+	title_size=n;
+      else
+	title_size=digsize[1];
+      
+      /* Print first line */
+      printf("\r\n");
+      printf(UC_C_LU);
+      for (x=0;x<title_size;x++)
+	printf(UC_BAR_H);
+      printf(UC_T_270);
+      for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+	{
+	  for (x=0;x<len+n_spaces;x++)
+	    printf(UC_BAR_H);
+	    //printf(UC_BAR_H);
+	}
+      printf(UC_C_RU);
+      printf("\r\n");
+      
+      /* Print column titles */
+      printf(UC_BAR_V);
+      printf(text);
+      if (n<title_size)
+	for (x=0;x<title_size-n;x++)
+	  printf(" ",x);
+      printf(UC_BAR_V);
+
+      for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+	{
+	  //printf("len=%d  n_spaces=%d  digsize[0]=%d\r\n",len,n_spaces,digsize[0]);
+	  for (x=0;x<len+n_spaces-digsize[0];x++)
+	    printf("*",x);
+	  strcpy(s,"");
+	  sprintf(s,"%c %du",37,digsize[0]);
+
+	  if (0)
+	    {
+	      printf("\r\n");
+	      y=0;
+	      while (s[y]!='\0')
+		{
+		  printf("%c",s[y]);
+		  y++;
+		}
+	    } 
+	  printf(s,j[0]);
+	}
+      printf(UC_BAR_V);
+      printf("\r\n");
+
+      /* Print column separator */
+      printf(UC_T_0);
+      
+      for (x=0;x<title_size;x++)
+	printf(UC_BAR_H);
+      printf(UC_CROSS);
+
+      for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+	{
+	  for (x=0;x<len+n_spaces;x++)
+	    printf(UC_BAR_H);
+	}
+
+      printf(UC_T_180);
+      printf("\r\n");
+	     
+      /* printing row title */
+      for (j[1]=0;j[1]<(*M).dim[1];j[1]++)
+	{
+	  printf(UC_BAR_V);
+	  for (x=0;x<title_size-digsize[1];x++)
+	    printf("-");
+	  strcpy(s,"");
+	  sprintf(s,"%c %du",37,digsize[1]);
+	  printf(s,j[1]);
+	  printf(UC_BAR_V);
+
+	  /* Values */
+	  for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+	    {
+	      for (x=0;x<n_spaces;x++)
+		printf(" ");
+	       strcpy(s,"");
+	       sprintf(s,"%c%d.%de",37,len,dec);
+	       printf(s,(*M).a2[j[1]][j[0]]);
+
+	    }
+	  printf(UC_BAR_V);
+	  printf("\r\n");
+	}
+
+      /* Print last line */
+      printf(UC_C_LD);
+      for (x=0;x<title_size;x++)
+	printf(UC_BAR_H);
+      printf(UC_T_90);
+      for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+	{
+	  for (x=0;x<len+n_spaces;x++)
+	    printf(UC_BAR_H);
+	    //printf(UC_BAR_H);
+	}
+      printf(UC_C_RD);
+      printf("\r\n");
+
+
+      
+	  // for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+	  //{
+	  //	  printf("%03");
+	  //	}
+
+      if (0)
+	{
+	 
+	  printf(UC_BAR_H);
+	  if ( (j[0]+1) != (*M).dim[0] )
+	    printf(UC_T_90);
+	  else
+	    printf(UC_T_180);
+
+      printf("\r\n");
+      	  
+      /* Print row titles */
+      for (j[1]=0;j[1]<(*M).dim[1];j[1]++)
+	{
+	  printf(UC_BAR_V);
+	  for (x=0;x<len-3;x++)
+		printf(" ",x);
+	      printf("%03d",j[1]);
+	      printf(UC_BAR_V);
+
+	      /* Print values */
+	      for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+		{
+		  printf("%08.2f",(*M).a2[j[1]][j[0]]);
+		  if ( (j[0]+1)!=(*M).dim[0] )
+		    printf(" ");
+		}
+	    
+	      printf(UC_BAR_V);
+	      printf("\r\n");
+	    }
+	}
+
+      //     strcat(s,"[%02i,%02i]=");
+      //strcat(s,format);
+      //strcat(s," ");
+      //for (j[1]=0;j[1]<(*M).dim[1];j[1]++)
+      //	{
+      //	  for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+      //	    lb_ft_printf(ty_C,s,j[1],j[0],(*M).a2[j[1]][j[0]]);
+      //	  printf("\r\n");
+      //	} 
+      break;
+    case 3:
+      //strcat(s,"[%02i,%02i,%02i]=");
+      //strcat(s,format);
+      //strcat(s," ");
+     	 
+      //for (j[2]=0;j[2]<(*M).dim[2];j[2]++)
+      //	{
+      //	  for (j[1]=0;j[1]<(*M).dim[1];j[1]++)
+      //	    {
+      //	      for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+      //		lb_ft_printf(ty_C,s,j[2],j[1],j[0],(*M).a3[j[2]][j[1]][j[0]]);
+      //	      printf("\r\n");
+      //	    }
+      //	  for (r=0;r<80;r++)
+      //	    printf("-");
+      //	  printf("\r\n");
+      //	}
+      break;
+    case 4:
+      //strcat(s,"[%02i,%02i,%02i,%02i]=");
+      //strcat(s,format);
+      //strcat(s," ");
+     	 
+      //for (j[3]=0;j[3]<(*M).dim[3];j[3]++)
+      //	{
+      //	  for (j[2]=0;j[2]<(*M).dim[2];j[2]++)
+      //	    {
+      //	      for (j[1]=0;j[1]<(*M).dim[1];j[1]++)
+      //		{
+      //		  for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+      //		    lb_ft_printf(ty_C,s,j[3],j[2],j[1],j[0],(*M).a4[j[3]][j[2]][j[1]][j[0]]);
+      //		  printf("\r\n");
+      //		}
+      //	      if ( (j[2]+1) != (*M).dim[2] )
+      //		{
+      //	  for (r=0;r<80;r++)
+      //	    printf("-");
+      //	  printf("\r\n");
+      //		}
+      //	    }
+      //  printf("\r\n\r\n");
+       
+      //}
+      break;
+    case 5:
+      //strcat(s,"[%02i,%02i,%02i,%02i,%02i]=");
+      //strcat(s,format);
+      //strcat(s," ");
+      
+      //      for (r=0;r<80;r++)
+      //	printf("\u2588");
+      //printf("\r\n");     	 
+      //for (j[4]=0;j[4]<(*M).dim[4];j[4]++)
+      //{
+
+      // for (j[3]=0;j[3]<(*M).dim[3];j[3]++)
+      //  {
+      //     for (j[2]=0;j[2]<(*M).dim[2];j[2]++)
+      //      {
+      //	 for (j[1]=0;j[1]<(*M).dim[1];j[1]++)
+      //	   {
+      //	     for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
+      //	       lb_ft_printf(ty_C,s,j[4],j[3],j[2],j[1],j[0],(*M).a5[j[4]][j[3]][j[2]][j[1]][j[0]]);
+      //	     printf("\r\n");
+      //	   }
+      //	 if ((j[2]+1) != (*M).dim[2])
+      //
+      //	   {
+      //	     for (r=0;r<80;r++)
+      //	       printf("-");
+      //	     printf("\r\n");
+      //	   }
+      //       }
+      //     if ((j[3]+1) != (*M).dim[3])
+      //       printf("\r\n\r\n");
+      //     else
+      {
+	//	 for (r=0;r<80;r++)
+	//printf("\u2588");
+	//printf("\r\n");
+	//}
+      
+	//	   }
+	// for (r=0;r<80;r++)
+	 
+	//printf("\r\n");
+		  
+	//       }
+	// break;
+      }
+    }
+}
+

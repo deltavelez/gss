@@ -1,0 +1,399 @@
+
+  S_INT_16_T a, n, n_chars, i, BUFFER_SIZE;
+  a=0;
+  n=0;
+  BUFFER_SIZE=10;
+  char V[11];
+
+  c='\0';
+  while (c!=ASCII_ESC)
+    {
+      c=mygetch();
+
+      if ((a+n) < BUFFER_SIZE)
+	{
+	  V[a+n]=c;
+	  n++;
+	}
+      else
+	{
+	  V[a+n-BUFFER_SIZE]=c;
+	  if (n < BUFFER_SIZE)
+	    n++;
+	  else
+	    if (a < BUFFER_SIZE - 1)
+	      a++;
+	    else
+	      a=0;
+	}
+      printf("\n");
+      for (i=0;i<BUFFER_SIZE;i++)
+	printf("%c",V[i]);
+      printf("\n");
+      for (i=0;i<n;i++)
+	{
+	  if ((a+i)< BUFFER_SIZE)
+	    printf("%c",V[a+i]);
+	  else
+	    printf("%c",V[a+i-BUFFER_SIZE]);
+	}
+    }
+
+Another easier implementation:
+
+ if (1) while (c!=ASCII_ESC)
+    {
+      c=mygetch();
+      B[b]=c;
+      b++;
+      if (b>=MAX_N)
+	{
+	  b=0;
+	  flag_overflow=TRUE;
+	}
+      printf("\r\n");
+      // for (i=0;i<MAX_N;i++)
+      //printf("[%c]",B[i]);
+      
+      if (!flag_overflow)
+      	for (i=0;i<b;i++)
+        printf("[%c]",B[i]);
+      else
+      for (i=0;i<MAX_N;i++)
+      	  printf("[%c]",B[(i+b)%MAX_N]);
+      
+    }
+
+Easier implementation 2d
+
+while (c!=ASCII_ESC)
+    {
+      c=mygetch();
+      V[b_row][col]=c;
+      col++;
+      if (col>=MAX_COLS)
+	{
+	  col=0;
+	  b_row++;
+	  if (b_row>=MAX_ROWS)
+	    {
+	      b_row=0;
+	      flag_overflow=TRUE;
+	    }
+	  printf("\r\n");
+      	  for (j=0;j<MAX_COLS;j++)
+	    V[b_row][j]='\0';
+	}
+
+      
+      for (j=0;j<MAX_COLS;j++)
+	    printf("-");
+      printf("\n");
+      if (0) for (i=0;i<MAX_ROWS;i++)
+	{
+	  for (j=0;j<MAX_COLS;j++)
+	    printf("[%c]",V[i][j]);
+	  printf("\n");
+	}
+
+      if (!flag_overflow)
+      	for (i=0;i<=b_row;i++)
+	  {
+	    for (j=0;j<MAX_COLS;j++)
+	      printf("[%c]",V[i][j]);
+	    printf("\n");
+	  }
+      else
+	{
+	  for (i=0;i<MAX_ROWS;i++)
+	    {
+	      for (j=0;j<MAX_COLS;j++)
+		printf("[%c]",V[(i+b_row+1)%MAX_ROWS][j]);
+	      printf("\n");
+	    }
+	} 
+    }
+
+
+
+    /* 2D Circular Buffer implementation with window */
+
+
+    if (1) while (c!=ASCII_ESC)
+    {
+      c=mygetch();
+      V[b_row][col]=c;
+      col++;
+      if (col>=MAX_COLS)
+	{
+	  col=0;
+	  b_row++;
+	  if (b_row>=MAX_ROWS)
+	    {
+	      b_row=0;
+	      flag_overflow=TRUE;
+	    }
+	  printf("\r\n");
+      	  for (j=0;j<MAX_COLS;j++)
+	    V[b_row][j]='\0';
+	}
+
+      
+      for (j=0;j<MAX_COLS;j++)
+	    printf("-");
+      printf("\n");
+      S_INT_16_T start_row;
+      if (1) for (i=0;i<MAX_ROWS;i++)
+	       {
+		 for (j=0;j<MAX_COLS;j++)
+		   printf("[%c]",V[i][j]);
+		 printf("\n");
+	       }
+
+      for (j=0;j<MAX_COLS;j++)
+	    printf("-");
+	 printf("\n");
+	
+      if (!flag_overflow)
+	{
+	  start_row=b_row-MAX_ROWS_V+1;
+	  if (start_row<0)
+	    start_row=0;
+	  printf("start_row =%d\r\n",start_row);
+	  for (i=start_row;i<=b_row;i++)
+	    {
+	      for (j=0;j<MAX_COLS;j++)
+		printf("[%c]",V[i][j]);
+	      printf("\n");
+	    }
+	}
+      else
+	{
+	  for (i=MAX_ROWS-MAX_ROWS_V;i<MAX_ROWS;i++)
+	    {
+	      for (j=0;j<MAX_COLS;j++)
+		printf("[%c]",V[(i+b_row+1)%MAX_ROWS][j]);
+	      printf("\n");
+	    }
+	} 
+    }
+
+/* Improved circular buffer */
+
+
+  
+  n_row=0;
+  w_row=0;
+  V[0][0]='_';
+  flag_overflow=FALSE;
+  if (1)
+    while (c!=ASCII_ESC)
+      {
+	while (!kbhit()) ;
+	c=pc_getch();
+	switch (c)
+	  {
+	  case PCKEY_BS:
+	    V[w_row][col]='\0';
+	    col--;
+	    if (col<0)
+	      {
+		if (n_row>0)
+		  {
+		    col=MAX_COLS-1;
+		    n_row--;
+		    w_row--;
+		    if (w_row<0)
+		      w_row=MAX_ROWS-1;
+		  }
+		else
+		  col=0;
+	      }
+	    V[w_row][col]='_';
+	    break;
+	  case PCKEY_ENTER:
+	    col=0;
+	    w_row++;
+	    if (w_row>=MAX_ROWS)
+	      w_row=0;
+	
+	    V[w_row][col]='_';
+	    for (j=1;j<MAX_COLS;j++)
+		  V[w_row][j]='\0';
+	    n_row++;
+	    if (n_row>=MAX_ROWS)
+	      n_row=MAX_ROWS-1;
+	    break;
+	  default:
+	    V[w_row][col]=c;
+	    col++;
+	    V[w_row][col]='_';
+	    if (col>=MAX_COLS)
+	      {
+		col=0;
+		w_row++;
+		if (w_row>=MAX_ROWS)
+		    w_row=0;
+		printf("\r\n");
+		V[w_row][0]='_';
+		for (j=1;j<MAX_COLS;j++)
+		  V[w_row][j]='\0';
+		n_row++;
+		if (n_row>=MAX_ROWS)
+		  n_row=MAX_ROWS-1;
+	      }
+	    printf("\nb=%d n_row=%d\r\n",w_row,n_row);
+      	  }
+	
+	for (j=0;j<MAX_COLS;j++)
+	  printf("-");
+	printf("\n");
+	S_INT_16_T start_row;
+	if (1) for (i=0;i<MAX_ROWS;i++)
+		 {
+		   for (j=0;j<MAX_COLS;j++)
+		     printf("[%c]",V[i][j]);
+		   printf("\n");
+		 }
+
+	for (j=0;j<MAX_COLS;j++)
+	  printf("-");
+	printf("\n");
+	
+	end_row=MAX_ROWS_V-1;
+	if (n_row<end_row)
+	  end_row=n_row;
+	for (i=0;i<=end_row;i++)
+	  {
+	    for (j=0;j<MAX_COLS;j++)
+	      printf("[%c]",V[(i+w_row+MAX_ROWS-end_row)%MAX_ROWS][j]);
+	    printf("\n");
+	  } 
+      }
+
+
+
+
+    exit(1);
+
+Improved 2D circular buffer with ENTER, BACKSPACE, CURSOR MOVEMENT, and window
+
+	switch (c)
+	  {
+	  case PCKEY_UP:
+	    if (n_row>n_back)
+	      {
+		n_back++;
+		if (n_back>MAX_ROWS-1)
+		  n_back=MAX_ROWS-1;
+	      }
+	    if (n_back>MAX_ROWS_V-1)
+	      n_back_adj=n_back-MAX_ROWS_V+1;
+	    break;
+	  case PCKEY_DOWN:
+	    n_back--;
+	    if (n_back<0)
+	      n_back=0;
+
+	    printf("\n** n_row-n_back =%d\r\n",n_row-n_back);
+	    if (n_row-n_back>MAX_ROWS_V-1)
+	      n_back_adj=n_back;
+	    break;
+	  case PCKEY_LEFT:
+	    s_col--;
+	    if (s_col<0)
+	      {
+		if (n_row>n_back)
+		  {
+		    s_col=MAX_COLS-1;
+		    n_back++;
+		    if (n_back>MAX_ROWS-1)
+		      n_back=MAX_ROWS-1;
+		    if (n_back>MAX_ROWS_V-1)
+		      n_back_adj=n_back-MAX_ROWS_V+1;
+		  }
+		else
+		  s_col=0;
+	      }
+	    break;
+	  case PCKEY_RIGHT:
+	    if (n_back==0)
+	      {
+		if (s_col<w_col)
+		  s_col++;
+	      }
+	    else
+	      {
+		s_col++;
+		if (s_col>=MAX_COLS)
+		  {
+		    s_col=0;
+		    n_back--;
+		    if (n_back<0)
+		      n_back=0;
+		    if (n_row-n_back>MAX_ROWS_V-1)
+		      n_back_adj=n_back;
+		  }
+	      }
+	    break;
+	  case PCKEY_INSERT:
+	    flag_insert=!flag_insert;
+	    printf("Insert =%d\r\n",flag_insert);;
+	    break;
+	  case PCKEY_BS:
+	    V[w_row][w_col]='\0';
+	    w_col--;
+	    if (w_col<0)
+	      {
+		if (n_row>0)
+		  {
+		    w_col=MAX_COLS-1;
+		    n_row--;
+		    w_row--;
+		    if (w_row<0)
+		      w_row=MAX_ROWS-1;
+		  }
+		else
+		  w_col=0;
+	      }
+	    n_back=0;
+	    n_back_adj=n_back;
+	    s_col=w_col;
+	    break;
+	  case PCKEY_ENTER:
+	    w_col=0;
+	    w_row++;
+	    if (w_row>=MAX_ROWS)
+	      w_row=0;
+	
+	    for (j=0;j<MAX_COLS;j++)
+	      V[w_row][j]='\0';
+	    n_row++;
+	    if (n_row>=MAX_ROWS)
+	      n_row=MAX_ROWS-1;
+	    n_back=0;
+	    s_col=w_col;
+	    break;
+	  default:
+	    V[w_row][w_col]=c;
+	    w_col++;
+	    if (w_col>=MAX_COLS)
+	      {
+		w_col=0;
+		w_row++;
+		if (w_row>=MAX_ROWS)
+		  w_row=0;
+		printf("\r\n");
+		for (j=0;j<MAX_COLS;j++)
+		  V[w_row][j]='\0';
+		n_row++;
+		if (n_row>=MAX_ROWS)
+		  n_row=MAX_ROWS-1;
+	      }
+	    n_back=0;
+	    n_back_adj=n_back;
+	    s_col=w_col;
+	    break;
+      	  }
+
+

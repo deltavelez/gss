@@ -1,0 +1,433 @@
+#include "stdio.h"
+#include "math.h"
+#include <graphics.h>
+#define N_SAMPLES 8
+#define N_POINTS 16384
+
+typedef struct 
+{
+  double r, i;
+} complex_t;
+
+typedef struct 
+  {
+    int xp_min;
+    int yp_min;
+    int xp_max;
+    int yp_max;
+    double xr_min;
+    double xr_max;
+    double yr_min;
+    double yr_max;
+  } st_viewport;
+
+double marsaglia_polar(double variance)
+{
+  double x, y, s;
+  do {
+    x= 2.0*rand()/(double)RAND_MAX -1.0;
+    y= 2.0*rand()/(double)RAND_MAX -1.0;
+    s = x*x + y*y;
+  } while ((s>=1) || (s==0));
+  return variance*x*sqrt(-2.0*log(s)/s); /* another gaussian variable is y*sqrt(-2.0*ln(s)/s) */
+}
+
+void plot (st_viewport w, double x, double y)
+{
+  putpixel( w.xp_min + (x-w.xr_min)*(w.xp_max-w.xp_min)/(w.xr_max-w.xr_min),
+            w.yp_min + (-y-w.yr_min)*(w.yp_max-w.yp_min)/(w.yr_max-w.yr_min), WHITE);
+}
+
+complex_t complex_add(complex_t a, complex_t b)
+{
+	complex_t temp;
+	temp.r = a.r + b.r;
+	temp.i = a.i + b.i;
+	return temp;
+}
+
+complex_t complex_prod(complex_t a, complex_t b)
+{
+	complex_t temp;
+	temp.r = a.r*b.r - a.i*b.i;
+	temp.i = a.r*b.i + a.i*b.r;
+	return temp;
+}
+
+complex_t complex_exp(complex_t a)
+{
+	complex_t temp;
+	temp.r = exp(a.r)*cos(a.i);
+	temp.i = exp(a.r)*sin(a.i);
+	return temp;
+}
+
+complex_t complex_neg(complex_t a)
+{
+	complex_t temp;
+	temp.r = -a.r;
+	temp.i = -a.i;
+	return temp;
+}
+
+ 
+double sqr(double x)
+{
+  return x*x;
+}
+
+void escale_complex_vector(complex_t vector[], double factor, int size)
+{
+  int k;
+  for(k=0;k<size;k++)
+    {
+      vector[k].r*=factor;
+      vector[k].i*=factor;
+    }
+} 
+
+void DTF(complex_t data_time[], complex_t data_freq[], int size) 
+{
+  int k, n;
+  complex_t a;
+
+  for(k=0;k<size;k++)
+    {
+      data_freq[k].r=0.0;
+      data_freq[k].i=0.0;
+    }
+  for (k=0;k<size;k++)
+    for (n=0;n<size;n++)
+    {
+      a.r=0;
+      a.i=-2*M_PI*k*n/size;
+      data_freq[k]=complex_add(data_freq[k],complex_prod(data_time[n],complex_exp(a)));
+    }
+}
+
+void IDTF( complex_t data_freq[], complex_t data_time[], int size) 
+{
+  int k, n;
+  complex_t a;
+
+  for(n=0;n<size;n++)
+    {
+      data_time[n].r=0.0;
+      data_time[n].i=0.0;
+    }
+  for (n=0;n<size;n++)
+    {    
+      for (k=0;k<size;k++)
+	{
+	  a.r=0;
+	  a.i=2*M_PI*k*n/size;
+	  data_time[n]=complex_add(data_time[n],complex_prod(data_freq[k],complex_exp(a)));
+	}
+      data_time[n].r=data_time[n].r/size;
+      data_time[n].i=data_time[n].i/size;
+    }
+}
+
+double RMS_noise_time(complex_t signal[], int size)
+{
+  double temp;
+  int i;
+
+  temp=0.0;
+  for(i=0;i<size;i++)
+    temp+=signal[i].r*signal[i].r + signal[i].i + signal[i].i;
+  return sqrt(temp/size);
+} 
+
+double RMS_noise_frequency(complex_t frequencies[], int size)
+{
+  double temp;
+  int i;
+  
+  for(i=0;i<size;i++)
+    temp+=frequencies[i].r*frequencies[i].r + frequencies[i].i*frequencies[i].i;
+  return sqrt(temp)/size;
+}
+
+int invert_bits(int x,int n_bits)
+{
+  unsigned char bit;
+  int inverted=0;
+  for (bit=0;bit<=n_bits;bit++)
+    inverted|= ((x>>bit) & 0x01)<<((n_bits-1-bit));
+  inverted = inverted & ((0x01<<n_bits) -1);
+ return inverted;
+}
+
+
+unsigned char FFT_even_or_odd(unsigned int x, unsigned char stage)
+{
+  return (x>>stage) & 0x01;
+}
+
+void FFT(complex_t data_time[], complex_t data_freq[], int size) 
+{
+  int k, n;
+  complex_t temp1, temp2;
+  complex_t W[N_SAMPLES];
+  double arg;
+  unsigned char stage;
+  unsigned char l;
+  unsigned char addr_1;
+  unsigned char addr_2;
+  unsigned char stage_max=2;
+
+  /* We assert the size */
+  stage_max=2;
+ 
+  /* We pre-calculate all the  W_k_n */
+  for(k=0;k<size;k++)
+    {
+      arg=-2*M_PI*k/N_SAMPLES;
+      W[k].r = cos(arg);
+      W[k].i = sin(arg);
+    }
+  
+  /* This implementation of the FFT stores the temporary results in the same output buffer, and works recursively on it */
+  for(k=0;k<size;k++)
+    data_freq[k]=data_time[invert_bits(k,3)];
+
+  for (k=0;k<N_SAMPLES;k++)
+    printf("index=%i   real=%f  im=%f\r\n",invert_bits(k,3),data_freq[k].r,data_freq[k].i);
+
+  printf("**************************************\r\n");
+
+
+  for(stage=0;stage<=stage_max;stage++)
+    {
+      for (k=0;k<(0x01<<(stage_max-stage));k++)
+        for (l=0;l<(0x01<<stage);l++)
+	  {
+	    addr_1=k*(0x01<<(stage+1))+l;
+	    addr_2=k*(0x01<<(stage+1))+l+(0x01<<stage);
+	    temp1=data_freq[addr_1];
+	    temp2=data_freq[addr_2];
+
+	    data_freq[addr_1]=complex_add(temp1,complex_prod(W[l*(0x01<<(stage_max-stage))],temp2));
+	    data_freq[addr_2]=complex_add(temp1,complex_prod(W[(l+(0x01<<stage))*(0x01<<(stage_max-stage))],temp2));
+	  }
+    }
+ }
+
+
+void main()
+{
+  complex_t data_buffer[8] ={
+    {0.11,0.12},
+    {0.21,0.22},
+    {0.31,0.32},
+    {0.41,0.42},
+    {0.51,0.52},
+    {0.61,0.62},
+    {0.71,0.72},
+    {0.81,0.82}};
+
+    
+  /* The DTF is as follows:
+       3.6800,  3.7600,
+      -1.3657,  0.5657,
+      -0.8000,  0.0000,
+      -0.5657, -0.2343,
+      -0.4000, -0.4000,
+      -0.2343, -0.5657,
+       0.0000, -0.8000,
+       0.5657, -1.3657  */
+     
+  system("clear");
+  printf("FFT \r\n");
+
+  int k,n;
+
+  complex_t X[N_SAMPLES];
+  complex_t a,b;
+
+  for (k=0;k<N_SAMPLES;k++)
+    {
+      X[k].r=0.0;
+      X[k].i=0.0;
+    }
+  //  for (k=0;k<16;k++)
+  //  printf("%i  --> %i,  even_or_odd = %i\r\n",k,invert_bits(k),FFT_even_or_odd(k,0));
+
+ FFT(data_buffer,X,N_SAMPLES);
+ printf("**************************************\r\n");
+ printf("FFT:\r\n");
+ 
+  for (k=0;k<N_SAMPLES;k++)
+      	printf("real=%f  im=%f\r\n",X[k].r,X[k].i);
+
+  printf("**************************************\r\n");
+  printf("DFT:\r\n");
+  DTF(data_buffer,X,N_SAMPLES);
+  for (k=0;k<N_SAMPLES;k++)
+      	printf("real=%f  im=%f\r\n",X[k].r,X[k].i);
+
+
+#ifdef TEST 
+
+  /******************************************************************************************/ 
+  /* Forward Discrete Fourier Transform */
+    for(k=0;k<N_SAMPLES;k++)  
+    {
+      X[k].r=0;  
+      X[k].i=0;
+    }  
+  DTF(data_buffer,X,N_SAMPLES);
+  printf("\r\nDirect Fourier Transform\r\n");
+  for (k=0;k<N_SAMPLES;k++)
+      	printf("real=%f  im=%f\r\n",X[k].r,X[k].i);
+  /******************************************************************************************/ 
+  /* Inverse Discrete Fourier Transform */
+  for (k=0;k<N_SAMPLES;k++)
+    {
+      data_buffer[k].r=0.0;
+      data_buffer[k].i=0.0;
+    }
+  IDTF(X,data_buffer,N_SAMPLES);
+
+  printf("\r\nInverse Fourier Transform\r\n");
+
+  for (k=0;k<N_SAMPLES;k++)
+      	printf("real=%f  im=%f\r\n",data_buffer[k].r,data_buffer[k].i);
+  /******************************************************************************************/ 
+ 
+ /* Drawing */
+ 
+  int gd, gm;
+  double t_min=0, t_max=1/5464.0+1/4291.0, t; /* time */
+  double w1=2*M_PI*5464.0, w2=2*M_PI*4291.0;
+
+  printf("t = %e\r\n",t_min-t_max);
+  printf("dt = %e\r\n",(t_min-t_max)/N_POINTS);
+  printf("f0 = %e\r\n",1/(t_min-t_max));
+  printf("df = %e\r\n",N_POINTS/(t_min-t_max));
+
+  int i;
+  complex_t signal[N_POINTS];
+  complex_t frequencies[N_POINTS];
+  
+  srand(time(NULL));
+  for(i=0;i<N_POINTS;i++)
+    {
+      t=i*(t_max-t_min)/N_POINTS;
+      signal[i].r = marsaglia_polar(0.1);
+    }
+
+  /* Noise using the time's Domain */
+  double RMS_noise;
+  printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time(signal,N_POINTS));
+
+  /* Noise using the frequency's Domain */
+  DTF(signal,frequencies,N_POINTS);
+  
+  printf("RMS Noise (frequency domain method) = %f\r\n", RMS_noise_frequency(frequencies,N_POINTS));
+
+  
+  /* A perfect Bandpass filter: we're leaving the a fourth of the lower frequencies  */
+  /* Why 12 ?
+     The circuit being simulated is a 1-st order active Low Pass with R=27.4K and C=220p, hence f=26.403KHz
+     The DFT' base period is tmax = 1/5464 + 1/4291 = 4.1606*10^-4 seg   ==> d_freq=2403.5 Hz
+
+     To fiter using a DTF we need to "keep"the base frequencies:
+     f0  = DC
+     f1  = 2403.5
+     f2  = 4807
+     f3  = 7210
+     f4  = 9614
+     f5  = 12017.5
+     f6  = 24421
+     f7  = 16824.5
+     f8  = 19228
+     f9  = 21631.5
+     f10 = 24035
+     f11 = 26438.5
+     f12 = 0, etc. */
+    for(i=12;i<N_POINTS;i++)
+   {
+      frequencies[i].r=0;
+      frequencies[i].i=0;
+   } 
+
+  /* Digital filter */
+  IDTF(frequencies,signal,N_POINTS);
+  RMS_noise=RMS_noise_time(signal,N_POINTS);
+  printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
+  printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
+  
+  escale_complex_vector(signal,0.1/RMS_noise,N_POINTS);
+  printf("RMS Noise (time domain method) after filtering and normalizing= %f\r\n",RMS_noise_time(signal,N_POINTS));
+
+ for(i=0;i<N_POINTS;i++)
+    {
+      t=i*(t_max-t_min)/N_POINTS;
+      signal[i].r += sin(w1*t);
+    }
+
+ 
+  /**************** GRAPHICS ******************************/
+  gd = X11;
+  gm = X11_1024x768;
+  initgraph (&gd, &gm, "");
+
+  st_viewport win;
+
+  win.xp_min=25;
+  win.xp_max=getmaxx()-25;
+  win.yp_min=25;
+  win.yp_max=getmaxy()-25;
+
+  win.xr_min=0;
+  win.xr_max=t_max;
+  win.yr_min=-1.25;
+  win.yr_max=1.25;
+
+  setbkcolor(BLACK);
+  setcolor(WHITE);
+  cleardevice ();
+
+  /* We draw a box and the axis */  
+ 
+  //setlinestyle (SOLID_LINE, 0, THICK_WIDTH);
+  rectangle (win.xp_min, win.yp_min, win.xp_max, win.yp_max);
+  outtextxy (25, 10, "CHARACTERIZATION OF A ZERO-CROSSING MODULATION SCHEME");
+
+  setcolor(YELLOW);
+  line(win.xp_min,0.5*(win.yp_max+win.yp_min), win.xp_max,0.5*(win.yp_max+win.yp_min));
+
+
+  for(i=0;i<N_POINTS;i++)
+    plot(win,i*(t_max-t_min)/N_POINTS,signal[i].r);
+ 
+  while (!kbhit ()) ;
+
+  closegraph ();
+#endif
+ 
+}
+
+/* Might be useful later
+
+  while (!kbhit ()) {
+    
+    if (p = mouseclick ())
+      if ( (mousex () < 200) && (mousey () < 20))
+	break;
+    else {
+      setfillstyle (SOLID_FILL, 
+		    COLOR (random(255), random(255), random(255)));
+      setcolor (COLOR (random(255), random(255), random(255)));
+      if (0 == random (2))
+	fillellipse (mousex (), mousey (), p*10, p*10);
+      else
+	bar (mousex () - p*10, mousey () - p*10,
+	     mousex () + p*10, mousey () + p*10);
+    }
+    
+  } // while
+*/
+

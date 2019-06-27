@@ -1,0 +1,2 @@
+pwm: pwm.c
+	gcc -o pwm pwm.c lb_real.c -lX11 -lm

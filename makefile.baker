@@ -1,0 +1,2 @@
+test: test.c
+	gcc -o prueba test.c dv_complex.c dv_fourier.c dv_algebra.c dv_real.c dv_statistics.c dv_graphics.c dv_integer.c /usr/lib/libXbgi.a -lX11 -lm

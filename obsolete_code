@@ -1,0 +1,671 @@
+void lb_fb_printf(const char *format, ...)
+{
+  va_list args;
+  int size;
+  char *buffer;
+  va_start(args,format);
+
+  /* We want this function to support an arbitrary size. */
+  size=vsnprintf(NULL, 0, format, args);
+  printf("Size=[%d]\n",size);
+  buffer=malloc(size+1);
+  if (buffer==NULL)
+    lb_fb_exit_msg("Error: lb_fb_printf() --> malloc failed");
+    
+  /* This seems to be a bug */
+  va_end(args);
+  va_start(args,format);
+  vsprintf(buffer, format, args);
+  printf("\r\n%s\n\n",buffer);
+  va_end(args);
+  free(buffer);
+}
+
+
+
+FILE *input;
+FILE *output;
+int tty;
+struct termios oldkey, newkey;       /* Place tor old and new port settings for keyboard teletype */
+
+void CONSOLE_Initialize()
+{
+  input = fopen("/dev/tty", "r");      /* open the terminal keyboard   */
+  output = fopen("/dev/tty", "w");     /* open the terminal screen     */   
+  
+  if (!input || !output)
+    {
+      fprintf(stderr, "Unable to open /dev/tty\n");
+      exit(1);
+    }
+  
+  tty = open("/dev/tty", O_RDWR | O_NOCTTY | O_NONBLOCK); /* set the user console port up */
+ 
+  tcgetattr(tty,&oldkey); /* save current port settings so commands are interpreted right for this program */
+  
+  /* set new port settings for non-canonical input processing */
+  /* must be NOCTTY */
+  
+  newkey.c_cflag = B38400 | CRTSCTS | CS8 | CLOCAL | CREAD;
+  newkey.c_iflag = IGNPAR;
+  newkey.c_oflag = 0;
+  newkey.c_lflag = 0;       /* ICANON; */
+  newkey.c_cc[VMIN]=0;
+  newkey.c_cc[VTIME]=0;
+  tcflush(tty, TCIFLUSH);
+  tcsetattr(tty,TCSANOW,&newkey);
+}
+
+void CONSOLE_Close()
+{
+  /* restore old port settings */
+  tcsetattr(tty,TCSANOW,&oldkey);
+  close(tty);
+  fclose(input);
+  fclose(output);
+}
+
+int CONSOLE_RxByte(char *c)
+{
+  int n; 
+  n = fread(c,1,1,input);
+  return n;
+}
+
+void CONSOLE_TxByte(char c)
+{
+  fputc(c, output);
+  fflush(output);
+}
+
+
+void CONSOLE_TxStr(const char * mystring)
+{
+  fprintf(output,"%s",mystring);
+  fflush(output);   
+}
+
+void  Gotox(int x)
+{
+  /* working gotoxy(5,5) fprintf(output,"\E[5;5H"); */
+  fprintf(output,"\r\E[%dC",x);
+  fflush(output);
+} 
+
+
+
+
+#ifdef NADA
+
+void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, PIXEL_T default_color)
+{
+  MATRIX_R_T M1_r, M1_g, M1_b, M2_r, M2_g, M2_b;
+  S_INT_16_T i, j, x_lowest, x_highest, y_lowest, y_highest;
+  FLOAT_T  i_rot, j_rot;
+  FLOAT_T x01, y01, x10, y10, x11, y11;
+    
+  /* New limits detection */
+
+  /* New limits detection */
+  lb_re_rotate((*pic_src).w, 0.0, -angle, &x01, &y01);
+  lb_re_rotate(0.0, (*pic_src).h, -angle, &x10, &y10);
+  lb_re_rotate((*pic_src).w, (*pic_src).h, -angle, &x11, &y11);
+  x_lowest=0.0;
+  x_highest=0.0;
+  y_lowest=0.0;
+  y_highest=0.0;
+
+  if(x01<x_lowest)
+    x_lowest=x01;
+  if(x10<x_lowest)
+    x_lowest=x10;
+  if(x11<x_lowest)
+    x_lowest=x11;
+
+  if(x01>x_highest)
+    x_highest=x01;
+  if(x10>x_highest)
+    x_highest=x10;
+  if(x11>x_highest)
+    x_highest=x11;
+
+  if(y01<y_lowest)
+    y_lowest=y01;
+  if(y10<y_lowest)
+    y_lowest=y10;
+  if(y11<y_lowest)
+    y_lowest=y11;
+
+  if(y01>y_highest)
+    y_highest=y01;
+  if(y10>y_highest)
+    y_highest=y10;
+  if(y11>y_highest)
+    y_highest=y11;
+
+  /* If destination picture had already been created, destroy it */ 
+  if(((*pic_dst).w==0) || ((*pic_dst).h==0))
+    lb_gr_release_picture(pic_dst);
+       
+  (*pic_dst).w=ceil(x_highest)-floor(x_lowest);
+  (*pic_dst).h=ceil(y_highest)-floor(y_lowest);
+  lb_gr_create_picture(pic_dst,default_color);
+
+  FLOAT_T sin_val, cos_val, tan_val;
+  sin_val=sin(-angle);
+  cos_val=cos(-angle);
+  tan_val=tan(-angle);
+  
+
+  M1_r.cols=(*pic_src).w+1;
+  M1_r.rows=ceil(y_highest)-floor(y_lowest)+1;
+
+  M1_g.cols=M1_r.cols;
+  M1_g.rows=M1_r.rows;
+
+  M1_b.cols=M1_r.cols;
+  M1_b.rows=M1_r.rows;
+
+  lb_al_create_matrix_r(&M1_r);
+  lb_al_create_matrix_r(&M1_g);
+  lb_al_create_matrix_r(&M1_b);
+
+  printf("hol;a\r\n");
+
+  /* First operation: x remains constant, we distort y */
+  for(i=0;i<(*pic_src).h;i++)
+    for(j=0;j<(*pic_src).w;j++)
+      {
+	j_rot = (FLOAT_T)j;
+	i_rot = -y_lowest + ((FLOAT_T)j*sin_val + (FLOAT_T)i*cos_val);
+	//printf("angle=%f\r\n",angle);
+	//printf("angle=%f,i=%d, j=%d, M1.rows=%d  M1.cols=%d i_lowest=%d i_highest=%d i_rot f=%f, d=%d, j_rot=%f\r\n",
+	//     180*angle/M_PI, i,j,M1_g.rows,M1_g.cols,y_lowest, y_highest, i_rot,(S_INT_16_T)i_rot,j_rot);
+
+	M1_r.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot]+=(1.0-lb_re_frac(i_rot))*(*pic_src).pic[i][j].r;
+	M1_r.array[(S_INT_16_T)i_rot+1][(S_INT_16_T)j_rot]+=lb_re_frac(i_rot)*(*pic_src).pic[i][j].r;
+
+	M1_g.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot]+=(1.0-lb_re_frac(i_rot))*(*pic_src).pic[i][j].g;
+	M1_g.array[(S_INT_16_T)i_rot+1][(S_INT_16_T)j_rot]+=lb_re_frac(i_rot)*(*pic_src).pic[i][j].g;
+
+	M1_b.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot]+=(1.0-lb_re_frac(i_rot))*(*pic_src).pic[i][j].b;
+	M1_b.array[(S_INT_16_T)i_rot+1][(S_INT_16_T)j_rot]+=lb_re_frac(i_rot)*(*pic_src).pic[i][j].b;
+
+	//SDL_Delay(100);
+      }
+  printf("hola!\r\n");
+  
+  M2_r.cols=ceil(x_highest)-floor(x_lowest)+5;
+  M2_r.rows=ceil(y_highest)-floor(y_lowest)+5;
+
+  M2_g.cols=M2_r.cols;
+  M2_g.rows=M2_r.rows;
+
+  M2_b.cols=M2_r.cols;
+  M2_b.rows=M2_r.rows;
+
+  lb_al_create_matrix_r(&M2_r);
+  lb_al_create_matrix_r(&M2_g);
+  lb_al_create_matrix_r(&M2_b);
+
+  FLOAT_T offset;
+  
+  printf("angle=%f\r\n",angle*180.0/M_PI);
+  /* Second operation: y remains constant, we distort x */
+  for(i=0;i<M1_g.rows-1;i++)
+    for(j=0;j<M1_g.cols-1;j++)
+      {
+	//	j_rot =  x_lowest  + (FLOAT_T)j*cos_val - tan_val*((FLOAT_T)i-(FLOAT_T)j*sin_val);
+	j_rot =  x_lowest  + (FLOAT_T)j*cos_val - tan_val*((FLOAT_T)i+y_lowest-(FLOAT_T)j*sin_val);
+	i_rot =   (FLOAT_T)i;
+
+	if ( (S_INT_16_T)i_rot<0)
+	  {
+	    printf("Error: negative i_rot = %d / %d \r\n",(S_INT_16_T)i_rot, M2_g.rows);
+	    SDL_Delay(100);
+	  }
+	else
+	  if ( (S_INT_16_T)j_rot<0)
+	    {
+	      printf("Error: negative j_rot = %d / %d \r\n",(S_INT_16_T)j_rot, M2_g.cols);
+	      SDL_Delay(100);
+	    }
+	  else
+	    if ( (S_INT_16_T)i_rot+1>=M2_g.rows)
+	      {
+		printf("Error: out of boundaries i_rot = %d / %d\r\n",(S_INT_16_T)i_rot, M2_g.rows);
+		SDL_Delay(100);
+	      }
+	    else
+	      if ( (S_INT_16_T)j_rot+1>=M2_g.cols)
+		{
+		  printf("Error: out of boundaries j_rot = %d / %d\r\n",(S_INT_16_T)j_rot, M2_g.cols);
+		  SDL_Delay(100);
+		}
+	      else
+		{
+		  M2_r.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot+1]+=lb_re_frac(j_rot)*M1_r.array[i][j];
+		  M2_r.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot]+=(1.0-lb_re_frac(j_rot))*M1_r.array[i][j];
+		  
+		  M2_g.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot+1]+=lb_re_frac(j_rot)*M1_g.array[i][j];
+		  M2_g.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot]+=(1.0-lb_re_frac(j_rot))*M1_g.array[i][j];
+		  
+		  M2_b.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot+1]+=lb_re_frac(j_rot)*M1_b.array[i][j];
+		  M2_b.array[(S_INT_16_T)i_rot][(S_INT_16_T)j_rot]+=(1.0-lb_re_frac(j_rot))*M1_b.array[i][j];
+		}
+      } 
+
+  for(i=0;i<(*pic_dst).h;i++)
+    for(j=0;j<(*pic_dst).w;j++)
+      {
+	//printf("M1_g.rows = %d  M1_g.cols = %d\r\n",M1_g.rows,M1_g.cols);
+	//printf("(*pic_dst).h = %d  (*pic_dst).w = %d\r\n",(*pic_dst).h,(*pic_dst).w);
+ 	if ( (i<M2_g.rows) && (j<M2_g.cols) )
+	  {
+	    (*pic_dst).pic[i][j].r=5;
+	    (*pic_dst).pic[i][j].g=5;
+	    (*pic_dst).pic[i][j].b=5;
+	    if (M2_g.array[i][j]<=MAX_R) (*pic_dst).pic[i][j].r=M2_r.array[i][j];
+	    else
+	      (*pic_dst).pic[i][j].r=MAX_R;
+	    if (M2_g.array[i][j]<=MAX_G) (*pic_dst).pic[i][j].g=M2_g.array[i][j];
+	    else
+	      (*pic_dst).pic[i][j].g=MAX_G;
+	    if (M2_g.array[i][j]<=MAX_B) (*pic_dst).pic[i][j].b=M2_b.array[i][j];
+	    else
+	      (*pic_dst).pic[i][j].b=MAX_B;
+	  }
+      }
+
+  /*  for(i=0;i<(*pic_dst).h;i++)
+      for(j=0;j<(*pic_dst).w;j++)
+      {
+      //printf("M1_g.rows = %d  M1_g.cols = %d\r\n",M1_g.rows,M1_g.cols);
+      //printf("(*pic_dst).h = %d  (*pic_dst).w = %d\r\n",(*pic_dst).h,(*pic_dst).w);
+      printf("i=%d  j=%d\r\n",i, j);
+      if ( (i<M1_g.rows) && (j<M1_g.cols) )
+      {
+      if (M1_g.array[i][j]<=MAX_G) (*pic_dst).pic[i][j].g=M1_g.array[i][j];
+      (*pic_dst).pic[i][j].r=0;
+      (*pic_dst).pic[i][j].b=0;
+      }
+      }*/
+  lb_al_release_matrix_r(&M1_r);
+  lb_al_release_matrix_r(&M1_g);
+  lb_al_release_matrix_r(&M1_b);
+  lb_al_release_matrix_r(&M2_r);
+  lb_al_release_matrix_r(&M2_g);
+  lb_al_release_matrix_r(&M2_b);
+}
+#endif
+
+
+#ifdef NADA
+n_xy_den=phi_fg*fg.k+phi_bg*bg.k;
+if (n_xy_den!=0)
+  {
+    n_xy_num=phi_fg*fg.k;
+    temp_r = fg.r*15*n_xy_num/n_xy_den + bg.r*(15-15.0*n_xy_num/n_xy_den) ;
+    temp_g = fg.g*15*n_xy_num/n_xy_den + bg.g*(15-15.0*n_xy_num/n_xy_den) ;
+    temp_b = fg.b*15*n_xy_num/n_xy_den + bg.b*(15-15.0*n_xy_num/n_xy_den) ;
+    //temp_k = phi_fg*fg.k +   phi_bg*bg.k ;
+    //temp_r = (fg.r*fg.k + bg.r*(15-fg.k))/15 ;
+    //temp_g = (fg.g*fg.k + bg.g*(15-fg.k))/15 ;
+    //temp_b = (fg.b*fg.k + bg.b*(15-fg.k))/15 ;
+      
+    //printf("n_xy=%f P = %f , %f, %f\r\n",(FLOAT_T)n_xy_num/n_xy_den,(FLOAT_T)temp_r, (FLOAT_T)temp_g,(FLOAT_T)temp_b);
+    
+    (*P).pic[x][y].r=temp_r/15;
+    (*P).pic[x][y].g=temp_g/15;
+    (*P).pic[x][y].b=temp_b/15;
+    // (*P).pic[x][y].k=15;
+    (*P).pic[x][y].k=temp_k/225;
+  case FILTERMODE_WEIGHTED:
+    temp=(*P).pic[x][y].k+pixel.k;
+    if (temp!=0)
+      {
+	temp_r=(*P).pic[x][y].k*(*P).pic[x][y].r + pixel.k*pixel.r;
+	temp_g=(*P).pic[x][y].k*(*P).pic[x][y].g + pixel.k*pixel.g;
+	temp_b=(*P).pic[x][y].k*(*P).pic[x][y].b + pixel.k*pixel.b;
+	temp_k=(*P).pic[x][y].k*(*P).pic[x][y].k + pixel.k*pixel.k;
+	new_pixel.r = temp_r/temp;
+	new_pixel.g = temp_g/temp;
+	new_pixel.b = temp_b/temp;
+	new_pixel.k = temp_k/temp;
+      }
+    else
+      printf("Temp=0\r\n");
+#endif
+
+
+/* Attempted code to read back a color from an X11 window.  It works, but
+it is too slow and there is no known faster way to do it */
+
+unsigned long gfx_getpoint( int x, int y )
+{
+  //XColor c;
+  //XImage *image;
+  //  image = XGetImage (gfx_display, RootWindow (gfx_display, DefaultScreen (gfx_display)), x, y, 1, 1, AllPlanes, XYPixmap);
+  //c.pixel = XGetPixel (image, 0, 0);
+  //XFree (image);
+  //XQueryColor (gfx_display, DefaultColormap(gfx_display, DefaultScreen (gfx_display)), &c);
+
+  //printf("red = %d, green =%d, blue =%d\r\n",c.red,c.green,c.blue); 
+  //return (c.red/256)<<16 | (c.green/8)<<16 | (c.blue/256); 
+}
+
+
+
+
+/* Attempted code (80% complete) to fill out a (x0, y0, x1, y1 window) with
+  a grid in polar coordinates, both filling in the window or partially filling
+  it */
+
+if (options & AXIS_DRAW_Y_GRID_LOG)
+     {
+       if (delta_grid_y<=0)
+	 {
+	   printf("Error: lg_gr_draw_axis_2d() --> delta_grid_y <=0 [%f]\r\n",delta_grid_y);
+      	   exit(1);
+	 }
+       if (!lb_re_equal(lb_re_frac(delta_grid_y),0.0))
+	 {
+	   printf("Error: lg_gr_draw_axis_2d() --> delta_grid_y must be integer [%f]\r\n",delta_grid_y);
+      	   exit(1);
+	 }
+       S_INT_16_T delta;
+       FLOAT_T increment;
+       
+       delta=lb_re_round_i(delta_grid_y);
+       exp_inc=lb_re_normed_exponent(yr_min);
+       k=(S_INT_16_T)lb_re_normed_significand(yr_min)/(10.0/delta);
+       increment=pow(10.0,exp_inc);
+       k= delta;
+       exp_inc--;
+       while (yr<=yr_max)
+	 {
+	   yr=((FLOAT_T)k/delta)*pow(10.0,exp_inc);
+
+	   printf("yr=%f,  k=%d, delta=%d  k/delta =%f  exp_inc=%d\r\n",
+		  yr,       k,      delta,  (FLOAT_T)k/delta, exp_inc);
+	   if ((yr>=yr_min) && (yr<=yr_max))
+	     {
+	       lb_gr_project_2d_y_log(vp, yr, &yp0);
+	       lb_gr_draw_line(P, vp.xp_min, yp0, vp.xp_max, yp0, 2, lb_gr_value_to_color(k), copymode, linemode);
+	       lb_gr_render_picture(P, renderer, 0, 0, 1, 1, RENDERMODE_BOX);
+	       SDL_Delay(1000);
+	     }
+	   k++;
+	   if (k>delta)
+	     {
+	       k=1;
+	       exp_inc++;
+	     }
+       	 }
+     } /* End of AXIS_DRAW_Y_GRID_LOG */
+
+   //exit(1);
+
+
+
+// Saves current color 
+//SDL_GetRenderDrawColor(_my_renderer, &temp_r, &temp_g, &temp_b, &temp_alpha); //Get current color 
+//SDL_SetRenderDrawColor(_my_renderer,0,0,0,255);  //Set color black 
+//SDL_RenderDrawPoint(_my_renderer, xc+a1_x, yc-a1_y);
+//SDL_RenderDrawPoint(_my_renderer, xc+a2_x, yc-a2_y);
+//SDL_SetRenderDrawColor(_my_renderer, temp_r, temp_g, temp_b, temp_alpha); /* Restore current color */
+//SDL_RenderDrawLine(my_renderer, rand()%SCREEN_WIDTH, rand()%SCREEN_HEIGHT,rand()%SCREEN_WIDTH, rand()%SCREEN_HEIGHT);
+//SDL_RenderClear(my_renderer);
+//SDL_SetRenderDrawColor(my_renderer,0,0,255,255);
+//SDL_RenderDrawPoint(my_renderer, rand()%SCREESN_WIDTH, rand()%SCREEN_HEIGHT);
+//Draw_circle_simple(my_renderer, rand()%SCREEN_WIDTH, rand()%SCREEN_HEIGHT, rand()%200);
+//SDL_RenderPresent(my_renderer);
+
+#ifdef SURFACES
+/* This code uses Surfaces, which seem to be obsolete in the newer SDL versions */
+void lb_gr_draw_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+    Uint8 *target_pixel = (Uint8 *)surface->pixels + y * surface->pitch + x * 4;
+    *(Uint32 *)target_pixel = pixel;
+}
+/* Example: 
+  for(i=50;i<150;i++)
+    for(j=50;j<150;j++)
+      {
+	lb_gr_draw_pixel(my_renderer, i, j, 0x000000FF);
+	} */
+#endif
+
+
+/*
+int main() 
+{
+  cls();
+  textcolorRGB(5,5,5);
+  char variables[MAX_FN_SIZE+1]="x,y,z";
+  char function[MAX_FN_SIZE+1]="10+,100*(3.1416+x^(3-y)+1)";
+  FN_RECORD_T function_rec;
+ 
+  float values[10];
+  
+  values[0]=1000;
+  values[1]=2;
+  values[2]=3;
+  
+  //  showcursor(1);
+  // movecursor(5,5);
+  //shiftcursor(-4,-2);
+  textcolor(TEXT_COLOR_BLUE);
+  gotox(50);
+  printf("hola papi");
+  printf("\r\n");
+  printf("VARIABLES: %s\r\n",variables);
+  parse(function,&function_rec,variables,values);
+  printf("FUNCTION TO BE PARSED: %s\r\n",function);
+  eval(&function_rec,values);
+  return 0;
+  } */
+
+//SDL_SetRenderDrawColor(my_renderer,0,0,0,255);
+//SDL_RenderClear(my_renderer);
+ 
+
+
+void lb_gr_project_3d_analytical(VIEWPORT_3D_T w, MATRIX_R_T *Rot, VECTOR_R_T *Pa, U_INT_16_T *xp, U_INT_16_T *yp, U_INT_8_T *flag)
+{
+  MATRIX_R_T M;
+  M.rows=3;
+  M.cols=3;
+  lb_al_create_matrix_r(&M);
+
+  VECTOR_R_T X;
+  X.items=3;
+  lb_al_create_vector_r(&X);
+
+  VECTOR_R_T Pp;
+  Pp.items=3;
+  lb_al_create_vector_r(&Pp);
+
+  M.array[0][0]=(*Rot).array[0][1];
+  M.array[0][1]=(*Rot).array[0][2]; 
+  M.array[0][2]=(*Pa).array[0]-w.cam.x + w.cam_h*(*Rot).array[0][0] - w.cam_d*(*Rot).array[0][1];
+
+  M.array[1][0]=(*Rot).array[1][1];
+  M.array[1][1]=(*Rot).array[1][2]; 
+  M.array[1][2]=(*Pa).array[1]-w.cam.y + w.cam_h*(*Rot).array[1][0] - w.cam_d*(*Rot).array[1][1];
+ 
+  M.array[2][0]=(*Rot).array[2][1];
+  M.array[2][1]=(*Rot).array[2][2]; 
+  M.array[2][2]=(*Pa).array[2]-w.cam.z + w.cam_h*(*Rot).array[2][0] - w.cam_d*(*Rot).array[2][1];
+ 
+  X.array[0]= (*Pa).array[0]-w.cam.x;
+  X.array[1]= (*Pa).array[1]-w.cam.y;
+  X.array[2]= (*Pa).array[2]-w.cam.z;
+
+  lb_al_solve_linear_system_r(&M, &X, &Pp);
+
+  /* t becomes negative due to looking in the opposite direction */
+  Pp.array[0] = -Pp.array[0]  + w.cam_d;
+  
+  *xp = 0.5*(w.xp_max-w.xp_min) + w.scale*Pp.array[0];
+  *yp = 0.5*(w.yp_max-w.yp_min) - w.scale*Pp.array[1];
+  *flag=1;
+
+  if ((*xp<w.xp_min) || (w.xp_max<*xp) || (*yp<w.yp_min) || (w.yp_max<*yp) || (Pp.array[2]>1))
+    {
+      *xp=0;
+      *yp=0;
+      *flag=0;
+    }
+
+  lb_al_release_matrix_r(&M);
+  lb_al_release_vector_r(&X);
+  lb_al_release_vector_r(&Pp);
+}
+
+   /* Polar coordinates r-grid */
+
+   if (options & (AXIS_DRAW_R_GRID | AXIS_DRAW_T_GRID))
+     {
+       cond_1 = ( (vp.xr_min<0) && (vp.xr_max>=0) ) || ( (vp.xr_min>=0) && (vp.xr_max<0) );
+       cond_2 = ( (vp.yr_min<0) && (vp.yr_max>=0) ) || ( (vp.yr_min>=0) && (vp.yr_max<0) );
+       lb_gr_project_2d(vp, 0.0, 0.0, &xp0, &yp0);
+
+       /* Largest and shortest Euclidean distances are calculated */
+
+       distances[0] = sqrt(vp.xr_min*vp.xr_min + vp.yr_min*vp.yr_min);
+       distances[1] = sqrt(vp.xr_min*vp.xr_min + vp.yr_max*vp.yr_max);
+       distances[2] = sqrt(vp.xr_max*vp.xr_max + vp.yr_min*vp.yr_min);
+       distances[3] = sqrt(vp.xr_max*vp.xr_max + vp.yr_max*vp.yr_max);
+       lb_al_sort_bubble_vector_r_unreg(distances, 4);
+       euclid_min=distances[0];
+       euclid_max=distances[3];
+
+
+       /* Largest and shortest Taxi cab distances are calculated */
+       taxi_min=fabs(vp.xr_min);
+       taxi_max=taxi_min;
+
+       r=fabs(vp.xr_max);
+       if (r>taxi_max)
+	 taxi_max=r;
+       if (r<taxi_min)
+	 taxi_min=r;
+
+       r=fabs(vp.yr_min);
+       if (r>taxi_max)
+	 taxi_max=r;
+       if (r<taxi_min)
+	 taxi_min=r;
+	   
+       r=fabs(vp.yr_max);
+       if (r>taxi_max)
+	 taxi_max=r;
+       if (r<taxi_min)
+	 taxi_min=r;
+
+       if (options & AXIS_DRAW_R_GRID_FILL)
+	 {
+	   if (cond_1 && cond_2)
+	     {
+	       r_min=0.0;
+	       r_max=euclid_max;
+	     }
+	   else
+	     {
+	       if ((xr_min<0) && (xr_max>0))
+		 {
+		   if (yr_min>=0)
+		     r_min=yr_min;
+		   else
+		     if (yr_max<=0)
+		       r_min=fabs(yr_max);
+		 }
+	       else
+		 if ((yr_min<0) && (yr_max>0))
+		   {
+		     if (xr_min>=0)
+		       r_min=xr_min;
+		     else
+		       if (xr_max<=0)
+			 r_min=fabs(xr_max);
+		   }
+		 else
+		   r_min=euclid_min;
+	       r_max=euclid_max;
+	     }
+	 }
+       else
+	 {
+	   if (cond_1 && cond_2)
+	     {
+	       r_min=0;
+	       r_max=taxi_max;
+	     }
+	   else
+	     {
+	       // oxo
+	       if ((xr_min<0) && (xr_max>0))
+		 {
+		   if (yr_min>=0)
+		     {
+		       r_min=yr_min;
+		       r_max=yr_max;
+		     }
+		   else
+		     if (yr_max<=0)
+		       {
+			 r_min=fabs(yr_max);
+			 r_max=fabs(yr_min);
+		       }
+		 }
+	       else
+		 if ((yr_min<0) && (yr_max>0))
+		   {
+		     if (xr_min>=0)
+		       {
+			 r_min=xr_min;
+			 r_max=xr_max;
+		       }
+		     else
+		       if (xr_max<=0)
+			 {
+			   r_min=fabs(xr_max);
+			   r_max=fabs(xr_min);
+			 }
+		   }
+		 else
+		   {
+		     r_min=euclid_min;
+		     r_max=distances[2]; 
+		   }
+	     }
+	 }
+       printf("r_min= %f  rmax= %f\r\n",r_min,r_max);
+       if ((S_INT_16_T)ceil(r_min/delta_grid_x)==0)
+		r=delta_grid_x*(1+ceil(r_min/delta_grid_x));
+       else
+       	 r=delta_grid_x*(ceil(r_min/delta_grid_x));
+       while (r<=r_max)
+	 {
+	   printf("r = %f  r_min= %f rmax= %f\r\n",r,r_min,r_max);
+	   lb_gr_project_2d(vp, r, r, &xp1, &yp1);
+	   lb_gr_draw_ellipse(P, xp0, yp0, fabs(xp1-xp0), fabs(yp1-yp0), color_grid, COPYMODE_COPY);
+	   r+=delta_grid_x;
+	 }
+     }
+
+   /* Polar coordinates tetha-grid */
+   if (options & AXIS_DRAW_T_GRID)
+     {
+       printf("r_min= %f  rmax= %f\r\n",r_min,r_max);
+       r=0.0;
+       r_max=	 delta_grid_x*((S_INT_16_T)(r_max/delta_grid_x));
+
+       while (r<2*M_PI)
+	 {
+	   lb_gr_project_2d(vp, r_max*cos(r), r_max*sin(r), &xp1, &yp1);
+	   lb_gr_draw_line(P, xp0, yp0, xp1, yp1, w_grid, color_grid, copymode, linemode);
+	   r+=delta_grid_y;
+	 }
+     }

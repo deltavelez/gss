@@ -1,0 +1,152 @@
+Checking include files:
+test@test-VirtualBox ~/Desktop/fb_50
+ echo | gcc -E -Wp,-v -
+
+locate dma-mapping.h
+
+/usr/src/linux-headers-4.8.0-53/include/linux/dma-mapping.h
+
+
+$C_INCLUDE_PATH=/usr/src/linux-headers-4.8.0-53/include/linux/
+$ export C_INCLUDE_PATH
+$ echo | gcc -E -Wp,-v -
+
+Error: stdio.h and others not found
+
+sudo apt-get clean
+sudo apt-get update
+sudo apt-get install libc6-dev
+
+#ifdef NADA
+https://www.linuxquestions.org/questions/debian-26/changing-resolution-4175425398/
+https://askubuntu.com/questions/176306/how-to-change-the-screen-resolution-of-the-virtual-console-on-an-external-vga 
+http://distro.ibiblio.org/fatdog/web/faqs/boot-options.html
+
+1. probe videomodes
+run: 
+hwinfo
+
+if it isn't yet installed:
+sudo apt install hwinfo
+
+sudo hwinfo --framebuffer
+
+02: None 00.0: 11001 VESA Framebuffer                           
+  [Created at bios.459]
+  Unique ID: rdCR.v92huD5ErJ9
+  Hardware Class: framebuffer
+  Model: "Intel(R)Ironlake Desktop Graphics Controller"
+  Vendor: "Intel Corporation"
+  Device: "Intel(R)Ironlake Desktop Graphics Controller"
+  SubVendor: "Intel(R)Ironlake Desktop Graphics Chipset Accelerated VGA BIOS"
+  SubDevice: 
+  Revision: "Hardware Version 0.0"
+  Memory Size: 31 MB + 960 kB
+  Memory Range: 0xe0000000-0xe1feffff (rw)
+  Mode 0x0360: 1536x384 (+1536), 8 bits
+  Mode 0x0361: 1536x384 (+3072), 16 bits
+  Mode 0x0362: 1536x384 (+6144), 24 bits
+  Mode 0x033c: 1920x1440 (+1920), 8 bits
+  Mode 0x034d: 1920x1440 (+3840), 16 bits
+  Mode 0x035c: 1920x1440 (+7680), 24 bits
+  Mode 0x033a: 1600x1200 (+1600), 8 bits
+  Mode 0x034b: 1600x1200 (+3200), 16 bits
+  Mode 0x035a: 1600x1200 (+6400), 24 bits
+  Mode 0x0307: 1280x1024 (+1280), 8 bits
+  Mode 0x031a: 1280x1024 (+2560), 16 bits
+  Mode 0x031b: 1280x1024 (+5120), 24 bits
+  Mode 0x0305: 1024x768 (+1024), 8 bits
+  Mode 0x0317: 1024x768 (+2048), 16 bits
+  Mode 0x0318: 1024x768 (+4096), 24 bits
+  Mode 0x0312: 640x480 (+2560), 24 bits
+  Mode 0x0314: 800x600 (+1600), 16 bits
+  Mode 0x0315: 800x600 (+3200), 24 bits
+  Mode 0x0301: 640x480 (+640), 8 bits
+  Mode 0x0303: 800x600 (+832), 8 bits
+  Mode 0x0311: 640x480 (+1280), 16 bits
+  Config Status: cfg=new, avail=yes, need=no, active=unknown
+
+
+3. 
+
+cd /etc/default/grub.d/
+
+
+GRUB_CMDLINE_LINUX_DEFAULT="video=1024x768@60"
+
+3. update-grub
+
+video
+
+This kernel boot options tells the kernel KMS driver on what resolution and/or frequency to use. For this to work, KMS must not be disabled (see above). The format of the option is as follows:
+
+video=conn:res[M][R][-bpp][@refresh][i][m][eDd]
+
+This option can be specified multiple times, one for each different connection name - so you can have on settings for VGA, one for HDMI, etc.
+
+    conn means the connection name, which depends how your monitor is connected to the system. Listed are some common connection names, their names are self-explanatory:
+        VGA (VGA connector)
+        DVI-I (DVI connector, supporting both digital and analog - rare)
+        DVI-D (DVI connector, digital only)
+        DVI-A (DVI connector, analog only - rare)
+        composite (composite video)
+        s-video (S-video output)
+        LVDS (Laptop panel)
+        component (component video output)
+        displayport (Mac display)
+        HDMI-A (the first HDMI port)
+        HDMI-B (the second HDMI port)
+        TV (TV output)
+    res stands for the resolution. It is specified as widthxheight, in pixels (e.g. 800x600).
+    M if specified, means that the display timing frequency will be computed using VESA CVT standard, otherwise a hard-coded timing table will be used.
+    R if specified, means that a "reduced blanking" display timing frequency will be used. This is useful for digital displays (LVDS, DVI or HDMI). Otherwise standard timing will be used.
+    -bpp stands for bit-per-pixel, that is, the bit-depth of the display, that is, the number of colours to be used. If not specified, the driver will choose the highest supported one. Common values are:
+        -32 (32-bit per pixel: 16million colours)
+        -24 (24-bit per pixel: 16million colours)
+        -16 (16-bit per pixel: 64thousand colours) - you're unlike to use this nowadays
+-15 (15-bit per pixel: 32thousand colours) - you're unlike to use this nowadays
+        -8 (8-bit per pixel: 256 colours) - you're unlike to use this nowadays
+-4 (4-bit per pixel: 16 colours) - you're unlike to use this nowadays
+    @refresh specifies display refresh rate (also known as the vertical frequency refresh rate). Usually @60 or @59 for digital displays, you can specify others for analog / CRT monitors. If not specified the highest supported rate will be used.
+    i, if specified, means to use interlaced mode for calculation. Only makes sense for analog / CRT monitors.
+    m, if specified, means add some margins to the display timing calcuation (add 1.8% margin).
+    m, if specified, means add some margins to the display timing calcuation (add 1.8% margin).
+    e, if specified, means to enable the port (even if no device/monitor is detected).
+    D, if specified, means to enable the port (even if no device/monitor is detected) and use the Digital interface.
+    d, if specified, means to disable the port (even if there is a monitor attached there).
+
+Note: This is a generic parameter used to set framebuffer display resolution. It can also be used for non-KMS drivers too. That is not discussed here because it is irrelevant, for further reference you can refer to Linux Kernel Framebuffer Documentation.
+pci=nocrs
+
+Discard pci ACPI information. May fix boot problems.
+pci=noacpi
+
+Do not use ACPI for PCI bus management. May fix boot problems.
+acpi=off
+
+Do not use ACPI. Note that modern systems probably will not boot if this parameter is specified.
+loglevel=n
+
+Verbosity of kernel boot-up message. n is between 0 to 7. loglevel=0 means don't print anything, loglevel=7 means print any single details. Default is n=3.
+
+  More Linux kernel parameters can be found here or here.
+
+  
+
+inline void swap_buffers()
+{
+  if (var_info.yoffset==0)
+    var_info.yoffset = screensize;
+  else
+    var_info.yoffset=0;
+
+  //"Pan" to the back buffer
+  ioctl(fd_fb, FBIOPAN_DISPLAY, &var_info);
+
+  //Update the pointer to the back buffer so we don't draw on the front buffer
+  char *tmp;
+  tmp=fb_main;
+  fb_main=fb_back;
+  fb_back=tmp;
+}
+#endif

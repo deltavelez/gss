@@ -1,0 +1,206 @@
+
+  //LINE_3D_T myline;
+  //myline.items=100;
+  //lb_gr_create_line3d(&myline);
+  //for (i=0;i<myline.items;i++)
+  //  {
+  //    myline.array[i].P.x=cos(4*M_PI*i/myline.items);
+  //    myline.array[i].P.y=sin(4*M_PI*i/myline.items);
+  //    myline.array[i].P.z=(FLOAT_T)i/myline.items;
+  //  }
+
+  /* The point to be projected */
+  VECTOR_R_T Pa;
+  Pa.items=3;
+  lb_al_create_vector_r(&Pa);
+
+  VECTOR_R_T V1;
+  V1.items=3;
+  lb_al_create_vector_r(&V1);
+
+  VECTOR_R_T V2;
+  V2.items=3;
+  lb_al_create_vector_r(&V2);
+   
+  /* The rotation Matrix */
+  MATRIX_R_T Rot_fixed;
+  Rot_fixed.rows=3;
+  Rot_fixed.cols=3;
+  lb_al_create_matrix_r(&Rot_fixed);
+
+  MATRIX_R_T Rot_analytical;
+  Rot_analytical.rows=3;
+  Rot_analytical.cols=3;
+  lb_al_create_matrix_r(&Rot_analytical);
+
+  VIEWPORT_3D_T win;
+  win.xp_min=25;
+  //  win.xp_max=getmaxx()-25;
+  win.yp_min=25;
+  //win.yp_max=getmaxy()-25;
+
+  win.scale=200.0;
+  win.cam_h=1;
+  win.cam.x=10;
+  win.cam.y=0;
+  win.cam.z=0;
+  
+  win.roll=0.0; 
+  win.pitch=0.0; 
+  win.yaw=M_PI; 
+
+
+  c=0;
+
+  //  lb_gr_compute_rotation_matrix_tait_bryan_ZXY(win, &Rot_analytical);
+  //lb_gr_compute_rotation_matrix_tait_bryan_YXZ(win, &Rot_fixed);
+ 
+}
+
+
+#ifdef oxo 
+  while (c!=KEY_ESC)
+    {
+     cleardevice();
+     setcolor(YELLOW);
+     outtextxy (10, 10, "ACCELEROMETER-BASED POSITIONING FOR WIRELINE");
+ 
+      setcolor(WHITE);
+      sprintf(digit_string, "Zoom = %0.4f",win.scale);
+      outtextxy(10, 25, digit_string);
+
+      sprintf(digit_string, "Cam_x= %0.4f", win.cam.x);
+      outtextxy(10, 40, digit_string);
+      
+      sprintf(digit_string, "Cam_y= %0.4f", win.cam.y);
+      outtextxy(10+100, 40, digit_string);
+
+      sprintf(digit_string, "Cam_z= %0.4f", win.cam.z);
+      outtextxy(10+200, 40, digit_string);
+      
+      sprintf(digit_string, "Yaw= %0.4f", win.yaw);
+      outtextxy(10, 55, digit_string);
+      
+      sprintf(digit_string, "Roll= %0.4f", win.roll);
+      outtextxy(10+100, 55, digit_string);
+   
+      sprintf(digit_string, "Pitch= %0.4f", win.pitch);
+      outtextxy(10+200, 55, digit_string);
+
+      sprintf(digit_string, "Last key: %i", c);
+      outtextxy(10, 70, digit_string);
+
+      win.cam_d=-0.1;
+      setcolor(BLUE);
+
+      //#define FIXED
+      //#ifdef FIXED    
+      lg_gr_draw_axis_fixed(win, &Rot_fixed, 2.0, BLUE);
+      win.cam_d=0.1;
+      setcolor(RED);
+      lg_gr_draw_axis_fixed(win, &Rot_fixed, 2.0, RED);
+      
+      win.cam_d=0;
+      lb_gr_plot_line3d(win, &Rot_fixed, &myline);
+
+      //#endif  
+      //#define ANALYTICAL
+      //#ifdef ANALYTICAL
+      lg_gr_draw_axis_analytical(win, &Rot_analytical, 2.0, WHITE);
+      win.cam_d=0.1;
+      setcolor(RED);
+      lg_gr_draw_axis_analytical(win, &Rot_analytical, 2.0, YELLOW);
+      for (u1=-3.14; u1<3.14; u1+=0.1)
+	for (u2=-3.14; u2<3.14; u2+=0.1)
+	  {
+	    Pa.array[0]=cos(u1)*cos(u2);  
+	    Pa.array[1]=sin(u1)*cos(u2);  
+	    Pa.array[2]=sin(u2);
+	    
+	    win.cam_d=-0.1;
+	    lb_grproject_3d_to_2d_analytical(win, &Rot_analytical, &Pa, &x2, &y2, &flag1);
+	    if (&flag1)
+	    putpixel(x2,y2,WHITE);
+	  win.cam_d=0.1;
+	  lb_gr_project_3d_to_2d_analytical(win, &Rot_analytical, &Pa, &x2, &y2, &flag1);
+	  if (flag1)
+	    putpixel(x2,y2,YELLOW);
+	  }
+      //#endif
+
+	//#ifdef TWO_VECTORS
+      V1.array[0]=-10;
+      V1.array[1]=0;
+      V1.array[2]=0;
+      
+      V2.array[0]=0;
+      V2.array[1]=10;
+      V2.array[2]=5;
+
+      for (u1=-3.14; u1<3.14; u1+=0.1)
+	for (u2=-3.14; u2<3.14; u2+=0.1)
+	  {
+	    Pa.array[0]=cos(u1)*cos(u2);  
+	    Pa.array[1]=sin(u1)*cos(u2);  
+	    Pa.array[2]=sin(u2);
+	    
+	    win.cam_d=-0.1;
+	    lb_gr_project_3d_to_2d_analytical_two_vectors(win, &V1, &V2, &Pa, &x2, &y2, &flag1);
+	    if (&flag1)
+	      putpixel(x2,y2,GREEN);
+	    win.cam_d=0.1;
+	    lb_gr_project_3d_to_2d_analytical_two_vectors(win, &V1, &V2, &Pa, &x2, &y2, &flag1);
+	  if (flag1)
+	    putpixel(x2,y2,MAGENTA);
+	  }
+      //#endif
+      c=0;
+      if (kbhit()) 
+	c=getch();
+      if (c==0)
+      	c=getch();
+      
+      switch (c)
+	{
+	case 81: /* Left arrow:  roll */
+	  win.roll-=M_PI/30;
+	  break; 
+	case 83: /* Right arrow:  Roll */
+	  win.roll+=M_PI/30;
+	  break; 
+	case 82:  /* Up: Pitch */
+	  win.pitch+=M_PI/30;
+	  break;
+	case 84:   /* Down: Pitch */
+	  win.pitch-=M_PI/30;
+	  break; 
+	case -1:  /* Delete: yaw */
+	  win.yaw+=M_PI/30;
+	  break;  
+	case 86:  /* Page down: yaw */
+	  win.yaw-=M_PI/30;
+	  break; 
+	case 85:  break; /* Page up */
+	case 99:  break;  /* Insert */
+	case -65: win.scale+=1.0; break; /* F1 */
+	case -66: win.scale-=1.0; break; /* F1 */
+	  
+	  /* Camera position */
+	case -62: win.cam.x-=0.25; break; /* F5 */
+	case -61: win.cam.y-=0.25; break; /* F6 */
+	case -60: win.cam.z-=0.25; break; /* F7 */
+	case -58: win.cam.x+=0.25; break; /* F9 */
+	case -57: win.cam.y+=0.25; break; /* F10 */
+	case -56: win.cam.z+=0.25; break; /* F11 */
+	}
+      lb_gr_compute_rotation_matrix_tait_bryan_YXZ(win, &Rot_fixed);
+      lb_gr_compute_rotation_matrix_tait_bryan_ZXY(win, &Rot_analytical);
+    } 
+  closegraph ();
+  lb_al_release_matrix_r(&Rot_fixed);
+  lb_al_release_matrix_r(&Rot_analytical);
+  lb_al_release_vector_r(&V1);
+  lb_al_release_vector_r(&V2);
+  lb_al_release_vector_r(&Pa);
+  //lb_gr_release_line3d(&myline);
+#endif

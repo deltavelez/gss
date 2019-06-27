@@ -1,0 +1,2 @@
+graf: graf.c
+	gcc -o graf graf.c lb_complex.c lb_fourier.c lb_algebra.c lb_real.c lb_statistics.c lb_graphics.c lb_integer.c lb_parser.c /usr/lib/libXbgi.a -lX11 -lm
