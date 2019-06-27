@@ -1,0 +1,21 @@
+Definitions:
+master: is the main branch
+-----------------------
+Linux commands:
+ls -la  (lists all files)
+-----------------------
+Git Commands:
+
+git init
+git status
+git add .
+git commit -m "message"
+git push origin master
+
+Shows all commits:
+git log
+git log --author
+
+
+Shows differences:
+git diff

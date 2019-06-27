@@ -1,0 +1,54 @@
+Definitions:
+master: is the main branch
+-----------------------
+Linux commands:
+ls -la  (lists all files)
+-----------------------
+Sharing a folder in Virtuualbox:
+Host: Mac, Guest: Linux
+1. Add the share in the machine (permanent, full access, auto-mount), but leave the last field empty.
+2. A new folder sf_xxx should be visible.
+3. If it cannot be accessed, add yourself to the vboxsf group within the VM:
+   sudo usermod -a -G vboxsf $whoami
+-----------------------
+Git Commands:
+
+git init
+git status
+git add .
+git commit -m "message"
+git push origin master
+
+Shows all commits:
+git log
+git log --author
+
+Removes file:
+git rm filename
+
+Renames file:
+git mv old_filename new_filename
+
+git config -- global user.name 
+git config --global user.name "Diego Velez"
+git config --global user.email "delta@velez.ca"
+
+Shows differences:
+git diff
+
+Shows configuration:
+git config --list
+
+Add a remote:
+git remote add origen https://github.com/deltavelez/tesisUPB.git
+git remote remove origin
+
+Check a remote:
+git remote -v
+
+
+Github certificate error:  Try either
+export GIT_SSL_NO_VERIFY
+git config --system http.sslVerify false
+
+
