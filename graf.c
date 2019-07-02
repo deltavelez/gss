@@ -1164,7 +1164,7 @@ int main()
   long k;
   clock_t begin, end;
   PIXEL_T a, b;
-  int x, y, z, SIZE_X=8, SIZE_Y=8;
+  int x, y, z, SIZE_X=60, SIZE_Y=60;
   
   
   //  begin=clock();
@@ -1183,18 +1183,19 @@ int main()
 
   for (y=0; y<ty_screen.h; y++)
    for (x=0; x<ty_screen.w; x++)
-     lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, 255*x/ty_screen.w, 255*x/ty_screen.w, 255*x/ty_screen.w, 0, COPYMODE_COPY);
+     lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, 255*x/ty_screen.w, 255*x/ty_screen.w, 255*x/ty_screen.w, 255, COPYMODE_COPY);
+  //lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, 100, 100, 100, 0, COPYMODE_COPY);
 
   //lb_gr_fb_rectangle_copymode(&ty_screen, 100, 100, 200, 200, 255, 255, 255, 255, COPYMODE_BLEND);
 
   lb_gr_refresh();
 
-  for (y=0; y<ty_screen.h/SIZE_Y; y++)
+  if (1) for (y=0; y<ty_screen.h/SIZE_Y; y++)
     {
       for (x=0; x<ty_screen.w/SIZE_X; x++)
-	lb_gr_draw_pixel(NULL, x,y, lb_gr_12RGB(0x2F00),
-			 COPYMODE_XOR | COPYMODE_SCALE_X(SIZE_X) |  COPYMODE_SCALE_Y(SIZE_Y));
-      lb_gr_refresh();
+	  lb_gr_draw_pixel(NULL, x,y, lb_gr_12RGB(0x500f),
+			 COPYMODE_BGCOLOR(0x0FFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_COPY | COPYMODE_SCALE_X(SIZE_X) |  COPYMODE_SCALE_Y(SIZE_Y));
+	  lb_gr_refresh();
       if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
 	{
 	  SDL_Quit();

@@ -158,7 +158,6 @@ void       lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_1
 void       lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, FLOAT_T _x0, FLOAT_T _y0, FLOAT_T _x1, FLOAT_T _y1,
 					 PIXEL_T color, COPYMODE_T copymode);
 
-void       _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel, COPYMODE_T copymode);
 void       lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel, COPYMODE_T copymode);
 void       lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_INT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode,
 				  LINEMODE_T linemode);

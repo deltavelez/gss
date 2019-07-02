@@ -4081,8 +4081,6 @@ void lb_gr_fb_line_h_copymode(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_
 }
 
 
-//void lb_gr_fb_main_clear(U_INT_8_T r, U_INT_8_T g, U_INT_8_T b);
-
 void lb_gr_fb_line_v(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
 {
   U_INT_32_T l_color, *pos, *pos_a, *pos_b;
@@ -4151,20 +4149,6 @@ void lb_gr_fb_line_v_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_
 
 void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel, COPYMODE_T copymode)
 {
-  if (Pic==NULL)
-    if ( (x<0) || (x>=ty_screen.w) || (y<0) || (y>=ty_screen.h) )
-      return;
-    else ;
-  else
-    if ( (x<0) || (x>=(*Pic).w) || (y<0) || (y>=(*Pic).h) )
-      return;
-  
-  _lb_gr_draw_pixel(Pic, x, y, pixel, copymode);
-}
-
-
-void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel, COPYMODE_T copymode)
-{
   U_INT_32_T dat_offset;
   
   if (!copymode) /* This is the Fastest possible mode.  
@@ -4185,10 +4169,13 @@ void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel
     }
 
   COPYMODE_T temp_copymode;
-  temp_copymode = copymode & 0b11111; /* The mode is defined in the 5-lower bits of the 16-bit parameter. */
+  temp_copymode = copymode & COPYMODE_COPYMODE_MASK; /* The mode is defined in the 5-lower bits of the 16-bit parameter. */
 
   if (Pic!=NULL)
     {
+      if ( (x<0) || (x>=(*Pic).w) || (y<0) || (y>=(*Pic).h) ) 
+	return;
+      
       if (temp_copymode==COPYMODE_COPY)
 	{
 	  (*Pic).pic[y][x]=pixel;
@@ -4431,22 +4418,26 @@ void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel
     }
   else /* Copying directly to the screen */
     {
+      // oxo 
       if (!(copymode & (COPYMODE_SCALEX_MASK | COPYMODE_SCALEY_MASK))) /* size == 1 */
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
 	lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
+#else
+	lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, FACTOR_N_TO_8_R*pixel.r, FACTOR_N_TO_8_G*pixel.g, FACTOR_N_TO_8_B*pixel.b, FACTOR_N_TO_8_A*pixel.a, copymode);
+#endif
       
       else /* if size != 1, e.g., a scale factor is being used */
 	{
 	  U_INT_8_T scale_x, scale_y;
-	  scale_x = 1+((copymode & COPYMODE_SCALEX_MASK) >> COPYMODE_SCALEX_SHIFT);
-	  scale_y = 1+((copymode & COPYMODE_SCALEY_MASK) >> COPYMODE_SCALEY_SHIFT);
+	  scale_x = 1 + ((copymode & COPYMODE_SCALEX_MASK) >> COPYMODE_SCALEX_SHIFT );
+	  scale_y = 1 + ((copymode & COPYMODE_SCALEY_MASK) >> COPYMODE_SCALEY_SHIFT);
 	  //printf("copymode=0x%x, scale_x=%d, scale_y=%d\r\n",copymode,scale_x, scale_y);
 	  //printf("%x\r\n",copymode);
 
-	  switch ((copymode & COPYMODE_PIXELMODE_MASK) >> COPYMODE_PIXELMODE_SHIFT)
+	  switch (copymode & COPYMODE_PIXELMODE_MASK)
 	    {
-	    case 0: /* solid rectangle */
-	      //	      		printf("hola\r\n"); 
-
+	    case COPYMODE_PIXELMODE_0: /* solid rectangle */
+      
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
 	      lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x, y*scale_y, (x+1)*scale_x-1, (y+1)*scale_y-1,
 					  pixel.r, pixel.g, pixel.b, pixel.a, copymode);
@@ -4455,10 +4446,15 @@ void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel
 					  FACTOR_N_TO_8_R*pixel.r, FACTOR_N_TO_8_G*pixel.g, FACTOR_N_TO_8_B*pixel.b, FACTOR_N_TO_8_A*pixel.a, copymode);
 #endif
 	      break;
-	    case 1:
+	    case COPYMODE_PIXELMODE_1:
 	      {
 		U_INT_8_T border_r, border_g, border_b;
-	      
+		border_r = ((copymode & COPYMODE_PIXELBG_R_MASK) >> COPYMODE_PIXELBG_R_SHIFT)*255/15;
+		border_g = ((copymode & COPYMODE_PIXELBG_G_MASK) >> COPYMODE_PIXELBG_G_SHIFT)*255/15;
+		border_b = ((copymode & COPYMODE_PIXELBG_B_MASK) >> COPYMODE_PIXELBG_B_SHIFT)*255/15;
+		
+		
+	
 		lb_gr_fb_line_h_copymode(&ty_screen,  y   *scale_y, x*scale_x,   (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
 		lb_gr_fb_line_h_copymode(&ty_screen, (y+1)*scale_y, x*scale_x,   (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
 		lb_gr_fb_line_v_copymode(&ty_screen,  x   *scale_x, y*scale_y+1, (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
@@ -4468,6 +4464,21 @@ void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel
 	      }
 	      break;
 	    case 2:
+	      {
+		U_INT_8_T border_r, border_g, border_b;
+		border_r = ((copymode & COPYMODE_PIXELBG_R_MASK) >> COPYMODE_PIXELBG_R_SHIFT)*255/15;
+		border_g = ((copymode & COPYMODE_PIXELBG_G_MASK) >> COPYMODE_PIXELBG_G_SHIFT)*255/15;
+		border_b = ((copymode & COPYMODE_PIXELBG_B_MASK) >> COPYMODE_PIXELBG_B_SHIFT)*255/15;
+		
+		
+	
+		lb_gr_fb_line_h_copymode(&ty_screen,  y     *scale_y, x*scale_x,   (x+1)*scale_x-1,   border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_h_copymode(&ty_screen, (y+1)*scale_y-1, x*scale_x,   (x+1)*scale_x-1,   border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen,  x   *scale_x, y*scale_y+1, (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, (x+1)*scale_x-1, y*scale_y+1, (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode );
+		
+		lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x+1, y*scale_y+1, (x+1)*scale_x-2, (y+1)*scale_y-2, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
+	      }
 	      break;
 	    case 3:
 	      break;
@@ -4481,67 +4492,9 @@ void _lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel
 	      break;
 	    }
 	}
-    
     }
 }
  
-#ifdef DELETE_CODE
-if (Pic==NULL)  /* Renders pixel directly to the screen */
-  {
-    temp_r=FACTOR_N_TO_8_R*dst.r;
-    temp_g=FACTOR_N_TO_8_G*dst.g;
-    temp_b=FACTOR_N_TO_8_B*dst.b;
-    temp_k=FACTOR_N_TO_8_K*dst.a;
-
-    //if (lb_fb_use_shadow())
-    //	ty_pic_shadow.pic[y][x]=dst;
-      
-    if ( (ty_scale_x==1) && (ty_scale_y==1) )
-      {
-	//d.x=x;
-	//d.y=y;
-
-	/* Writting a single pixel: Method No. 1 - too slow
-	   unsigned char my_pixel[4];
-
-	   my_pixel[0] = temp_r;
-	   my_pixel[1] = temp_g;
-	   my_pixel[2] = temp_b;
-	   my_pixel[3] = 255;
-
-	   SDL_UpdateTexture(small_texture, &s, my_pixel, 4); 
-	  
-	   SDL_RenderCopy(renderer, small_texture, NULL, &d); */
-	SDL_SetRenderDrawColor(renderer, temp_r, temp_g, temp_b, 255);
-	SDL_RenderDrawPoint(renderer,x,y);
-      }
-    else
-      {
-	if(ty_renderoptions & RENDEROPTIONS_LINE)
-	  {
-	    if ((ty_scale_x<3) || (ty_scale_y<3))
-	      {
-		printf("Error: lb_gr_draw_pixel() --> invalid scale: scale_x=%d scale_y=%d\r\n",ty_scale_x,ty_scale_y);
-		exit(EXIT_FAILURE);
-	      }
-	      
-	    //lb_fb_line_h(ty_fb_main,     y*ty_scale_y,   x*ty_scale_x, (x+1)*ty_scale_x-1, temp_r, temp_g, temp_b, temp_k);
-	    //lb_fb_line_h(ty_fb_main, (y+1)*ty_scale_y-1, x*ty_scale_x, (x+1)*ty_scale_x-1, temp_r, temp_g, temp_b, temp_k);
-
-	    //lb_fb_line_v(ty_fb_main,     x*ty_scale_x,   y*ty_scale_y, (y+1)*ty_scale_y-1, temp_r, temp_g, temp_b, temp_k);
-	    //lb_fb_line_v(ty_fb_main, (x+1)*ty_scale_x-1, y*ty_scale_y, (y+1)*ty_scale_y-1, temp_r, temp_g, temp_b, temp_k);
-	  }
-	else
-	  {
-	    //lb_fb_rectangle(ty_fb_main, x*ty_scale_x, y*ty_scale_y, (x+1)*ty_scale_x-1, (y+1)*ty_scale_y-1,
-	    //		    temp_r, temp_g, temp_b, temp_k);
-	  }
-      }
-  }
- else
-   (*Pic).pic[y][x]=dst;
-}
-#endif
 
 void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_INT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
