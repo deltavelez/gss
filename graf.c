@@ -1157,7 +1157,7 @@ int main()
 
 
 
-#define DEMO_LINE_ANTIALIASING
+  //#define DEMO_LINE_ANTIALIASING
 #ifdef DEMO_LINE_ANTIALIASING
  
   SDL_Event event;
@@ -1210,46 +1210,43 @@ int main()
 
 
 
-
-
-
-  //#define DEMO_LINE_ANTIALIASING2
+#define DEMO_LINE_ANTIALIASING2
 #ifdef DEMO_LINE_ANTIALIASING2
     SDL_Event event;
     FLOAT_T angle;
     PICTURE_T Pic;
-
-    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
-    Pic.w= ty_screen.w;
-    Pic.h= ty_screen.h;
-
-    lb_gr_create_picture(&Pic,lb_gr_12RGB(0x7000));
-
+    U_INT_8_T pix_x=32, pix_y=32;
   
-    angle=0.0;
-    while (angle<6*2*M_PI)
-      {
-	printf("angle=%f\r\n",angle*180/M_PI);
-	lb_gr_draw_rectangle(&Pic,0,0,ty_screen.w,ty_screen.h,lb_gr_12RGB(0xFA00),COPYMODE_COPY);
-	lb_gr_draw_line_antialiasing(&Pic, 0.5*ty_screen.w, 0.5*ty_screen.h,
-				     0  + 0.3*ty_screen.h*cos(angle),
-				     0 - 0.3*ty_screen.h*sin(angle), 
-				     25, lb_gr_12RGB(0xF00F), COPYMODE_BLEND | COPYMODE_SCALE_X(16) |  COPYMODE_SCALE_Y(16));
-	lb_gr_render_picture(&Pic, 0, 0, COPYMODE_BLEND | COPYMODE_SCALE_X(16) |  COPYMODE_SCALE_Y(16));
+    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+    Pic.w= ty_screen.w/pix_x;
+    Pic.h= ty_screen.h/pix_y;
 
-	lb_gr_refresh();
- 
-	angle+=M_PI/180;
-	lb_gr_delay(1000);
-      }
- 
-    while (1)
+    lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
+
+    angle=0.0;
+    while (angle<2*M_PI)
       {
-	if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
-	  break;
-      }
-    SDL_Quit();
-    return EXIT_SUCCESS;
+	printf("angle=%f\r\n",angle*180.0/M_PI);
+	lb_gr_draw_rectangle(&Pic,0,0,Pic.w,Pic.h,lb_gr_12RGB(0xF060),COPYMODE_COPY);
+	lb_gr_draw_line_antialiasing(&Pic, 0.5*Pic.w, 0.5*Pic.h,
+				      0.5*Pic.w  + 0.3*Pic.h*cos(angle),
+				      0.5*Pic.h  - 0.3*Pic.h*sin(angle), 
+				     5, lb_gr_12RGB(0xFfFFF), COPYMODE_BLEND );
+	lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY |  COPYMODE_BGCOLOR(0x0FFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+	lb_gr_refresh();
+
+	angle+=M_PI/180;
+	lb_gr_delay(100);
+
+	while (SDL_PollEvent(&event))
+	  {
+	    if (event.type == SDL_QUIT)
+	      {
+		SDL_Quit();
+		return EXIT_SUCCESS;
+	      }
+	  }
+       }
 #endif
 
   //#define DEMO_LINE_ANTIALIASING23

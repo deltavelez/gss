@@ -4453,14 +4453,17 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 		border_g = ((copymode & COPYMODE_PIXELBG_G_MASK) >> COPYMODE_PIXELBG_G_SHIFT)*255/15;
 		border_b = ((copymode & COPYMODE_PIXELBG_B_MASK) >> COPYMODE_PIXELBG_B_SHIFT)*255/15;
 		
-		
-	
 		lb_gr_fb_line_h_copymode(&ty_screen,  y   *scale_y, x*scale_x,   (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
 		lb_gr_fb_line_h_copymode(&ty_screen, (y+1)*scale_y, x*scale_x,   (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
 		lb_gr_fb_line_v_copymode(&ty_screen,  x   *scale_x, y*scale_y+1, (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
 		lb_gr_fb_line_v_copymode(&ty_screen, (x+1)*scale_x, y*scale_y+1, (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode );
 		
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
 		lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x+1, y*scale_y+1, (x+1)*scale_x-1, (y+1)*scale_y-1, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
+#else
+		lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x+1, y*scale_y+1, (x+1)*scale_x-1, (y+1)*scale_y-1,
+					    FACTOR_N_TO_8_R*pixel.r, FACTOR_N_TO_8_G*pixel.g, FACTOR_N_TO_8_B*pixel.b, FACTOR_N_TO_8_A*pixel.a, copymode);
+#endif
 	      }
 	      break;
 	    case 2:
@@ -6796,7 +6799,7 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
   //oxo
   for (i=0;i<(*Pic).h;i++)
     for (j=0;j<(*Pic).w;j++)
-      lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, j, i, (*Pic).pic[i][j].r, (*Pic).pic[i][j].g, (*Pic).pic[i][j].b, (*Pic).pic[i][j].a, copymode);
+      lb_gr_draw_pixel(NULL, j, i, (*Pic).pic[i][j], copymode);
 }
 
 
