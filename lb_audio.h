@@ -1,7 +1,7 @@
 #ifndef LB_AUDIO_H
 #define LB_AUDIO_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "lb_types.h"
 
 typedef struct wavfile_header {

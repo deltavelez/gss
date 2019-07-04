@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <stdarg.h>
 #include <sys/sysinfo.h>
-#include "SDL.h"
+#include <SDL2/SDL.h>
 
 #include "lb_audio.h"
 #include "lb_geometry.h"

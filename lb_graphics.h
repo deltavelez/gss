@@ -1,5 +1,5 @@
 #include <jpeglib.h>
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include "lb_types.h"
 
 #ifndef LB_GRAPHICS_H
