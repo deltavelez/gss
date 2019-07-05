@@ -24,8 +24,6 @@ void  lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT
 void lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T src_r, U_INT_8_T src_g, U_INT_8_T src_b, U_INT_8_T src_a, COPYMODE_T copymode);
 
 
-
-
 PIXEL_T    lb_gr_12RGB(U_INT_16_T number);
 S_INT_8_T  lb_gr_assert_dimensions_line2d_i(LINE_2D_INT_T *L);
 S_INT_8_T  lb_gr_assert_dimensions_line2d_f(LINE_2D_FLOAT_T *L);

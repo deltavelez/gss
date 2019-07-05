@@ -71,6 +71,8 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_
   texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
   SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
 #endif
+  lb_gr_fb_rectangle(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, r, g, b);
+  lb_gr_refresh();
 }
   
 void lb_gr_SDL_close()
@@ -916,23 +918,13 @@ S_INT_8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, U_INT_8_T qua
   return 1;
 }
 
+
 void lb_gr_clear_picture(PICTURE_T *Pic, PIXEL_T default_color)
 {
   S_INT_16_T i, j;
   if (Pic==NULL)
-    {
-      //      lb_fb_rectangle(ty_fb_main, 0, 0, ty_width*ty_scale_x, ty_height*ty_scale_y,
-      //	      round(FACTOR_N_TO_8_R*default_color.r),
-      //	      round(FACTOR_N_TO_8_G*default_color.g),
-      //	      round(FACTOR_N_TO_8_B*default_color.b),
-      //	      round(FACTOR_N_TO_8_K*default_color.a));
-      //if (lb_fb_use_shadow())
-      //{
-      //  for (i=0;i<ty_height;i++)
-      //    for (j=0;j<ty_width;j++)
-      //      ty_pic_shadow.pic[i][j]= default_color;
-      //}
-    }
+    lb_gr_fb_rectangle(&ty_screen, 0, 0, ty_screen.w, ty_screen.h,
+		       FACTOR_N_TO_8_R*default_color.r, FACTOR_N_TO_8_G*default_color.g, FACTOR_N_TO_8_B*default_color.b);
   else
     {
       if (!lb_gr_assert_dimensions_picture(Pic))
@@ -1802,11 +1794,13 @@ void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T y
       if (fabs(distance)>dmax)
 	dmax=fabs(distance);
       
-      if (fabs(distance)<=1.5)
-	pix_adj.a=round(MAX_A*(1.0-fabs(distance)/1.5)); 
-      //	pix_adj.a=round(MAX_A*(1.0-fabs(distance))); 
+      if (fabs(distance)<=1.0)
+	pix_adj.a=round(MAX_A*(1.0-fabs(distance)/1.0)); /* try out other values! */ 
       else
 	pix_adj.a=0;
+
+	
+      //oxo 
 
       lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); /* Oct 1 */
       lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, copymode); /* Oct 2 */
@@ -3580,7 +3574,7 @@ void lb_gr_fb_rectangle(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16
   if (y_max>(*screen).h-1)
     y_max=(*screen).h-1;
 
-  l_color=r<<16 | g<<8 |  b;
+  l_color= 0xFF000000 | r<<16 | g<<8 |  b;
   for (y=y_min; y<=y_max; y++)
     {
       pos_a = (unsigned int*)(*screen).dat + (*screen).w*y + x_min;
@@ -3589,7 +3583,6 @@ void lb_gr_fb_rectangle(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16
       	*pos = l_color;
     }
 }
-
 
 
 void  lb_gr_fb_rectangle_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
@@ -3642,12 +3635,12 @@ void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT
   /* Sets a pixel in the screen buffer with no blending and no boundary checks. */
   /* Can corrupt the memory if misused. */
   
-  U_INT_16_T dat_offset;
-  
-  //#define METHOD_1
+  U_INT_32_T dat_offset;
+
+#define METHOD_1
 #ifdef METHOD_1
   /* Performance: 5.02 fps @ 1920x1080 on Raspberry Pi */
-  dat_offset=4*(ty_width*y+x);
+  dat_offset=4*((*screen).w*y+x);
   *((unsigned char*)(*screen).dat + dat_offset)     = b;
   *((unsigned char*)(*screen).dat + dat_offset + 1) = g; 
   *((unsigned char*)(*screen).dat + dat_offset + 2) = r;
@@ -3696,7 +3689,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
   dat_offset=4*((*screen).w*y+x);
   dst_b = *((unsigned char*)(*screen).dat + dat_offset);
   dst_g = *((unsigned char*)(*screen).dat + dat_offset + 1); 
-  dst_b = *((unsigned char*)(*screen).dat + dat_offset + 2);
+  dst_r = *((unsigned char*)(*screen).dat + dat_offset + 2);
   dst_a = *((unsigned char*)(*screen).dat + dat_offset + 3);
 
   switch (temp_copymode)
@@ -3832,10 +3825,11 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       dst_r = (U_INT_32_T)((0xFF-src_a)*dst_r + src_a*src_r)>>8;
       dst_g = (U_INT_32_T)((0xFF-src_a)*dst_g + src_a*src_g)>>8;
       dst_b = (U_INT_32_T)((0xFF-src_a)*dst_b + src_a*src_b)>>8;
-      dst_a = (U_INT_32_T)((0xFF-src_a)*dst_a + src_a*src_a)>>8;
+      //      dst_a = (U_INT_32_T)((0xFF-src_a)*dst_a + src_a*src_a)>>8;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      //      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+            *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_MULTIPLY:
       dst_r = (U_INT_32_T)dst_r*src_r>>8;
@@ -3999,7 +3993,7 @@ void _lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT
   //#define METHOD_1
 #ifdef METHOD_1
   /* Performance: 5.02 fps @ 1920x1080 on Raspberry Pi */
-  dat_offset=4*(ty_width*y+x);
+  dat_offset=4*((*screen).w*y+x);
   *((unsigned char*)(*screen).dat + dat_offset)     = b;
   *((unsigned char*)(*screen).dat + dat_offset + 1) = g; 
   *((unsigned char*)(*screen).dat + dat_offset + 2) = r;
@@ -4157,7 +4151,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
       dat_offset = ty_screen.w*y + x;
-      *((U_INT_32_T*)ty_screen.dat + dat_offset) =  0xFF000000 | pixel.r<<16 | pixel.g<<8 |  pixel.b ;
+      *((U_INT_32_T*)ty_screen.dat + dat_offset) =   pixel.r<<16 | pixel.g<<8 |  pixel.b ;
 #else
       dat_offset=4*(ty_screen.w*y+x);
       *((U_INT_8_T*)ty_screen.dat + dat_offset    ) = FACTOR_N_TO_8_B*pixel.b;
@@ -4287,7 +4281,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	      (*Pic).pic[y][x].r = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].r + pixel.a*pixel.r)/MAX_R;
 	      (*Pic).pic[y][x].g = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].g + pixel.a*pixel.g)/MAX_G;
 	      (*Pic).pic[y][x].b = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].b + pixel.a*pixel.b)/MAX_B;
-	      (*Pic).pic[y][x].a = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].a + pixel.a*pixel.a)/MAX_A;
+	      //(*Pic).pic[y][x].a = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].a + pixel.a*pixel.a)/MAX_A;
 	      return;
 	    case COPYMODE_MULTIPLY:
 	      (*Pic).pic[y][x].r = (U_INT_32_T)(*Pic).pic[y][x].r*pixel.r/MAX_R;
