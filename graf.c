@@ -1335,7 +1335,7 @@ int main()
 	  }
 #endif
 
-#define DEMO_CIRCLE_ANTIALIASING23
+      //#define DEMO_CIRCLE_ANTIALIASING23
 #ifdef DEMO_CIRCLE_ANTIALIASING23
       SDL_Event event;
       int pix_x=20, pix_y=20;
@@ -1344,10 +1344,10 @@ int main()
       lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0, 0, 0, 0xff, 0);
 
       
-      lb_gr_draw_circle_antialiasing2(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xF00f),
-				      COPYMODE_BLEND | COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-      //lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFFa0),
+      //lb_gr_draw_circle_antialiasing2(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xF00f),
       //				      COPYMODE_BLEND | COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+      lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFFa0),
+      				      COPYMODE_BLEND | COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
       lb_gr_refresh();
       while (1)
 	while (SDL_PollEvent(&event))
@@ -1362,24 +1362,52 @@ int main()
 
       //#define DEMO_CIRCLE_ANTIALIASING 
 #ifdef DEMO_CIRCLE_ANTIALIASING
-      lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+      SDL_Event event;
+      int pix_x=10, pix_y=10;
+      lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+      //      lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0xff, 0xff, 0xff, 0xff, 0);
+      lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0, 0, 0, 0xff, 0);
 
-      lb_gr_draw_circle_antialiasing(NULL, ty_width/2,   ty_height/2, 0.25*ty_height, 10, lb_gr_12RGB(0xfF00), COPYMODE_BLEND);
-      lb_gr_draw_circle_antialiasing(NULL, ty_width/3,   ty_height/3, 0.15*ty_height, 10, lb_gr_12RGB(0xf0f0), COPYMODE_BLEND);
-      lb_gr_draw_circle_antialiasing(NULL, ty_width*2/3, ty_height/3, 0.15*ty_height, 10, lb_gr_12RGB(0xf00F), COPYMODE_BLEND);
-      lb_gr_delay(10000);
-      lb_fb_exit(1);
+      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(2*pix_x),   ty_screen.h/(2*pix_y), 0.25*ty_screen.w/pix_x, 10, lb_gr_12RGB(0xfF00),
+      				     COPYMODE_BLEND |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf0f0), 
+   				     COPYMODE_BLEND |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+
+      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf00F),
+				     COPYMODE_BLEND |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+   
+
+      lb_gr_refresh();
+      while (1)
+	while (SDL_PollEvent(&event))
+	  {
+	    if (event.type == SDL_QUIT)
+	      {
+		SDL_Quit();
+		return EXIT_SUCCESS;
+	      }
+	  }
 #endif
 
-      //#define DEMO_CIRCLE_FILLED_SLOW
+      #define DEMO_CIRCLE_FILLED_SLOW
 #ifdef DEMO_CIRCLE_FILLED_SLOW
-      lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+      SDL_Event event;
+      int pix_x=30, pix_y=30;
+      lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
       lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
-      lb_gr_draw_circle_filled_slow(NULL, ty_width/2, ty_height/2, ty_height/3, lb_gr_12RGB(0xF00F), COPYMODE_COPY);
-      lb_gr_delay(8000);
-      lb_fb_exit(1);
+      lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xF00F),
+				    COPYMODE_COPY |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+            lb_gr_refresh();
+      while (1)
+	while (SDL_PollEvent(&event))
+	  {
+	    if (event.type == SDL_QUIT)
+	      {
+		SDL_Quit();
+		return EXIT_SUCCESS;
+	      }
+	  }
 #endif
 
       //#define DEMO_CIRCLE_FILLED_FAST
