@@ -361,8 +361,7 @@ void lb_al_create_array_r(ARRAY_R_T *M)
 	}
       
       for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
-	( *M).a1[j[0]]=0.0;
-	   	
+	(*M).a1[j[0]]=0.0;
       break;
     case 2:
       (*M).a2=malloc((*M).dim[1]*sizeof(FLOAT_T*));
@@ -376,7 +375,7 @@ void lb_al_create_array_r(ARRAY_R_T *M)
 	  (*M).a2[j[1]]=malloc((*M).dim[0]*sizeof(FLOAT_T));
 	  if ((*M).a2[j[1]]==NULL)
 	    {
-	      printf("Error: lb_al_create_array_r() -- malloc failed 2.1 [%d] [%d]\r\n",j[2],j[1]);
+	      printf("Error: lb_al_create_array_r() -- malloc failed 2.1 [%d]\r\n",j[1]);
 	      exit(EXIT_FAILURE);
 	    }
 	  for (j[0]=0;j[0]<(*M).dim[0];j[0]++)
@@ -1754,7 +1753,7 @@ void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT_8_T len, S_INT_8_
       /* Second line */
       printf("\r\n");
       printf(UC_BAR_V);
-      printf(text); 
+      printf(text,""); 
 
       for (x=0;x<title_size-strlen(text);x++)
 	printf(" ");
@@ -1824,7 +1823,7 @@ void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT_8_T len, S_INT_8_
       
       /* Print column titles */
       printf(UC_BAR_V);
-      printf(text);
+      printf(text,"");
       if (n<title_size)
 	for (x=0;x<title_size-n;x++)
 	  printf(" ");

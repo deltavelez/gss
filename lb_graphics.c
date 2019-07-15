@@ -3962,7 +3962,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       if((temp_r<0) || (temp_g<0) || (temp_b<0) || (temp_k<0)||
 	 (temp_r>0xFF) || (temp_g>0xFF) || (temp_b>0xFF) || (temp_k>0xFF))
 	{
-	  printf("Error: lb_gr_fb_setpixel_ARGB_copymode()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%d, tg=%d, tb=%d, tk=%d\r\n",
+	  printf("Error: lb_gr_fb_setpixel_ARGB_copymode()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%ld, tg=%ld, tb=%ld, tk=%ld\r\n",
 		 src_r, src_g, src_b, src_a,
 		 dst_r, dst_g, dst_b, dst_a,
 		 temp_r, temp_g, temp_b, temp_k);
