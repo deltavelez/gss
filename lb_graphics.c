@@ -5040,7 +5040,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_FLOAT_T P0, POINT_2D_FL
       for(i=round(x_start);i<=round(x_end);i++)
 	lb_gr_draw_pixel(Pic,i, round(line_y),lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_WHITE),  COPYMODE_BLEND);
       line_y++;
-      lb_gr_delay(10);
+      //lb_gr_delay(10);
     }
   while (line_y <= C.y)
     {
@@ -5061,7 +5061,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_FLOAT_T P0, POINT_2D_FL
       //lb_gr_draw_pixel(Pic,x_start, line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_RED),  COPYMODE_BLEND);
       //lb_gr_draw_pixel(Pic,x_end,   line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
       line_y++;
-      lb_gr_delay(10);
+      //lb_gr_delay(10);
     }  
  
 

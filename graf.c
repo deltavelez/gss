@@ -1535,14 +1535,13 @@ int main()
 #endif
 
   
-#define DEMO_TRIANGLE
+	    //#define DEMO_TRIANGLE
 #ifdef DEMO_TRIANGLE
+    	    SDL_Event event;
+	    int pix_x=1, pix_y=1;
 	    S_INT_16_T i;
 	    POINT_2D_INT_T A, B, C, D, X;
 	    clock_t begin, end;
-
-    	    SDL_Event event;
-	    int pix_x=1, pix_y=1;
 	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
 	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 	    
@@ -1578,93 +1577,135 @@ int main()
   
 	    //#define DEMO_POLYGON
 #ifdef DEMO_POLYGON
+    	    SDL_Event event;
+	    int pix_x=1, pix_y=1;
 	    LINE_2D_INT_T myPol;
 	    int i;
 	    float phase;
 
-	    lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+	
 	    /* Polygon creation and testing */
 	    myPol.items=10;
 	    lb_gr_create_line2d_i(&myPol);
 	    for (phase=0; phase<6.2832; phase+=0.01) 
 	      {
-		lb_gr_clear_picture(NULL,lb_gr_12RGB(0xf444));
+		lb_gr_clear_picture(NULL,lb_gr_12RGB(0xfEEE));
 
 		for (i=0;i<myPol.items;i++)
 		  {
-		    myPol.array[i].x=round(0.5*ty_width  + 0.4*ty_height*cos(phase+6.2832*i/(myPol.items-1)));
-		    myPol.array[i].y=round(0.5*ty_height - 0.4*ty_height*sin(phase+6.2832*i/(myPol.items-1)));
-		  }
+		    myPol.array[i].x=round(0.5*ty_screen.w/pix_x + 0.4*ty_screen.h*cos(phase+6.2832*i/(myPol.items-1))/pix_y);
+		    myPol.array[i].y=round(0.5*ty_screen.h/pix_x - 0.4*ty_screen.h*sin(phase+6.2832*i/(myPol.items-1))/pix_y);
+		   }
 		//lb_gr_draw_polygon_i(NULL,&myPol,7,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND,LINEMODE_DOTS_FILTERED);
-		lb_gr_draw_polygon_i(NULL,&myPol,7,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND,LINEMODE_FILTERED);
+		lb_gr_draw_polygon_i(NULL,&myPol,3,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
+		lb_gr_refresh();
+		 
 		lb_gr_delay(500);
 	      }
-	    lb_gr_delay(5000);
 	    lb_gr_release_line2d_i(&myPol);
-	    lb_fb_exit(1);
+
+	    while (1)
+	      while (SDL_PollEvent(&event))
+		{
+		  if (event.type == SDL_QUIT)
+		    {
+		      
+		      SDL_Quit();
+		      return EXIT_SUCCESS;
+		    }
+		}
 #endif
 
 	    //#define DEMO_POLYGON_FLOAT
 #ifdef DEMO_POLYGON_FLOAT
+	    SDL_Event event;
+	    int pix_x=1, pix_y=1;
 	    LINE_2D_FLOAT_T myPol;
 	    int i;
 	    float phase;
 
-	    lb_fb_open("/dev/fb0", "/dev/tty1", 8, 8, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+	    lb_gr_refresh();
+ 
 	    /* Polygon creation and testing */ 
 	    myPol.items=10;
 	    lb_gr_create_line2d_f(&myPol);
+	    printf("\a\r\n");
 	    for (phase=0; phase<6.2832; phase+=0.01) 
 	      {
-		lb_gr_clear_picture(NULL,lb_gr_12RGB(0xffff));
+		//lb_gr_clear_picture(NULL,lb_gr_12RGB(0xffff));
 		for (i=0;i<myPol.items;i++)
 		  {
-		    myPol.array[i].x=0.5*ty_width  + 0.45*ty_height*cos(phase+6.2832*i/(myPol.items-1));
-		    myPol.array[i].y=0.5*ty_height - 0.45*ty_height*sin(phase+6.2832*i/(myPol.items-1));
+		    myPol.array[i].x=0.5*ty_screen.w/pix_x + 0.45*ty_screen.h*cos(phase+6.2832*i/(myPol.items-1)/pix_y);
+		    myPol.array[i].y=0.5*ty_screen.h/pix_y - 0.45*ty_screen.h*sin(phase+6.2832*i/(myPol.items-1)/pix_y);
 		  }
-		lb_gr_draw_polygon_antialiasing(NULL,&myPol,6.1,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND);
-		lb_gr_delay(500);
+		lb_gr_draw_polygon_antialiasing(NULL,&myPol,6.1,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
+		printf("hi\r\n");
+		lb_gr_refresh();
+		//lb_gr_delay(50);
 	      }
-	    lb_gr_delay(2000);
 	    lb_gr_release_line2d_f(&myPol);
-	    lb_fb_exit(1);
+	    while (1)
+	      while (SDL_PollEvent(&event))
+		{
+		  if (event.type == SDL_QUIT)
+		    {
+		      SDL_Quit();
+		      return EXIT_SUCCESS;
+		    }
+		}
 #endif
 
 	    //#define DEMO_INSIDE_POLYGON_INT
 #ifdef DEMO_INSIDE_POLYGON_INT
+	    SDL_Event event;
+	    int pix_x=12, pix_y=12;
 	    S_INT_16_T i, j;
 	    LINE_2D_INT_T Poly_int;
 	    POINT_2D_INT_T P;
 
-	    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+	    
 	    /* Polygon creation and testing */
 	    Poly_int.items=6;
 	    lb_gr_create_line2d_i(&Poly_int);
 	    for (i=0;i<Poly_int.items-1;i++)
 	      {
-		Poly_int.array[i].x=0.5*ty_width + 0.45*ty_height*cos(2*M_PI*i/(Poly_int.items-1));
-		Poly_int.array[i].y=0.5*ty_height - 0.45*ty_height*sin(2*M_PI*i/(Poly_int.items-1));
+		Poly_int.array[i].x=ty_screen.w/(2*pix_x) + 0.35*(ty_screen.h/pix_y)*cos(2*M_PI*i/(Poly_int.items-1));
+		Poly_int.array[i].y=ty_screen.h/(2*pix_y) - 0.35*(ty_screen.h/pix_y)*sin(2*M_PI*i/(Poly_int.items-1));
 	      }
 	    Poly_int.array[Poly_int.items-1] = Poly_int.array[0]; /* This ensures the polygon is "closed" */
       
-	    lb_gr_draw_polygon_i(NULL,&Poly_int,2,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND,LINEMODE_FILTERED);
+	    lb_gr_draw_polygon_i(NULL,&Poly_int,4,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
+	    lb_gr_refresh();
+	    lb_gr_delay(5000);
 
-	    for(i=0;i<ty_height;i++)
-	      for(j=0;j<ty_width;j++)
+	    for(i=0;i<ty_screen.h/pix_y;i++)
+	      for(j=0;j<ty_screen.w/pix_x;j++)
 		{
 		  P.x=j;
 		  P.y=i;
 		  if (lb_gr_is_in_polygon_i(&Poly_int,P))
-		    lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_BEIGE), COPYMODE_COPY);
+		    lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_BEIGE), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
 		  else
-		    lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY);
+		    lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
 		}
-	    lb_gr_delay(2000);
-	    lb_gr_release_line2d_i(&Poly_int);
-	    lb_fb_exit(1);
+	    lb_gr_refresh();
+
+	    while (1)
+	      while (SDL_PollEvent(&event))
+		{
+		  if (event.type == SDL_QUIT)
+		    {
+		      
+		      SDL_Quit();
+		      return EXIT_SUCCESS;
+		    }
+		}
 #endif
 
 	    //#define DEMO_INSIDE_POLYGON_FLOAT
