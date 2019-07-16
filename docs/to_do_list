@@ -1,3 +1,7 @@
+#define DEMO_CIRCLE_FILLED_FAST
+==> has a minor glitch at angles = 45 +k*90
+
+
 To follow-up on the order of the bytes in SDL.
 As it is works, but it may affect support of other platforms
 
