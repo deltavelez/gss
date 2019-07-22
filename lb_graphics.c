@@ -38,14 +38,21 @@ int pitch;
 
 void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_T height, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
 {
+  SDL_Init(SDL_INIT_VIDEO);
+
   if ( (width==0) && (height==0) )
     {
-      SDL_DisplayMode DM;
-      if (!SDL_GetCurrentDisplayMode(0, &DM))
+      SDL_Rect rect;
+
+      if (!SDL_GetDisplayUsableBounds(0, &rect))
 	{
-	  ty_screen.w = (U_INT_16_T)DM.w;
-	  ty_screen.h = (U_INT_16_T)DM.h;
-	  printf("Detected width = %d, height = %d\r\n", DM.w, DM.h);
+	  /* Some of the usable area will be taken by the title bar, whose size may be set or even change 
+	     dynamically as per the user's settings and theme. I could not find how to read these and, likely, such 
+	     a method does not exist covering all platforms.  The values below look nicely with the Linux Mint's default
+	     settings using xfce". */
+	  ty_screen.w = (U_INT_16_T)rect.w-6;  // 6: makes up for a 3 pixels border width on each side of the screen
+	  ty_screen.h = (U_INT_16_T)rect.h-28; // 6*2 + 3*2 + 10 font size
+	  printf("Detected usable area: width = %d, height = %d\r\n", rect.w, rect.h);
 	}
       else
 	{
@@ -59,8 +66,6 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_
       ty_screen.h = height;
     }
   
-  SDL_Init(SDL_INIT_VIDEO);
-
   window = SDL_CreateWindow(title, 0, 0, ty_screen.w, ty_screen.h, 0);
 
   printf("Native window Format = %s\r\n",SDL_GetPixelFormatName(SDL_GetWindowPixelFormat(window)));

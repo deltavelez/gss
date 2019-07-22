@@ -1390,14 +1390,14 @@ int main()
 	  }
 #endif
 
-      //      #define DEMO_CIRCLE_FILLED_SLOW
+#define DEMO_CIRCLE_FILLED_SLOW
 #ifdef DEMO_CIRCLE_FILLED_SLOW
       SDL_Event event;
       int pix_x=30, pix_y=30;
-      lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
-      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+      lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLUE));
 
-      lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xF00F),
+      lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(2*pix_y), lb_gr_12RGB(0xF00F),
 				    COPYMODE_COPY |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
       lb_gr_refresh();
       while (1)
@@ -1660,7 +1660,7 @@ int main()
 #endif
 
 	    //oxo
-#define DEMO_INSIDE_POLYGON_INT
+	    //#define DEMO_INSIDE_POLYGON_INT
 #ifdef DEMO_INSIDE_POLYGON_INT
 	    SDL_Event event;
 	    int pix_x=12, pix_y=12;
@@ -1668,7 +1668,7 @@ int main()
 	    LINE_2D_INT_T Poly_int;
 	    POINT_2D_INT_T P;
 
-	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
 	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 	    
 	    /* Polygon creation and testing */
@@ -3596,7 +3596,7 @@ int main()
 
 
 	    // printf("x=%f x 10 ^%f\r\n",lb_re_normed_significand(10.01),lb_re_normed_exponent(10.01));
-	    // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX);
+	    // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
 
             
 	    system("clear");
