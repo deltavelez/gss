@@ -38,19 +38,35 @@ int pitch;
 
 void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_T height, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
 {
-  ty_screen.w = width;
-  ty_screen.h = height;
+  if ( (width==0) && (height==0) )
+    {
+      SDL_DisplayMode DM;
+      if (!SDL_GetCurrentDisplayMode(0, &DM))
+	{
+	  ty_screen.w = (U_INT_16_T)DM.w;
+	  ty_screen.h = (U_INT_16_T)DM.h;
+	  printf("Detected width = %d, height = %d\r\n", DM.w, DM.h);
+	}
+      else
+	{
+	  printf("Error: lb_gr_SLD_init() --> Tried detecting maximum screen size but failed.\r\n");
+	  exit(EXIT_FAILURE);
+	}
+    }
+      else
+    {	  
+      ty_screen.w = width;
+      ty_screen.h = height;
+    }
   
   SDL_Init(SDL_INIT_VIDEO);
 
-  window = SDL_CreateWindow(title, 0, 0, width, height, 0);
-  if (SDL_GetWindowPixelFormat(window) != SDL_PIXELFORMAT_RGB888 )
-    {
-      printf("Error: lb_gr-SDL_init() --> Native window Format = %s\r\n",SDL_GetPixelFormatName(SDL_GetWindowPixelFormat(window)));
-      printf("Pixel formats other than SDL_PIXELFORMAT_RGB888 are not currently supported...\r\n");
-      exit(EXIT_FAILURE);
-    }
+  window = SDL_CreateWindow(title, 0, 0, ty_screen.w, ty_screen.h, 0);
 
+  printf("Native window Format = %s\r\n",SDL_GetPixelFormatName(SDL_GetWindowPixelFormat(window)));
+
+  if (SDL_GetWindowPixelFormat(window) != SDL_PIXELFORMAT_RGB888 )
+    printf("Warning: Native window Format = %s\r\n",SDL_GetPixelFormatName(SDL_GetWindowPixelFormat(window)));
   
   /* The renderer is created as "Software" since it is actually faster both in the Raspberry Pi as well as in a Desktop */
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
@@ -59,16 +75,14 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_
   //SDL_RenderPresent(renderer);
 
 #ifdef TEXTUREMODE_SOFTWARE
-  ty_screen.dat=malloc(width*height*4);
-  ty_screen.w=width;
-  ty_screen.h=height;
+  ty_screen.dat=malloc(ty_screen.w*ty_screen.h*4);
 #endif
 
 #ifdef TEXTUREMODE_SOFTWARE
-  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, width, height);
+  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, ty_screen.w, ty_screen.h);
   SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_NONE);
 #else
-  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
+  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, ty_screen.w, ty_screen.h);
   SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
 #endif
   lb_gr_fb_rectangle(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, r, g, b);

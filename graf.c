@@ -1659,7 +1659,8 @@ int main()
 		}
 #endif
 
-	    //#define DEMO_INSIDE_POLYGON_INT
+	    //oxo
+#define DEMO_INSIDE_POLYGON_INT
 #ifdef DEMO_INSIDE_POLYGON_INT
 	    SDL_Event event;
 	    int pix_x=12, pix_y=12;
@@ -1667,7 +1668,7 @@ int main()
 	    LINE_2D_INT_T Poly_int;
 	    POINT_2D_INT_T P;
 
-	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
 	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 	    
 	    /* Polygon creation and testing */
