@@ -50,10 +50,9 @@ typedef struct
 #define ARRAY_MAX_DIM      5
 #define ARRAY_MAX_N        65535
 
-/* These ought to be deleted */
-#define MATRIX_MAX_ROWS  10
-#define MATRIX_MAX_COLS  10
-#define VECTOR_MAX_ITEMS 10
+#define MATRIX_MAX_ROWS  1000
+#define MATRIX_MAX_COLS  1000
+#define VECTOR_MAX_ITEMS 1000
 
 /******************************************************/
 /* Linear Algebra data types */

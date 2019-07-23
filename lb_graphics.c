@@ -23,7 +23,6 @@
 */
 
 /* Global Variables.  They're declared "extern" in lb_x11.c */
-extern PICTURE_T ty_pic_shadow;
 extern CONSOLE_T *ty_C;
 extern SCREEN_T ty_screen;
 
@@ -577,7 +576,7 @@ void lb_gr_BMPfile_getsize(const char *filename, S_INT_16_T *width, S_INT_16_T *
   fd = fopen(filename, "rb");
   if (fd == NULL)
     {
-      lb_ft_printf(ty_C, "Error: fopen failed\n");
+      lb_ft_printf(ty_C, "Error: lb_gr_BMPfile_getsize() --> fopen failed\n");
       return; 
     }
 
@@ -724,14 +723,16 @@ void lb_gr_BMPfile_load_to_matrix(const char *filename, MATRIX_R_T *R, MATRIX_R_
   fclose(fd);
 }
 
+// oxo
 void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
 {
-  unsigned int headers[13];
   FILE * outfile;
+  unsigned int headers[13];
   int extrabytes;
   int paddedsize;
   int x, y, n, width, height;
   int r, g, b;
+  U_INT_32_T dat_offset;
 
   if (Pic==NULL)
     {
@@ -805,9 +806,10 @@ void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
       {
 	for (x=0; x<width; x++)
 	  {
-	    r = round(FACTOR_N_TO_8_R*ty_pic_shadow.pic[y][x].r);
-	    g = round(FACTOR_N_TO_8_G*ty_pic_shadow.pic[y][x].g);
-	    b = round(FACTOR_N_TO_8_B*ty_pic_shadow.pic[y][x].b);
+	    dat_offset=4*(ty_screen.w*y+x);
+	    b = *((U_INT_8_T*)ty_screen.dat + dat_offset    );
+	    g = *((U_INT_8_T*)ty_screen.dat + dat_offset + 1); 
+	    r = *((U_INT_8_T*)ty_screen.dat + dat_offset + 2);
 
 	    fprintf(outfile, "%c", b);
 	    fprintf(outfile, "%c", g);
@@ -911,9 +913,9 @@ S_INT_8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, U_INT_8_T qua
       {
 	for(j=0;j<width;j++)
 	  {
-	    buffer[(unsigned int)3*j]   = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].r*FACTOR_N_TO_8_R;
-	    buffer[(unsigned int)3*j+1] = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].g*FACTOR_N_TO_8_G;
-	    buffer[(unsigned int)3*j+2] = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].b*FACTOR_N_TO_8_B;
+	    //	    buffer[(unsigned int)3*j]   = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].r*FACTOR_N_TO_8_R;
+	    //buffer[(unsigned int)3*j+1] = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].g*FACTOR_N_TO_8_G;
+	    //buffer[(unsigned int)3*j+2] = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].b*FACTOR_N_TO_8_B;
 	  }
 	row_pointer= (JSAMPROW) buffer;
 	jpeg_write_scanlines(&cinfo, &row_pointer, 1);
@@ -1217,7 +1219,7 @@ void       lb_gr_plot_zbuffer_line_1(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, FLOAT_T
       /* If a NULL pointer is passed, we "read" the framebuffer's color from a shadow register */
       if (Pic==NULL)
 	{
-	  if ( (xr<0) || (xr>=ty_pic_shadow.w) || (yr<0) || (yr>=ty_pic_shadow.h) )
+	  //	  if ( (xr<0) || (xr>=ty_pic_shadow.w) || (yr<0) || (yr>=ty_pic_shadow.h) )
 	    return;
 	}
       else
