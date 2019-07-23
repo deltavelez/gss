@@ -1390,7 +1390,7 @@ int main()
 	  }
 #endif
 
-#define DEMO_CIRCLE_FILLED_SLOW
+      //#define DEMO_CIRCLE_FILLED_SLOW
 #ifdef DEMO_CIRCLE_FILLED_SLOW
       SDL_Event event;
       int pix_x=30, pix_y=30;
@@ -1659,8 +1659,7 @@ int main()
 		}
 #endif
 
-	    //oxo
-	    //#define DEMO_INSIDE_POLYGON_INT
+	    //	    #define DEMO_INSIDE_POLYGON_INT
 #ifdef DEMO_INSIDE_POLYGON_INT
 	    SDL_Event event;
 	    int pix_x=12, pix_y=12;
@@ -1711,17 +1710,20 @@ int main()
 
 	    //#define DEMO_INSIDE_POLYGON_FLOAT
 #ifdef DEMO_INSIDE_POLYGON_FLOAT
+	    SDL_Event event;
+	    int pix_x=1, pix_y=1;
 	    S_INT_16_T i, j;
 	    LINE_2D_FLOAT_T Poly_f;
 	    POINT_2D_FLOAT_T P;
 	    VIEWPORT_2D_T win;
 
-	    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
 	    win.xp_min=0;
 	    win.yp_min=0;
-	    win.xp_max=ty_width;
-	    win.yp_max=ty_height;
+	    win.xp_max=ty_screen.w/pix_x;
+	    win.yp_max=ty_screen.h/pix_y;
 	    win.xr_min=-2*1.024;
 	    win.xr_max=2*1.024;
 	    win.yr_min=-2*0.768;
@@ -1737,8 +1739,8 @@ int main()
 	      }
 	    Poly_f.array[Poly_f.items-1] = Poly_f.array[0]; /* This ensures the polygon is "closed" */
       
-	    for(i=0;i<ty_height;i++)
-	      for(j=0;j<ty_width;j++)
+	    for(i=0;i<ty_screen.h/pix_y;i++)
+	      for(j=0;j<ty_screen.w/pix_x;j++)
 		{
 		  lb_gr_project_2d_inv(win, j, i, &P.x, &P.y);
 
@@ -1746,18 +1748,31 @@ int main()
 		    lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_GREEN | 0xF000), COPYMODE_BLEND);
 		  else
 		    lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_BLEND);
-		} 
-	    lb_gr_delay(10000);
+		}
+	    lb_gr_refresh();
+
 	    lb_gr_release_line2d_f(&Poly_f);
-	    lb_fb_exit(1);
+	    while (1)
+	      while (SDL_PollEvent(&event))
+		{
+		  if (event.type == SDL_QUIT)
+		    {
+		      
+		      SDL_Quit();
+		      return EXIT_SUCCESS;
+		    }
+		}
 #endif
 
 	    //#define DEMO_POLYGON_FILL
 #ifdef DEMO_POLYGON_FILL
+	    SDL_Event event;
+	    int pix_x=1, pix_y=1;
 	    LINE_2D_INT_T myPol;
 	    int k=40;
 
-	    lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
 	    /* Polygon creation and testing */
 	    myPol.items=5;
@@ -1772,9 +1787,19 @@ int main()
 	    lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xFF00),COPYMODE_BLEND);
 	    lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xF0F0),COPYMODE_BLEND);
 	    lb_gr_draw_polygon_i(NULL,&myPol, 4,lb_gr_12RGB(0xF00F),COPYMODE_BLEND,LINEMODE_FILTERED);
-	    lb_gr_delay(10000);
+	    lb_gr_refresh();
+
 	    lb_gr_release_line2d_i(&myPol);
-	    lb_fb_exit(1);
+	    while (1)
+	      while (SDL_PollEvent(&event))
+		{
+		  if (event.type == SDL_QUIT)
+		    {
+		      
+		      SDL_Quit();
+		      return EXIT_SUCCESS;
+		    }
+		}
 #endif
 
 	    //#define DUFF_PORTER
@@ -2162,7 +2187,6 @@ int main()
 		if (SDL_PollEvent(&event) && event.type == SDL_WINDOWEVENT)
 		  lb_gr_refresh();
 	      }
-
 #endif
 
   
@@ -2295,7 +2319,6 @@ int main()
 
 	    //#define DEMO_PLOT2D_REVERSE_SLOW
 #ifdef DEMO_PLOT2D_REVERSE_SLOW
-	    /* oxo: missing lines due to emulation error  */
 	    FLOAT_T t, t0, t1;
 	    S_INT_16_T i;
 	    VIEWPORT_2D_T vp;
@@ -2546,19 +2569,23 @@ int main()
 #endif
 
 
-	    //#define DEMO_MALDENBROT
+#define DEMO_MALDENBROT
 #ifdef DEMO_MALDENBROT
+	    SDL_Event event;
+	    int pix_x=1, pix_y=1;
+	    
 	    int xp, yp, iterations;
 	    FLOAT_T xr, yr;
 	    COMPLEX_T z, p;
 	    VIEWPORT_2D_T win;
 
-	    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+	    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+	    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
 	    win.xp_min=0;
 	    win.yp_min=0;
-	    win.xp_max=ty_width;
-	    win.yp_max=ty_height;
+	    win.xp_max=ty_screen.w/pix_x;
+	    win.yp_max=ty_screen.h/pix_y;
 	    win.xr_min=-1.024*2;
 	    win.xr_max=1.024*2;
 	    win.yr_min=-0.768*2; 
@@ -2578,11 +2605,23 @@ int main()
 		      z=lb_cp_add(lb_cp_multiply(z,z),p);
 		      iterations++;
 		    }
-		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations), COPYMODE_COPY);
+		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations<<8), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
 		}
+	    lb_gr_refresh();
 	    lb_gr_BMPfile_save("maldenbrot.bmp",NULL);
-	    lb_gr_delay(10000);
-	    lb_fb_exit(1);
+	    while (1)
+	      while (SDL_PollEvent(&event))
+		{
+		  if (event.type == SDL_QUIT)
+		    {
+		      
+		      SDL_Quit();
+		      return EXIT_SUCCESS;
+		    }
+		}
+		
+
+
 #endif
 
 	    //#define DEMO_VIDEO

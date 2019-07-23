@@ -922,7 +922,6 @@ typedef struct
 /* Global Variables */
 /******************************************************/
 
-PICTURE_T  ty_pic_shadow;
 CONSOLE_T  *ty_C;
 SCREEN_T ty_screen;
 S_INT_8_T  ty_SDL_initialized;
