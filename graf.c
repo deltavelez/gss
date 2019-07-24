@@ -1708,7 +1708,6 @@ int main()
       }
 #endif
 
-  // oxo
   //#define DEMO_INSIDE_POLYGON_FLOAT
 #ifdef DEMO_INSIDE_POLYGON_FLOAT
   SDL_Event event;
@@ -2318,11 +2317,10 @@ int main()
   lb_fb_exit(1);
 #endif
 
-  // oxo
-#define DEMO_PLOT2D_REVERSE_SLOW
+  //#define DEMO_PLOT2D_REVERSE_SLOW
 #ifdef DEMO_PLOT2D_REVERSE_SLOW
   SDL_Event event;
-  int pix_x=3, pix_y=3;
+  int pix_x=1, pix_y=8;
   FLOAT_T t, t0, t1;
   S_INT_16_T i;
   VIEWPORT_2D_T vp;
@@ -2342,13 +2340,13 @@ int main()
   vp.yr_min = -2*0.768;
   vp.yr_max = 2*0.768;
 
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_x),   ty_screen.h/(5*pix_y), lb_gr_12RGB(0xf00f), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_x),   ty_screen.h/(5*pix_y), lb_gr_12RGB(0xf0f0), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(2*pix_x),   ty_screen.h*2/(3*pix_x), ty_screen.h/(5*pix_y), lb_gr_12RGB(0x3F00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_y),   ty_screen.h/(5*pix_y), lb_gr_12RGB(0xf00f), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y),   ty_screen.h/(5*pix_y), lb_gr_12RGB(0xf0f0), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(2*pix_x),   ty_screen.h*2/(3*pix_y), ty_screen.h/(5*pix_y), lb_gr_12RGB(0x3F00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
 
   /* Create and load vectors */ 
-  Lx.items=50;
-  Ly.items=50;
+  Lx.items=150;
+  Ly.items=150;
   lb_al_create_vector_r(&Lx);
   lb_al_create_vector_r(&Ly);
 
@@ -2361,7 +2359,7 @@ int main()
       t+=(t1-t0)/(FLOAT_T)Lx.items;
     }
 
-  lb_gr_plot2d_line_reverse_slow(NULL, vp, &Lx, &Ly, 20, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_plot2d_line_reverse_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
   lb_gr_refresh();
       
   lb_al_release_vector_r(&Lx);
@@ -2432,12 +2430,16 @@ int main()
       }
 #endif
 
-  //#define DEMO_POLAR_AXIS
+  //oxo
+#define DEMO_POLAR_AXIS
 #ifdef DEMO_POLAR_AXIS
+  SDL_Event event;
+  int pix_x=10, pix_y=10;
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2452,20 +2454,31 @@ int main()
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
   win.xp_min=0;
-  win.xp_max=ty_width;
+  win.xp_max=ty_screen.w;
   win.yp_min=0;
-  win.yp_max=ty_height;
+  win.yp_max=ty_screen.h;
 
   win.xr_min= -1.024*3;
   win.xr_max=  1.024*3;
   win.yr_min=  0.768*3;
   win.yr_max= -0.768*3; 
 
-  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID), COPYMODE_COPY);
+  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID),
+		       COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
   lg_gr_draw_axis_2d_polar(NULL, win, &my_font, 0, 4, 1, lb_gr_12RGB(COLOR_BLUE), 0, 2*M_PI, 30*M_PI/180,
-			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_BLEND);
-  lb_gr_delay(10000);
-  lb_fb_exit(1);
+			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
+  lb_gr_refresh();
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   //#define DEMO_ADXIS_2D

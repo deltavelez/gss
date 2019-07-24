@@ -723,7 +723,6 @@ void lb_gr_BMPfile_load_to_matrix(const char *filename, MATRIX_R_T *R, MATRIX_R_
   fclose(fd);
 }
 
-// oxo
 void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
 {
   FILE * outfile;
@@ -1819,9 +1818,6 @@ void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T y
 	pix_adj.a=round(MAX_A*(1.0-fabs(distance)/1.0)); /* try out other values! */ 
       else
 	pix_adj.a=0;
-
-	
-      //oxo 
 
       lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); /* Oct 1 */
       lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, copymode); /* Oct 2 */
@@ -4433,7 +4429,6 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
     }
   else /* Copying directly to the screen */
     {
-      // oxo 
       if (!(copymode & (COPYMODE_SCALEX_MASK | COPYMODE_SCALEY_MASK))) /* size == 1 */
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
 	lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
@@ -5789,16 +5784,22 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
   ERR_T error;
   PIXEL_T pix_main;
   FLOAT_T scale;
+  FLOAT_T scale_x, scale_y;
 
+	  
   if (Pic==NULL) 
     {
       width  = ty_screen.w;
       height = ty_screen.h;
+      scale_x = 1.0 / (1 + ((copymode & COPYMODE_SCALEX_MASK) >> COPYMODE_SCALEX_SHIFT));
+      scale_y = 1.0 / (1 + ((copymode & COPYMODE_SCALEY_MASK) >> COPYMODE_SCALEY_SHIFT));
     }
   else
     {
       width  = (*Pic).w;
       height = (*Pic).h;
+      scale_x=1.0;
+      scale_y=1.0;
     }
     
   pix_main=color;
@@ -5818,7 +5819,7 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
     for(xi=0;xi<width;xi++)
       {
 	pix_main.a=0;
-	lb_gr_project_2d_inv(vp2d, xi, yi, &xr, &yr);
+	lb_gr_project_2d_inv(vp2d, xi*scale_x, yi*scale_y, &xr, &yr);
 
 	/* For each pixel, we calculate the shortest distance to the curve */
 	distance=10000;
@@ -5834,14 +5835,8 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
 	      pix_main.a=MAX_A*(1.0-fabs(w2-distance)); 
 	  }
 	if (pix_main.a!=0)
-	  {
-	    lb_gr_draw_pixel(Pic, xi, yi, lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID), COPYMODE_COPY);
-	  }
-	else
-	  {
-	    //lb_gr_draw_pixel(Pic, xi, yi, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), copymode);
-	  }
-	 
+	  lb_gr_draw_pixel(Pic, xi, yi, lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID),
+			   copymode & COPYMODE_SCALEX_MASK & COPYMODE_SCALEY_MASK);
       }
 }
 
@@ -6406,6 +6401,7 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
 }
 
 
+// oxo
 void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
 				    FLOAT_T r0, FLOAT_T r1, FLOAT_T delta_r, PIXEL_T color_r, 
 				    FLOAT_T t0, FLOAT_T t1, FLOAT_T delta_t, PIXEL_T color_t,
@@ -6414,7 +6410,19 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
   FLOAT_T r, t, t_temp, t_min, t_max, r_min, r_max, xr, yr, xp0, yp0, xp1, yp1, factor_delta;
   S_INT_16_T xp0_i, yp0_i, xp1_i, yp1_i;
   S_INT_8_T flag_adjacent, counter_adjacent, exponent;
-      
+  FLOAT_T scale_x, scale_y;
+	  
+  if (Pic==NULL) 
+    {
+      scale_x = 1.0 / (1 + ((copymode & COPYMODE_SCALEX_MASK) >> COPYMODE_SCALEX_SHIFT));
+      scale_y = 1.0 / (1 + ((copymode & COPYMODE_SCALEY_MASK) >> COPYMODE_SCALEY_SHIFT));
+    }
+  else
+    {
+      scale_x=1.0;
+      scale_y=1.0;
+    }
+  
   if (lb_re_equal(vp2d.xr_min, vp2d.xr_max))
     {
       printf("Error: lg_gr_draw_axis_2d_polar() --> vp2d.xr_min [%f]= vp2d.xr_max [%f]\r\n",vp2d.xr_min,vp2d.xr_max);
@@ -6477,8 +6485,8 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
       yr=r*sin(t);
   
       lb_gr_project_2d(vp2d, xr, yr, &xp0, &yp0);
-      xp0_i = round(xp0);
-      yp0_i = round(yp0);
+      xp0_i = round(xp0)*scale_x;
+      yp0_i = round(yp0)*scale_y;
       lb_gr_draw_pixel(Pic, xp0_i, yp0_i, color_t, copymode);
 
       exponent=0;
@@ -6495,8 +6503,8 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
 	      yr=r*sin(t_temp);
   
 	      lb_gr_project_2d(vp2d, xr, yr, &xp1, &yp1);
-	      xp1_i = round(xp1);
-	      yp1_i = round(yp1);
+	      xp1_i = round(xp1)*scale_x;
+	      yp1_i = round(yp1)*scale_y;
 	      if ( (abs(xp1_i-xp0_i)<=1) && (abs(yp1_i-yp0_i)<=1) )
 		{
 		  flag_adjacent=TRUE;
@@ -6544,7 +6552,8 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
       yr=r_max*sin(t);
       lb_gr_project_2d(vp2d, xr, yr, &xp1, &yp1);
 
-      lb_gr_draw_line1_f(Pic, round(xp0), round(yp0), round(xp1), round(yp1), color_r, COPYMODE_COPY);
+      lb_gr_draw_line1_f(Pic, round(xp0*scale_x), round(yp0*scale_y),
+			 round(xp1*scale_x), round(yp1*scale_y), color_r, copymode);
       t+=delta_t;
     }
 }
@@ -6811,13 +6820,10 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
       exit(EXIT_FAILURE);
     }
 
-  //oxo
   for (i=0;i<(*Pic).h;i++)
     for (j=0;j<(*Pic).w;j++)
       lb_gr_draw_pixel(NULL, j, i, (*Pic).pic[i][j], copymode);
 }
-
-
 
 
 #ifdef XXXXX
