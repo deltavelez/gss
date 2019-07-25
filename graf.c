@@ -1296,14 +1296,21 @@ int main()
       }
 #endif
 
-  //#define DEMO_CIRCLE
+#define DEMO_CIRCLE
 #ifdef DEMO_CIRCLE
   SDL_Event event;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
   lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);
   lb_gr_refresh();
+  lb_gr_delay(2000);
 
+  lb_gr_resize(100, 100);
+
+  //  lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
+  //lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);
+  //lb_gr_refresh();
+  
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -2431,7 +2438,7 @@ int main()
 #endif
 
   //oxo
-#define DEMO_POLAR_AXIS
+  //#define DEMO_POLAR_AXIS
 #ifdef DEMO_POLAR_AXIS
   SDL_Event event;
   int pix_x=10, pix_y=10;

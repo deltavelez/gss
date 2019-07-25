@@ -7,6 +7,8 @@
 
 
 void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_T height,  U_INT_8_T r, U_INT_8_T g, U_INT_8_T b);
+void lb_gr_resize(S_INT_16_T width, S_INT_16_T height);
+
 void lb_gr_SDL_close();
 void lb_gr_refresh();
 
