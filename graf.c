@@ -1305,7 +1305,7 @@ int main()
   lb_gr_refresh();
   lb_gr_delay(2000);
 
-  lb_gr_resize(100, 100);
+  //  lb_gr_resize(100, 100);
 
   //  lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
   //lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);

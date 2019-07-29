@@ -11,6 +11,7 @@
 #include "lb_types.h"
 #include "lb_numer.h"
 #include "lb_fonts.h"
+#include <SDL2/SDL.h>
 
 #define TEXTUREMODE_SOFTWARE
 
@@ -35,25 +36,22 @@ int pitch;
 
 #define TEXTUREMODE_SOFTWARE
 
-void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_T height, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, RENDERMODE_T rendermode)
+void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_T height, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
 {
-  ty_scale_x= 1 + ( (rendermode>>RENDERMODE_SCALEX_SHIFT) & RENDERMODE_SCALEX_MASK );
-  ty_scale_y= 1 + ( (rendermode>>RENDERMODE_SCALEY_SHIFT) & RENDERMODE_SCALEY_MASK );
-
   SDL_Init(SDL_INIT_VIDEO);
 
   if ( (width==0) && (height==0) )
     {
       SDL_Rect rect;
 
-      if (!SDL_GetDisplayUsableBounds(0, &rect))
+      if (!SDL_GetDisplayBounds(0, &rect))
 	{
 	  /* Some of the usable area will be taken by the title bar, whose size may be set or even change 
 	     dynamically as per the user's settings and theme. I could not find how to read these and, likely, such 
 	     a method does not exist covering all platforms.  The values below look nicely with the Linux Mint's default
 	     settings using xfce". */
-	  ty_screen.w = ((U_INT_16_T)rect.w -6)/ty_scale_x;  // 6: makes up for a 3 pixels border width on each side of the screen
-	  ty_screen.h = ((U_INT_16_T)rect.h-28)/ty_scale_y; // 6*2 + 3*2 + 10 font size
+	  ty_screen.w = (U_INT_16_T)rect.w-6;  // 6: makes up for a 3 pixels border width on each side of the screen
+	  ty_screen.h = (U_INT_16_T)rect.h-28; // 6*2 + 3*2 + 10 font size
 	  printf("Detected usable area: width = %d, height = %d\r\n", rect.w, rect.h);
 	}
       else
@@ -64,8 +62,8 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_
     }
   else
     {	  
-      ty_screen.w = width*ty_scale_x;
-      ty_screen.h = height*ty_scale_y;
+      ty_screen.w = width;
+      ty_screen.h = height;
     }
   
   window = SDL_CreateWindow(title, 0, 0, ty_screen.w, ty_screen.h, 0);
@@ -99,11 +97,6 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_
 void lb_gr_SDL_close()
 {
   free(ty_screen.dat);
-}
-
-void lb_gr_resize(S_INT_16_T width, S_INT_16_T height)
-{
-  SDL_SetWindowSize(window, width, height);
 }
 
 void lb_gr_refresh()
@@ -731,6 +724,7 @@ void lb_gr_BMPfile_load_to_matrix(const char *filename, MATRIX_R_T *R, MATRIX_R_
   fclose(fd);
 }
 
+// oxo
 void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
 {
   FILE * outfile;
@@ -1826,6 +1820,9 @@ void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T y
 	pix_adj.a=round(MAX_A*(1.0-fabs(distance)/1.0)); /* try out other values! */ 
       else
 	pix_adj.a=0;
+
+	
+      //oxo 
 
       lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); /* Oct 1 */
       lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, copymode); /* Oct 2 */
@@ -3610,6 +3607,48 @@ void lb_gr_fb_rectangle(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16
 }
 
 
+void  lb_gr_fb_rectangle_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
+{
+  S_INT_16_T x_min, x_max, y_min, y_max, x, y;
+
+  if (x0<=x1)
+    {
+      x_min=x0;
+      x_max=x1;
+    }
+  else
+    {
+      x_min=x1;
+      x_max=x0;
+    }
+  
+  if (x_min<0)
+    x_min=0;
+
+  if (x_max>(*screen).w-1)
+    x_max=(*screen).w-1;
+
+  if (y0<=y1)
+    {
+      y_min=y0;
+      y_max=y1;
+    }
+  else
+    {
+      y_min=y1;
+      y_max=y0;
+    }
+  
+  if (y_min<0)
+    y_min=0;
+
+  if (y_max>(*screen).h-1)
+    y_max=(*screen).h-1;
+
+  for (y=y_min; y<=y_max; y++)
+    for (x=x_min; x<=x_max; x++)
+      lb_gr_fb_setpixel_ARGB_copymode(screen, x, y, r, g, b, a, copymode);
+}
 
 
 void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a)
@@ -3635,11 +3674,320 @@ void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT
   return;
 }
 
+
 void lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a)
 {
   if ( (x<0) || (y<0) || (x>(*screen).w) || (y>(*screen).h) )
     return;
   _lb_gr_fb_setpixel_ARGB(screen, x, y, r, g, b, a);
+}
+
+
+void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T src_r, U_INT_8_T src_g, U_INT_8_T src_b, U_INT_8_T src_a, COPYMODE_T copymode)
+{
+  U_INT_32_T dat_offset;
+
+  if ( (copymode == COPYMODE_FRAMEBUFFER) || (copymode == COPYMODE_COPY) )
+    {
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  src_a<<24 | src_r<<16 | src_g<<8 |  src_b ;
+      return;
+    }
+
+  U_INT_8_T dst_r, dst_g, dst_b, dst_a;
+  
+  dat_offset=4*((*screen).w*y+x);
+  dst_b = *((unsigned char*)(*screen).dat + dat_offset);
+  dst_g = *((unsigned char*)(*screen).dat + dat_offset + 1); 
+  dst_r = *((unsigned char*)(*screen).dat + dat_offset + 2);
+  dst_a = *((unsigned char*)(*screen).dat + dat_offset + 3);
+
+  switch (copymode)
+    { 
+    case COPYMODE_AND: /* Performs logical AND between SRC and DST. Alpha remains unchanged. */
+      dst_r &= src_r;
+      dst_g &= src_g;
+      dst_b &= src_b;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_OR: /* Performs logical OR between SRC and DST. Alpha remains unchanged. */
+      dst_r |= src_r;
+      dst_g |= src_g;
+      dst_b |= src_b;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_XOR: /* Performs logical XOR between SRC and DST. Alpha remains unchanged. */
+      dst_r ^= src_r;
+      dst_g ^= src_g;
+      dst_b ^= src_b;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_NOT_SRC: /* Makes DST the logical NOT of SRC. Alpha remains unchanged. */
+      dst_r = ~src_r;
+      dst_g = ~src_g;
+      dst_b = ~src_b;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_NOT_DST: /* Performs a logical NOT on DST (regardless of SRC). Alpha remains unchanged. */
+      dst_r = ~dst_r;
+      dst_g = ~dst_g;
+      dst_b = ~dst_b;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_ADD: /* Sums each one of the color components but caps the value at the maximum if exceeded. */
+      {
+	S_INT_16_T temp; /* Sets the alpha as the average of SRC and DST */
+	      
+	temp=dst_r + src_r;  
+	if (temp>0xFF)
+	  temp=0xFF;
+	dst_r=temp;
+
+	temp=dst_g + src_g;  
+	if (temp>0xFF)
+	  temp=0xFF;
+	dst_g=temp;
+
+	temp=dst_b + src_b;  
+	if (temp>0xFF)
+	  temp=0xFF;
+	dst_b=temp;
+
+	temp=(src_a + dst_a) >> 1;
+	dst_a=temp;
+
+	dat_offset = (*screen).w*y + x;
+	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	return;
+      }
+    case COPYMODE_SRC_MINUS_DST: /* Substracts each one of the color components of SRC minus DST.  Caps at zero. */
+      {
+	S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+	      
+	temp = src_r - dst_r;
+	if (temp<0)
+	  temp=0;
+	dst_r=temp;
+
+	temp = src_g - dst_g;
+	if (temp<0)
+	  temp=0;
+	dst_g=temp;
+
+	temp = src_b - dst_b;
+	if (temp<0)
+	  temp=0;
+	dst_b=temp;
+
+	temp=(src_a + dst_a) >> 1;
+	dst_a=temp;
+
+	dat_offset = (*screen).w*y + x;
+	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	return;
+      }
+    case COPYMODE_DST_MINUS_SRC: /* Substracts each one of the color components of DST minus SRC.  Caps at zero. */
+      {
+	S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+	
+	temp=dst_r - src_r;      
+	if (temp<0)
+	  temp=0;
+	dst_r=temp;
+
+	temp=dst_g - src_g;      
+	if (temp<0)
+	  temp=0;
+	dst_g=temp;
+
+	temp=dst_b - src_b;      
+	if (temp<0)
+	  temp=0;
+	dst_b=temp;
+
+	temp=(src_a + dst_a) >> 1;
+	dst_a=temp;
+	
+	dat_offset = (*screen).w*y + x;
+	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	return;
+      }
+    case COPYMODE_AVG: /* Averages each one of the components of SRC and DST as well as the alpha. */
+      dst_r = ((S_INT_16_T)src_r + (S_INT_16_T)dst_r) >> 1;
+      dst_g = ((S_INT_16_T)src_g + (S_INT_16_T)dst_g) >> 1;
+      dst_b = ((S_INT_16_T)src_b + (S_INT_16_T)dst_b) >> 1;
+      dst_a = ((S_INT_16_T)src_a + (S_INT_16_T)dst_a) >> 1;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_BLEND:
+      dst_r = (U_INT_32_T)((0xFF-src_a)*dst_r + src_a*src_r)>>8;
+      dst_g = (U_INT_32_T)((0xFF-src_a)*dst_g + src_a*src_g)>>8;
+      dst_b = (U_INT_32_T)((0xFF-src_a)*dst_b + src_a*src_b)>>8;
+      //      dst_a = (U_INT_32_T)((0xFF-src_a)*dst_a + src_a*src_a)>>8;
+
+      dat_offset = (*screen).w*y + x;
+      //      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_MULTIPLY:
+      dst_r = (U_INT_32_T)dst_r*src_r>>8;
+      dst_g = (U_INT_32_T)dst_g*src_g>>8;
+      dst_b = (U_INT_32_T)dst_b*src_b>>8;
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      return;
+    case COPYMODE_SRC_DIV_DST:
+      {
+	U_INT_8_T temp;
+	      
+	if (dst_r!=0)
+	  temp=(U_INT_32_T)(0xFF*src_r/dst_r);
+	else
+	  temp=0xFF;
+	dst_r=temp;
+
+	if (dst_g!=0)
+	  temp=(U_INT_32_T)(0xFF*src_g/dst_g);
+	else
+	  temp=0xFF;
+	dst_g=temp;
+
+	if (dst_b!=0)
+	  temp=(U_INT_32_T)(0xFF*src_b/dst_b);
+	else
+	  temp=0xFF;
+	dst_b=temp;
+	
+	dat_offset = (*screen).w*y + x;
+	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	return;
+      }
+    case COPYMODE_DST_DIV_SRC:
+      {
+	U_INT_8_T temp;
+	      
+	if (src_r!=0)
+	  temp=(U_INT_32_T)(0xFF*dst_r/src_r);
+	else
+	  temp=0xFF;
+	dst_r=temp;
+
+	if (src_g!=0)
+	  temp=(U_INT_32_T)(0xFF*dst_g/src_g);
+	else
+	  temp=0xFF;
+	dst_g=temp;
+
+	if (src_b!=0)
+	  temp=(U_INT_32_T)(0xFF*dst_b/src_b);
+	else
+	  temp=0xFF;
+	dst_b=temp;
+
+	dat_offset = (*screen).w*y + x;
+	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	return;
+      }
+    default:
+      break;
+    }
+
+  S_INT_32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
+  FLOAT_T n_f;
+  
+  dat_offset=4*((*screen).w*y+x);
+  dst_b = *((unsigned char*)(*screen).dat + dat_offset);
+  dst_g = *((unsigned char*)(*screen).dat + dat_offset + 1); 
+  dst_b = *((unsigned char*)(*screen).dat + dat_offset + 2);
+  dst_a = *((unsigned char*)(*screen).dat + dat_offset + 3);
+
+  switch (copymode)
+    {
+    case COPYMODE_PORTERDUFF_CLEAR_DST:
+      phi_src=0;       phi_dst=0;
+      break;
+    case COPYMODE_PORTERDUFF_COPY_SRC:
+      phi_src=0xFF;   phi_dst=0;
+      break;
+    case COPYMODE_PORTERDUFF_LEAVES_DST:
+      phi_src=0;       phi_dst=0xFF;
+      break;
+    case COPYMODE_PORTERDUFF_SRC_OVER_DST:
+      phi_src=0xFF;   phi_dst=0xFF-src_a;
+      break;
+    case COPYMODE_PORTERDUFF_DST_OVER_SRC:
+      phi_src=0xFF-dst_a;   phi_dst=0xFF;
+      break;
+    case COPYMODE_PORTERDUFF_SRC_IN_DST:
+      phi_src=dst_a;   phi_dst=0;
+      break;
+    case COPYMODE_PORTERDUFF_DST_IN_SRC:
+      phi_src=0;   phi_dst=src_a;
+      break;
+    case COPYMODE_PORTERDUFF_SRC_OUT_DST:
+      phi_src=0xFF-dst_a;   phi_dst=0;
+      break;
+    case COPYMODE_PORTERDUFF_DST_OUT_SRC:
+      phi_src=0;   phi_dst=0xFF-src_a;
+      break;
+    case COPYMODE_PORTERDUFF_SRC_ATOP_DST:
+      phi_src=dst_a;   phi_dst=0xFF-src_a;
+      break;
+    case COPYMODE_PORTERDUFF_DST_ATOP_SRC:
+      phi_src=0xFF-dst_a;   phi_dst=src_a;
+      break;
+    case COPYMODE_PORTERDUFF_XOR:
+      phi_src=0xFF-dst_a;   phi_dst=0xFF-src_a;
+      break;
+    default:
+      break;
+    }
+  n_xy_num= phi_src*src_a;
+  n_xy_den = n_xy_num + phi_dst*dst_a;
+  if (n_xy_den!=0)
+    {
+      n_f=(FLOAT_T)n_xy_num/(FLOAT_T)n_xy_den;
+      //lb_ft_printf(ty_C, "n_xy= %f / %f =%f\r\n",(FLOAT_T)n_xy_num,(FLOAT_T)n_xy_den,(FLOAT_T)n_xy_num/n_xy_den);
+      
+      temp_r = round(n_f*src_r + (1.0-n_f)*dst_r);
+      temp_g = round(n_f*src_g + (1.0-n_f)*dst_g);
+      temp_b = round(n_f*src_b + (1.0-n_f)*dst_b);
+      temp_k = round((phi_src*src_a +  phi_dst*dst_a)>>8);
+
+      if((temp_r<0) || (temp_g<0) || (temp_b<0) || (temp_k<0)||
+	 (temp_r>0xFF) || (temp_g>0xFF) || (temp_b>0xFF) || (temp_k>0xFF))
+	{
+	  printf("Error: lb_gr_fb_setpixel_ARGB_copymode()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%ld, tg=%ld, tb=%ld, tk=%ld\r\n",
+		 src_r, src_g, src_b, src_a,
+		 dst_r, dst_g, dst_b, dst_a,
+		 temp_r, temp_g, temp_b, temp_k);
+	  exit(EXIT_FAILURE);
+	}
+
+      dat_offset = (*screen).w*y + x;
+      *((U_INT_32_T*)(*screen).dat + dat_offset) =  ((U_INT_8_T)temp_k<<24) | ((U_INT_8_T)temp_r<<16) | ((U_INT_8_T)temp_g<<8) | ((U_INT_8_T)temp_b) ;
+    }
+  return;
+}
+
+void lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T src_r, U_INT_8_T src_g, U_INT_8_T src_b, U_INT_8_T src_a, COPYMODE_T copymode)
+{
+  if ( (x<0) || (x>=(*screen).w) || (y<0) || (y>=(*screen).h) )
+    return;
+  _lb_gr_fb_setpixel_ARGB_copymode(screen, x, y, src_r, src_g, src_b, src_a, copymode);
 }
 
   
@@ -3672,6 +4020,7 @@ void lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_
   _lb_gr_fb_setpixel_XRGB(screen, x, y, r, g, b);
 }
 
+
 void lb_gr_fb_line_h(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_INT_16_T x1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
 {
   U_INT_32_T l_color, *pos, *pos_a, *pos_b;
@@ -3702,6 +4051,35 @@ void lb_gr_fb_line_h(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_INT_16_T 
   pos_b = (U_INT_32_T*)(*screen).dat + (*screen).w*y0 + x_max;;
   for (pos=pos_a; pos<=pos_b; pos++)
     *pos = l_color;
+}
+
+
+void lb_gr_fb_line_h_copymode(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_INT_16_T x1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
+{
+  S_INT_16_T x_min, x_max, x;
+  
+  if ( (y0<0) || (y0>=(*screen).h) ) return;
+  
+  if (x0<=x1)
+    {
+      x_min=x0;
+      x_max=x1;
+    }
+  else
+    {
+      x_min=x1;
+      x_max=x0;
+    }
+  
+  if (x_min<0)
+    x_min=0;
+
+  if (x_max>(*screen).w-1)
+    x_max=(*screen).w-1;
+
+
+  for (x=x_min; x<=x_max; x++)
+    _lb_gr_fb_setpixel_ARGB_copymode(screen, x, y0, r, g, b, a, copymode);
 }
 
 
@@ -3743,14 +4121,40 @@ void lb_gr_fb_line_v(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T 
 }
 
 
-// oxo
+void lb_gr_fb_line_v_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
+{
+  S_INT_16_T y_min, y_max, y;
+ 
+  if ( (x0<0) || (x0>=(*screen).w) ) return;
+  
+  if (y0<=y1)
+    {
+      y_min=y0;
+      y_max=y1;
+    }
+  else
+    {
+      y_min=y1;
+      y_max=y0;
+    }
+  
+  if (y_min<0)
+    y_min=0;
+
+  if (y_max>(*screen).h-1)
+    y_max=(*screen).h-1;
+
+  for (y=y_min;y<=y_max;y++)
+    _lb_gr_fb_setpixel_ARGB_copymode(screen, x0, y, r, g, b, a, copymode);
+}
+
+
 void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel, COPYMODE_T copymode)
 {
-  PICTURE_T *P;
   U_INT_32_T dat_offset;
   
-  if (!copymode) /* This is the Fastest possible mode.  
-		    Draws directly to the framebuffer */
+  if (copymode==COPYMODE_FRAMEBUFFER) /* This is the Fastest possible mode.  
+					 Draws directly to the framebuffer */
     {
 	
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
@@ -3766,332 +4170,260 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
       return;
     }
 
-  S_INT_8_T flag_draw=FALSE;
-  if (Pic==NULL)
+
+  if (Pic!=NULL)
     {
-      P=&ty_Pic_shadow;
-      flag_direct=TRUE;
-    }
-    
-  if ( (x<0) || (x>=(*P).w) || (y<0) || (y>=(*P).h) ) 
-    return;
+      if ( (x<0) || (x>=(*Pic).w) || (y<0) || (y>=(*Pic).h) ) 
+	return;
       
-  if (copymode==COPYMODE_COPY)
-    {
-      (*P).pic[y][x]=pixel;
-      return;
-    }
-  else
-    {
-      switch (copymode)
+      if (copymode==COPYMODE_COPY)
 	{
-	case COPYMODE_AND: /* Performs logical AND between SRC and DST. Alpha remains unchanged. */
-	  (*P).pic[y][x].r &= pixel.r;
-	  (*P).pic[y][x].g &= pixel.g;
-	  (*P).pic[y][x].b &= pixel.b;
-	  return;
-	case COPYMODE_OR: /* Performs logical OR between SRC and DST. Alpha remains unchanged. */
-	  (*P).pic[y][x].r |= pixel.r;
-	  (*P).pic[y][x].g |= pixel.g;
-	  (*P).pic[y][x].b |= pixel.b;
-	  return;
-	case COPYMODE_XOR: /* Performs logical XOR between SRC and DST. Alpha remains unchanged. */
-	  (*P).pic[y][x].r ^= pixel.r;
-	  (*P).pic[y][x].g ^= pixel.g;
-	  (*P).pic[y][x].b ^= pixel.b;
-	  return;
-	case COPYMODE_NOT_SRC: /* Makes DST the logical NOT of SRC. Alpha remains unchanged. */
-	  (*P).pic[y][x].r = ~pixel.r;
-	  (*P).pic[y][x].g = ~pixel.g;
-	  (*P).pic[y][x].b = ~pixel.b;
-	  return;
-	case COPYMODE_NOT_DST: /* Performs a logical NOT on DST (regardless of SRC). Alpha remains unchanged. */
-	  (*P).pic[y][x].r = ~(*P).pic[y][x].r;
-	  (*P).pic[y][x].g = ~(*P).pic[y][x].g;
-	  (*P).pic[y][x].b = ~(*P).pic[y][x].b;
-	  return;
-	case COPYMODE_ADD: /* Sums each one of the color components but caps the value at the maximum if exceeded. */
-	  {
-	    S_INT_16_T temp; /* Sets the alpha as the average of SRC and DST */
-	      
-	    temp=(*P).pic[y][x].r + pixel.r;  
-	    if (temp>MAX_R)
-	      temp=MAX_R;
-	    (*P).pic[y][x].r=temp;
-
-	    temp=(*P).pic[y][x].g + pixel.g;  
-	    if (temp>MAX_G)
-	      temp=MAX_G;
-	    (*P).pic[y][x].g=temp;
-
-	    temp=(*P).pic[y][x].b + pixel.b;  
-	    if (temp>MAX_B)
-	      temp=MAX_B;
-	    (*P).pic[y][x].b=temp;
-	    temp=((*P).pic[y][x].a+pixel.a)>>1;
-	    (*P).pic[y][x].a=temp;
-	    return;
-	  }
-	case COPYMODE_SRC_MINUS_DST: /* Substracts each one of the color components of SRC minus DST.  Caps at zero. */
-	  {
-	    S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
-	      
-	    temp = pixel.r - (*P).pic[y][x].r;
-	    if (temp<0)
-	      temp=0;
-	    (*P).pic[y][x].r =temp;
-
-	    temp = pixel.g - (*P).pic[y][x].g;
-	    if (temp<0)
-	      temp=0;
-	    (*P).pic[y][x].g =temp;
-
-	    temp = pixel.b - (*P).pic[y][x].b;
-	    if (temp<0)
-	      temp=0;
-	    (*P).pic[y][x].b =temp;
-
-	    temp = (pixel.a+(*P).pic[y][x].a)>>1;
-	    (*P).pic[y][x].a=temp;
-	    return;
-	  }
-	case COPYMODE_DST_MINUS_SRC: /* Substracts each one of the color components of DST minus SRC.  Caps at zero. */
-	  {
-	    S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
-	      
-	    temp=(*P).pic[y][x].r - pixel.r;      
-	    if (temp<0)
-	      temp=0;
-	    (*P).pic[y][x].r=temp;
-
-	    temp=(*P).pic[y][x].g - pixel.g;      
-	    if (temp<0)
-	      temp=0;
-	    (*P).pic[y][x].g=temp;
-
-	    temp=(*P).pic[y][x].b - pixel.b;      
-	    if (temp<0)
-	      temp=0;
-	    (*P).pic[y][x].b=temp;
-
-	    temp = (pixel.a+(*P).pic[y][x].a)>>1;
-	    (*P).pic[y][x].a=temp;
-	    return;
-	  }
-	case COPYMODE_AVG: /* Averages each one of the components of SRC and DST as well as the alpha. */
-	  (*P).pic[y][x].r = ((S_INT_16_T)(*P).pic[y][x].r + (S_INT_16_T)pixel.r) >> 1;
-	  (*P).pic[y][x].g = ((S_INT_16_T)(*P).pic[y][x].g + (S_INT_16_T)pixel.g) >> 1;
-	  (*P).pic[y][x].b = ((S_INT_16_T)(*P).pic[y][x].b + (S_INT_16_T)pixel.b) >> 1;
-	  return;
-	case COPYMODE_BLEND:
-	  (*P).pic[y][x].r = (U_INT_32_T)((MAX_A-pixel.a)*(*P).pic[y][x].r + pixel.a*pixel.r)/MAX_R;
-	  (*P).pic[y][x].g = (U_INT_32_T)((MAX_A-pixel.a)*(*P).pic[y][x].g + pixel.a*pixel.g)/MAX_G;
-	  (*P).pic[y][x].b = (U_INT_32_T)((MAX_A-pixel.a)*(*P).pic[y][x].b + pixel.a*pixel.b)/MAX_B;
-	  //(*P).pic[y][x].a = (U_INT_32_T)((MAX_A-pixel.a)*(*P).pic[y][x].a + pixel.a*pixel.a)/MAX_A;
-	  return;
-	case COPYMODE_MULTIPLY:
-	  (*P).pic[y][x].r = (U_INT_32_T)(*P).pic[y][x].r*pixel.r/MAX_R;
-	  (*P).pic[y][x].g = (U_INT_32_T)(*P).pic[y][x].g*pixel.r/MAX_G;
-	  (*P).pic[y][x].b = (U_INT_32_T)(*P).pic[y][x].b*pixel.r/MAX_B;
-	  return;
-	case COPYMODE_SRC_DIV_DST:
-	  {
-	    U_INT_8_T temp;
-	      
-	    if ((*P).pic[y][x].r!=0)
-	      temp=(U_INT_32_T)(MAX_R*pixel.r/(*P).pic[y][x].r);
-	    else
-	      temp=MAX_R;
-	    (*P).pic[y][x].r=temp;
-
-	    if ((*P).pic[y][x].g!=0)
-	      temp=(U_INT_32_T)(MAX_G*pixel.g/(*P).pic[y][x].g);
-	    else
-	      temp=MAX_G;
-	    (*P).pic[y][x].g=temp;
-
-	    if ((*P).pic[y][x].b!=0)
-	      temp=(U_INT_32_T)(MAX_B*pixel.b/(*P).pic[y][x].b);
-	    else
-	      temp=MAX_B;
-	    (*P).pic[y][x].b=temp;
-	    return;
-	  }
-	case COPYMODE_DST_DIV_SRC:
-	  {
-	    U_INT_8_T temp;
-	      
-	    if (pixel.r!=0)
-	      temp=(U_INT_32_T)(MAX_R*(*P).pic[y][x].r/pixel.r);
-	    else
-	      temp=MAX_R;
-	    (*P).pic[y][x].r=temp;
-
-	    if (pixel.g!=0)
-	      temp=(U_INT_32_T)(MAX_G*(*P).pic[y][x].g/pixel.g);
-	    else
-	      temp=MAX_G;
-	    (*P).pic[y][x].g=temp;
-
-	    if (pixel.b!=0)
-	      temp=(U_INT_32_T)(MAX_B*(*P).pic[y][x].b/pixel.b);
-	    else
-	      temp=MAX_B;
-	    (*P).pic[y][x].b=temp;
-	    return;
-	  }
-	case COPYMODE_RESERVED0:
-	  return;
-	case COPYMODE_RESERVED1:
-	  return;
-	case COPYMODE_RESERVED2:
+	  (*Pic).pic[y][x]=pixel;
 	  return;
 	}
-
-      S_INT_32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
-      FLOAT_T n_f;
-      switch (temp_copymode)
+      else
 	{
-	case COPYMODE_PORTERDUFF_CLEAR_DST:
-	  phi_src=0;       phi_dst=0;
-	  break;
-	case COPYMODE_PORTERDUFF_COPY_SRC:
-	  phi_src=MAX_A;   phi_dst=0;
-	  break;
-	case COPYMODE_PORTERDUFF_LEAVES_DST:
-	  phi_src=0;       phi_dst=MAX_A;
-	  break;
-	case COPYMODE_PORTERDUFF_SRC_OVER_DST:
-	  phi_src=MAX_A;   phi_dst=MAX_A-pixel.a;
-	  break;
-	case COPYMODE_PORTERDUFF_DST_OVER_SRC:
-	  phi_src=MAX_A-(*P).pic[y][x].a;   phi_dst=MAX_A;
-	  break;
-	case COPYMODE_PORTERDUFF_SRC_IN_DST:
-	  phi_src=(*P).pic[y][x].a;   phi_dst=0;
-	  break;
-	case COPYMODE_PORTERDUFF_DST_IN_SRC:
-	  phi_src=0;   phi_dst=pixel.a;
-	  break;
-	case COPYMODE_PORTERDUFF_SRC_OUT_DST:
-	  phi_src=MAX_A-(*P).pic[y][x].a;   phi_dst=0;
-	  break;
-	case COPYMODE_PORTERDUFF_DST_OUT_SRC:
-	  phi_src=0;   phi_dst=MAX_A-pixel.a;
-	  break;
-	case COPYMODE_PORTERDUFF_SRC_ATOP_DST:
-	  phi_src=(*P).pic[y][x].a;   phi_dst=MAX_A-pixel.a;
-	  break;
-	case COPYMODE_PORTERDUFF_DST_ATOP_SRC:
-	  phi_src=MAX_A-(*P).pic[y][x].a;   phi_dst=pixel.a;
-	  break;
-	case COPYMODE_PORTERDUFF_XOR:
-	  phi_src=MAX_A-(*P).pic[y][x].a;   phi_dst=MAX_A-pixel.a;
-	  break;
-	}
-      n_xy_num= phi_src*pixel.a;
-      n_xy_den = n_xy_num + phi_dst*(*P).pic[y][x].a;
-      if (n_xy_den!=0)
-	{
-	  n_f=(FLOAT_T)n_xy_num/(FLOAT_T)n_xy_den;
-	  //lb_ft_printf(ty_C, "n_xy= %f / %f =%f\r\n",(FLOAT_T)n_xy_num,(FLOAT_T)n_xy_den,(FLOAT_T)n_xy_num/n_xy_den);
-      
-	  temp_r = round(n_f*pixel.r + (1.0-n_f)*(*P).pic[y][x].r);
-	  temp_g = round(n_f*pixel.g + (1.0-n_f)*(*P).pic[y][x].g);
-	  temp_b = round(n_f*pixel.b + (1.0-n_f)*(*P).pic[y][x].b);
-	  temp_k = round((phi_src*pixel.a +  phi_dst*(*P).pic[y][x].a)/MAX_A);
-
-	  if((temp_r<0) || (temp_g<0) || (temp_b<0) || (temp_k<0)||
-	     (temp_r>MAX_R) || (temp_g>MAX_G) || (temp_b>MAX_B) || (temp_k>MAX_A))
+	  switch (copymode)
 	    {
-	      //lb_ft_printf(ty_C, "Error: lb_gr_draw_pixel()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%d, tg=%d, tb=%d, tk=%d\r\n",
-	      //		     src.r,src.g,src.b,src.a,    dst.r,dst.g,dst.b,dst.a, temp_r, temp_g, temp_b, temp_k);
-	      //lb_fb_exit(1);
+	    case COPYMODE_AND: /* Performs logical AND between SRC and DST. Alpha remains unchanged. */
+	      (*Pic).pic[y][x].r &= pixel.r;
+	      (*Pic).pic[y][x].g &= pixel.g;
+	      (*Pic).pic[y][x].b &= pixel.b;
+	      return;
+	    case COPYMODE_OR: /* Performs logical OR between SRC and DST. Alpha remains unchanged. */
+	      (*Pic).pic[y][x].r |= pixel.r;
+	      (*Pic).pic[y][x].g |= pixel.g;
+	      (*Pic).pic[y][x].b |= pixel.b;
+	      return;
+	    case COPYMODE_XOR: /* Performs logical XOR between SRC and DST. Alpha remains unchanged. */
+	      (*Pic).pic[y][x].r ^= pixel.r;
+	      (*Pic).pic[y][x].g ^= pixel.g;
+	      (*Pic).pic[y][x].b ^= pixel.b;
+	      return;
+	    case COPYMODE_NOT_SRC: /* Makes DST the logical NOT of SRC. Alpha remains unchanged. */
+	      (*Pic).pic[y][x].r = ~pixel.r;
+	      (*Pic).pic[y][x].g = ~pixel.g;
+	      (*Pic).pic[y][x].b = ~pixel.b;
+	      return;
+	    case COPYMODE_NOT_DST: /* Performs a logical NOT on DST (regardless of SRC). Alpha remains unchanged. */
+	      (*Pic).pic[y][x].r = ~(*Pic).pic[y][x].r;
+	      (*Pic).pic[y][x].g = ~(*Pic).pic[y][x].g;
+	      (*Pic).pic[y][x].b = ~(*Pic).pic[y][x].b;
+	      return;
+	    case COPYMODE_ADD: /* Sums each one of the color components but caps the value at the maximum if exceeded. */
+	      {
+		S_INT_16_T temp; /* Sets the alpha as the average of SRC and DST */
+	      
+		temp=(*Pic).pic[y][x].r + pixel.r;  
+		if (temp>MAX_R)
+		  temp=MAX_R;
+		(*Pic).pic[y][x].r=temp;
+
+		temp=(*Pic).pic[y][x].g + pixel.g;  
+		if (temp>MAX_G)
+		  temp=MAX_G;
+		(*Pic).pic[y][x].g=temp;
+
+		temp=(*Pic).pic[y][x].b + pixel.b;  
+		if (temp>MAX_B)
+		  temp=MAX_B;
+		(*Pic).pic[y][x].b=temp;
+		temp=((*Pic).pic[y][x].a+pixel.a)>>1;
+		(*Pic).pic[y][x].a=temp;
+		return;
+	      }
+	    case COPYMODE_SRC_MINUS_DST: /* Substracts each one of the color components of SRC minus DST.  Caps at zero. */
+	      {
+		S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+	      
+		temp = pixel.r - (*Pic).pic[y][x].r;
+		if (temp<0)
+		  temp=0;
+		(*Pic).pic[y][x].r =temp;
+
+		temp = pixel.g - (*Pic).pic[y][x].g;
+		if (temp<0)
+		  temp=0;
+		(*Pic).pic[y][x].g =temp;
+
+		temp = pixel.b - (*Pic).pic[y][x].b;
+		if (temp<0)
+		  temp=0;
+		(*Pic).pic[y][x].b =temp;
+
+		temp = (pixel.a+(*Pic).pic[y][x].a)>>1;
+		(*Pic).pic[y][x].a=temp;
+		return;
+	      }
+	    case COPYMODE_DST_MINUS_SRC: /* Substracts each one of the color components of DST minus SRC.  Caps at zero. */
+	      {
+		S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+	      
+		temp=(*Pic).pic[y][x].r - pixel.r;      
+		if (temp<0)
+		  temp=0;
+		(*Pic).pic[y][x].r=temp;
+
+		temp=(*Pic).pic[y][x].g - pixel.g;      
+		if (temp<0)
+		  temp=0;
+		(*Pic).pic[y][x].g=temp;
+
+		temp=(*Pic).pic[y][x].b - pixel.b;      
+		if (temp<0)
+		  temp=0;
+		(*Pic).pic[y][x].b=temp;
+
+		temp = (pixel.a+(*Pic).pic[y][x].a)>>1;
+		(*Pic).pic[y][x].a=temp;
+		return;
+	      }
+	    case COPYMODE_AVG: /* Averages each one of the components of SRC and DST as well as the alpha. */
+	      (*Pic).pic[y][x].r = ((S_INT_16_T)(*Pic).pic[y][x].r + (S_INT_16_T)pixel.r) >> 1;
+	      (*Pic).pic[y][x].g = ((S_INT_16_T)(*Pic).pic[y][x].g + (S_INT_16_T)pixel.g) >> 1;
+	      (*Pic).pic[y][x].b = ((S_INT_16_T)(*Pic).pic[y][x].b + (S_INT_16_T)pixel.b) >> 1;
+	      return;
+	    case COPYMODE_BLEND:
+	      (*Pic).pic[y][x].r = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].r + pixel.a*pixel.r)/MAX_R;
+	      (*Pic).pic[y][x].g = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].g + pixel.a*pixel.g)/MAX_G;
+	      (*Pic).pic[y][x].b = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].b + pixel.a*pixel.b)/MAX_B;
+	      //(*Pic).pic[y][x].a = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].a + pixel.a*pixel.a)/MAX_A;
+	      return;
+	    case COPYMODE_MULTIPLY:
+	      (*Pic).pic[y][x].r = (U_INT_32_T)(*Pic).pic[y][x].r*pixel.r/MAX_R;
+	      (*Pic).pic[y][x].g = (U_INT_32_T)(*Pic).pic[y][x].g*pixel.r/MAX_G;
+	      (*Pic).pic[y][x].b = (U_INT_32_T)(*Pic).pic[y][x].b*pixel.r/MAX_B;
+	      return;
+	    case COPYMODE_SRC_DIV_DST:
+	      {
+		U_INT_8_T temp;
+	      
+		if ((*Pic).pic[y][x].r!=0)
+		  temp=(U_INT_32_T)(MAX_R*pixel.r/(*Pic).pic[y][x].r);
+		else
+		  temp=MAX_R;
+		(*Pic).pic[y][x].r=temp;
+
+		if ((*Pic).pic[y][x].g!=0)
+		  temp=(U_INT_32_T)(MAX_G*pixel.g/(*Pic).pic[y][x].g);
+		else
+		  temp=MAX_G;
+		(*Pic).pic[y][x].g=temp;
+
+		if ((*Pic).pic[y][x].b!=0)
+		  temp=(U_INT_32_T)(MAX_B*pixel.b/(*Pic).pic[y][x].b);
+		else
+		  temp=MAX_B;
+		(*Pic).pic[y][x].b=temp;
+		return;
+	      }
+	    case COPYMODE_DST_DIV_SRC:
+	      {
+		U_INT_8_T temp;
+	      
+		if (pixel.r!=0)
+		  temp=(U_INT_32_T)(MAX_R*(*Pic).pic[y][x].r/pixel.r);
+		else
+		  temp=MAX_R;
+		(*Pic).pic[y][x].r=temp;
+
+		if (pixel.g!=0)
+		  temp=(U_INT_32_T)(MAX_G*(*Pic).pic[y][x].g/pixel.g);
+		else
+		  temp=MAX_G;
+		(*Pic).pic[y][x].g=temp;
+
+
+		if (pixel.b!=0)
+		  temp=(U_INT_32_T)(MAX_B*(*Pic).pic[y][x].b/pixel.b);
+		else
+		  temp=MAX_B;
+		(*Pic).pic[y][x].b=temp;
+		return;
+	      }
+	    default:
+	      break;
 	    }
-	  (*P).pic[y][x].r=temp_r;
-	  (*P).pic[y][x].g=temp_g;
-	  (*P).pic[y][x].b=temp_b;
-	  (*P).pic[y][x].a=temp_k;
+
+	  S_INT_32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
+	  FLOAT_T n_f;
+	  switch (copymode)
+	    {
+	    case COPYMODE_PORTERDUFF_CLEAR_DST:
+	      phi_src=0;       phi_dst=0;
+	      break;
+	    case COPYMODE_PORTERDUFF_COPY_SRC:
+	      phi_src=MAX_A;   phi_dst=0;
+	      break;
+	    case COPYMODE_PORTERDUFF_LEAVES_DST:
+	      phi_src=0;       phi_dst=MAX_A;
+	      break;
+	    case COPYMODE_PORTERDUFF_SRC_OVER_DST:
+	      phi_src=MAX_A;   phi_dst=MAX_A-pixel.a;
+	      break;
+	    case COPYMODE_PORTERDUFF_DST_OVER_SRC:
+	      phi_src=MAX_A-(*Pic).pic[y][x].a;   phi_dst=MAX_A;
+	      break;
+	    case COPYMODE_PORTERDUFF_SRC_IN_DST:
+	      phi_src=(*Pic).pic[y][x].a;   phi_dst=0;
+	      break;
+	    case COPYMODE_PORTERDUFF_DST_IN_SRC:
+	      phi_src=0;   phi_dst=pixel.a;
+	      break;
+	    case COPYMODE_PORTERDUFF_SRC_OUT_DST:
+	      phi_src=MAX_A-(*Pic).pic[y][x].a;   phi_dst=0;
+	      break;
+	    case COPYMODE_PORTERDUFF_DST_OUT_SRC:
+	      phi_src=0;   phi_dst=MAX_A-pixel.a;
+	      break;
+	    case COPYMODE_PORTERDUFF_SRC_ATOP_DST:
+	      phi_src=(*Pic).pic[y][x].a;   phi_dst=MAX_A-pixel.a;
+	      break;
+	    case COPYMODE_PORTERDUFF_DST_ATOP_SRC:
+	      phi_src=MAX_A-(*Pic).pic[y][x].a;   phi_dst=pixel.a;
+	      break;
+	    case COPYMODE_PORTERDUFF_XOR:
+	      phi_src=MAX_A-(*Pic).pic[y][x].a;   phi_dst=MAX_A-pixel.a;
+	      break;
+	    default:
+	      break;
+	    }
+	  n_xy_num= phi_src*pixel.a;
+	  n_xy_den = n_xy_num + phi_dst*(*Pic).pic[y][x].a;
+	  if (n_xy_den!=0)
+	    {
+	      n_f=(FLOAT_T)n_xy_num/(FLOAT_T)n_xy_den;
+	      //lb_ft_printf(ty_C, "n_xy= %f / %f =%f\r\n",(FLOAT_T)n_xy_num,(FLOAT_T)n_xy_den,(FLOAT_T)n_xy_num/n_xy_den);
+      
+	      temp_r = round(n_f*pixel.r + (1.0-n_f)*(*Pic).pic[y][x].r);
+	      temp_g = round(n_f*pixel.g + (1.0-n_f)*(*Pic).pic[y][x].g);
+	      temp_b = round(n_f*pixel.b + (1.0-n_f)*(*Pic).pic[y][x].b);
+	      temp_k = round((phi_src*pixel.a +  phi_dst*(*Pic).pic[y][x].a)/MAX_A);
+
+	      if((temp_r<0) || (temp_g<0) || (temp_b<0) || (temp_k<0)||
+		 (temp_r>MAX_R) || (temp_g>MAX_G) || (temp_b>MAX_B) || (temp_k>MAX_A))
+		{
+		  //lb_ft_printf(ty_C, "Error: lb_gr_draw_pixel()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%d, tg=%d, tb=%d, tk=%d\r\n",
+		  //		     src.r,src.g,src.b,src.a,    dst.r,dst.g,dst.b,dst.a, temp_r, temp_g, temp_b, temp_k);
+		  //lb_fb_exit(1);
+		}
+	      (*Pic).pic[y][x].r=temp_r;
+	      (*Pic).pic[y][x].g=temp_g;
+	      (*Pic).pic[y][x].b=temp_b;
+	      (*Pic).pic[y][x].a=temp_k;
+	    }
 	}
     }
-
-  if (flag_draw) /* Copying directly to the screen */
+  else /* Copying directly to the screen */
     {
-      if ( (ty_scale_x==1) && (ty_scale_y==1) )
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
-	lb_gr_fb_setpixel_XRGB(&ty_screen, x, y, (*P).pic[y][x].r, (*P).pic[y][x].g, (*P).pic[y][x].b);
+      lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
 #else
-      lb_gr_fb_setpixel_XRGB_copymode(&ty_screen, x, y,
-				      FACTOR_N_TO_8_R*(*P).pic[y][x].r,
-				      FACTOR_N_TO_8_G*(*P).pic[y][x].g,
-				      FACTOR_N_TO_8_B*(*P).pic[y][x].b);
+      lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, FACTOR_N_TO_8_R*pixel.r, FACTOR_N_TO_8_G*pixel.g, FACTOR_N_TO_8_B*pixel.b, FACTOR_N_TO_8_A*pixel.a, copymode);
 #endif
-     else /* if size != 1, e.g., a scale factor is being used */
-       {
-	  
-	 switch (copymode)
-	   {
-	   case COPYMODE_PIXELMODE_0: /* solid rectangle */
-      
-#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
-	     lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x, y*scale_y, (x+1)*scale_x-1, (y+1)*scale_y-1,
-					 pixel.r, pixel.g, pixel.b, pixel.a, copymode);
-#else
-	     lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x, y*scale_y, (x+1)*scale_x-1, (y+1)*scale_y-1,
-					 FACTOR_N_TO_8_R*pixel.r, FACTOR_N_TO_8_G*pixel.g, FACTOR_N_TO_8_B*pixel.b, FACTOR_N_TO_8_A*pixel.a, copymode);
-#endif
-	     break;
-	   case COPYMODE_PIXELMODE_1:
-	     {
-	       U_INT_8_T border_r, border_g, border_b;
-	       border_r = ((copymode & COPYMODE_PIXELBG_R_MASK) >> COPYMODE_PIXELBG_R_SHIFT)*255/15;
-	       border_g = ((copymode & COPYMODE_PIXELBG_G_MASK) >> COPYMODE_PIXELBG_G_SHIFT)*255/15;
-	       border_b = ((copymode & COPYMODE_PIXELBG_B_MASK) >> COPYMODE_PIXELBG_B_SHIFT)*255/15;
-		
-	       lb_gr_fb_line_h_copymode(&ty_screen,  y   *scale_y, x*scale_x,   (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
-	       lb_gr_fb_line_h_copymode(&ty_screen, (y+1)*scale_y, x*scale_x,   (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
-	       lb_gr_fb_line_v_copymode(&ty_screen,  x   *scale_x, y*scale_y+1, (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
-	       lb_gr_fb_line_v_copymode(&ty_screen, (x+1)*scale_x, y*scale_y+1, (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode );
-		
-#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
-	       lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x+1, y*scale_y+1, (x+1)*scale_x-1, (y+1)*scale_y-1, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
-#else
-	       lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x+1, y*scale_y+1, (x+1)*scale_x-1, (y+1)*scale_y-1,
-					   FACTOR_N_TO_8_R*pixel.r, FACTOR_N_TO_8_G*pixel.g, FACTOR_N_TO_8_B*pixel.b, FACTOR_N_TO_8_A*pixel.a, copymode);
-#endif
-	     }
-	     break;
-	   case 2:
-	     {
-	       U_INT_8_T border_r, border_g, border_b;
-	       border_r = ((copymode & COPYMODE_PIXELBG_R_MASK) >> COPYMODE_PIXELBG_R_SHIFT)*255/15;
-	       border_g = ((copymode & COPYMODE_PIXELBG_G_MASK) >> COPYMODE_PIXELBG_G_SHIFT)*255/15;
-	       border_b = ((copymode & COPYMODE_PIXELBG_B_MASK) >> COPYMODE_PIXELBG_B_SHIFT)*255/15;
-		
-		
-	
-	       lb_gr_fb_line_h_copymode(&ty_screen,  y     *scale_y, x*scale_x,   (x+1)*scale_x-1,   border_r, border_g, border_b, 255, copymode);
-	       lb_gr_fb_line_h_copymode(&ty_screen, (y+1)*scale_y-1, x*scale_x,   (x+1)*scale_x-1,   border_r, border_g, border_b, 255, copymode);
-	       lb_gr_fb_line_v_copymode(&ty_screen,  x   *scale_x, y*scale_y+1, (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode);
-	       lb_gr_fb_line_v_copymode(&ty_screen, (x+1)*scale_x-1, y*scale_y+1, (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode );
-		
-	       lb_gr_fb_rectangle_copymode(&ty_screen, x*scale_x+1, y*scale_y+1, (x+1)*scale_x-2, (y+1)*scale_y-2, pixel.r, pixel.g, pixel.b, pixel.a, copymode);
-	     }
-	     break;
-	   case 3:
-	     break;
-	   case 4:
-	     break;
-	   case 5:
-	     break;
-	   case 6:
-	     break;
-	   case 7:
-	     break;
-	   }
-       }
-   }
+    }
 }
+ 
  
 
 void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_INT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
@@ -5369,22 +5701,16 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
   ERR_T error;
   PIXEL_T pix_main;
   FLOAT_T scale;
-  FLOAT_T scale_x, scale_y;
 
-	  
   if (Pic==NULL) 
     {
       width  = ty_screen.w;
       height = ty_screen.h;
-      scale_x = 1.0 / (1 + ((copymode & COPYMODE_SCALEX_MASK) >> COPYMODE_SCALEX_SHIFT));
-      scale_y = 1.0 / (1 + ((copymode & COPYMODE_SCALEY_MASK) >> COPYMODE_SCALEY_SHIFT));
     }
   else
     {
       width  = (*Pic).w;
       height = (*Pic).h;
-      scale_x=1.0;
-      scale_y=1.0;
     }
     
   pix_main=color;
@@ -5404,7 +5730,7 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
     for(xi=0;xi<width;xi++)
       {
 	pix_main.a=0;
-	lb_gr_project_2d_inv(vp2d, xi*scale_x, yi*scale_y, &xr, &yr);
+	lb_gr_project_2d_inv(vp2d, xi, yi, &xr, &yr);
 
 	/* For each pixel, we calculate the shortest distance to the curve */
 	distance=10000;
@@ -5420,8 +5746,14 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
 	      pix_main.a=MAX_A*(1.0-fabs(w2-distance)); 
 	  }
 	if (pix_main.a!=0)
-	  lb_gr_draw_pixel(Pic, xi, yi, lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID),
-			   copymode & COPYMODE_SCALEX_MASK & COPYMODE_SCALEY_MASK);
+	  {
+	    lb_gr_draw_pixel(Pic, xi, yi, lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID), COPYMODE_COPY);
+	  }
+	else
+	  {
+	    //lb_gr_draw_pixel(Pic, xi, yi, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), copymode);
+	  }
+	 
       }
 }
 
@@ -5986,7 +6318,6 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
 }
 
 
-// oxo
 void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
 				    FLOAT_T r0, FLOAT_T r1, FLOAT_T delta_r, PIXEL_T color_r, 
 				    FLOAT_T t0, FLOAT_T t1, FLOAT_T delta_t, PIXEL_T color_t,
@@ -5995,19 +6326,7 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
   FLOAT_T r, t, t_temp, t_min, t_max, r_min, r_max, xr, yr, xp0, yp0, xp1, yp1, factor_delta;
   S_INT_16_T xp0_i, yp0_i, xp1_i, yp1_i;
   S_INT_8_T flag_adjacent, counter_adjacent, exponent;
-  FLOAT_T scale_x, scale_y;
-	  
-  if (Pic==NULL) 
-    {
-      scale_x = 1.0 / (1 + ((copymode & COPYMODE_SCALEX_MASK) >> COPYMODE_SCALEX_SHIFT));
-      scale_y = 1.0 / (1 + ((copymode & COPYMODE_SCALEY_MASK) >> COPYMODE_SCALEY_SHIFT));
-    }
-  else
-    {
-      scale_x=1.0;
-      scale_y=1.0;
-    }
-  
+      
   if (lb_re_equal(vp2d.xr_min, vp2d.xr_max))
     {
       printf("Error: lg_gr_draw_axis_2d_polar() --> vp2d.xr_min [%f]= vp2d.xr_max [%f]\r\n",vp2d.xr_min,vp2d.xr_max);
@@ -6070,8 +6389,8 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
       yr=r*sin(t);
   
       lb_gr_project_2d(vp2d, xr, yr, &xp0, &yp0);
-      xp0_i = round(xp0)*scale_x;
-      yp0_i = round(yp0)*scale_y;
+      xp0_i = round(xp0);
+      yp0_i = round(yp0);
       lb_gr_draw_pixel(Pic, xp0_i, yp0_i, color_t, copymode);
 
       exponent=0;
@@ -6088,8 +6407,8 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
 	      yr=r*sin(t_temp);
   
 	      lb_gr_project_2d(vp2d, xr, yr, &xp1, &yp1);
-	      xp1_i = round(xp1)*scale_x;
-	      yp1_i = round(yp1)*scale_y;
+	      xp1_i = round(xp1);
+	      yp1_i = round(yp1);
 	      if ( (abs(xp1_i-xp0_i)<=1) && (abs(yp1_i-yp0_i)<=1) )
 		{
 		  flag_adjacent=TRUE;
@@ -6137,8 +6456,7 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
       yr=r_max*sin(t);
       lb_gr_project_2d(vp2d, xr, yr, &xp1, &yp1);
 
-      lb_gr_draw_line1_f(Pic, round(xp0*scale_x), round(yp0*scale_y),
-			 round(xp1*scale_x), round(yp1*scale_y), color_r, copymode);
+      lb_gr_draw_line1_f(Pic, round(xp0), round(yp0), round(xp1), round(yp1), color_r, COPYMODE_COPY);
       t+=delta_t;
     }
 }
@@ -6396,79 +6714,94 @@ void lb_gr_project_3d_analytical_two_vectors(VIEWPORT_3D_T vp3d, VECTOR_R_T *V1,
 } 
 
 
-void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE_T copymode)
+void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE_T copymode, RENDERMODE_T rendermode)
 {
-  S_INT_16_T i, j;
+    S_INT_16_T x, y;
   if (!lb_gr_assert_dimensions_picture(Pic))
     {
-      printf("Error: lb_gr_render_picture() --> invalid dimension\r\n");
+      printf("Error: lb_gr_render_picture() --> invalid dimension\r\n"); 
       exit(EXIT_FAILURE);
     }
 
-  for (i=0;i<(*Pic).h;i++)
-    for (j=0;j<(*Pic).w;j++)
-      lb_gr_draw_pixel(NULL, j, i, (*Pic).pic[i][j], copymode);
-}
+  //oxo
 
+  U_INT_8_T scale_x, scale_y;
+  scale_x = 1 + ((rendermode & RENDERMODE_SCALE_X_MASK) >> RENDERMODE_SCALE_X_SHIFT );
+  scale_y = 1 + ((rendermode & RENDERMODE_SCALE_Y_MASK) >> RENDERMODE_SCALE_Y_SHIFT );
 
-#ifdef XXXXX
-lb_gr_buffer_pixel(xc+j, yc+i, 255,255,255);
-  
-if ( (scale_x==1) && (scale_y==1) )
-  {
-    for (i=0;i<(*Pic).h;i++)
-      for (j=0;j<(*Pic).w;j++)
-	{
-	  lb_fb_draw_pixel(ty_fb_main, xc + j, yc + i,
-			   round(FACTOR_N_TO_8_R*(*Pic).pic[i][j].r),
-			   round(FACTOR_N_TO_8_G*(*Pic).pic[i][j].g),
-			   round(FACTOR_N_TO_8_B*(*Pic).pic[i][j].b),
-			   round(FACTOR_N_TO_8_K*(*Pic).pic[i][j].a));
-	}
-  }
- else
-   if(renderoptions & RENDEROPTIONS_LINE)
-     {
-       if ((scale_x<3) || (scale_y<3))
-	 {
-	   printf("Error: lb_gr_render_picture() --> invalid scale: scale_x=%d scale_y=%d\r\n",scale_x,scale_y);
-	   exit(EXIT_FAILURE);
-	 }
-	
-       for (i=0;i<(*Pic).h;i++)
-	 for (j=0;j<(*Pic).w;j++)
-	   {
-	     U_INT_8_T temp_r, temp_g, temp_b, temp_k;
-	     temp_r=round(FACTOR_N_TO_8_R*(*Pic).pic[i][j].r);
-	     temp_g=round(FACTOR_N_TO_8_G*(*Pic).pic[i][j].g);
-	     temp_b=round(FACTOR_N_TO_8_B*(*Pic).pic[i][j].b);
-	     temp_k=round(FACTOR_N_TO_8_K*(*Pic).pic[i][j].a);
-		  
-	     lb_fb_line_h(ty_fb_main, yc+ scale_y*i, xc+ scale_x*j, xc+ scale_x*(j+1)-2,
-			  temp_r, temp_g, temp_b, temp_k);
-
-	     lb_fb_line_h(ty_fb_main, yc+ scale_y*(i+1)-2, xc+ scale_x*j, xc+ scale_x*(j+1)-2,
-			  temp_r, temp_g, temp_b, temp_k);
-	
-	     lb_fb_line_v(ty_fb_main, xc+ scale_x*j, yc+ scale_y*i, yc+ scale_y*(i+1)-2,
-			  temp_r, temp_g, temp_b, temp_k);
-
-	     lb_fb_line_v(ty_fb_main, xc+ scale_x*(j+1)-2, yc+ scale_y*i, yc+ scale_y*(i+1)-2,
-			  temp_r, temp_g, temp_b, temp_k);
-	   }
-     } 
-   else
-     for (i=0;i<(*Pic).h;i++)
-       for (j=0;j<(*Pic).w;j++)
-	 {
-	   lb_fb_rectangle(ty_fb_main, xc+j*scale_x, yc+i*scale_y, xc+(j+1)*scale_x, yc+(i+1)*scale_y,
-			   round(FACTOR_N_TO_8_R*(*Pic).pic[i][j].r),
-			   round(FACTOR_N_TO_8_G*(*Pic).pic[i][j].g),
-			   round(FACTOR_N_TO_8_B*(*Pic).pic[i][j].b),
-			   round(FACTOR_N_TO_8_K*(*Pic).pic[i][j].a));	
-	 }
-}
+  printf("rendermode=0x%x, scale_x=%d, scale_y=%d\r\n",rendermode,scale_x, scale_y);
+  if ((scale_x==1) && (scale_y==1))
+    for (y=0;y<(*Pic).h;y++)
+      for (x=0;x<(*Pic).w;x++)
+	lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, xc+x, yc+y, (*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+  else
+    switch (rendermode & RENDERMODE_PIXELMODE_MASK)
+      {
+      case RENDERMODE_PIXELMODE_0: /* solid rectangle */
+	for (y=0;y<(*Pic).h;y++)
+	  for (x=0;x<(*Pic).w;x++)
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+	    lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x, yc + y*scale_y, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+					(*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+#else
+	lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x, yc + y*scale_y, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+				    FACTOR_N_TO_8_R*(*Pic).pic[y][x].r, FACTOR_N_TO_8_G*(*Pic).pic[y][x].g, FACTOR_N_TO_8_B*(*Pic).pic[y][x].b, FACTOR_N_TO_8_A*(*Pic).pic[y][x].a, copymode);
 #endif
+	break;
+      
+      case RENDERMODE_PIXELMODE_1:
+	{
+	  U_INT_8_T border_r, border_g, border_b;
+	  border_r = ((rendermode & RENDERMODE_PIXELBG_R_MASK) >> RENDERMODE_PIXELBG_R_SHIFT)*255/15;
+	  border_g = ((rendermode & RENDERMODE_PIXELBG_G_MASK) >> RENDERMODE_PIXELBG_G_SHIFT)*255/15;
+	  border_b = ((rendermode & RENDERMODE_PIXELBG_B_MASK) >> RENDERMODE_PIXELBG_B_SHIFT)*255/15;
+
+	  for (y=0;y<(*Pic).h;y++)
+	    for (x=0;x<(*Pic).w;x++)
+	      {
+		lb_gr_fb_line_h_copymode(&ty_screen, yc +  y   *scale_y, xc + x*scale_x,   xc + (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_h_copymode(&ty_screen, yc + (y+1)*scale_y, xc + x*scale_x,   xc + (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc +  x   *scale_x, yc + y*scale_y+1, yc + (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc + (x+1)*scale_x, yc + y*scale_y+1, yc + (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
+		
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+					    (*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+#else
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+					    FACTOR_N_TO_8_R*(*Pic).pic[y][x].r, FACTOR_N_TO_8_G*(*Pic).pic[y][x].g, FACTOR_N_TO_8_B*(*Pic).pic[y][x].b, FACTOR_N_TO_8_A*(*Pic).pic[y][x].a, copymode);
+#endif
+	      }
+	}
+	break;
+      case RENDERMODE_PIXELMODE_2:
+	  {
+	    U_INT_8_T border_r, border_g, border_b;
+	    border_r = ((rendermode & RENDERMODE_PIXELBG_R_MASK) >> RENDERMODE_PIXELBG_R_SHIFT)*255/15;
+	    border_g = ((rendermode & RENDERMODE_PIXELBG_G_MASK) >> RENDERMODE_PIXELBG_G_SHIFT)*255/15;
+	    border_b = ((rendermode & RENDERMODE_PIXELBG_B_MASK) >> RENDERMODE_PIXELBG_B_SHIFT)*255/15;
+
+	    for (y=0;y<(*Pic).h;y++)
+	      for (x=0;x<(*Pic).w;x++)
+	      {
+		lb_gr_fb_line_h_copymode(&ty_screen, yc +     y*scale_y,   xc + x*scale_x,   xc + (x+1)*scale_x-1, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_h_copymode(&ty_screen, yc + (y+1)*scale_y-1, xc + x*scale_x,   xc + (x+1)*scale_x-1, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc +   x  *scale_x,   yc + y*scale_y+1, yc + (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc + (x+1)*scale_x-1, yc + y*scale_y+1, yc + (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode);
+	  
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-2, yc + (y+1)*scale_y-2,
+					    (*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+#else
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-2, yc + (y+1)*scale_y-2,
+					    FACTOR_N_TO_8_R*(*Pic).pic[y][x].r, FACTOR_N_TO_8_G*(*Pic).pic[y][x].g, FACTOR_N_TO_8_B*(*Pic).pic[y][x].b, FACTOR_N_TO_8_A*(*Pic).pic[y][x].a, copymode);
+#endif
+	      }
+	  }
+      }
+}
+
+
     
 void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
 				       FLOAT_T t0, FLOAT_T t1, FLOAT_T delta,
@@ -6788,3 +7121,4 @@ PIXEL_T lb_gr_value_to_color(S_INT_8_T value)
     }
   return color;
 }
+

@@ -223,7 +223,7 @@ void       lb_gr_release_line2d_i(LINE_2D_INT_T *L);
 void       lb_gr_release_line2d_f(LINE_2D_FLOAT_T *L);
 void       lb_gr_release_line3d_f(LINE_3D_FLOAT_T *L);
 void       lb_gr_release_picture(volatile PICTURE_T *Pic);
-void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE_T copymode);
+void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, COPYMODE_T copymode, RENDERMODE_T rendermode);
 PIXEL_T    lb_gr_value_to_color(S_INT_8_T value);
 
 

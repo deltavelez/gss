@@ -669,3 +669,64 @@ void lb_gr_project_3d_analytical(VIEWPORT_3D_T w, MATRIX_R_T *Rot, VECTOR_R_T *P
 	   r+=delta_grid_y;
 	 }
      }
+
+
+
+#ifdef XXXXX
+lb_gr_buffer_pixel(xc+j, yc+i, 255,255,255);
+  
+if ( (scale_x==1) && (scale_y==1) )
+  {
+    for (i=0;i<(*Pic).h;i++)
+      for (j=0;j<(*Pic).w;j++)
+	{
+	  lb_fb_draw_pixel(ty_fb_main, xc + j, yc + i,
+			   round(FACTOR_N_TO_8_R*(*Pic).pic[i][j].r),
+			   round(FACTOR_N_TO_8_G*(*Pic).pic[i][j].g),
+			   round(FACTOR_N_TO_8_B*(*Pic).pic[i][j].b),
+			   round(FACTOR_N_TO_8_K*(*Pic).pic[i][j].a));
+	}
+  }
+ else
+   if(renderoptions & RENDEROPTIONS_LINE)
+     {
+       if ((scale_x<3) || (scale_y<3))
+	 {
+	   printf("Error: lb_gr_render_picture() --> invalid scale: scale_x=%d scale_y=%d\r\n",scale_x,scale_y);
+	   exit(EXIT_FAILURE);
+	 }
+	
+       for (i=0;i<(*Pic).h;i++)
+	 for (j=0;j<(*Pic).w;j++)
+	   {
+	     U_INT_8_T temp_r, temp_g, temp_b, temp_k;
+	     temp_r=round(FACTOR_N_TO_8_R*(*Pic).pic[i][j].r);
+	     temp_g=round(FACTOR_N_TO_8_G*(*Pic).pic[i][j].g);
+	     temp_b=round(FACTOR_N_TO_8_B*(*Pic).pic[i][j].b);
+	     temp_k=round(FACTOR_N_TO_8_K*(*Pic).pic[i][j].a);
+		  
+	     lb_fb_line_h(ty_fb_main, yc+ scale_y*i, xc+ scale_x*j, xc+ scale_x*(j+1)-2,
+			  temp_r, temp_g, temp_b, temp_k);
+
+	     lb_fb_line_h(ty_fb_main, yc+ scale_y*(i+1)-2, xc+ scale_x*j, xc+ scale_x*(j+1)-2,
+			  temp_r, temp_g, temp_b, temp_k);
+	
+	     lb_fb_line_v(ty_fb_main, xc+ scale_x*j, yc+ scale_y*i, yc+ scale_y*(i+1)-2,
+			  temp_r, temp_g, temp_b, temp_k);
+
+	     lb_fb_line_v(ty_fb_main, xc+ scale_x*(j+1)-2, yc+ scale_y*i, yc+ scale_y*(i+1)-2,
+			  temp_r, temp_g, temp_b, temp_k);
+	   }
+     } 
+   else
+     for (i=0;i<(*Pic).h;i++)
+       for (j=0;j<(*Pic).w;j++)
+	 {
+	   lb_fb_rectangle(ty_fb_main, xc+j*scale_x, yc+i*scale_y, xc+(j+1)*scale_x, yc+(i+1)*scale_y,
+			   round(FACTOR_N_TO_8_R*(*Pic).pic[i][j].r),
+			   round(FACTOR_N_TO_8_G*(*Pic).pic[i][j].g),
+			   round(FACTOR_N_TO_8_B*(*Pic).pic[i][j].b),
+			   round(FACTOR_N_TO_8_K*(*Pic).pic[i][j].a));	
+	 }
+}
+#endif
