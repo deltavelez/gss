@@ -334,8 +334,12 @@ int main()
   /* General Computer Science                                                                                        */
   /*******************************************************************************************************************/
   
-  /* This demo is the base for a two-dimensional circular buffer such as the one used in text consoles */
+  
+  
+#endif
+    
 
+  
   //#define DEMO_2D_CIRCULAR_BUFFER_TEXT
 #ifdef DEMO_2D_CIRCULAR_BUFFER_TEXT
 #define MAX_COLS 4
