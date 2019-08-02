@@ -53,3 +53,15 @@ git config --system http.sslVerify false
 git config --global http.sslVerify false
 
 
+
+Retrieving an older commit:
+
+git checkout -f 9cfdcda4f263be8e197bc1e75821552a72782701
+
+git branch -d pixelargs
+Deleted branch pixelargs (was 9cfdcda).
+
+Creating a local branch of a specific commit:
+ git branch pixelargs 9cfdcda4f263be8e197bc1e75821552a72782701
+
+
