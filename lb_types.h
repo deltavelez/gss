@@ -19,7 +19,7 @@
 /* Basic data types */
 /******************************************************/
 
-#define FLOAT_T float
+#define FLOAT_T double
 #define U_INT_8_T unsigned char
 #define U_INT_16_T unsigned short
 #define U_INT_32_T unsigned int
@@ -711,9 +711,9 @@ typedef enum { COPYMODE_FRAMEBUFFER=0,
 #define RENDERMODE_SCALE_Y_SHIFT         22
 
 /* These macros help the user setting an arbitrary "pixel size" */
-#define RENDERMODE_SCALEX(X) (((X-1)<<COPYMODE_SCALEX_SHIFT) & COPYMODE_SCALEX_MASK)
-#define RENDERMODE_SCALEY(X) (((X-1)<<COPYMODE_SCALEY_SHIFT) & COPYMODE_SCALEY_MASK)
-#define RENDERMODE_BGCOLOR(X) (X & (COPYMODE_PIXELBG_R_MASK | COPYMODE_PIXELBG_G_MASK | COPYMODE_PIXELBG_B_MASK) )
+#define RENDERMODE_SCALE_X(X) (((X-1)<<RENDERMODE_SCALE_X_SHIFT) & RENDERMODE_SCALE_X_MASK)
+#define RENDERMODE_SCALE_Y(X) (((X-1)<<RENDERMODE_SCALE_Y_SHIFT) & RENDERMODE_SCALE_Y_MASK)
+#define RENDERMODE_BGCOLOR(X) (X & (RENDERMODE_PIXELBG_R_MASK | RENDERMODE_PIXELBG_G_MASK | RENDERMODE_PIXELBG_B_MASK) )
 
 
 typedef enum

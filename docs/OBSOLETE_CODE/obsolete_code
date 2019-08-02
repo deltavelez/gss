@@ -730,3 +730,226 @@ if ( (scale_x==1) && (scale_y==1) )
 	 }
 }
 #endif
+
+
+//  lb_co_color_fg(lb_gr_12RGB(COLOR_WHITE));
+//lb_co_color_bg(lb_gr_12RGB(COLOR_BLACK));
+
+void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+  int bpp = surface->format->BytesPerPixel;
+  /* Here p is the address to the pixel we want to set */
+  Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+  switch(bpp) {
+  case 1:
+    *p = pixel;
+    break;
+
+  case 2:
+    *(Uint16 *)p = pixel;
+    break;
+
+  case 3:
+    if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+      p[0] = (pixel >> 16) & 0xff;
+      p[1] = (pixel >> 8) & 0xff;
+      p[2] = pixel & 0xff;
+    } else {
+      p[0] = pixel & 0xff;
+      p[1] = (pixel >> 8) & 0xff;
+      p[2] = (pixel >> 16) & 0xff;
+    }
+    break;
+
+  case 4:
+    *(Uint32 *)p = pixel;
+    break;
+  }
+}
+
+  //#define DEMO_SDL
+#ifdef DEMO_SDL
+  SDL_Event event;
+  SDL_Renderer *renderer;
+  SDL_Window *window;
+  SDL_Texture *texture;
+  
+  int x,y,z;
+
+  unsigned char *pixels;
+  int pitch;
+
+  SDL_Init(SDL_INIT_VIDEO);
+  //SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, 0, &window, &renderer);
+  window = SDL_CreateWindow("Hello World", 0, 0, WIDTH, HEIGHT, 0);
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, WIDTH, HEIGHT);
+    
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+  SDL_RenderClear(renderer);
+  char color;
+  clock_t begin, end;
+
+
+  begin=clock();
+ 
+  for (z=0; z<1000; z++)
+    {
+      SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
+      for (y=0; y<HEIGHT; y++)
+	for (x=0; x<WIDTH; x++)
+	  {
+	    unsigned int offset;
+	    offset= WIDTH*4*y+x*4;
+	    *((unsigned char*)pixels+offset)=  x % 255;
+	    *((unsigned char*)pixels+offset+1)= y % 255;
+	    *((unsigned char*)pixels+offset+2)=  z % 255;
+	    *((unsigned char*)pixels+offset+3)=  255;
+	  }
+
+      if (0) for (y=0; y<HEIGHT; y++)
+	       for (x=0; x<WIDTH; x++)
+		 {
+		   unsigned int offset;
+		   offset= WIDTH*4*y+x*4;
+		   printf("value = %u, %u, %u, %u\r\n",
+			  (unsigned int)*((unsigned char*)pixels+offset),
+			  (unsigned int)*((unsigned char*)pixels+offset+1),
+			  (unsigned int)*((unsigned char*)pixels+offset+2),
+			  (unsigned int)*((unsigned char*)pixels+offset+3));
+		 }
+   
+      //SDL_RenderClear(renderer);
+      SDL_UnlockTexture(texture);
+      SDL_UpdateTexture(texture, NULL, &pixels[0], pitch); //Copy entire array only once
+      SDL_RenderCopy(renderer, texture, NULL, NULL);
+      SDL_RenderPresent(renderer);
+      //lb_gr_delay(200);
+    }
+  end=clock();
+  printf("frames per second = %f\n",(double)1000.0*CLOCKS_PER_SEC/(double)(end - begin) );
+
+  SDL_Quit();
+  while (1) {
+    if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
+      break;
+  }
+  return EXIT_SUCCESS;
+  
+  exit(1);
+#endif
+
+  
+#ifdef DEMO_SDL_WORKS
+  SDL_Event event;
+  SDL_Renderer *renderer;
+  SDL_Window *window;
+  SDL_Texture *texture;
+  
+  int x,y,z;
+
+  char *pixels;
+  int pitch;
+
+  pitch=WIDTH*4;
+
+  pixels=malloc(WIDTH*HEIGHT*4);
+
+  SDL_Init(SDL_INIT_VIDEO);
+  //SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, 0, &window, &renderer);
+  window = SDL_CreateWindow("Hello World", 0, 0, WIDTH, HEIGHT, 0);
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
+    
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+  SDL_RenderClear(renderer);
+  char color;
+  clock_t begin, end;
+
+
+  begin=clock();
+  for (z=0; z<1000; z++)
+    {
+      //SDL_LockTexture(texture, NULL, &pixels, &pitch); //Copy entire array only once
+      //printf("z=%d\r\n",z);
+      for (y=0; y<HEIGHT; y++)
+	for (x=0; x<WIDTH; x++)
+	  {
+	    unsigned int offset;
+	    offset= WIDTH*4*y+x*4;
+	    *((char*)pixels+offset)=  x % 255;
+	    *((char*)pixels+offset+1)= y % 255;
+	    *((char*)pixels+offset+2)=  z % 255;
+	    *((char*)pixels+offset+3)=  255;
+	    printf("x=%d, y=%d, z=%d\r\n",x,y,z);
+	  }
+      //SDL_RenderClear(renderer);
+      // SDL_UnlockTexture(texture);
+      SDL_UpdateTexture(texture, NULL, &pixels[0], pitch); //Copy entire array only once
+      SDL_RenderCopy(renderer, texture, NULL, NULL);
+      SDL_RenderPresent(renderer);
+      //lb_gr_delay(200);
+    }
+  end=clock();
+  printf("frames per second = %f\n",(double)1000.0*CLOCKS_PER_SEC/(double)(end - begin) );
+
+  SDL_Quit();
+  while (1) {
+    if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
+      break;
+  }
+  return EXIT_SUCCESS;
+  
+  exit(1);
+#endif
+  
+  //#define DEMO_TIMIMNG_FB
+#ifdef DEMO_TIMIMNG_FB
+  S_INT_16_T x, y, z, width, height;
+  clock_t begin, end;
+
+  lb_fb_get_res("/dev/fb0", &width, &height);
+  printf("width = %d, height=%d\r\n",width,height);
+ 	
+  lb_fb_open("/dev/fb0", "/dev/tty1", 8, 8,  0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY );
+
+  begin=clock();
+ 
+  for (z=0; z<1000; z++)
+    for (y=0; y<height; y++)
+      for (x=0; x<width; x++)
+	lb_fb_draw_pixel(ty_fb_main, x, y, x%255, y%255, z%255,255);
+      
+  end=clock();
+  lb_fb_setmode_text();
+  printf("frames per second = %f\n",(double)1000.0*CLOCKS_PER_SEC/(double)(end - begin) );
+  
+  lb_fb_exit(1);
+
+  
+#endif
+
+  //#define NEW_DEMO_SDL
+#ifdef NEW_DEMO_SDL
+  SDL_Event event;
+  
+  int x,y,z;
+  char color;
+  clock_t begin, end;
+
+  lb_gr_SDL_init(SDL_INIT_VIDEO, 320, 200);
+  
+
+  while (1)
+    {
+      if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
+	break;
+    }
+  begin=clock();
+  end=clock();
+  printf("frames per second = %f\n",(double)1000.0*CLOCKS_PER_SEC/(double)(end - begin) );
+  SDL_Quit();
+  return EXIT_SUCCESS;
+#endif
+
