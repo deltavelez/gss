@@ -684,7 +684,7 @@ int main()
 #endif
 
   // oxo 
-#define DEMO_VIRTUAL_CONSOLE
+  //#define DEMO_VIRTUAL_CONSOLE
 #ifdef DEMO_VIRTUAL_CONSOLE
   SDL_Event event;
   PICTURE_T Pic_console;
@@ -2407,11 +2407,9 @@ int main()
 #endif
 
 
-    //#define DEMO_MALDENBROT
-#ifdef DEMO_MALDENBROT
+#define DEMO_MANDELBROT
+#ifdef DEMO_MANDELBROT
     SDL_Event event;
-    int pix_x=1, pix_y=1;
-	    
     int xp, yp, iterations;
     FLOAT_T xr, yr;
     COMPLEX_T z, p;
@@ -2422,8 +2420,8 @@ int main()
 
     win.xp_min=0;
     win.yp_min=0;
-    win.xp_max=ty_screen.w/pix_x;
-    win.yp_max=ty_screen.h/pix_y;
+    win.xp_max=ty_screen.w;
+    win.yp_max=ty_screen.h;
     win.xr_min=-1.024*2;
     win.xr_max=1.024*2;
     win.yr_min=-0.768*2; 
@@ -2443,10 +2441,10 @@ int main()
 	      z=lb_cp_add(lb_cp_multiply(z,z),p);
 	      iterations++;
 	    }
-	  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations<<8), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+	  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations<<8), COPYMODE_COPY);
 	}
     lb_gr_refresh();
-    lb_gr_BMPfile_save("maldenbrot.bmp",NULL);
+    lb_gr_BMPfile_save("./media/images/mandelbrot.bmp",NULL);
     while (1)
       while (SDL_PollEvent(&event))
 	{

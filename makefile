@@ -4,4 +4,5 @@ graf: graf.c lb_algebra.c lb_algebra.h lb_audio.h lb_audio.c lb_complex.c lb_com
 
 clean:
 	rm *.*~*
+	rm *~
 # add -lSDL2main if there are compilation/linking errors.  It was removed to try out if it was necessary.
