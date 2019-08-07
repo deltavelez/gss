@@ -2,4 +2,6 @@ graf: graf.c lb_algebra.c lb_algebra.h lb_audio.h lb_audio.c lb_complex.c lb_com
 
 	gcc -o graf graf.c lb_audio.c lb_algebra.c lb_complex.c lb_console.c lb_fonts.c lb_fourier.c lb_geometry.c lb_graphics.c lb_integer.c lb_numer.c lb_parser.c lb_real.c lb_serial.c lb_statistics.c -lm -D_REENTRANT -ljpeg -lpthread -Wall -I/usr/include -lSDL2 -O0
 
+clean:
+	rm *.*~*
 # add -lSDL2main if there are compilation/linking errors.  It was removed to try out if it was necessary.
