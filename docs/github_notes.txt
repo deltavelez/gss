@@ -40,7 +40,7 @@ Shows configuration:
 git config --list
 
 Add a remote:
-git remote add origen https://github.com/deltavelez/tesisUPB.git
+git remote add origin https://github.com/deltavelez/gss.git
 git remote remove origin
 
 Check a remote:
