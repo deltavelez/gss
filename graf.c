@@ -683,7 +683,7 @@ int main()
   exit(1);
 #endif
 
-  // oxo 
+   
   //#define DEMO_VIRTUAL_CONSOLE
 #ifdef DEMO_VIRTUAL_CONSOLE
   SDL_Event event;
@@ -2225,7 +2225,6 @@ int main()
       }
 #endif
 
-  //oxo
   //#define DEMO_POLAR_AXIS
 #ifdef DEMO_POLAR_AXIS
   SDL_Event event;
@@ -2532,17 +2531,47 @@ int main()
     M[i].v = tmp_vel;
   }
 
+  VECTOR_3D_T ka, kv, k1a, k1v, k2a, k2v, k3a, k3v, k4a, k4v;
   SDL_Event event;
+  FONT_T my_font;
+  char text[40];
   FLOAT_T t;
   FLOAT_T dt;
-  int i;
+  VIEWPORT_2D_T win;
+  FLOAT_T xp, yp;
+  S_INT_32_T step_counter=0;
+  S_INT_8_T flag_paused=FALSE;
 
-  
+  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1200, 800, 0xFF, 0xFF, 0xFF);
+ 
+  //oxo
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
+  win.xr_max= 2.0*1.496e11;
+  win.xr_min=-win.xr_max;
+  win.yr_min=win.xr_max*ty_screen.h/ty_screen.w;
+  win.yr_max=-win.yr_min; 
+
+
+  lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
+  my_font.scale_x=4;
+  my_font.scale_y=4;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=TRUE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
+  my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
+
+      
   dt=60;  /* seconds */
   t=0;      /* tracks the elapsed time */
 
-  VECTOR_3D_T ka, kv, k1a, k1v, k2a, k2v, k3a, k3v, k4a, k4v;
-
+  
   /* Initialize values for Euler Matrix */
   M_euler[0].m=1.9891e30;
  
@@ -2609,1798 +2638,1836 @@ int main()
 
   while (1)
     {
-      for (i=0;i<N_OBJECTS;i++)
+      if (!flag_paused)
 	{
-	  M_euler[i].dv = calc_acceleration(M_euler,i);
-
-	  kv.x = 0;
-	  kv.y = 0;
-	  kv.z = 0;
-      
-	  ka.x = 0;
-	  ka.y = 0;
-	  ka.z = 0;
-
-	  future_accel(M_rk4, i ,t        ,0      ,&kv ,&ka);
-	  k1v=kv;
-	  k1a=ka;
-
-	  kv.x = 0.5*k1v.x;
-	  kv.y = 0.5*k1v.y;
-	  kv.z = 0.5*k1v.z;
-
-	  ka.x = 0.5*k1a.x;
-	  ka.y = 0.5*k1a.y;
-	  ka.z = 0.5*k1a.z;
-
-	  future_accel(M_rk4, i ,t+0.5*dt ,0.5*dt ,&kv ,&ka);
-	  k2v=kv;
-	  k2a=ka;
-
-	  kv.x = 0.5*k2v.x;
-	  kv.y = 0.5*k2v.y;
-	  kv.z = 0.5*k2v.z;
-
-	  ka.x = 0.5*k2a.x;
-	  ka.y = 0.5*k2a.y;
-	  ka.z = 0.5*k2a.z;
-
-	  future_accel(M_rk4, i ,t+0.5*dt ,0.5*dt ,&kv ,&ka);
-	  k3v=kv;
-	  k3a=ka;
-      
-	  future_accel(M_rk4, i ,t+dt     ,dt     ,&kv ,&ka);
-	  k4v=kv;
-	  k4a=ka;
-
-	  M_rk4[i].dv.x = (k1a.x + 2*k2a.x + 2*k3a.x + k4a.x)/6.0;
-	  M_rk4[i].dv.y = (k1a.y + 2*k2a.y + 2*k3a.y + k4a.y)/6.0;
-	  M_rk4[i].dv.z = (k1a.z + 2*k2a.z + 2*k3a.z + k4a.z)/6.0;
-      
-	  M_rk4[i].dp.x = (k1v.x + 2*k2v.x + 2*k3v.x + k4v.x)/6.0;
-	  M_rk4[i].dp.y = (k1v.y + 2*k2v.y + 2*k3v.y + k4v.y)/6.0;
-	  M_rk4[i].dp.z = (k1v.z + 2*k2v.z + 2*k3v.z + k4v.z)/6.0;
-	}
-    
-      for (i=0;i<2;i++)
-	{
-	  /* Euler Integration */
-	  M_euler[i].p.x += M_euler[i].v.x*dt + 0.5*M_euler[i].dv.x*dt*dt;
-	  M_euler[i].p.y += M_euler[i].v.y*dt + 0.5*M_euler[i].dv.y*dt*dt;
-	  M_euler[i].p.z += M_euler[i].v.z*dt + 0.5*M_euler[i].dv.z*dt*dt;
- 
-	  M_euler[i].v.x += M_euler[i].dv.x*dt;
-	  M_euler[i].v.y += M_euler[i].dv.y*dt;
-	  M_euler[i].v.z += M_euler[i].dv.z*dt;
-
-	  /* Runge-Kutta 4 Integration */  
-	  M_rk4[i].p.x += M_rk4[i].dp.x*dt;  
-	  M_rk4[i].p.y += M_rk4[i].dp.y*dt; 
-	  M_rk4[i].p.z += M_rk4[i].dp.z*dt; 
-
-	  M_rk4[i].v.x += M_rk4[i].dv.x*dt;
-	  M_rk4[i].v.y += M_rk4[i].dv.y*dt;
-	  M_rk4[i].v.z += M_rk4[i].dv.z*dt;
-      
-	  if (i==1)
+	  for (i=0;i<N_OBJECTS;i++)
 	    {
-	      printf("EU: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_euler[i].p.x, M_euler[i].p.y, M_euler[i].p.z);
-	      printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
-	      printf("\n");
+	      M_euler[i].dv = calc_acceleration(M_euler,i);
 
-#ifdef oxo
-	      for(j=0;j<40.0*(M_euler[i].p.x/1.496e11);j++)
-		printf("*");
-	      printf("\n");
-	      for(j=0;j<40.0*(M_rk4[i].p.x/1.496e11);j++)
-		printf("*");
-#endif
-	      printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
-	      printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
-	      printf("\n\n");
-	      //delay(200);
+	      kv.x = 0;
+	      kv.y = 0;
+	      kv.z = 0;
+      
+	      ka.x = 0;
+	      ka.y = 0;
+	      ka.z = 0;
+
+	      future_accel(M_rk4, i ,t        ,0      ,&kv ,&ka);
+	      k1v=kv;
+	      k1a=ka;
+
+	      kv.x = 0.5*k1v.x;
+	      kv.y = 0.5*k1v.y;
+	      kv.z = 0.5*k1v.z;
+
+	      ka.x = 0.5*k1a.x;
+	      ka.y = 0.5*k1a.y;
+	      ka.z = 0.5*k1a.z;
+
+	      future_accel(M_rk4, i ,t+0.5*dt ,0.5*dt ,&kv ,&ka);
+	      k2v=kv;
+	      k2a=ka;
+
+	      kv.x = 0.5*k2v.x;
+	      kv.y = 0.5*k2v.y;
+	      kv.z = 0.5*k2v.z;
+
+	      ka.x = 0.5*k2a.x;
+	      ka.y = 0.5*k2a.y;
+	      ka.z = 0.5*k2a.z;
+
+	      future_accel(M_rk4, i ,t+0.5*dt ,0.5*dt ,&kv ,&ka);
+	      k3v=kv;
+	      k3a=ka;
+      
+	      future_accel(M_rk4, i ,t+dt     ,dt     ,&kv ,&ka);
+	      k4v=kv;
+	      k4a=ka;
+
+	      M_rk4[i].dv.x = (k1a.x + 2*k2a.x + 2*k3a.x + k4a.x)/6.0;
+	      M_rk4[i].dv.y = (k1a.y + 2*k2a.y + 2*k3a.y + k4a.y)/6.0;
+	      M_rk4[i].dv.z = (k1a.z + 2*k2a.z + 2*k3a.z + k4a.z)/6.0;
+      
+	      M_rk4[i].dp.x = (k1v.x + 2*k2v.x + 2*k3v.x + k4v.x)/6.0;
+	      M_rk4[i].dp.y = (k1v.y + 2*k2v.y + 2*k3v.y + k4v.y)/6.0;
+	      M_rk4[i].dp.z = (k1v.z + 2*k2v.z + 2*k3v.z + k4v.z)/6.0;
 	    }
-	}
+    
+	  for (i=0;i<N_OBJECTS;i++)
+	    {
+	      /* Euler Integration */
+	      M_euler[i].p.x += M_euler[i].v.x*dt + 0.5*M_euler[i].dv.x*dt*dt;
+	      M_euler[i].p.y += M_euler[i].v.y*dt + 0.5*M_euler[i].dv.y*dt*dt;
+	      M_euler[i].p.z += M_euler[i].v.z*dt + 0.5*M_euler[i].dv.z*dt*dt;
+ 
+	      M_euler[i].v.x += M_euler[i].dv.x*dt;
+	      M_euler[i].v.y += M_euler[i].dv.y*dt;
+	      M_euler[i].v.z += M_euler[i].dv.z*dt;
+
+	      /* Runge-Kutta 4 Integration */  
+	      M_rk4[i].p.x += M_rk4[i].dp.x*dt;  
+	      M_rk4[i].p.y += M_rk4[i].dp.y*dt; 
+	      M_rk4[i].p.z += M_rk4[i].dp.z*dt; 
+
+	      M_rk4[i].v.x += M_rk4[i].dv.x*dt;
+	      M_rk4[i].v.y += M_rk4[i].dv.y*dt;
+	      M_rk4[i].v.z += M_rk4[i].dv.z*dt;
+
+	  
+	      if (i==1) 
+		{
+		  if ( (step_counter==0) || (U_INT_32_T)((t+dt)/(365*24*3600))>(U_INT_32_T)(t/(365*24*3600)) )
+		    {
+		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
+		      lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
+		      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
+						     fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+		      if (t/(365*24*3600)>99)
+			flag_paused=TRUE;
+		    }
+		  if ((step_counter % 60) == 0)
+		    {
+		      sprintf(text,"n: %0d",step_counter);
+		      lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
+
+		      sprintf(text,"t: %02.2f",t/(24.0*365.0*3600.0));
+		      lb_ft_draw_text(NULL, &my_font, 20, 80, text, COPYMODE_COPY);
+
+
+	    	      //
+		      //printf("EU: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_euler[i].p.x, M_euler[i].p.y, M_euler[i].p.z);
+		      //printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
+		      //printf("\n");
+		      lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
+		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(0xFF00), COPYMODE_COPY);
+		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF00F), COPYMODE_COPY); 
+
+
+		      lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
+		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(0xF0B0), COPYMODE_COPY);
+		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY); 
+	      
+
+		      //printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
+		      //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
+		      //printf("\n\n");
+		      //delay(200);
+		      lb_gr_refresh();
+		    }
+		}
+	    }
      
-      t=t+dt;
+	  t=t+dt;
+	  step_counter++;
+	}
       while (SDL_PollEvent(&event))
 	{
 	  if (event.type == SDL_QUIT)
 	    {
-		      
 	      SDL_Quit();
 	      return EXIT_SUCCESS;
 	    }
+	  if (event.type== SDL_KEYDOWN)
+		   {
+		     if (event.key.keysym.sym == SDLK_SPACE)
+		       {
+			 if (flag_paused)
+			   flag_paused=FALSE;
+			 else
+			   flag_paused=TRUE;
+		       }
+		   }
 	}
     }
-  //delay(20);
+  lb_gr_SDL_close();
+    
 #endif
     
-//#define DEMO_VIDEO
+  //#define DEMO_VIDEO
 #ifdef DEMO_VIDEO
-int xp, yp, iterations, k;
-FLOAT_T xr, yr, z_zoom;
-char filename[12];
-COMPLEX_T z, p;
-VIEWPORT_2D_T win;
+  int xp, yp, iterations, k;
+  FLOAT_T xr, yr, z_zoom;
+  char filename[12];
+  COMPLEX_T z, p;
+  VIEWPORT_2D_T win;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
 
-z_zoom=1.0;
-win.xp_min=0;
-win.yp_min=0;
-win.xp_max=ty_width;
-win.yp_max=ty_height;
+  z_zoom=1.0;
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_width;
+  win.yp_max=ty_height;
 
-for(k=0;k<1440;k++)
-  {
-    win.xr_min=0.32-1.0/z_zoom;
-    win.xr_max=0.32+1.0/z_zoom;
-    win.yr_min=-0.32/z_zoom; 
-    win.yr_max=0.32/z_zoom;
+  for(k=0;k<1440;k++)
+    {
+      win.xr_min=0.32-1.0/z_zoom;
+      win.xr_max=0.32+1.0/z_zoom;
+      win.yr_min=-0.32/z_zoom; 
+      win.yr_max=0.32/z_zoom;
 
-    for(xp=0;xp<win.xp_max;xp++)
-      for(yp=0;yp<win.yp_max;yp++)
-	{
-	  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
-	  iterations=0;
-	  z.r=xr;
-	  z.i=yr;
-	  while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
-	    {
-	      p.r=xr;
-	      p.i=yr;
-	      z=lb_cp_add(lb_cp_multiply(z,z),p);
-	      iterations++;
-	    }
-	  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations), COPYMODE_COPY);
-	}
-    sprintf(filename,"malde%04d.jpg",k);
-    lb_gr_JPGfile_save(filename, NULL, 75);
-    z_zoom*=1.001;
-  }
-lb_fb_exit(1);
+      for(xp=0;xp<win.xp_max;xp++)
+	for(yp=0;yp<win.yp_max;yp++)
+	  {
+	    lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+	    iterations=0;
+	    z.r=xr;
+	    z.i=yr;
+	    while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
+	      {
+		p.r=xr;
+		p.i=yr;
+		z=lb_cp_add(lb_cp_multiply(z,z),p);
+		iterations++;
+	      }
+	    lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations), COPYMODE_COPY);
+	  }
+      sprintf(filename,"malde%04d.jpg",k);
+      lb_gr_JPGfile_save(filename, NULL, 75);
+      z_zoom*=1.001;
+    }
+  lb_fb_exit(1);
 #endif
 
-//#define DEMO_PLOT3D
+  //#define DEMO_PLOT3D
 #ifdef DEMO_PLOT3D
-PICTURE_T Pic, Pic_console;
-CONSOLE_T Con;
+  PICTURE_T Pic, Pic_console;
+  CONSOLE_T Con;
   
-VIEWPORT_3D_T vp3d;
-//FLOAT_T u_a, u_b, v_a, v_b;
-FLOAT_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
-S_INT_8_T flag_exit;
+  VIEWPORT_3D_T vp3d;
+  //FLOAT_T u_a, u_b, v_a, v_b;
+  FLOAT_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
+  S_INT_8_T flag_exit;
     
-//MATRIX_POINT_3D_T S;
-MATRIX_R_T Z;
-char c;
-FONT_T font_console;
+  //MATRIX_POINT_3D_T S;
+  MATRIX_R_T Z;
+  char c;
+  FONT_T font_console;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
     
   
-Pic.w=ty_width;
-Pic.h=ty_height/2;
-lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
+  Pic.w=ty_width;
+  Pic.h=ty_height/2;
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
 
-Pic_console.w=ty_width;
-Pic_console.h=ty_height/2;
-lb_gr_create_picture(&Pic_console,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID));
+  Pic_console.w=ty_width;
+  Pic_console.h=ty_height/2;
+  lb_gr_create_picture(&Pic_console,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID));
 
 
-lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &font_console);
-font_console.scale_x=1;
-font_console.scale_y=1;
-font_console.gap_x=2;
-font_console.gap_y=2;
-font_console.max_x=10;
-font_console.angle=0;
-font_console.flag_fg=TRUE;
-font_console.flag_bg=FALSE;
-font_console.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
-font_console.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &font_console);
+  font_console.scale_x=1;
+  font_console.scale_y=1;
+  font_console.gap_x=2;
+  font_console.gap_y=2;
+  font_console.max_x=10;
+  font_console.angle=0;
+  font_console.flag_fg=TRUE;
+  font_console.flag_bg=FALSE;
+  font_console.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
+  font_console.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
  
-lb_ft_resize_console(&Pic_console, &font_console, &Con);
-Con.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
-Con.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
-lb_ft_create_console(&Con);
-lb_ft_set_active_console(&Con);
+  lb_ft_resize_console(&Pic_console, &font_console, &Con);
+  Con.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
+  Con.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
+  lb_ft_create_console(&Con);
+  lb_ft_set_active_console(&Con);
     
-flag_exit=FALSE;
+  flag_exit=FALSE;
       
-vp3d.xp_min=0;
-vp3d.yp_min=0;
-vp3d.xp_max=Pic.w;
-vp3d.yp_max=Pic.h;
-vp3d.scale =200.0;    /* Zoom */
-vp3d.cam_d= 0.0;   /* Stereoscopic */
-vp3d.cam_h=10.0;    /* Depth */
-vp3d.cam.x=0.0;   /* Camera's location */
-vp3d.cam.y=0.0;   /* Camera's location */
-vp3d.cam.z=40.0;   /* Camera's location */
+  vp3d.xp_min=0;
+  vp3d.yp_min=0;
+  vp3d.xp_max=Pic.w;
+  vp3d.yp_max=Pic.h;
+  vp3d.scale =200.0;    /* Zoom */
+  vp3d.cam_d= 0.0;   /* Stereoscopic */
+  vp3d.cam_h=10.0;    /* Depth */
+  vp3d.cam.x=0.0;   /* Camera's location */
+  vp3d.cam.y=0.0;   /* Camera's location */
+  vp3d.cam.z=40.0;   /* Camera's location */
 		    
       
-lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
-lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
-lb_al_fill_rotation_matrix33_Y(Ry_p, M_PI/90);
-lb_al_fill_rotation_matrix33_Y(Ry_n,-M_PI/90);
-lb_al_fill_rotation_matrix33_X(Rx_p, M_PI/90);
-lb_al_fill_rotation_matrix33_X(Rx_n,-M_PI/90);
+  lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
+  lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
+  lb_al_fill_rotation_matrix33_Y(Ry_p, M_PI/90);
+  lb_al_fill_rotation_matrix33_Y(Ry_n,-M_PI/90);
+  lb_al_fill_rotation_matrix33_X(Rx_p, M_PI/90);
+  lb_al_fill_rotation_matrix33_X(Rx_n,-M_PI/90);
 
     
-lb_al_print_matrix33_r(Rz_p,"Rz_p",FLOAT_FORMAT_MATRIX);
-lb_al_print_matrix33_r(Rz_n,"Rz_n",FLOAT_FORMAT_MATRIX);
-lb_al_print_matrix33_r(Ry_p,"Ry_p",FLOAT_FORMAT_MATRIX);
-lb_al_print_matrix33_r(Ry_n,"Ry_n",FLOAT_FORMAT_MATRIX);
-lb_al_print_matrix33_r(Rx_p,"Rx_p",FLOAT_FORMAT_MATRIX);
-lb_al_print_matrix33_r(Rx_n,"Rx_n",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rz_p,"Rz_p",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rz_n,"Rz_n",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Ry_p,"Ry_p",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Ry_n,"Ry_n",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rx_p,"Rx_p",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rx_n,"Rx_n",FLOAT_FORMAT_MATRIX);
 
 
-lb_al_fill_rotation_matrix33_tait_bryan_ZYX(Rot,0,0,-M_PI/4);
+  lb_al_fill_rotation_matrix33_tait_bryan_ZYX(Rot,0,0,-M_PI/4);
 
-/* Surface */
-//S.rows=20;
-//S.cols=30;
-//lb_al_create_matrix_p3d(&S);
-//u_a=0.0;
-//u_b= 2*M_PI;
-//v_a=0;
-//v_b=5.0;
+  /* Surface */
+  //S.rows=20;
+  //S.cols=30;
+  //lb_al_create_matrix_p3d(&S);
+  //u_a=0.0;
+  //u_b= 2*M_PI;
+  //v_a=0;
+  //v_b=5.0;
 
 
-/* Z-buffer */
-lb_gr_create_zbuffer(NULL, &Z);
+  /* Z-buffer */
+  lb_gr_create_zbuffer(NULL, &Z);
 
 
     
-//for (i=0;i<S.rows;i++)
-//  for (j=0;j<S.cols;j++)
-//	{
-//	  S.array[i][j].x=(j*(v_b-v_a)/(S.cols-1))*cos(u_a + i*(u_b-u_a)/(S.rows-1));
-//	  S.array[i][j].y=(j*(v_b-v_a)/(S.cols-1))*sin(u_a + i*(u_b-u_a)/(S.rows-1));;
-//	  S.array[i][j].z=sin(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/2.5;
-//	  S.array[i][j].z=(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/10.0;
-//printf("[%f\t%f\t%f]\r\n",S.array[i][j].x,S.array[i][j].y,S.array[i][j].z); 
-//	}
+  //for (i=0;i<S.rows;i++)
+  //  for (j=0;j<S.cols;j++)
+  //	{
+  //	  S.array[i][j].x=(j*(v_b-v_a)/(S.cols-1))*cos(u_a + i*(u_b-u_a)/(S.rows-1));
+  //	  S.array[i][j].y=(j*(v_b-v_a)/(S.cols-1))*sin(u_a + i*(u_b-u_a)/(S.rows-1));;
+  //	  S.array[i][j].z=sin(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/2.5;
+  //	  S.array[i][j].z=(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/10.0;
+  //printf("[%f\t%f\t%f]\r\n",S.array[i][j].x,S.array[i][j].y,S.array[i][j].z); 
+  //	}
     
 
-while (!flag_exit)
-  {
-    lb_gr_clear_picture(&Pic,lb_gr_12RGB(COLOR_BLACK));
+  while (!flag_exit)
+    {
+      lb_gr_clear_picture(&Pic,lb_gr_12RGB(COLOR_BLACK));
 
-    lb_gr_reset_zbuffer(&Z);
+      lb_gr_reset_zbuffer(&Z);
 	
-    //lb_gr_plot3d_surface(NULL, vp3d, Rot, &S,
-    //		     1.0, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+      //lb_gr_plot3d_surface(NULL, vp3d, Rot, &S,
+      //		     1.0, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
 
-    lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){2,2,2},
-			      lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){2,2,2},
+				lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
-    lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){0,1,0},
-			      lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){0,1,0},
+				lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 
-    lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,1}, (POINT_3D_FLOAT_T){0,3,1},
-				(POINT_3D_FLOAT_T){3,0,1}, lb_gr_12RGB(COLOR_SOLID | COLOR_FORESTGREEN), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,1}, (POINT_3D_FLOAT_T){0,3,1},
+				  (POINT_3D_FLOAT_T){3,0,1}, lb_gr_12RGB(COLOR_SOLID | COLOR_FORESTGREEN), COPYMODE_BLEND);
 
-    lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){1,2,0},
-				(POINT_3D_FLOAT_T){1,0,2}, lb_gr_12RGB(COLOR_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){1,2,0},
+				  (POINT_3D_FLOAT_T){1,0,2}, lb_gr_12RGB(COLOR_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
 
-    lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){0,5,0},
-				(POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){0,5,0},
+				  (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
 
-    lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){5,5,0}, (POINT_3D_FLOAT_T){0,5,0},
-				(POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){5,5,0}, (POINT_3D_FLOAT_T){0,5,0},
+				  (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
 
-    lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){1,1,1},
-				(POINT_3D_FLOAT_T){2,2,2}, lb_gr_12RGB(COLOR_SOLID | 0xF00), COPYMODE_BLEND);
-
-	
-    vp3d.cam_d=0;
-
-
-    lg_gr_draw_axis_3d(&Pic, vp3d, Rot, &font_console,
-		       5.0, 4.0, lb_gr_12RGB(COLOR_WHITE),
-		       0, 5.0, 1.0,
-		       0, 5.0, 1.0,
-		       0, 1.0, 1.0,
-		       2.0, lb_gr_12RGB(0xF911),
-		       0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | AXIS_DRAW_Z_GRID,
-		       "O","X","Y","Z",
-		       COPYMODE_BLEND, LINEMODE_FILTERED);
-
-    lb_gr_render_picture(&Pic, 0, 0, 1, 1, 1*RENDEROPTIONS_LINE);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){1,1,1},
+				  (POINT_3D_FLOAT_T){2,2,2}, lb_gr_12RGB(COLOR_SOLID | 0xF00), COPYMODE_BLEND);
 
 	
-    // Wait for the user to press a character.
+      vp3d.cam_d=0;
 
-    lb_gr_clear_picture(&Pic_console, lb_gr_12RGB(COLOR_GRAY));
-    lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
-    lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
 
-    S_INT_8_T flag_process_keys=TRUE;
-    while (!lb_co_kbhit()) ;
-    while (flag_process_keys)
-      {
-	c=lb_co_getch_pc();
+      lg_gr_draw_axis_3d(&Pic, vp3d, Rot, &font_console,
+			 5.0, 4.0, lb_gr_12RGB(COLOR_WHITE),
+			 0, 5.0, 1.0,
+			 0, 5.0, 1.0,
+			 0, 1.0, 1.0,
+			 2.0, lb_gr_12RGB(0xF911),
+			 0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | AXIS_DRAW_Z_GRID,
+			 "O","X","Y","Z",
+			 COPYMODE_BLEND, LINEMODE_FILTERED);
+
+      lb_gr_render_picture(&Pic, 0, 0, 1, 1, 1*RENDEROPTIONS_LINE);
+
+	
+      // Wait for the user to press a character.
+
+      lb_gr_clear_picture(&Pic_console, lb_gr_12RGB(COLOR_GRAY));
+      lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
+      lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
+
+      S_INT_8_T flag_process_keys=TRUE;
+      while (!lb_co_kbhit()) ;
+      while (flag_process_keys)
+	{
+	  c=lb_co_getch_pc();
 	  
-	switch(c)
-	  {
-	  case 'r':
-	    vp3d.xp_min=0;
-	    vp3d.yp_min=0;
-	    vp3d.xp_max=ty_width;
-	    vp3d.yp_max=ty_height;
-	    vp3d.scale =100.0;    /* Zoom */
-	    vp3d.cam_d= 0.0;   /* Stereoscopic */
-	    vp3d.cam_h=10.0;    /* Depth */
-	    vp3d.cam.x=0.0;   /* Camera's location */
-	    vp3d.cam.y=0.0;   /* Camera's location */
-	    vp3d.cam.z=20.0;   /* Camera's location */
-	    break;
-	  case 'h':
-	    vp3d.cam_h*=1.1;
-	    break;
-	  case 'H':
-	    vp3d.cam_h/=1.1;
-	    break;
-	  case 'x':
-	    lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
-	    break;
-	  case 'X':
-	    lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
-	    break;
-	  case 'y':
-	    lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
-	    break;
-	  case 'Y':
-	    lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
-	    break;
-	  case 'z':
-	    lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
-	    break;
-	  case 'Z':
-	    lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
-	    break;
-	  case PCKEY_PAGE_UP:
-	    vp3d.scale*=1.1;
-	    break;
-	  case PCKEY_PAGE_DOWN:
-	    vp3d.scale/=1.1;
-	    break;
-	  case PCKEY_UP:
-	    vp3d.cam.y+=1.0;
-	    break;
-	  case PCKEY_DOWN:
-	    vp3d.cam.y-=1.0;
-	    break;
-	  case PCKEY_LEFT:
-	    vp3d.cam.x+=1.0;
-	    break;
-	  case PCKEY_RIGHT:
-	    vp3d.cam.x-=1.0;
-	    break;
-	  case PCKEY_ESC:
-	    flag_exit=TRUE;
-	    break;
-	  }
-	if(lb_co_kbhit())
-	  flag_process_keys=TRUE;
-	else
-	  flag_process_keys=FALSE;
-      }
-  }
-lb_ft_release_GLCDfont(&font_console);
-lb_gr_release_picture(&Pic);
-lb_gr_release_picture(&Pic_console);
-lb_ft_release_console(&Con);
-lb_fb_exit_msg("Closing program\r\n");    
-//lb_al_release_matrix_p3d(&S);
+	  switch(c)
+	    {
+	    case 'r':
+	      vp3d.xp_min=0;
+	      vp3d.yp_min=0;
+	      vp3d.xp_max=ty_width;
+	      vp3d.yp_max=ty_height;
+	      vp3d.scale =100.0;    /* Zoom */
+	      vp3d.cam_d= 0.0;   /* Stereoscopic */
+	      vp3d.cam_h=10.0;    /* Depth */
+	      vp3d.cam.x=0.0;   /* Camera's location */
+	      vp3d.cam.y=0.0;   /* Camera's location */
+	      vp3d.cam.z=20.0;   /* Camera's location */
+	      break;
+	    case 'h':
+	      vp3d.cam_h*=1.1;
+	      break;
+	    case 'H':
+	      vp3d.cam_h/=1.1;
+	      break;
+	    case 'x':
+	      lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
+	      break;
+	    case 'X':
+	      lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
+	      break;
+	    case 'y':
+	      lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
+	      break;
+	    case 'Y':
+	      lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
+	      break;
+	    case 'z':
+	      lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
+	      break;
+	    case 'Z':
+	      lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
+	      break;
+	    case PCKEY_PAGE_UP:
+	      vp3d.scale*=1.1;
+	      break;
+	    case PCKEY_PAGE_DOWN:
+	      vp3d.scale/=1.1;
+	      break;
+	    case PCKEY_UP:
+	      vp3d.cam.y+=1.0;
+	      break;
+	    case PCKEY_DOWN:
+	      vp3d.cam.y-=1.0;
+	      break;
+	    case PCKEY_LEFT:
+	      vp3d.cam.x+=1.0;
+	      break;
+	    case PCKEY_RIGHT:
+	      vp3d.cam.x-=1.0;
+	      break;
+	    case PCKEY_ESC:
+	      flag_exit=TRUE;
+	      break;
+	    }
+	  if(lb_co_kbhit())
+	    flag_process_keys=TRUE;
+	  else
+	    flag_process_keys=FALSE;
+	}
+    }
+  lb_ft_release_GLCDfont(&font_console);
+  lb_gr_release_picture(&Pic);
+  lb_gr_release_picture(&Pic_console);
+  lb_ft_release_console(&Con);
+  lb_fb_exit_msg("Closing program\r\n");    
+  //lb_al_release_matrix_p3d(&S);
   
 #endif
 
 
-/*******************************************************************************************************************/
-/* Fonts */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Fonts */
+  /******************************************************************************************************************/
 
-//#define DEMO_NEW_FONT
+  //#define DEMO_NEW_FONT
 #ifdef DEMO_NEW_FONT
-FONT_T my_font;
-char text[40];
-FLOAT_T x;
+  FONT_T my_font;
+  char text[40];
+  FLOAT_T x;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
 
-//printf("-10/10=%d\r\n",lb_in_round_div_up(1000,1001));
-//lb_fb_exit(1);
+  //printf("-10/10=%d\r\n",lb_in_round_div_up(1000,1001));
+  //lb_fb_exit(1);
     
-lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-//lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
-my_font.scale_x=4;
-my_font.scale_y=3;
-my_font.gap_x=2;
-my_font.gap_y=1;
-my_font.max_x=40;
-my_font.angle=0;
-my_font.flag_fg=TRUE;
-my_font.flag_bg=TRUE;
-my_font.color_fg=lb_gr_12RGB(COLOR_TEAL);
-my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+  //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
+  my_font.scale_x=4;
+  my_font.scale_y=3;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=TRUE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_TEAL);
+  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
-for(x=0;x<50.0;x+=0.1)
-  {
-    sprintf(text,"%02.1f",x);
-    lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
-    lb_gr_delay(200);
-  } 
+  for(x=0;x<50.0;x+=0.1)
+    {
+      sprintf(text,"%02.1f",x);
+      lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
+      lb_gr_delay(200);
+    } 
 
-strcpy(text,"hola \r\namigo");
-lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
-lb_ft_draw_text_centered(NULL, &my_font, 20, 70, 200, 50,  text, COPYMODE_COPY);
-lb_gr_draw_rectangle(NULL, 20, 70, 200, 50, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-lb_gr_delay(10000);
-lb_ft_release_GLCDfont(&my_font);
-lb_fb_exit(1);
+  strcpy(text,"hola \r\namigo");
+  lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
+  lb_ft_draw_text_centered(NULL, &my_font, 20, 70, 200, 50,  text, COPYMODE_COPY);
+  lb_gr_draw_rectangle(NULL, 20, 70, 200, 50, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+  lb_gr_delay(10000);
+  lb_ft_release_GLCDfont(&my_font);
+  lb_fb_exit(1);
 #endif
 
     
-/*******************************************************************************************************************/
-/* Financial */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Financial */
+  /******************************************************************************************************************/
 
-//#define DEMO_FINANCIAL
+  //#define DEMO_FINANCIAL
 #ifdef DEMO_FINANCIAL
-ERR_T e_code;
-FLOAT_T apr, monthly;
-apr=6.75;
-monthly=lb_re_APR_to_monthly(apr, &e_code);
-printf("APR = %.4f %% half yearly, not in advanced corresponds to %.4f %% monthly\r\n",
-       apr,monthly);
-printf("monthly = %.4f %% corresponds to %.4f %% effective yearly\r\n",
-       monthly,lb_re_monthly_to_effective(monthly,&e_code));
-printf("monthly = %.4f %% corresponds to %.4f %% APR\r\n",
-       monthly,lb_re_monthly_to_APR(monthly,&e_code));
-exit(1);
+  ERR_T e_code;
+  FLOAT_T apr, monthly;
+  apr=6.75;
+  monthly=lb_re_APR_to_monthly(apr, &e_code);
+  printf("APR = %.4f %% half yearly, not in advanced corresponds to %.4f %% monthly\r\n",
+	 apr,monthly);
+  printf("monthly = %.4f %% corresponds to %.4f %% effective yearly\r\n",
+	 monthly,lb_re_monthly_to_effective(monthly,&e_code));
+  printf("monthly = %.4f %% corresponds to %.4f %% APR\r\n",
+	 monthly,lb_re_monthly_to_APR(monthly,&e_code));
+  exit(1);
 #endif
 
-/*******************************************************************************************************************/
-/* Parsing */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Parsing */
+  /******************************************************************************************************************/
 
-//#define DEMO_PARSER_REAL
+  //#define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
-ERR_T e_code;
-FLOAT_T x,y,z,result;
-char variables[]="x,y,i"; 
-x=1;
-y=M_PI*60/180;
-z=3;  
+  ERR_T e_code;
+  FLOAT_T x,y,z,result;
+  char variables[]="x,y,i"; 
+  x=1;
+  y=M_PI*60/180;
+  z=3;  
     
       
-/* Example: pi as an infinite addition - Machin */
-//char expression[]="4*SIGMA(1,20000,(-1)^(i+1)/(2*i-1),i,1)";   
+  /* Example: pi as an infinite addition - Machin */
+  //char expression[]="4*SIGMA(1,20000,(-1)^(i+1)/(2*i-1),i,1)";   
      
-/* Example: pi as an infinite product */
-//char expression[]="2*PROD(1,100000,4*i^2/(4*i^2-1),i,1)";   
+  /* Example: pi as an infinite product */
+  //char expression[]="2*PROD(1,100000,4*i^2/(4*i^2-1),i,1)";   
         
-/* Example: sin(x) as an infinite addition */
-//char expression[]="sigma(0,10,(-1)^i*y^(2*i+1)/(2*i+1)!,i,1)"; 
+  /* Example: sin(x) as an infinite addition */
+  //char expression[]="sigma(0,10,(-1)^i*y^(2*i+1)/(2*i+1)!,i,1)"; 
 
-/* Example: cos(x) as an infinite addition */
-//char expression[]="sigma(0,2,(-1)^i*y^(2*i)/(2*i)!,i,1)";    
+  /* Example: cos(x) as an infinite addition */
+  //char expression[]="sigma(0,2,(-1)^i*y^(2*i)/(2*i)!,i,1)";    
       
-/* Example: first order derivate */
-//char expression[]="diff(sin(x)/cos(x+pi/8),x,30*pi/180,1e-2)";   
-//char expression[]="sin(y)/cos(y+pi/8)";   
+  /* Example: first order derivate */
+  //char expression[]="diff(sin(x)/cos(x+pi/8),x,30*pi/180,1e-2)";   
+  //char expression[]="sin(y)/cos(y+pi/8)";   
 
-/* Example: first order derivate */
-//char expression[]="diff(sin(x),x,30*pi/180,1e-4)";   
+  /* Example: first order derivate */
+  //char expression[]="diff(sin(x),x,30*pi/180,1e-4)";   
 
-/* Example: second order derivate */
-//char expression[]="diff2(sin(x),x,30*pi/180,1e-4)";   
+  /* Example: second order derivate */
+  //char expression[]="diff2(sin(x),x,30*pi/180,1e-4)";   
 
-/* Example: integral */
-//char expression[]="idef(0,pi/6,sin(x),x,2)"; 
+  /* Example: integral */
+  //char expression[]="idef(0,pi/6,sin(x),x,2)"; 
       
-/* Example: double integral */
-char expression[]="idef2(1,5,0,2,x^2*y^3,x,y,5)"; 
+  /* Example: double integral */
+  char expression[]="idef2(1,5,0,2,x^2*y^3,x,y,5)"; 
 
-/* Example: first order differential */
-//char expression[]="diff(-x^2,x,10,1e-5)";   
+  /* Example: first order differential */
+  //char expression[]="diff(-x^2,x,10,1e-5)";   
       
-/* Example: second order differential */
-//char expression[]="diff2(sin(x),x,30*pi/180,1e-2)";   
+  /* Example: second order differential */
+  //char expression[]="diff2(sin(x),x,30*pi/180,1e-2)";   
 
-/* Example: Gauss' childhood sum */
-// char expression[]="sigma(0,100,i,i,1)";   
+  /* Example: Gauss' childhood sum */
+  // char expression[]="sigma(0,100,i,i,1)";   
 
-/* Example: product */
-//char expression[]="prod(2,7,i,i,1)";   
+  /* Example: product */
+  //char expression[]="prod(2,7,i,i,1)";   
 
-/* Example: comparison */
-//char expression[]="100*((10=10)*(10=4))";   
+  /* Example: comparison */
+  //char expression[]="100*((10=10)*(10=4))";   
 
-// char expression[]="diff(idef(0,y,sin(x),x,1000),y,pi/6,0.0001)";   
-//char expression[]="rand(2)";   
+  // char expression[]="diff(idef(0,y,sin(x),x,1000),y,pi/6,0.0001)";   
+  //char expression[]="rand(2)";   
       
-//char expression[]="(0+10+idef(0,pi/2,sin(x),x,10))/11";   
+  //char expression[]="(0+10+idef(0,pi/2,sin(x),x,10))/11";   
       
-//char expression[]="avg(1,2,3,4,5,6,7,8,sin(3+x*pi/4),10)";
-//char expression[]="diff(1+2+3+sin(x),x,0.4,0.01)";   
-//char expression[]="diff(idef(0,y,x^2,x,10),x,0.444,0.01)";   
-//char expression[]="45+idef(4.25,z,1,x,10)";   
-//char expression[]="diff(sin(x+y),x,0.4,0.0001)";   
-//char expression[]="diff(idef(0,y,sin(x),x,10),y,0.4,0.01)";   
-//char expression[]="diff(cos(x),x,pi/2,0.001)";   
-//char expression[]="exp(3.25)";   
-//char expression[]="idef(pi/2,pi,sin(x),x,65000)";   
-//char expression[]="sin(1+y*cos(3+pi/4))";   
-//char expression[]="1+2-avg(x,2,3,4,5,6,7,8)+10*sin(pi/4)+1000+2000+1+2+3";   
-//char expression[]="100+250+10*sin(pi/4)+1000+2000+sin(pi/4)";   
-//char expression[]="sin(sin(1,2,3,4,5)+2+3,sin(1,2,3,4,5,6),sin(1))"; 
-//char expression[]="avg(10,20)";
+  //char expression[]="avg(1,2,3,4,5,6,7,8,sin(3+x*pi/4),10)";
+  //char expression[]="diff(1+2+3+sin(x),x,0.4,0.01)";   
+  //char expression[]="diff(idef(0,y,x^2,x,10),x,0.444,0.01)";   
+  //char expression[]="45+idef(4.25,z,1,x,10)";   
+  //char expression[]="diff(sin(x+y),x,0.4,0.0001)";   
+  //char expression[]="diff(idef(0,y,sin(x),x,10),y,0.4,0.01)";   
+  //char expression[]="diff(cos(x),x,pi/2,0.001)";   
+  //char expression[]="exp(3.25)";   
+  //char expression[]="idef(pi/2,pi,sin(x),x,65000)";   
+  //char expression[]="sin(1+y*cos(3+pi/4))";   
+  //char expression[]="1+2-avg(x,2,3,4,5,6,7,8)+10*sin(pi/4)+1000+2000+1+2+3";   
+  //char expression[]="100+250+10*sin(pi/4)+1000+2000+sin(pi/4)";   
+  //char expression[]="sin(sin(1,2,3,4,5)+2+3,sin(1,2,3,4,5,6),sin(1))"; 
+  //char expression[]="avg(10,20)";
      
       
-e_code=e_none;
-system("clear");
-printf("Formula: %s\r\n",expression);
-printf(" Variables: %s\r\n", variables);
-printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
-result=lb_pa_formula(expression,variables,x,y,z,&e_code);
-printf("Error: %s\r\n", errors[e_code].msg);
-printf("Result=%0.6f\r\n",result);
-exit(1);
+  e_code=e_none;
+  system("clear");
+  printf("Formula: %s\r\n",expression);
+  printf(" Variables: %s\r\n", variables);
+  printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
+  result=lb_pa_formula(expression,variables,x,y,z,&e_code);
+  printf("Error: %s\r\n", errors[e_code].msg);
+  printf("Result=%0.6f\r\n",result);
+  exit(1);
 #endif
 
   
-//#define DEMO_PARSER_COMPLEX
+  //#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
-ERR_T e_code;
-COMPLEX_T var1,var2,imag,result;
-var1.r=0;
-var1.i=0;
-var2.r=0;
-var2.i=0;
-imag.r=0;
-imag.i=1;
+  ERR_T e_code;
+  COMPLEX_T var1,var2,imag,result;
+  var1.r=0;
+  var1.i=0;
+  var2.r=0;
+  var2.i=0;
+  imag.r=0;
+  imag.i=1;
 
-/* Example: pi as a product */
-char variables[]="x,k,i";
-//char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k+1,1)";   
+  /* Example: pi as a product */
+  char variables[]="x,k,i";
+  //char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k+1,1)";   
     
-/* Example: Gauss'childhood sum, using complex numbers  */
-char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
+  /* Example: Gauss'childhood sum, using complex numbers  */
+  char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
     
   
-/* Example: first order derivate */
-//char expression[]="diff(e^x,x,30*pi/180+0.5*i,1e-4)";   
+  /* Example: first order derivate */
+  //char expression[]="diff(e^x,x,30*pi/180+0.5*i,1e-4)";   
 
-/* Error: Example: complex integral */
-//char expression[]="idef(0,abs(pi*30/180,sin(x)+cos(x)*i),x,100)";   
+  /* Error: Example: complex integral */
+  //char expression[]="idef(0,abs(pi*30/180,sin(x)+cos(x)*i),x,100)";   
 
-/* Error: Example: complex integral */
-//char expression[]="idef(0,pi*30/180,abs(sin(x)+cos(x)*i),x,100)";   
+  /* Error: Example: complex integral */
+  //char expression[]="idef(0,pi*30/180,abs(sin(x)+cos(x)*i),x,100)";   
      
-/* Example: double integral */
-//char expression[]="idef2(0,pi/4,0,pi/2,sin(x+y*i),x,y,1.1)"; 
+  /* Example: double integral */
+  //char expression[]="idef2(0,pi/4,0,pi/2,sin(x+y*i),x,y,1.1)"; 
 
-/* Example: integral */
-//char expression[]="idef(i,pi/4+i/3,cos(x)+sin(x)*i,x,10)"; 
+  /* Example: integral */
+  //char expression[]="idef(i,pi/4+i/3,cos(x)+sin(x)*i,x,10)"; 
  
-/* Example: first order differential  */
-//char expression[]="diff(sin(x)+i*cos(x),x,30*pi/180,0.001)"; 
+  /* Example: first order differential  */
+  //char expression[]="diff(sin(x)+i*cos(x),x,30*pi/180,0.001)"; 
  
-/* Example: second order differential  */
-//char expression[]="diff2(sin(x)+i*cos(x),x,30*pi/180,0.01)"; 
+  /* Example: second order differential  */
+  //char expression[]="diff2(sin(x)+i*cos(x),x,30*pi/180,0.01)"; 
 
-/* Example: larger of two complex numbers  */
-//char expression[]="max2(5+4*i,-3*i)"; 
+  /* Example: larger of two complex numbers  */
+  //char expression[]="max2(5+4*i,-3*i)"; 
  
-/* Example: Gauss'childhood sum, using complex numbers  */
-//char expression[]="sigma(100,1,0.5*x+x*i,x,-1)";   
+  /* Example: Gauss'childhood sum, using complex numbers  */
+  //char expression[]="sigma(100,1,0.5*x+x*i,x,-1)";   
     
-/* Example: product  */
-//char expression[]="prod(1,3,x+i,x,1)";   
+  /* Example: product  */
+  //char expression[]="prod(1,3,x+i,x,1)";   
     
-/*
-  x.r=-1.0;
-  x.i=0.0;
-  y.r=1.0;
-  y.i=0.0;
-  lb_cp_print_c(x,"X",FLOAT_FORMAT);
-  printf("\r\n");
-  lb_cp_print_c(y,"Y",FLOAT_FORMAT);
-  printf("\r\n");
-  lb_cp_print_c(lb_cp_power(x,y,&e_code),"(-1)^1",FLOAT_FORMAT);
-  printf("\r\n"); */
+  /*
+    x.r=-1.0;
+    x.i=0.0;
+    y.r=1.0;
+    y.i=0.0;
+    lb_cp_print_c(x,"X",FLOAT_FORMAT);
+    printf("\r\n");
+    lb_cp_print_c(y,"Y",FLOAT_FORMAT);
+    printf("\r\n");
+    lb_cp_print_c(lb_cp_power(x,y,&e_code),"(-1)^1",FLOAT_FORMAT);
+    printf("\r\n"); */
       
-//char expression[]="sigma(0,10,(-1)^k,k,1)";   
-//char expression[]="sigma(0,10,x^(2*k+1),k,1)";   
-//char expression[]="sigma(0,4+0*0.01*i,(-1)^k*x^(2*k+1)/(2*k+1)!,k,1+0.1*0.01*i)";   
+  //char expression[]="sigma(0,10,(-1)^k,k,1)";   
+  //char expression[]="sigma(0,10,x^(2*k+1),k,1)";   
+  //char expression[]="sigma(0,4+0*0.01*i,(-1)^k*x^(2*k+1)/(2*k+1)!,k,1+0.1*0.01*i)";   
       
-/* Problem */
-// char expression[]="(20)^2";   
-//char expression[]="(-1)^1*x^(2.0*1.0+1.0)/(2.0*1.0+1.0)!";   
-//char expression[]="(-1)^k*x^(2*k+1)/(2*k+2)";   
+  /* Problem */
+  // char expression[]="(20)^2";   
+  //char expression[]="(-1)^1*x^(2.0*1.0+1.0)/(2.0*1.0+1.0)!";   
+  //char expression[]="(-1)^k*x^(2*k+1)/(2*k+2)";   
 
        
-e_code=e_none;
-system("clear");
-printf("Expression: %s\r\n",expression);
-printf(" Variables: %s\r\n", variables);
-printf(" Values: x=[%0.4f , %0.4f]  y=[%0.4f , %0.4f]\r\n", var1.r,var1.i,var2.r,var2.i);
-result=lb_pa_formula_complex(expression,variables,var1,var2,imag,&e_code);
-printf("Error: %s\r\n", errors[e_code].msg);
-printf("Result= [%0.8f , %0.8f] \r\n",result.r, result.i);
-exit(1);
+  e_code=e_none;
+  system("clear");
+  printf("Expression: %s\r\n",expression);
+  printf(" Variables: %s\r\n", variables);
+  printf(" Values: x=[%0.4f , %0.4f]  y=[%0.4f , %0.4f]\r\n", var1.r,var1.i,var2.r,var2.i);
+  result=lb_pa_formula_complex(expression,variables,var1,var2,imag,&e_code);
+  printf("Error: %s\r\n", errors[e_code].msg);
+  printf("Result= [%0.8f , %0.8f] \r\n",result.r, result.i);
+  exit(1);
 #endif
 
-/*******************************************************************************************************************/
-/* GIS demos */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* GIS demos */
+  /******************************************************************************************************************/
 
-//#define DEMO_GIS
+  //#define DEMO_GIS
 #ifdef DEMO_GIS
-FLOAT_T lon, lat;
-FILE *fp;
-int i_lat, i_lon, parsing_lon;
-S_INT_16_T i, j;
-char c, str_lat[128], str_lon[128];
+  FLOAT_T lon, lat;
+  FILE *fp;
+  int i_lat, i_lon, parsing_lon;
+  S_INT_16_T i, j;
+  char c, str_lat[128], str_lon[128];
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-lb_fb_clear(ty_fb_main, 0,0,0,255);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_clear(ty_fb_main, 0,0,0,255);
   
-if (!(fp = fopen("world_map_large.csv", "r")))
-  {
-    perror("invalid world data file");
-    lb_fb_exit(1);
-  }
-
-i_lat=0; i_lon=0;
-parsing_lon=TRUE;
-while ((c = fgetc(fp)) != EOF)
-  {
-    if (parsing_lon)
-      {
-	if(isdigit(c) || (c=='.') || (c=='-'))
-	  {
-	    str_lon[i_lon]=c;
-	    i_lon++;
-	  }
-	else
-	  {
-	    if ((i_lon>0) && (c==' '))
-	      {
-		str_lon[i_lon]='\0';
-		lon=atof(str_lon);
-		//printf("%f",lat);
-		parsing_lon=FALSE;
-		i_lon=0;		      
-	      }
-	  }
-      }
-    else
-      {
-	if(isdigit(c) || (c=='.') || (c=='-'))
-	  {
-	    str_lat[i_lat]=c;
-	    i_lat++;
-	  }
-	else
-	  {
-	    if ((i_lat>0) && ((c==',') || (c==')')))
-	      {
-		str_lat[i_lat]='\0';
-		lat=atof(str_lat);
-		//printf("***%f\r\n",lon);
-		fflush(stdout);
-		parsing_lon=TRUE;
-		i_lat=0;
-
-		j=0.5*ty_width*(1.0+lon/180.0);
-		i=0.3*ty_height*(1.0-lat/90.0);
-
-		if ( (-90.0<lat) && (lat<90.0) && (-180.0<lon) && (lon<180.0))
-		  lb_gr_draw_pixel(NULL,j,i,lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-	      }
-	  }
-      }
-    //printf("%c",c);
-  }
-fclose(fp);
-lb_gr_delay(30000);
-lb_fb_exit(1);
-#endif
-
-//#define DEMO_GIS_HEIGHT
-#ifdef DEMO_GIS_HEIGHT
-S_INT_16_T i, j, height, height_max;
-
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-lb_fb_clear(ty_fb_main, 0,0,0,255);
-
-height_max=0;
-      
-for (i=0;i<ty_height;i++)
-  for (j=0;j<ty_width;j++)
+  if (!(fp = fopen("world_map_large.csv", "r")))
     {
-      height=lb_gis_height(-73+(FLOAT_T)j/ty_width, 8.0+(FLOAT_T)i/ty_height);
-
-      if (height>height_max)
-	height_max=height;
-	    
-      //printf("height=%d\r\n",height);
-
-      PIXEL_T pix;
-      pix.r=0;
-      pix.g=round(MAX_R*(FLOAT_T)height/3619.0);
-      pix.b=0;
-      pix.k=MAX_K;
-	  
-      lb_gr_draw_pixel(NULL,j,i,pix,COPYMODE_COPY);
-
-      //lb_gr_delay(50);
+      perror("invalid world data file");
+      lb_fb_exit(1);
     }
-printf("height-max=%d\r\n",height_max);      
 
-char c;
-while ((c=lb_co_getch())!='x') ;
-lb_fb_exit(1);
+  i_lat=0; i_lon=0;
+  parsing_lon=TRUE;
+  while ((c = fgetc(fp)) != EOF)
+    {
+      if (parsing_lon)
+	{
+	  if(isdigit(c) || (c=='.') || (c=='-'))
+	    {
+	      str_lon[i_lon]=c;
+	      i_lon++;
+	    }
+	  else
+	    {
+	      if ((i_lon>0) && (c==' '))
+		{
+		  str_lon[i_lon]='\0';
+		  lon=atof(str_lon);
+		  //printf("%f",lat);
+		  parsing_lon=FALSE;
+		  i_lon=0;		      
+		}
+	    }
+	}
+      else
+	{
+	  if(isdigit(c) || (c=='.') || (c=='-'))
+	    {
+	      str_lat[i_lat]=c;
+	      i_lat++;
+	    }
+	  else
+	    {
+	      if ((i_lat>0) && ((c==',') || (c==')')))
+		{
+		  str_lat[i_lat]='\0';
+		  lat=atof(str_lat);
+		  //printf("***%f\r\n",lon);
+		  fflush(stdout);
+		  parsing_lon=TRUE;
+		  i_lat=0;
+
+		  j=0.5*ty_width*(1.0+lon/180.0);
+		  i=0.3*ty_height*(1.0-lat/90.0);
+
+		  if ( (-90.0<lat) && (lat<90.0) && (-180.0<lon) && (lon<180.0))
+		    lb_gr_draw_pixel(NULL,j,i,lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+		}
+	    }
+	}
+      //printf("%c",c);
+    }
+  fclose(fp);
+  lb_gr_delay(30000);
+  lb_fb_exit(1);
 #endif
 
-//#define DEMO_PARALELL
-#ifdef DEMO_PARALELL
-pthread_t threads[4];
-int rc;
-double l0, l1, l2, l3;
-l3=200;
-l2=200;
-l1=200;
-l0=200;
-rc=pthread_create(&threads[0],NULL, floatsum, (void *) &l0);
-rc=pthread_create(&threads[1],NULL, floatsum, (void *) &l1);
-rc=pthread_create(&threads[2],NULL, floatsum, (void *) &l2);
-rc=pthread_create(&threads[3],NULL, floatsum, (void *) &l3);
+  //#define DEMO_GIS_HEIGHT
+#ifdef DEMO_GIS_HEIGHT
+  S_INT_16_T i, j, height, height_max;
 
-rc=pthread_join(threads[0],NULL);;
-rc=pthread_join(threads[1],NULL);;
-rc=pthread_join(threads[2],NULL);;
-rc=pthread_join(threads[3],NULL);;
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_clear(ty_fb_main, 0,0,0,255);
+
+  height_max=0;
+      
+  for (i=0;i<ty_height;i++)
+    for (j=0;j<ty_width;j++)
+      {
+	height=lb_gis_height(-73+(FLOAT_T)j/ty_width, 8.0+(FLOAT_T)i/ty_height);
+
+	if (height>height_max)
+	  height_max=height;
+	    
+	//printf("height=%d\r\n",height);
+
+	PIXEL_T pix;
+	pix.r=0;
+	pix.g=round(MAX_R*(FLOAT_T)height/3619.0);
+	pix.b=0;
+	pix.k=MAX_K;
+	  
+	lb_gr_draw_pixel(NULL,j,i,pix,COPYMODE_COPY);
+
+	//lb_gr_delay(50);
+      }
+  printf("height-max=%d\r\n",height_max);      
+
+  char c;
+  while ((c=lb_co_getch())!='x') ;
+  lb_fb_exit(1);
+#endif
+
+  //#define DEMO_PARALELL
+#ifdef DEMO_PARALELL
+  pthread_t threads[4];
+  int rc;
+  double l0, l1, l2, l3;
+  l3=200;
+  l2=200;
+  l1=200;
+  l0=200;
+  rc=pthread_create(&threads[0],NULL, floatsum, (void *) &l0);
+  rc=pthread_create(&threads[1],NULL, floatsum, (void *) &l1);
+  rc=pthread_create(&threads[2],NULL, floatsum, (void *) &l2);
+  rc=pthread_create(&threads[3],NULL, floatsum, (void *) &l3);
+
+  rc=pthread_join(threads[0],NULL);;
+  rc=pthread_join(threads[1],NULL);;
+  rc=pthread_join(threads[2],NULL);;
+  rc=pthread_join(threads[3],NULL);;
   
 #endif
       
-/*******************************************************************************************************************/
-/* Statistics */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Statistics */
+  /******************************************************************************************************************/
 
-//#define DEMO_HISTOGRAM
+  //#define DEMO_HISTOGRAM
 #ifdef DEMO_HISTOGRAM
-VIEWPORT_2D_T win;
-VECTOR_R_T Data, Bins;
-FONT_T my_font;
-char text[40];
-FLOAT_T x;
-S_INT_16_T i;
-FLOAT_T mu, sigma2;
+  VIEWPORT_2D_T win;
+  VECTOR_R_T Data, Bins;
+  FONT_T my_font;
+  char text[40];
+  FLOAT_T x;
+  S_INT_16_T i;
+  FLOAT_T mu, sigma2;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
-win.xp_min=0;
-win.xp_max=ty_width;
-win.yp_min=0;
-win.yp_max=ty_height;
-win.xr_min=-40;
-win.xr_max=400;
-win.yr_min=3000.0; 
-win.yr_max=-30;
+  win.xp_min=0;
+  win.xp_max=ty_width;
+  win.yp_min=0;
+  win.yp_max=ty_height;
+  win.xr_min=-40;
+  win.xr_max=400;
+  win.yr_min=3000.0; 
+  win.yr_max=-30;
 
-/* Data generation */
-Data.items=30000;
-lb_al_create_vector_r(&Data);
-for(i=0;i<Data.items;i++)
-  Data.array[i]=lb_st_marsaglia_polar(30);
+  /* Data generation */
+  Data.items=30000;
+  lb_al_create_vector_r(&Data);
+  for(i=0;i<Data.items;i++)
+    Data.array[i]=lb_st_marsaglia_polar(30);
       
-Bins.items=40;
-lb_al_create_vector_r(&Bins);
-lb_st_histogram(&Data,&Bins,-100,100,&mu, &sigma2);
-lb_al_print_vector_r(&Bins, "Bin", "%04.2f\r\n");
+  Bins.items=40;
+  lb_al_create_vector_r(&Bins);
+  lb_st_histogram(&Data,&Bins,-100,100,&mu, &sigma2);
+  lb_al_print_vector_r(&Bins, "Bin", "%04.2f\r\n");
 
-printf("mu=%f,  sigma2=%f\r\n",mu,sigma2);
-lb_gr_draw_histogram(NULL, win, &Bins, 
-		     lb_gr_12RGB(COLOR_WHITE), lb_gr_12RGB(COLOR_DIMGRAY),
-		     lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_DARKBLUE));
+  printf("mu=%f,  sigma2=%f\r\n",mu,sigma2);
+  lb_gr_draw_histogram(NULL, win, &Bins, 
+		       lb_gr_12RGB(COLOR_WHITE), lb_gr_12RGB(COLOR_DIMGRAY),
+		       lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_DARKBLUE));
            
-lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-//lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
-my_font.scale_x=2;
-my_font.scale_y=2;
-my_font.gap_x=1;
-my_font.gap_y=1;
-my_font.max_x=40;
-my_font.angle=0;
-my_font.flag_fg=TRUE;
-my_font.flag_bg=FALSE;
-my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
-my_font.color_bg=lb_gr_12RGB(COLOR_RED);
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+  //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
+  my_font.scale_x=2;
+  my_font.scale_y=2;
+  my_font.gap_x=1;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=FALSE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
+  my_font.color_bg=lb_gr_12RGB(COLOR_RED);
 
-lb_gr_delay(10000);
-lb_ft_release_GLCDfont(&my_font);
-lb_al_release_vector_r(&Data);
-lb_fb_exit(1);
+  lb_gr_delay(10000);
+  lb_ft_release_GLCDfont(&my_font);
+  lb_al_release_vector_r(&Data);
+  lb_fb_exit(1);
 #endif
 
-/*******************************************************************************************************************/
-/* General Mathematics */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* General Mathematics */
+  /******************************************************************************************************************/
 
-//#define DEMO_PRIMES
+  //#define DEMO_PRIMES
 #ifdef DEMO_PRIMES
-VIEWPORT_2D_T win;
-FONT_T my_font;
-VECTOR_S_INT_16_T P;
-S_INT_32_T k,j;
-FLOAT_T t, x, y, xp, yp;
+  VIEWPORT_2D_T win;
+  FONT_T my_font;
+  VECTOR_S_INT_16_T P;
+  S_INT_32_T k,j;
+  FLOAT_T t, x, y, xp, yp;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
-lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-my_font.scale_x=1;
-my_font.scale_y=1;
-my_font.gap_x=2;
-my_font.gap_y=1;
-my_font.max_x=40;
-my_font.angle=0;
-my_font.flag_fg=TRUE;
-my_font.flag_bg=FALSE;
-my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
-my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+  my_font.scale_x=1;
+  my_font.scale_y=1;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=FALSE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
+  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
           
-win.xp_min=5;
-win.xp_max=ty_width-5;
-win.yp_min=5;
-win.yp_max=ty_height-5;
+  win.xp_min=5;
+  win.xp_max=ty_width-5;
+  win.yp_min=5;
+  win.yp_max=ty_height-5;
 
    
-win.xr_min= 0.0;
-win.xr_max=  10.0;
-win.yr_min=  10.0;
-win.yr_max= 0.0; 
+  win.xr_min= 0.0;
+  win.xr_max=  10.0;
+  win.yr_min=  10.0;
+  win.yr_max= 0.0; 
 
 
-P.items=100;
-lb_al_create_vector_si16(&P);
+  P.items=100;
+  lb_al_create_vector_si16(&P);
 
 
 
-lb_sieve_erathostenes_2(&P, 32500);
-lb_al_print_vector_si16(&P,"Primes");
+  lb_sieve_erathostenes_2(&P, 32500);
+  lb_al_print_vector_si16(&P,"Primes");
 
-j=0;
-for(k=1;k<10000000;k++)
-  {
-    if(lb_in_is_perfectsquare(k)==TRUE)
-      {
-	printf("%d\r\n",k);
-	j++;
-      }
-  }
+  j=0;
+  for(k=1;k<10000000;k++)
+    {
+      if(lb_in_is_perfectsquare(k)==TRUE)
+	{
+	  printf("%d\r\n",k);
+	  j++;
+	}
+    }
 
-k=10000000000;
-printf("isqrt(%d)=%d\r\n",k,lb_in_isqrt(k));
+  k=10000000000;
+  printf("isqrt(%d)=%d\r\n",k,lb_in_isqrt(k));
 
-for (k=1;k<P.items;k++)
-  {
-    x=log(k);
-    y=log(P.array[k]);
-    lb_gr_project_2d(win, x, y, &xp, &yp);
-    lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-  }
-lb_gr_delay(10000);
-lb_al_release_vector_si16(&P);
-lb_fb_exit(1);
+  for (k=1;k<P.items;k++)
+    {
+      x=log(k);
+      y=log(P.array[k]);
+      lb_gr_project_2d(win, x, y, &xp, &yp);
+      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+    }
+  lb_gr_delay(10000);
+  lb_al_release_vector_si16(&P);
+  lb_fb_exit(1);
 #endif
 
     
-/*******************************************************************************************************************/
-/* Numerical Methods */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Numerical Methods */
+  /******************************************************************************************************************/
 
-//#define DEMO_RK4
+  //#define DEMO_RK4
 #ifdef DEMO_RK4
-FLOAT_T t_n, y_rk4, y_euler, xp, yp;
-VIEWPORT_2D_T win;
-ERR_T error;
+  FLOAT_T t_n, y_rk4, y_euler, xp, yp;
+  VIEWPORT_2D_T win;
+  ERR_T error;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-lb_fb_clear(ty_fb_main, 0,0,0,255);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_clear(ty_fb_main, 0,0,0,255);
   
-win.xp_min=0;
-win.yp_min=0;
-win.xp_max=ty_width;
-win.yp_max=ty_height;
-win.xr_min=0.0;
-win.xr_max=6.2832*8.0;
-win.yr_min=-2.5; 
-win.yr_max=2.5;
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_width;
+  win.yp_max=ty_height;
+  win.xr_min=0.0;
+  win.xr_max=6.2832*8.0;
+  win.yr_min=-2.5; 
+  win.yr_max=2.5;
 
-t_n=0;
-y_rk4=0;
-y_euler=0;
-error=e_none;
+  t_n=0;
+  y_rk4=0;
+  y_euler=0;
+  error=e_none;
       
-while((t_n<=win.xr_max) && (error==e_none))
-  {
-    printf("t_n= %f, y_euler=%f, y_rk4=%f\r\n",t_n,y_euler, y_rk4);
-    lb_gr_project_2d(win, t_n, y_rk4, &xp, &yp);
-    lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-    lb_gr_project_2d(win, t_n, y_euler, &xp, &yp);
-    lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
-    rk4(&t_n, &y_rk4, 0.1, &error, diego_sin);
-    rk4(&t_n, &y_euler, 0.1, &error, diego_sin);
-  }
-lb_gr_delay(20000);
-lb_fb_exit(1); 
+  while((t_n<=win.xr_max) && (error==e_none))
+    {
+      printf("t_n= %f, y_euler=%f, y_rk4=%f\r\n",t_n,y_euler, y_rk4);
+      lb_gr_project_2d(win, t_n, y_rk4, &xp, &yp);
+      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+      lb_gr_project_2d(win, t_n, y_euler, &xp, &yp);
+      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
+      rk4(&t_n, &y_rk4, 0.1, &error, diego_sin);
+      rk4(&t_n, &y_euler, 0.1, &error, diego_sin);
+    }
+  lb_gr_delay(20000);
+  lb_fb_exit(1); 
 #endif
 
-//#define DEMO_GENERAL_RUNGE_KUTTA
+  //#define DEMO_GENERAL_RUNGE_KUTTA
 #ifdef DEMO_GENERAL_RUNGE_KUTTA
-VECTOR_R_T C, B, K;
-MATRIX_R_T A;
-S_INT_16_T i, j;
-FLOAT_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
-VIEWPORT_2D_T win;
+  VECTOR_R_T C, B, K;
+  MATRIX_R_T A;
+  S_INT_16_T i, j;
+  FLOAT_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
+  VIEWPORT_2D_T win;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-lb_fb_clear(ty_fb_main, 0,0,0,255);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_clear(ty_fb_main, 0,0,0,255);
 
   
-win.xp_min=0;
-win.yp_min=0;
-win.xp_max=ty_width;
-win.yp_max=ty_height;
-win.xr_min=-5.0;
-win.xr_max=5.0;
-win.yr_min=-3.5; 
-win.yr_max=3.5;
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_width;
+  win.yp_max=ty_height;
+  win.xr_min=-5.0;
+  win.xr_max=5.0;
+  win.yr_min=-3.5; 
+  win.yr_max=3.5;
 
-/* This defines the coeficients for RK4 */
-A.cols=4;
-A.rows=4;
-lb_al_create_matrix_r(&A);
-A.array[0][0]=0.0;   A.array[0][1]=0.0;   A.array[0][2]=0.0; A.array[0][3]=0.0;
-A.array[1][0]=1.0/2; A.array[1][1]=0.0;   A.array[1][2]=0.0; A.array[1][3]=0.0;
-A.array[2][0]=0.0;   A.array[2][1]=1.0/2; A.array[2][2]=0.0; A.array[2][3]=0.0;
-A.array[3][0]=0.0;   A.array[3][1]=0.0;   A.array[3][2]=1.0; A.array[3][3]=0.0;
+  /* This defines the coeficients for RK4 */
+  A.cols=4;
+  A.rows=4;
+  lb_al_create_matrix_r(&A);
+  A.array[0][0]=0.0;   A.array[0][1]=0.0;   A.array[0][2]=0.0; A.array[0][3]=0.0;
+  A.array[1][0]=1.0/2; A.array[1][1]=0.0;   A.array[1][2]=0.0; A.array[1][3]=0.0;
+  A.array[2][0]=0.0;   A.array[2][1]=1.0/2; A.array[2][2]=0.0; A.array[2][3]=0.0;
+  A.array[3][0]=0.0;   A.array[3][1]=0.0;   A.array[3][2]=1.0; A.array[3][3]=0.0;
       
-B.items=4;
-lb_al_create_vector_r(&B);
-B.array[0]=1.0/6;  B.array[1]=1.0/3;  B.array[2]=1.0/3;  B.array[3]=1.0/6;
+  B.items=4;
+  lb_al_create_vector_r(&B);
+  B.array[0]=1.0/6;  B.array[1]=1.0/3;  B.array[2]=1.0/3;  B.array[3]=1.0/6;
  
-C.items=4;
-lb_al_create_vector_r(&C);
-C.array[0]=0.0;  C.array[1]=1.0/2;  C.array[2]=1.0/2;  C.array[3]=1.0;
+  C.items=4;
+  lb_al_create_vector_r(&C);
+  C.array[0]=0.0;  C.array[1]=1.0/2;  C.array[2]=1.0/2;  C.array[3]=1.0;
 
-K.items=4;
-lb_al_create_vector_r(&K);
+  K.items=4;
+  lb_al_create_vector_r(&K);
      
     
-t_n=-3.1416;
-y_n=1.0;
-h=0.01;
+  t_n=-3.1416;
+  y_n=1.0;
+  h=0.01;
 
-while(t_n<=3.1416)
-  {
-    printf("t_n= %f, y_n= %f\r\n",t_n,y_n);
-    lb_gr_project_2d(win, t_n, y_n, &xp, &yp);
-    lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+  while(t_n<=3.1416)
+    {
+      printf("t_n= %f, y_n= %f\r\n",t_n,y_n);
+      lb_gr_project_2d(win, t_n, y_n, &xp, &yp);
+      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
     	
-    for(i=0;i<K.items;i++)
-      {
-	temp_t = t_n + h*C.array[i];
-	temp_y = 0.0;
-	for(j=0;j<=(i-1);j++)
-	  {
-	    //printf("A[%d][%d]*K[%d] = %f * %f = %f\r\n",i,j,j,A.array[i][j],K.array[j],A.array[i][j]*K.array[j]);
-	    temp_y+=A.array[i][j]*K.array[j];
-	  }
-	temp_y*=h;
-	temp_y+=y_n;
-	/* test function f(temp_t, temp_y) */
-	K.array[i]=-sin(temp_t);
-      }
+      for(i=0;i<K.items;i++)
+	{
+	  temp_t = t_n + h*C.array[i];
+	  temp_y = 0.0;
+	  for(j=0;j<=(i-1);j++)
+	    {
+	      //printf("A[%d][%d]*K[%d] = %f * %f = %f\r\n",i,j,j,A.array[i][j],K.array[j],A.array[i][j]*K.array[j]);
+	      temp_y+=A.array[i][j]*K.array[j];
+	    }
+	  temp_y*=h;
+	  temp_y+=y_n;
+	  /* test function f(temp_t, temp_y) */
+	  K.array[i]=-sin(temp_t);
+	}
 
-    y_next=0;
-    for(i=0;i<A.cols;i++)
-      {
-	//printf("B[%d] * K[%d] = %f, * %f\r\n",i,i,B.array[i],K.array[i]);
-	y_next+=B.array[i]*K.array[i];
-      }
-    y_next*=h;
-    y_next+=y_n;
-    printf("y_next=%f\r\n",y_next);
+      y_next=0;
+      for(i=0;i<A.cols;i++)
+	{
+	  //printf("B[%d] * K[%d] = %f, * %f\r\n",i,i,B.array[i],K.array[i]);
+	  y_next+=B.array[i]*K.array[i];
+	}
+      y_next*=h;
+      y_next+=y_n;
+      printf("y_next=%f\r\n",y_next);
 
-    y_n=y_next;
-    t_n+=h;
-  }
-lb_gr_delay(4000);
+      y_n=y_next;
+      t_n+=h;
+    }
+  lb_gr_delay(4000);
       
-lb_al_release_matrix_r(&A);
-lb_al_release_vector_r(&B);
-lb_al_release_vector_r(&C);
-lb_fb_exit(1); 
+  lb_al_release_matrix_r(&A);
+  lb_al_release_vector_r(&B);
+  lb_al_release_vector_r(&C);
+  lb_fb_exit(1); 
 #endif
 
-/*******************************************************************************************************************/
-/* System Functions */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* System Functions */
+  /******************************************************************************************************************/
       
-//#define DEMO_TIME_TEST
+  //#define DEMO_TIME_TEST
 #ifdef DEMO_TIME_TEST
-unsigned long i, max;
-S_INT_16_T j;
-clock_t begin, end;
+  unsigned long i, max;
+  S_INT_16_T j;
+  clock_t begin, end;
 
-max=1000000000;
+  max=1000000000;
 
-begin=clock();
-for (i=0;i<max;i++)
-  j=round(12.232);
-end = clock();
-printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
+  begin=clock();
+  for (i=0;i<max;i++)
+    j=round(12.232);
+  end = clock();
+  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
 
-begin=clock();
-for (i=0;i<max;i++)
-  j=lround(12.232);
-end = clock();
-printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
+  begin=clock();
+  for (i=0;i<max;i++)
+    j=lround(12.232);
+  end = clock();
+  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
 
-begin=clock();
-for (i=0;i<max;i++)
-  j=0.5+12.232;
-end = clock();
-printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
+  begin=clock();
+  for (i=0;i<max;i++)
+    j=0.5+12.232;
+  end = clock();
+  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
 
-exit(1);
+  exit(1);
 #endif
 
-/*******************************************************************************************************************/
-/* Simulation of Telecoil modulation */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Simulation of Telecoil modulation */
+  /******************************************************************************************************************/
 
-//#define DEMO_ZERO_CROSSING
+  //#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
-VECTOR_C_T signal, frequencies, W;
-FLOAT_T variance=0.1, RMS_noise, t_min=-0.25/FREQ_1, t_max=1/FREQ_2+1.25/FREQ_1, t, xp, yp;
-S_INT_32_T n_experiment, errors_count;
-S_INT_16_T i, k, noise_step;
-VIEWPORT_2D_T win, win2;
-FONT_T my_font;
+  VECTOR_C_T signal, frequencies, W;
+  FLOAT_T variance=0.1, RMS_noise, t_min=-0.25/FREQ_1, t_max=1/FREQ_2+1.25/FREQ_1, t, xp, yp;
+  S_INT_32_T n_experiment, errors_count;
+  S_INT_16_T i, k, noise_step;
+  VIEWPORT_2D_T win, win2;
+  FONT_T my_font;
 
-lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-lb_fb_clear(ty_fb_main, 0,0,0,255);
+  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_fb_clear(ty_fb_main, 0,0,0,255);
 
     
-//FLOAT_T w1=2*M_PI*FREQ_2, w2=2*M_PI*FREQ_1;
+  //FLOAT_T w1=2*M_PI*FREQ_2, w2=2*M_PI*FREQ_1;
   
-win.xp_min=50;
-win.xp_max=ty_width-50;
-win.yp_min=50;
-win.yp_max=ty_height/2-50;
+  win.xp_min=50;
+  win.xp_max=ty_width-50;
+  win.yp_min=50;
+  win.yp_max=ty_height/2-50;
       
-win.xr_min= t_min;
-win.xr_max=  t_max;
-win.yr_min=  2*sqrt(2);
-win.yr_max=  -2*sqrt(2);
+  win.xr_min= t_min;
+  win.xr_max=  t_max;
+  win.yr_min=  2*sqrt(2);
+  win.yr_max=  -2*sqrt(2);
 
 
-win2.xp_min=50;
-win2.xp_max=ty_width-50;
-win2.yp_min=ty_height/2+50;
-win2.yp_max=ty_height-50;
+  win2.xp_min=50;
+  win2.xp_max=ty_width-50;
+  win2.yp_min=ty_height/2+50;
+  win2.yp_max=ty_height-50;
       
-win2.xr_min=   4;
-win2.xr_max=  12;
-win2.yr_min=  1e-1;
-win2.yr_max=  1e-5;
+  win2.xr_min=   4;
+  win2.xr_max=  12;
+  win2.yr_min=  1e-1;
+  win2.yr_max=  1e-5;
 
-lg_gr_draw_axis_2d(NULL, win2, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 1,
-		   lb_gr_12RGB(COLOR_GRAY), 1.0,
-		   lb_gr_12RGB(COLOR_BLUE), 10,
-		   AXIS_DRAW_X | AXIS_DRAW_X_GRID |   
-		   AXIS_DRAW_Y_GRID_LOG | AXIS_DRAW_COLORVALUES_Y_1,
-		   COPYMODE_COPY, LINEMODE_SOLID); 
+  lg_gr_draw_axis_2d(NULL, win2, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 1,
+		     lb_gr_12RGB(COLOR_GRAY), 1.0,
+		     lb_gr_12RGB(COLOR_BLUE), 10,
+		     AXIS_DRAW_X | AXIS_DRAW_X_GRID |   
+		     AXIS_DRAW_Y_GRID_LOG | AXIS_DRAW_COLORVALUES_Y_1,
+		     COPYMODE_COPY, LINEMODE_SOLID); 
 
-printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
+  printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
       
-// for(t=t_min;t<t_max;t+=(t_max-t_min)/1000)
-//{
-//  lb_gr_project_2d(win, t, f(t,w1,w2), &xp, &yp);
-//  lb_gr_draw_pixel(&Pic, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-//}
+  // for(t=t_min;t<t_max;t+=(t_max-t_min)/1000)
+  //{
+  //  lb_gr_project_2d(win, t, f(t,w1,w2), &xp, &yp);
+  //  lb_gr_draw_pixel(&Pic, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+  //}
 
 
-//Chart.w=win.xp_max-win.xp_min;
-//Chart.h=win.yp_max-win.yp_min;
-//lb_gr_create_picture(&Chart,lb_gr_12RGB(COLOR_BLUE));
+  //Chart.w=win.xp_max-win.xp_min;
+  //Chart.h=win.yp_max-win.yp_min;
+  //lb_gr_create_picture(&Chart,lb_gr_12RGB(COLOR_BLUE));
 
 
-// printf("x=%f x 10 ^%f\r\n",lb_re_normed_significand(10.01),lb_re_normed_exponent(10.01));
-// lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
+  // printf("x=%f x 10 ^%f\r\n",lb_re_normed_significand(10.01),lb_re_normed_exponent(10.01));
+  // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
 
             
-system("clear");
-printf("Simulation running... please wait... \r\n");
-srand(time(NULL));
+  system("clear");
+  printf("Simulation running... please wait... \r\n");
+  srand(time(NULL));
 
-signal.items=2*N_HALF_SAMPLES;
-frequencies.items=2*N_HALF_SAMPLES;
-W.items=N_HALF_SAMPLES;
+  signal.items=2*N_HALF_SAMPLES;
+  frequencies.items=2*N_HALF_SAMPLES;
+  W.items=N_HALF_SAMPLES;
 
 
-lb_al_create_vector_c(&signal);
-lb_al_create_vector_c(&frequencies);
-lb_al_create_vector_c(&W);
-lb_fo_calculate_W(&W, 1);
+  lb_al_create_vector_c(&signal);
+  lb_al_create_vector_c(&frequencies);
+  lb_al_create_vector_c(&W);
+  lb_fo_calculate_W(&W, 1);
 
-for (noise_step=10;noise_step<=NOISE_STEPS_MAX;noise_step++)
-  {
-    errors_count=0;
-    for (n_experiment=0;n_experiment<N_EXPERIMENT_MAX;n_experiment++)
-      {
-	for(k=0;k<2*N_HALF_SAMPLES;k++)
-	  {
-	    signal.array[k].r=lb_st_marsaglia_polar(variance);
-	    signal.array[k].i=0.0;
-	  }
+  for (noise_step=10;noise_step<=NOISE_STEPS_MAX;noise_step++)
+    {
+      errors_count=0;
+      for (n_experiment=0;n_experiment<N_EXPERIMENT_MAX;n_experiment++)
+	{
+	  for(k=0;k<2*N_HALF_SAMPLES;k++)
+	    {
+	      signal.array[k].r=lb_st_marsaglia_polar(variance);
+	      signal.array[k].i=0.0;
+	    }
 	    
-	/* Noise using the time's Domain */
-	// printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time_complex(signal_complex,0,N_SAMPLES));
+	  /* Noise using the time's Domain */
+	  // printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time_complex(signal_complex,0,N_SAMPLES));
 
-	/* Noise using the frequency's Domain */
-	lb_fo_FFT_C(&signal, &frequencies, &W,-1); 
+	  /* Noise using the frequency's Domain */
+	  lb_fo_FFT_C(&signal, &frequencies, &W,-1); 
 	     
-	// printf("RMS Noise (frequency domain method) = %f\r\n", RMS_noise_frequency(frequencies,N_POINTS));
+	  // printf("RMS Noise (frequency domain method) = %f\r\n", RMS_noise_frequency(frequencies,N_POINTS));
   
-	/* A perfect Bandpass filter: we're leaving the a fourth of the lower frequencies  */
-	/* Why 12 ?
-	   The circuit being simulated is a 1-st order active Low Pass with R=27.4K and C=220p, hence f=26.403KHz
-	   The DFT' base period is tmax = 1/5464 + 1/4291 = 4.1606*10^-4 seg   ==> d_freq=2403.5 Hz
+	  /* A perfect Bandpass filter: we're leaving the a fourth of the lower frequencies  */
+	  /* Why 12 ?
+	     The circuit being simulated is a 1-st order active Low Pass with R=27.4K and C=220p, hence f=26.403KHz
+	     The DFT' base period is tmax = 1/5464 + 1/4291 = 4.1606*10^-4 seg   ==> d_freq=2403.5 Hz
 
-	   To fiter using a DTF we need to "keep"the base frequencies:
-	   f0  = DC
-	   f1  = 24
-	   03.5
-	   f2  = 4807
-	   f3  = 7210
-	   f4  = 9614
-	   f5  = 12017.5
-	   f6  = 24421
-	   f7  = 16824.5
-	   f8  = 19228
-	   f9  = 21631.5
-	   f10 = 24035
-	   f11 = 26438.5
-	   f12 = 0, etc. */
-	for(i=13;i<2*N_HALF_SAMPLES;i++)
+	     To fiter using a DTF we need to "keep"the base frequencies:
+	     f0  = DC
+	     f1  = 24
+	     03.5
+	     f2  = 4807
+	     f3  = 7210
+	     f4  = 9614
+	     f5  = 12017.5
+	     f6  = 24421
+	     f7  = 16824.5
+	     f8  = 19228
+	     f9  = 21631.5
+	     f10 = 24035
+	     f11 = 26438.5
+	     f12 = 0, etc. */
+	  for(i=13;i<2*N_HALF_SAMPLES;i++)
 		
-	  {
-	    frequencies.array[i].r=0;
-	    frequencies.array[i].i=0;
-	  } 
+	    {
+	      frequencies.array[i].r=0;
+	      frequencies.array[i].i=0;
+	    } 
 
-	/* Digital filter */
-	lb_fo_FFT_C(&frequencies, &signal, &W, 1); 
+	  /* Digital filter */
+	  lb_fo_FFT_C(&frequencies, &signal, &W, 1); 
 	   
-	//RMS_noise=RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1));
-	//printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
-	// printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
-	//	  escale_complex_vector(signal_complex,(1.0*(FLOAT_TYPE)noise_step/(FLOAT_TYPE)NOISE_STEPS_MAX)/RMS_noise,N_SAMPLES
+	  //RMS_noise=RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1));
+	  //printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
+	  // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
+	  //	  escale_complex_vector(signal_complex,(1.0*(FLOAT_TYPE)noise_step/(FLOAT_TYPE)NOISE_STEPS_MAX)/RMS_noise,N_SAMPLES
 
-	for(i=0;i<2*N_HALF_SAMPLES;i++)
-	  {
-	    signal.array[i].i=0;
-	  }
-	RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/FREQ_1),
-					 2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/FREQ_1));
+	  for(i=0;i<2*N_HALF_SAMPLES;i++)
+	    {
+	      signal.array[i].i=0;
+	    }
+	  RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/FREQ_1),
+					   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/FREQ_1));
 
  
-	lb_al_multiply_vector_c_real(&signal,(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX)/RMS_noise);
+	  lb_al_multiply_vector_c_real(&signal,(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX)/RMS_noise);
 	      
-	// printf("RMS Noise (time domain method) *** = %f\r\n",
-	// RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1)));
-	// printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(signal_complex,N_SAMPLES));
+	  // printf("RMS Noise (time domain method) *** = %f\r\n",
+	  // RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1)));
+	  // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(signal_complex,N_SAMPLES));
 
-	if ((n_experiment % 64) == 0)
-	  {
-	    lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_width, ty_height/2, lb_gr_12RGB(COLOR_DARKSLATEGRAY));
+	  if ((n_experiment % 64) == 0)
+	    {
+	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_width, ty_height/2, lb_gr_12RGB(COLOR_DARKSLATEGRAY));
 
-	    //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
-	    //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
+	      //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
+	      //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
 	   
-	    //lb_gr_draw_rectangle_bar(NULL, 70, 70, 512, 512, 8, lb_gr_12RGB(COLOR_PINK | COLOR_SEMI_SOLID),
-	    //			     lb_gr_12RGB(COLOR_GREEN | COLOR_SEMI_SOLID), COPYMODE_ADD);
+	      //lb_gr_draw_rectangle_bar(NULL, 70, 70, 512, 512, 8, lb_gr_12RGB(COLOR_PINK | COLOR_SEMI_SOLID),
+	      //			     lb_gr_12RGB(COLOR_GREEN | COLOR_SEMI_SOLID), COPYMODE_ADD);
 	   
-	    lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 2.5,
-			       lb_gr_12RGB(COLOR_GREEN), 1e-3, lb_gr_12RGB(COLOR_ORANGE), 0.5,
-			       AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-			       AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-			       COPYMODE_COPY, LINEMODE_SOLID);
-	  }
+	      lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 2.5,
+				 lb_gr_12RGB(COLOR_GREEN), 1e-3, lb_gr_12RGB(COLOR_ORANGE), 0.5,
+				 AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+				 AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
+				 COPYMODE_COPY, LINEMODE_SOLID);
+	    }
 	
-	for(i=0;i<2*N_HALF_SAMPLES;i++)
-	  {
-	    t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
-	    signal.array[i].r += sqrt(2)*f(t,2*M_PI*FREQ_2,2*M_PI*FREQ_1);
-	    /* We don have to plot all experiments, just some would be representative */
-	    if ((n_experiment % 64) == 0)
-	      {
-		lb_gr_project_2d(win, t, signal.array[i].r, &xp, &yp);
-		lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
-	      }
-	  }
+	  for(i=0;i<2*N_HALF_SAMPLES;i++)
+	    {
+	      t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
+	      signal.array[i].r += sqrt(2)*f(t,2*M_PI*FREQ_2,2*M_PI*FREQ_1);
+	      /* We don have to plot all experiments, just some would be representative */
+	      if ((n_experiment % 64) == 0)
+		{
+		  lb_gr_project_2d(win, t, signal.array[i].r, &xp, &yp);
+		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
+		}
+	    }
 
-	if (!parse_vector(&signal))
-	  errors_count++;
-	printf("Progress: %2.3f %% done E = %li  /  %i \r",
-	       100.0*n_experiment/N_EXPERIMENT_MAX, errors_count,N_EXPERIMENT_MAX);
-      }
+	  if (!parse_vector(&signal))
+	    errors_count++;
+	  printf("Progress: %2.3f %% done E = %li  /  %i \r",
+		 100.0*n_experiment/N_EXPERIMENT_MAX, errors_count,N_EXPERIMENT_MAX);
+	}
 
-    if ( errors_count!=0) 
-      {
-	lb_gr_project_2d_x(win2, -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX), &xp);
-	lb_gr_project_2d_y_log(win2, (FLOAT_T)errors_count/N_EXPERIMENT_MAX, &yp);
-	//lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-	lb_gr_draw_circle_filled_fast(NULL, xp, yp, 4, lb_gr_12RGB(0xFFFF), COPYMODE_COPY);
-      }
+      if ( errors_count!=0) 
+	{
+	  lb_gr_project_2d_x(win2, -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX), &xp);
+	  lb_gr_project_2d_y_log(win2, (FLOAT_T)errors_count/N_EXPERIMENT_MAX, &yp);
+	  //lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+	  lb_gr_draw_circle_filled_fast(NULL, xp, yp, 4, lb_gr_12RGB(0xFFFF), COPYMODE_COPY);
+	}
 	  
-    printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
-	   noise_step,
-	   NOISE_STEPS_MAX,
-	   -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX),
-	   errors_count, N_EXPERIMENT_MAX);
-  }
+      printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
+	     noise_step,
+	     NOISE_STEPS_MAX,
+	     -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX),
+	     errors_count, N_EXPERIMENT_MAX);
+    }
 
-lb_al_release_vector_c(&signal);
-lb_al_release_vector_c(&frequencies);
-lb_al_release_vector_c(&W);
+  lb_al_release_vector_c(&signal);
+  lb_al_release_vector_c(&frequencies);
+  lb_al_release_vector_c(&W);
 #endif
 
-//#define DEMO_KEYBOARD
+  //#define DEMO_KEYBOARD
 #ifdef DEMO_KEYBOARD
-unsigned char c;
-S_INT_8_T flag;
+  unsigned char c;
+  S_INT_8_T flag;
 
-flag=FALSE;
-lb_co_set_echo(0); 
+  flag=FALSE;
+  lb_co_set_echo(0); 
 
-while (!flag)
-  {
-    while (!(lb_co_kbhit())) ;
-    c=lb_co_getch_pc();
-    printf("value= dec=%d hex=%x\r\n",c,c);
-    switch(c)
-      {
-      case PCKEY_UP:          printf("PCKEY_UP\r\n");          break;
-      case PCKEY_DOWN:        printf("PCKEY_DOWN\r\n");        break;
-      case PCKEY_RIGHT:       printf("PCKEY_RIGHT\r\n");       break;
-      case PCKEY_LEFT:        printf("PCKEY_LEFT\r\n");        break;
-      case PCKEY_PAGE_UP:     printf("PCKEY_PAGE_UP\r\n");     break;
-      case PCKEY_PAGE_DOWN:   printf("PCKEY_PAGE_DOWN\r\n");   break;
-      case PCKEY_INSERT:      printf("PCKEY_INSERT\r\n");      break;
-      case PCKEY_BS:          printf("PCKEY_BS\r\n");          break;
-      case PCKEY_TAB:         printf("PCKEY_TAB\r\n");         break;
-      case PCKEY_ENTER:       printf("PCKEY_ENTER\r\n");       break;
-      case PCKEY_F1:          printf("PCKEY_F1\r\n");          break;
-      case PCKEY_F2:          printf("PCKEY_F2\r\n");          break;
-      case PCKEY_F3:          printf("PCKEY_F3\r\n");          break;
-      case PCKEY_F4:          printf("PCKEY_F4\r\n");          break;
-      case PCKEY_F5:          printf("PCKEY_F5\r\n");          break;
-      case PCKEY_F6:          printf("PCKEY_F6\r\n");          break;
-      case PCKEY_F7:          printf("PCKEY_F7\r\n");          break;
-      case PCKEY_F8:          printf("PCKEY_F8\r\n");          break;
-      case PCKEY_F9:          printf("PCKEY_F9\r\n");          break;
-      case PCKEY_F10:         printf("PCKEY_F10\r\n");         break;
-      case PCKEY_F11:         printf("PCKEY_F11\r\n");         break;
-      case PCKEY_F12:         printf("PCKEY_F12\r\n");         break;
-      case PCKEY_HOME:        printf("PCKEY_HOME\r\n");        break;
-      case PCKEY_PAUSE:       printf("PCKEY_PAUSE\r\n");       break;
-      case PCKEY_ALT:         printf("PCKEY_ALT\r\n");         break;
-      case PCKEY_SCROLL_LOCK: printf("PCKEY_SCROLL_LOCK\r\n"); break;
-      case PCKEY_ESC:         printf("PCKEY_ESC\r\n");         break;
-      case PCKEY_CAPS_LOCK:   printf("PCKEY_CAPS_LOCK\r\n");   break;
-      case PCKEY_SHIFT:       printf("PCKEY_SHIFT\r\n");       break;
-      case PCKEY_CONTROL:     printf("PCKEY_CONTROL\r\n");     break;
-      case PCKEY_NUM_LOCK:    printf("PCKEY_NUM_LOCK\r\n");    break;
-      case PCKEY_DEL:         printf("PCKEY_DEL\r\n");         break;
-      case PCKEY_END:         printf("PCKEY_END\r\n");         break;
-      case ASCII_NUL:         printf("NULL\r\n");              break;
-      default: printf("%c\r\n",c); break;
-      }
+  while (!flag)
+    {
+      while (!(lb_co_kbhit())) ;
+      c=lb_co_getch_pc();
+      printf("value= dec=%d hex=%x\r\n",c,c);
+      switch(c)
+	{
+	case PCKEY_UP:          printf("PCKEY_UP\r\n");          break;
+	case PCKEY_DOWN:        printf("PCKEY_DOWN\r\n");        break;
+	case PCKEY_RIGHT:       printf("PCKEY_RIGHT\r\n");       break;
+	case PCKEY_LEFT:        printf("PCKEY_LEFT\r\n");        break;
+	case PCKEY_PAGE_UP:     printf("PCKEY_PAGE_UP\r\n");     break;
+	case PCKEY_PAGE_DOWN:   printf("PCKEY_PAGE_DOWN\r\n");   break;
+	case PCKEY_INSERT:      printf("PCKEY_INSERT\r\n");      break;
+	case PCKEY_BS:          printf("PCKEY_BS\r\n");          break;
+	case PCKEY_TAB:         printf("PCKEY_TAB\r\n");         break;
+	case PCKEY_ENTER:       printf("PCKEY_ENTER\r\n");       break;
+	case PCKEY_F1:          printf("PCKEY_F1\r\n");          break;
+	case PCKEY_F2:          printf("PCKEY_F2\r\n");          break;
+	case PCKEY_F3:          printf("PCKEY_F3\r\n");          break;
+	case PCKEY_F4:          printf("PCKEY_F4\r\n");          break;
+	case PCKEY_F5:          printf("PCKEY_F5\r\n");          break;
+	case PCKEY_F6:          printf("PCKEY_F6\r\n");          break;
+	case PCKEY_F7:          printf("PCKEY_F7\r\n");          break;
+	case PCKEY_F8:          printf("PCKEY_F8\r\n");          break;
+	case PCKEY_F9:          printf("PCKEY_F9\r\n");          break;
+	case PCKEY_F10:         printf("PCKEY_F10\r\n");         break;
+	case PCKEY_F11:         printf("PCKEY_F11\r\n");         break;
+	case PCKEY_F12:         printf("PCKEY_F12\r\n");         break;
+	case PCKEY_HOME:        printf("PCKEY_HOME\r\n");        break;
+	case PCKEY_PAUSE:       printf("PCKEY_PAUSE\r\n");       break;
+	case PCKEY_ALT:         printf("PCKEY_ALT\r\n");         break;
+	case PCKEY_SCROLL_LOCK: printf("PCKEY_SCROLL_LOCK\r\n"); break;
+	case PCKEY_ESC:         printf("PCKEY_ESC\r\n");         break;
+	case PCKEY_CAPS_LOCK:   printf("PCKEY_CAPS_LOCK\r\n");   break;
+	case PCKEY_SHIFT:       printf("PCKEY_SHIFT\r\n");       break;
+	case PCKEY_CONTROL:     printf("PCKEY_CONTROL\r\n");     break;
+	case PCKEY_NUM_LOCK:    printf("PCKEY_NUM_LOCK\r\n");    break;
+	case PCKEY_DEL:         printf("PCKEY_DEL\r\n");         break;
+	case PCKEY_END:         printf("PCKEY_END\r\n");         break;
+	case ASCII_NUL:         printf("NULL\r\n");              break;
+	default: printf("%c\r\n",c); break;
+	}
 	  
-    if (c=='x')
-      flag=TRUE;
-  }
-exit(1);
+      if (c=='x')
+	flag=TRUE;
+    }
+  exit(1);
 #endif
 
    
-//#define DEMO_CONSOLE
+  //#define DEMO_CONSOLE
 #ifdef DEMO_CONSOLE
-lb_co_cls();
-printf("hello world\r\n"); 
-lb_co_gotoxy(1,1);
-printf("1"); 
-lb_co_gotoxy(2,2);
-printf("2"); 
-lb_co_gotoxy(3,3);
-printf("3"); 
+  lb_co_cls();
+  printf("hello world\r\n"); 
+  lb_co_gotoxy(1,1);
+  printf("1"); 
+  lb_co_gotoxy(2,2);
+  printf("2"); 
+  lb_co_gotoxy(3,3);
+  printf("3"); 
 
-lb_co_gotox(2);
-printf("2");
-lb_co_gotoxy(10,10);
-printf("DIEGO VELEZ\r\n"); 
-lb_co_gotoxy(10+6,10);
-lb_co_cls_from_cursor();
-lb_co_gotoxy(20,20);
-printf("*");
-lb_co_gotoxy(20,20);
-lb_co_cursor_shift(-1,0);
-printf("-\r\n");
-//lb_co_printf_block("DIEGO ALBERTO VELEZ HENAO", 1, 3);
-char text[40];
+  lb_co_gotox(2);
+  printf("2");
+  lb_co_gotoxy(10,10);
+  printf("DIEGO VELEZ\r\n"); 
+  lb_co_gotoxy(10+6,10);
+  lb_co_cls_from_cursor();
+  lb_co_gotoxy(20,20);
+  printf("*");
+  lb_co_gotoxy(20,20);
+  lb_co_cursor_shift(-1,0);
+  printf("-\r\n");
+  //lb_co_printf_block("DIEGO ALBERTO VELEZ HENAO", 1, 3);
+  char text[40];
 
-strcpy(text,"DON DIEGO VELEZ");
-lb_co_printf_lastn(text, 5);
-lb_co_gotoxy(2,2);
-lb_co_color(TEXT_COLOR_BLUE);
-lb_co_color(TEXT_COLOR_WHITE + TEXT_COLOR_BACKGROUND);
-lb_co_color(TEXT_MODE_BOLD);
-printf("TEXT_COLOR_BLUE\r\n");
-lb_co_color(TEXT_MODE_NOBOLD);
-lb_co_gotoxy(3,3);
+  strcpy(text,"DON DIEGO VELEZ");
+  lb_co_printf_lastn(text, 5);
+  lb_co_gotoxy(2,2);
+  lb_co_color(TEXT_COLOR_BLUE);
+  lb_co_color(TEXT_COLOR_WHITE + TEXT_COLOR_BACKGROUND);
+  lb_co_color(TEXT_MODE_BOLD);
+  printf("TEXT_COLOR_BLUE\r\n");
+  lb_co_color(TEXT_MODE_NOBOLD);
+  lb_co_gotoxy(3,3);
 
-//lb_co_color(TEXT_COLOR_DEFAULT);
-//lb_co_color(TEXT_COLOR_DEFAULT + TEXT_COLOR_BACKGROUND);
-lb_co_cls();
-lb_co_reset();
-char r, g, b;
-for (b=0;b<16;b++)
-  for (g=0;g<16;g++) 
-    {
-      lb_co_gotox(1);
-      lb_co_color(TEXT_COLOR_WHITE);
-      printf("0x%x",(b<<4)+g);
-      lb_co_gotox(10);
-      for (r=0;r<16;r++)
-	{
-	  lb_co_color_bg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
-	  lb_co_color_fg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
-	  printf("*");
-	}
-      lb_co_color_bg_RGB(lb_gr_12RGB(0x0000));
-      printf("\r\n");
-      lb_gr_delay(1000);
-    }
-printf("TEXT_COLOR_0x00f\r\n");
-printf("\a");
+  //lb_co_color(TEXT_COLOR_DEFAULT);
+  //lb_co_color(TEXT_COLOR_DEFAULT + TEXT_COLOR_BACKGROUND);
+  lb_co_cls();
+  lb_co_reset();
+  char r, g, b;
+  for (b=0;b<16;b++)
+    for (g=0;g<16;g++) 
+      {
+	lb_co_gotox(1);
+	lb_co_color(TEXT_COLOR_WHITE);
+	printf("0x%x",(b<<4)+g);
+	lb_co_gotox(10);
+	for (r=0;r<16;r++)
+	  {
+	    lb_co_color_bg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
+	    lb_co_color_fg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
+	    printf("*");
+	  }
+	lb_co_color_bg_RGB(lb_gr_12RGB(0x0000));
+	printf("\r\n");
+	lb_gr_delay(1000);
+      }
+  printf("TEXT_COLOR_0x00f\r\n");
+  printf("\a");
 
 
-//lb_co_cls();
-lb_fb_exit(1);
+  //lb_co_cls();
+  lb_fb_exit(1);
 #endif
 
-/*******************************************************************************************************************/
-/* Audio DEMOS */
-/******************************************************************************************************************/
+  /*******************************************************************************************************************/
+  /* Audio DEMOS */
+  /******************************************************************************************************************/
 
-//#define DEMO_DTMF
+  //#define DEMO_DTMF
 #ifdef DEMO_DTMF
-lb_au_SDL_audio_init_DTMF();
-lb_au_SDL_audio_start();
+  lb_au_SDL_audio_init_DTMF();
+  lb_au_SDL_audio_start();
 
-lb_au_freq_DTMF('4', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('4', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('0', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('0', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('5', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('5', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
   
-lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('2', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('2', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
-lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
-SDL_Delay(200);
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
-SDL_Delay(200);
+  lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
+  SDL_Delay(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  SDL_Delay(200);
 
 
-_lb_au_f0=0.0;
-_lb_au_f1=0.0;
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
 
-lb_au_SDL_audio_close_DTMF();
+  lb_au_SDL_audio_close_DTMF();
 
-lb_fb_exit(1);
+  lb_fb_exit(1);
 #endif
 
   
 #define SAMPLES 22050
-//#define DEMO_WAV_WRITE
+  //#define DEMO_WAV_WRITE
 #ifdef DEMO_WAV_WRITE
-VECTOR_R_T V;
-U_INT_16_T i;
-FLOAT_T f1,f2;
+  VECTOR_R_T V;
+  U_INT_16_T i;
+  FLOAT_T f1,f2;
   
-V.items=SAMPLES;
-lb_al_create_vector_r(&V);
+  V.items=SAMPLES;
+  lb_al_create_vector_r(&V);
 
-lb_au_freq_DTMF('3', &f1, &f2);
-for (i=0;i<SAMPLES;i++)
-  V.array[i]=0.5*sin(2*M_PI*f1*i/SAMPLES) + 0.5*sin(2*M_PI*f2*i/SAMPLES);
+  lb_au_freq_DTMF('3', &f1, &f2);
+  for (i=0;i<SAMPLES;i++)
+    V.array[i]=0.5*sin(2*M_PI*f1*i/SAMPLES) + 0.5*sin(2*M_PI*f2*i/SAMPLES);
       
-lb_au_wave_write_or_append_from_vector_r("test2.wav", &V, SAMPLES, 8);
+  lb_au_wave_write_or_append_from_vector_r("test2.wav", &V, SAMPLES, 8);
 
-lb_al_release_vector_r(&V);
+  lb_al_release_vector_r(&V);
   
-lb_fb_exit(1);
+  lb_fb_exit(1);
 #endif
 
-//#define PLAY_WAVE
+  //#define PLAY_WAVE
 #ifdef PLAY_WAVE
-// Initialize SDL.
-if (SDL_Init(SDL_INIT_AUDIO) < 0)
-  return 1;
+  // Initialize SDL.
+  if (SDL_Init(SDL_INIT_AUDIO) < 0)
+    return 1;
 
-// local variables
-extern Uint32 lb_au_audio_len; /* Extern variable declared in lb_audio.h */
-extern Uint8 *lb_au_audio_pos; /* Extern variable declared in lb_audio.h */
+  // local variables
+  extern Uint32 lb_au_audio_len; /* Extern variable declared in lb_audio.h */
+  extern Uint8 *lb_au_audio_pos; /* Extern variable declared in lb_audio.h */
 
-static Uint32 wav_length; // length of our sample
-static Uint8 *wav_buffer; // buffer containing our audio file
-static SDL_AudioSpec wav_spec; // the specs of our piece of music
+  static Uint32 wav_length; // length of our sample
+  static Uint8 *wav_buffer; // buffer containing our audio file
+  static SDL_AudioSpec wav_spec; // the specs of our piece of music
   
 	
-/* Load the WAV */
-// the specs, length and buffer of our wav are filled
-if( SDL_LoadWAV("toto.wav", &wav_spec, &wav_buffer, &wav_length) == NULL )
-  {
-    printf("Error loading wav file\r\n");
-    lb_fb_exit(1);
-  }
-// set the callback function
-wav_spec.callback = lb_au_callback_copy;
-wav_spec.userdata = NULL;
-// set our global static variables
-lb_au_audio_pos = wav_buffer; // copy sound buffer
-lb_au_audio_len = wav_length; // copy file length
+  /* Load the WAV */
+  // the specs, length and buffer of our wav are filled
+  if( SDL_LoadWAV("toto.wav", &wav_spec, &wav_buffer, &wav_length) == NULL )
+    {
+      printf("Error loading wav file\r\n");
+      lb_fb_exit(1);
+    }
+  // set the callback function
+  wav_spec.callback = lb_au_callback_copy;
+  wav_spec.userdata = NULL;
+  // set our global static variables
+  lb_au_audio_pos = wav_buffer; // copy sound buffer
+  lb_au_audio_len = wav_length; // copy file length
 	
-/* Open the audio device */
-printf("hello\r\n");
-if ( SDL_OpenAudio(&wav_spec, NULL) < 0 )
-  {
-    fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-    lb_fb_exit(-1);
-  }
+  /* Open the audio device */
+  printf("hello\r\n");
+  if ( SDL_OpenAudio(&wav_spec, NULL) < 0 )
+    {
+      fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+      lb_fb_exit(-1);
+    }
 	
-/* Start playing */
-SDL_PauseAudio(0);
+  /* Start playing */
+  SDL_PauseAudio(0);
 
-// wait until we're don't playing
-while ( lb_au_audio_len > 0 )
-  {
-    SDL_Delay(100); 
-  }
+  // wait until we're don't playing
+  while ( lb_au_audio_len > 0 )
+    {
+      SDL_Delay(100); 
+    }
 	
-// shut everything down
-SDL_CloseAudio();
-SDL_FreeWAV(wav_buffer);
+  // shut everything down
+  SDL_CloseAudio();
+  SDL_FreeWAV(wav_buffer);
 #endif
 
   
-//#define DEMO_WAV
+  //#define DEMO_WAV
 #ifdef DEMO_WAV
-VECTOR_R_T V;
-U_INT_16_T i;
-V.items=VECTOR_MAX_ITEMS;
-lb_al_create_vector_r(&V);
+  VECTOR_R_T V;
+  U_INT_16_T i;
+  V.items=VECTOR_MAX_ITEMS;
+  lb_al_create_vector_r(&V);
 
-for (i=0;i<V.items;i++)
-  V.array[i]=sin(2*M_PI*500.0*i/11025);
-lb_au_wave_write_from_vector_r("wav2.wav",&V, 11025,8);
+  for (i=0;i<V.items;i++)
+    V.array[i]=sin(2*M_PI*500.0*i/11025);
+  lb_au_wave_write_from_vector_r("wav2.wav",&V, 11025,8);
 
-lb_al_release_vector_r(&V);
-lb_fb_exit(1);
+  lb_al_release_vector_r(&V);
+  lb_fb_exit(1);
 #endif
 
 
 
-//#define DEMO_UNICODE
+  //#define DEMO_UNICODE
 #ifdef DEMO_UNICODE
-//https://stackoverflow.com/questions/34937375/printing-a-unicode-box-in-c
-setlocale(LC_ALL, "");
-//setlocale(LC_ALL, "en_US.UTF-8");
-unsigned int i;
+  //https://stackoverflow.com/questions/34937375/printing-a-unicode-box-in-c
+  setlocale(LC_ALL, "");
+  //setlocale(LC_ALL, "en_US.UTF-8");
+  unsigned int i;
 
 
-//printf("\n");
-for (i=0;i<0xffff;i++)
-  {
+  //printf("\n");
+  for (i=0;i<0xffff;i++)
+    {
 
-    // wprintf(L"%lc", (wchar_t)i);  works
-    if ((i % 16) == 0)
-      {
-	printf("\n0x%x\t",i);
-	lb_gr_delay(250);
-      }
-    printf("%lc", i);
+      // wprintf(L"%lc", (wchar_t)i);  works
+      if ((i % 16) == 0)
+	{
+	  printf("\n0x%x\t",i);
+	  lb_gr_delay(250);
+	}
+      printf("%lc", i);
  	
-    //sprintf(text,"\\x%x\\x%x\\x%x\r\n" ,(x>>16) & 0xff, (x>>8) & 0xff, x & 0xff);
-    //printf(text);
-  }
+      //sprintf(text,"\\x%x\\x%x\\x%x\r\n" ,(x>>16) & 0xff, (x>>8) & 0xff, x & 0xff);
+      //printf(text);
+    }
 
 #endif
 
-//#define DEMO_SERIAL
+  //#define DEMO_SERIAL
 #ifdef DEMO_SERIAL
 
-COMM_PORT_T port1;
-port1.device=dev_S0;
-port1.baud_rate=B75;
-port1.data_bits = CS8;
-port1.stop_bits =SB_1;
-port1.parity=PA_none;
-port1.flow_control=FC_none;
-lb_se_init(&port1);
+  COMM_PORT_T port1;
+  port1.device=dev_S0;
+  port1.baud_rate=B75;
+  port1.data_bits = CS8;
+  port1.stop_bits =SB_1;
+  port1.parity=PA_none;
+  port1.flow_control=FC_none;
+  lb_se_init(&port1);
 
-COMM_PORT_T port2;
-port2.device=dev_S1;
-port2.baud_rate=B75;
-port2.data_bits = CS8;
-port2.stop_bits =SB_1;
-port2.parity=PA_none;
-port2.flow_control=FC_none;
-lb_se_init(&port2);
+  COMM_PORT_T port2;
+  port2.device=dev_S1;
+  port2.baud_rate=B75;
+  port2.data_bits = CS8;
+  port2.stop_bits =SB_1;
+  port2.parity=PA_none;
+  port2.flow_control=FC_none;
+  lb_se_init(&port2);
 
-char a=0;
-while(1)
-  {
-    lb_se_tx_byte(&port1, a);
-    lb_se_tx_byte(&port2, a);
-    lb_se_process_rx(&port1);
-    lb_se_process_rx(&port2);
-    lb_co_textcolor(TEXT_COLOR_WHITE);
-    fflush(stdout);
+  char a=0;
+  while(1)
+    {
+      lb_se_tx_byte(&port1, a);
+      lb_se_tx_byte(&port2, a);
+      lb_se_process_rx(&port1);
+      lb_se_process_rx(&port2);
+      lb_co_textcolor(TEXT_COLOR_WHITE);
+      fflush(stdout);
 
-    lb_se_print_buffer(&port1);
-    lb_co_textcolor(TEXT_COLOR_YELLOW);
-    fflush(stdout);
-    lb_se_print_buffer(&port2);
-    a++;
-    if (a==128)
-      a=0;
-  }
-lb_se_close(&port1);
-lb_se_close(&port2);
+      lb_se_print_buffer(&port1);
+      lb_co_textcolor(TEXT_COLOR_YELLOW);
+      fflush(stdout);
+      lb_se_print_buffer(&port2);
+      a++;
+      if (a==128)
+	a=0;
+    }
+  lb_se_close(&port1);
+  lb_se_close(&port2);
 #endif
 
-//#define DEMO_BATTERY
+  //#define DEMO_BATTERY
 #ifdef DEMO_BATTERY
 
-/******************************************************************************/
-/*          B A T T E R Y    C H A R G I N G    P R O F I L E S               */
-/******************************************************************************/
+  /******************************************************************************/
+  /*          B A T T E R Y    C H A R G I N G    P R O F I L E S               */
+  /******************************************************************************/
   
 
-/* End of Battery Profile Definition ********************************************************************************/
-char message[90];
-char Key;
+  /* End of Battery Profile Definition ********************************************************************************/
+  char message[90];
+  char Key;
 
-fd_set set;
-struct timeval timeout;
-int select_result;
-int FLAG_STOP=0;
+  fd_set set;
+  struct timeval timeout;
+  int select_result;
+  int FLAG_STOP=0;
 
-fprintf(stderr,"\r\nGot here");
+  fprintf(stderr,"\r\nGot here");
   
-if (argc != 7)
-  {
-    printf("Error: invalid number of parameters\r\n");
-    printf("device [/dev/ttyS0] baud_rate [1200 2400 9600] data_bits [db8, db7] stop_bits [sb1, sb2] parity [none, even, odd] flow_control [no hw sw] \r\n");
-    lb_fb_exit(0);
-  }
+  if (argc != 7)
+    {
+      printf("Error: invalid number of parameters\r\n");
+      printf("device [/dev/ttyS0] baud_rate [1200 2400 9600] data_bits [db8, db7] stop_bits [sb1, sb2] parity [none, even, odd] flow_control [no hw sw] \r\n");
+      lb_fb_exit(0);
+    }
   
-if (!(strcmp(argv[1],"/dev/ttyS0"))) Data_Parameters.device=dev_S0;
- else if (!(strcmp(argv[1],"/dev/ttyS1"))) Data_Parameters.device=dev_S1;
- else
-   {
-     printf("Error: invalid device");
-     lb_fb_exit(0);
-   }
+  if (!(strcmp(argv[1],"/dev/ttyS0"))) Data_Parameters.device=dev_S0;
+  else if (!(strcmp(argv[1],"/dev/ttyS1"))) Data_Parameters.device=dev_S1;
+  else
+    {
+      printf("Error: invalid device");
+      lb_fb_exit(0);
+    }
       
-if (!(strcmp(argv[2],"50")))
-  Data_Parameters.baud_rate=B50;
- else if (!(strcmp(argv[2],"75")))
-   Data_Parameters.baud_rate=B75;
- else if (!(strcmp(argv[2],"110")))
-   Data_Parameters.baud_rate=B110;
- else if (!(strcmp(argv[2],"134")))
-   Data_Parameters.baud_rate=B134;
- else if (!(strcmp(argv[2],"150")))
-   Data_Parameters.baud_rate=B150;
- else if (!(strcmp(argv[2],"200")))
-   Data_Parameters.baud_rate=B200;
- else if (!(strcmp(argv[2],"300")))
-   Data_Parameters.baud_rate=B300;
- else if (!(strcmp(argv[2],"600")))
-   Data_Parameters.baud_rate=B600;
- else if (!(strcmp(argv[2],"1200")))
-   Data_Parameters.baud_rate=B1200;
- else if (!(strcmp(argv[2],"1800")))
-   Data_Parameters.baud_rate=B1800;
- else if (!(strcmp(argv[2],"2400")))
-   Data_Parameters.baud_rate=B2400;
- else if (!(strcmp(argv[2],"4800")))
-   Data_Parameters.baud_rate=B4800;
- else if (!(strcmp(argv[2],"9600")))
-   Data_Parameters.baud_rate=B9600;
- else if (!(strcmp(argv[2],"19200")))
-   Data_Parameters.baud_rate=B19200;
- else if (!(strcmp(argv[2],"38400")))
-   Data_Parameters.baud_rate=B38400;
- else if (!(strcmp(argv[2],"57600")))
-   Data_Parameters.baud_rate=B57600;
- else if (!(strcmp(argv[2],"115200")))
-   Data_Parameters.baud_rate=B115200;
- else 
-   {
-     printf("Error: invalid baud rate");
-     lb_fb_exit(0);
-   }
+  if (!(strcmp(argv[2],"50")))
+    Data_Parameters.baud_rate=B50;
+  else if (!(strcmp(argv[2],"75")))
+    Data_Parameters.baud_rate=B75;
+  else if (!(strcmp(argv[2],"110")))
+    Data_Parameters.baud_rate=B110;
+  else if (!(strcmp(argv[2],"134")))
+    Data_Parameters.baud_rate=B134;
+  else if (!(strcmp(argv[2],"150")))
+    Data_Parameters.baud_rate=B150;
+  else if (!(strcmp(argv[2],"200")))
+    Data_Parameters.baud_rate=B200;
+  else if (!(strcmp(argv[2],"300")))
+    Data_Parameters.baud_rate=B300;
+  else if (!(strcmp(argv[2],"600")))
+    Data_Parameters.baud_rate=B600;
+  else if (!(strcmp(argv[2],"1200")))
+    Data_Parameters.baud_rate=B1200;
+  else if (!(strcmp(argv[2],"1800")))
+    Data_Parameters.baud_rate=B1800;
+  else if (!(strcmp(argv[2],"2400")))
+    Data_Parameters.baud_rate=B2400;
+  else if (!(strcmp(argv[2],"4800")))
+    Data_Parameters.baud_rate=B4800;
+  else if (!(strcmp(argv[2],"9600")))
+    Data_Parameters.baud_rate=B9600;
+  else if (!(strcmp(argv[2],"19200")))
+    Data_Parameters.baud_rate=B19200;
+  else if (!(strcmp(argv[2],"38400")))
+    Data_Parameters.baud_rate=B38400;
+  else if (!(strcmp(argv[2],"57600")))
+    Data_Parameters.baud_rate=B57600;
+  else if (!(strcmp(argv[2],"115200")))
+    Data_Parameters.baud_rate=B115200;
+  else 
+    {
+      printf("Error: invalid baud rate");
+      lb_fb_exit(0);
+    }
 
-if (!strcmp(argv[3],"db5")) Data_Parameters.data_bits      = CS5;
- else if (!strcmp(argv[3],"db6")) Data_Parameters.data_bits = CS6;
- else if (!strcmp(argv[3],"db7")) Data_Parameters.data_bits = CS7;
- else if (!strcmp(argv[3],"db8")) Data_Parameters.data_bits = CS8;
- else 
-   {
-     printf("Error: invalid data bits");
-     lb_fb_exit(0);
-   }
+  if (!strcmp(argv[3],"db5")) Data_Parameters.data_bits      = CS5;
+  else if (!strcmp(argv[3],"db6")) Data_Parameters.data_bits = CS6;
+  else if (!strcmp(argv[3],"db7")) Data_Parameters.data_bits = CS7;
+  else if (!strcmp(argv[3],"db8")) Data_Parameters.data_bits = CS8;
+  else 
+    {
+      printf("Error: invalid data bits");
+      lb_fb_exit(0);
+    }
 
-if (!strcmp(argv[4],"sb1")) Data_Parameters.stop_bits=SB_1;
- else if (!strcmp(argv[4],"sb2")) Data_Parameters.stop_bits=SB_2;
- else 
-   {
-     printf("Error: invalid stop bits");
-     lb_fb_exit(0);
-   }
+  if (!strcmp(argv[4],"sb1")) Data_Parameters.stop_bits=SB_1;
+  else if (!strcmp(argv[4],"sb2")) Data_Parameters.stop_bits=SB_2;
+  else 
+    {
+      printf("Error: invalid stop bits");
+      lb_fb_exit(0);
+    }
 
-if (!strcmp(argv[5],"none")) Data_Parameters.parity=PA_none;
- else if (!strcmp(argv[5],"even")) Data_Parameters.parity=PA_even;
- else if (!strcmp(argv[5],"odd")) Data_Parameters.parity=PA_odd;
- else 
-   {
-     printf("Error: invalid parity");
-     lb_fb_exit(0);
-   }
+  if (!strcmp(argv[5],"none")) Data_Parameters.parity=PA_none;
+  else if (!strcmp(argv[5],"even")) Data_Parameters.parity=PA_even;
+  else if (!strcmp(argv[5],"odd")) Data_Parameters.parity=PA_odd;
+  else 
+    {
+      printf("Error: invalid parity");
+      lb_fb_exit(0);
+    }
 
-if (!strcmp(argv[6],"no")) Data_Parameters.flow_control=FC_none;
- else if (!strcmp(argv[6],"hw")) Data_Parameters.flow_control=FC_hw;
- else if (!strcmp(argv[6],"sw")) Data_Parameters.flow_control=FC_sw;
- else 
-   {
-     printf("Error: invalid flow control");
-     lb_fb_exit(0);
-   }
+  if (!strcmp(argv[6],"no")) Data_Parameters.flow_control=FC_none;
+  else if (!strcmp(argv[6],"hw")) Data_Parameters.flow_control=FC_hw;
+  else if (!strcmp(argv[6],"sw")) Data_Parameters.flow_control=FC_sw;
+  else 
+    {
+      printf("Error: invalid flow control");
+      lb_fb_exit(0);
+    }
 
-text_file=fopen("./charge_data.txt", "w");
-if (text_file== NULL)
-  { 
-    fprintf(stderr,"Error in opening text file..\r\n");
-    return 1;
-  }
-CONSOLE_Initialize();
-SERCOM_Initialize();
+  text_file=fopen("./charge_data.txt", "w");
+  if (text_file== NULL)
+    { 
+      fprintf(stderr,"Error in opening text file..\r\n");
+      return 1;
+    }
+  CONSOLE_Initialize();
+  SERCOM_Initialize();
   
-fprintf(output,"\E[H\E[2J");
-fflush(output);
+  fprintf(output,"\E[H\E[2J");
+  fflush(output);
   
-sprintf(message,"BATTERY TEST PROGRAM\r\n");
-fputs(message,output);   
-fflush(output);
-fprintf(stderr,"--------------------------------------------------------------------------------\r\n");
+  sprintf(message,"BATTERY TEST PROGRAM\r\n");
+  fputs(message,output);   
+  fflush(output);
+  fprintf(stderr,"--------------------------------------------------------------------------------\r\n");
 
-gettimeofday(&t_initial, NULL);
-/* printf("\r\nt_initial = %f",(float)t_initial.tv_sec); */
-t_previous=0;
-t_delta=0;
-SetupPSU(0);
+  gettimeofday(&t_initial, NULL);
+  /* printf("\r\nt_initial = %f",(float)t_initial.tv_sec); */
+  t_previous=0;
+  t_delta=0;
+  SetupPSU(0);
 
-while (!FLAG_STOP)
-  {
-    /************************************************************************/
-    /*  Re-initialize the file descriptor set.                              */
-    /************************************************************************/
-    FD_ZERO (&set);
-    FD_SET (fd, &set);
-    FD_SET (tty, &set);
-    /* Initialize the timeout data structure. */
-    timeout.tv_sec = 0.25;
-    timeout.tv_usec = 0;
-    select_result=select(sizeof(set)*8,&set,NULL,NULL,&timeout);
-    /************************************************************************/
+  while (!FLAG_STOP)
+    {
+      /************************************************************************/
+      /*  Re-initialize the file descriptor set.                              */
+      /************************************************************************/
+      FD_ZERO (&set);
+      FD_SET (fd, &set);
+      FD_SET (tty, &set);
+      /* Initialize the timeout data structure. */
+      timeout.tv_sec = 0.25;
+      timeout.tv_usec = 0;
+      select_result=select(sizeof(set)*8,&set,NULL,NULL,&timeout);
+      /************************************************************************/
 
-    if (current_stage==N_STAGES)
-      {
-	fprintf(output,"Sequence completed...\r\n");
-	FLAG_STOP=1;
-      }  
-
-    if (CONSOLE_RxByte(&Key))  /* if a key was hit */
-      {
-	CONSOLE_TxByte(Key);
-	SERCOM_TxByte(Key);
-	if (Key==0x1b) 
+      if (current_stage==N_STAGES)
+	{
+	  fprintf(output,"Sequence completed...\r\n");
 	  FLAG_STOP=1;
-      }
+	}  
 
-    if (FLAG_STOP)
-      {
-	SERCOM_TxStr("OUTP:STAT 0\r\n");
-	SERCOM_Flush();
-	SERCOM_Close();
-	CONSOLE_Close();
-	fclose(text_file);
-	lb_fb_exit(0);
-      }
-    RunProcess();
-  }
+      if (CONSOLE_RxByte(&Key))  /* if a key was hit */
+	{
+	  CONSOLE_TxByte(Key);
+	  SERCOM_TxByte(Key);
+	  if (Key==0x1b) 
+	    FLAG_STOP=1;
+	}
+
+      if (FLAG_STOP)
+	{
+	  SERCOM_TxStr("OUTP:STAT 0\r\n");
+	  SERCOM_Flush();
+	  SERCOM_Close();
+	  CONSOLE_Close();
+	  fclose(text_file);
+	  lb_fb_exit(0);
+	}
+      RunProcess();
+    }
 #endif
 
   
