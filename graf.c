@@ -2457,6 +2457,88 @@ int main()
       }
 #endif
 
+  //  #define EULER_2ND_ORDER
+#ifdef EULER_2ND_ORDER
+
+  FLOAT_T t, x0, x1, t_max, delta, x0_copy, x1_copy;
+  delta=0.05;
+  t_max=10;
+  x0 = 10; /* position */
+  x1 = 0;  /* speed */
+  
+  
+  t=0;
+  while (t<t_max)
+    {
+      x0_copy=x0;
+      x1_copy=x1;
+
+      x0 += delta*x1_copy;
+
+      if (fabs(x0)>1e-6)
+	x1 += delta*(-1.0)*x0/fabs(x0);
+
+      printf("%4.4f %4.4f %4.4f\r\n",t, x0, x1);  
+
+      t+=delta;
+    }
+  
+  
+#endif
+
+
+  //  #define RK4_2ND_ORDER
+#ifdef RK4_2ND_ORDER
+
+  FLOAT_T t, x0, x1, t_max, delta, x0_copy, x1_copy, k1, k2, k3, k4;
+  delta=0.05;
+  t_max=10;
+  x0 = 10; /* position */
+  x1 = 0;  /* speed */
+  
+  FLOAT_T f(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
+  {
+    if (fabs(_x0)>1e-6)
+      return (-1.0)*_x0/fabs(_x0);
+    else
+      return 0;
+  }
+
+  FLOAT_T g(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
+  {
+    return _x1;
+  }
+
+  t=0;
+  while (t<t_max)
+    {
+      x0_copy=x0;
+      x1_copy=x1;
+
+      k1 =g(t,             x0_copy,          x1_copy);
+      k2 =g(t + 0.5*delta, x0_copy + 0.5*k1, x1_copy);
+      k3 =g(t + 0.5*delta, x0_copy + 0.5*k2, x1_copy);
+      k4 =g(t + delta,     x0_copy + k3,     x1_copy);
+
+      x0 = x0 + delta*(k1 + 2*k2 + 2*k3 + k4)/6;  
+
+
+      k1=f(t,             x0_copy, x1_copy);
+      k2=f(t + 0.5*delta, x0_copy, x1_copy + 0.5*k1);
+      k3=f(t + 0.5*delta, x0_copy, x1_copy + 0.5*k2);
+      k4=f(t + delta,     x0_copy, x1_copy + k3);
+
+      x1 = x1 + delta*(k1 + 2*k2 + 2*k3 + k4)/6;  
+
+      printf("%4.4f %4.4f %4.4f\r\n",t, x0, x1);  
+
+      t+=delta;
+    }
+  
+  
+#endif
+
+  
 #define DEMO_ORBITS
 #ifdef DEMO_ORBITS
 #define G 6.674e-11
@@ -2542,7 +2624,7 @@ int main()
   S_INT_32_T step_counter=0;
   S_INT_8_T flag_paused=FALSE;
 
-  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1200, 800, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
  
   //oxo
   win.xp_min=0;
@@ -2556,8 +2638,8 @@ int main()
 
 
   lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
-  my_font.scale_x=4;
-  my_font.scale_y=4;
+  my_font.scale_x=3;
+  my_font.scale_y=3;
   my_font.gap_x=2;
   my_font.gap_y=1;
   my_font.max_x=40;
@@ -2722,16 +2804,19 @@ int main()
 		      lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
 		      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
 						     fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
-		      if (t/(365*24*3600)>99)
+		      if (t/(365*24*3600)>199)
 			flag_paused=TRUE;
 		    }
 		  if ((step_counter % 60) == 0)
 		    {
-		      sprintf(text,"n: %0d",step_counter);
+		      sprintf(text,"dt: %02.2f [s]",dt);
 		      lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
 
-		      sprintf(text,"t: %02.2f",t/(24.0*365.0*3600.0));
+		      sprintf(text,"t: %02.2f [a]",t/(24.0*365.0*3600.0));
 		      lb_ft_draw_text(NULL, &my_font, 20, 80, text, COPYMODE_COPY);
+
+		      sprintf(text,"n: %0d",step_counter);
+		      lb_ft_draw_text(NULL, &my_font, 20, 130, text, COPYMODE_COPY);
 
 
 	    	      //
