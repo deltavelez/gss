@@ -2487,52 +2487,51 @@ int main()
 #endif
 
 
-  //  #define RK4_2ND_ORDER
+  //#define RK4_2ND_ORDER
 #ifdef RK4_2ND_ORDER
 
-  FLOAT_T t, x0, x1, t_max, delta, x0_copy, x1_copy, k1, k2, k3, k4;
-  delta=0.05;
-  t_max=10;
+  FLOAT_T t, x0, x1, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
+  h=0.001;
+  t_max=45;
   x0 = 10; /* position */
-  x1 = 0;  /* speed */
-  
-  FLOAT_T f(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
-  {
-    if (fabs(_x0)>1e-6)
-      return (-1.0)*_x0/fabs(_x0);
-    else
-      return 0;
-  }
+  x1 = 10;  /* speed */
 
-  FLOAT_T g(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
+
+  FLOAT_T f_x0_div_dt(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
   {
     return _x1;
   }
 
+  
+  FLOAT_T f_x1_div_dt(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
+  {
+      return -1.0;
+  }
+
+
   t=0;
   while (t<t_max)
     {
+      printf("%4.4f %4.4f %4.4f,%4.4f, %4.4f\r\n",t, x0, x1,10.0+10.0*t-0.5*t*t, 10.0-t);  
       x0_copy=x0;
       x1_copy=x1;
 
-      k1 =g(t,             x0_copy,          x1_copy);
-      k2 =g(t + 0.5*delta, x0_copy + 0.5*k1, x1_copy);
-      k3 =g(t + 0.5*delta, x0_copy + 0.5*k2, x1_copy);
-      k4 =g(t + delta,     x0_copy + k3,     x1_copy);
+      k1 = h*f_x0_div_dt(t,         x0_copy,          x1_copy);
+      k2 = h*f_x0_div_dt(t + 0.5*h, x0_copy + 0.5*k1, x1_copy);
+      k3 = h*f_x0_div_dt(t + 0.5*h, x0_copy + 0.5*k2, x1_copy);
+      k4 = h*f_x0_div_dt(t + h,     x0_copy + k3,     x1_copy);
 
-      x0 = x0 + delta*(k1 + 2*k2 + 2*k3 + k4)/6;  
+      x0 = x0 + (k1 + 2*k2 + 2*k3 + k4)/6;  
+
+      k1 = h*f_x1_div_dt(t,         x0_copy,  x1_copy          );
+      k2 = h*f_x1_div_dt(t + 0.5*h, x0_copy , x1_copy + 0.5*k1 );
+      k3 = h*f_x1_div_dt(t + 0.5*h, x0_copy , x1_copy + 0.5*k2 );
+      k4 = h*f_x1_div_dt(t + h,     x0_copy , x1_copy + k3     );
+
+      x1 = x1 + (k1 + 2*k2 + 2*k3 + k4)/6;  
 
 
-      k1=f(t,             x0_copy, x1_copy);
-      k2=f(t + 0.5*delta, x0_copy, x1_copy + 0.5*k1);
-      k3=f(t + 0.5*delta, x0_copy, x1_copy + 0.5*k2);
-      k4=f(t + delta,     x0_copy, x1_copy + k3);
-
-      x1 = x1 + delta*(k1 + 2*k2 + 2*k3 + k4)/6;  
-
-      printf("%4.4f %4.4f %4.4f\r\n",t, x0, x1);  
-
-      t+=delta;
+      t+=h;
     }
   
   
@@ -2556,8 +2555,6 @@ int main()
     FLOAT_T m;
     VECTOR_3D_T p;
     VECTOR_3D_T v;
-    VECTOR_3D_T dp;
-    VECTOR_3D_T dv;
   } ASTRO_T;
 
   ASTRO_T M_euler[N_OBJECTS];
@@ -2590,7 +2587,7 @@ int main()
     return accel;
   }
 
-  void future_accel(ASTRO_T M[], int i, FLOAT_T tiempo, FLOAT_T delta, VECTOR_3D_T *vel, VECTOR_3D_T *acc)
+  void future_accel_and_vel(ASTRO_T M[], int i, FLOAT_T delta, VECTOR_3D_T *vel, VECTOR_3D_T *acc)
   {
     VECTOR_3D_T tmp_pos, tmp_vel;
   
@@ -2613,7 +2610,7 @@ int main()
     M[i].v = tmp_vel;
   }
 
-  VECTOR_3D_T ka, kv, k1a, k1v, k2a, k2v, k3a, k3v, k4a, k4v;
+  VECTOR_3D_T ka, kv, k1, k2, k3, k3, k4;
   SDL_Event event;
   FONT_T my_font;
   char text[40];
@@ -2650,7 +2647,7 @@ int main()
   my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
 
       
-  dt=60;  /* seconds */
+  dt=60*60;  /* seconds */
   t=0;      /* tracks the elapsed time */
 
   
@@ -2726,6 +2723,11 @@ int main()
 	    {
 	      M_euler[i].dv = calc_acceleration(M_euler,i);
 
+	      /* oxo */
+	      M_euler[i].dp.x = M_euler[i].v.x;
+	      M_euler[i].dp.y = M_euler[i].v.y;
+	      M_euler[i].dp.z = M_euler[i].v.z;
+
 	      kv.x = 0;
 	      kv.y = 0;
 	      kv.z = 0;
@@ -2734,7 +2736,9 @@ int main()
 	      ka.y = 0;
 	      ka.z = 0;
 
-	      future_accel(M_rk4, i ,t        ,0      ,&kv ,&ka);
+	        void future_accel_and_vel(ASTRO_T M[], int i, FLOAT_T delta, VECTOR_3D_T *vel, VECTOR_3D_T *acc)
+
+	      future_accel(M_rk4, i ,       ,0      ,&kv ,&ka);
 	      k1v=kv;
 	      k1a=ka;
 
@@ -2746,7 +2750,7 @@ int main()
 	      ka.y = 0.5*k1a.y;
 	      ka.z = 0.5*k1a.z;
 
-	      future_accel(M_rk4, i ,t+0.5*dt ,0.5*dt ,&kv ,&ka);
+	      future_accel(M_rk4, i ,dt ,0.5*dt ,&kv ,&ka);
 	      k2v=kv;
 	      k2a=ka;
 
@@ -2758,7 +2762,7 @@ int main()
 	      ka.y = 0.5*k2a.y;
 	      ka.z = 0.5*k2a.z;
 
-	      future_accel(M_rk4, i ,t+0.5*dt ,0.5*dt ,&kv ,&ka);
+	      future_accel(M_rk4, i ,0.5*dt ,&kv ,&ka);
 	      k3v=kv;
 	      k3a=ka;
       
@@ -2778,9 +2782,9 @@ int main()
 	  for (i=0;i<N_OBJECTS;i++)
 	    {
 	      /* Euler Integration */
-	      M_euler[i].p.x += M_euler[i].v.x*dt + 0.5*M_euler[i].dv.x*dt*dt;
-	      M_euler[i].p.y += M_euler[i].v.y*dt + 0.5*M_euler[i].dv.y*dt*dt;
-	      M_euler[i].p.z += M_euler[i].v.z*dt + 0.5*M_euler[i].dv.z*dt*dt;
+	      M_euler[i].p.x += M_euler[i].dp.x*dt;
+	      M_euler[i].p.y += M_euler[i].dp.y*dt;
+	      M_euler[i].p.z += M_euler[i].dp.z*dt;
  
 	      M_euler[i].v.x += M_euler[i].dv.x*dt;
 	      M_euler[i].v.y += M_euler[i].dv.y*dt;
@@ -2824,12 +2828,12 @@ int main()
 		      //printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
 		      //printf("\n");
 		      lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
-		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(0xFF00), COPYMODE_COPY);
+		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF00F), COPYMODE_COPY); 
 
 
 		      lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
-		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(0xF0B0), COPYMODE_COPY);
+		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
 		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY); 
 	      
 
