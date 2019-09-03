@@ -2555,6 +2555,8 @@ int main()
     FLOAT_T m;
     VECTOR_3D_T p;
     VECTOR_3D_T v;
+    VECTOR_3D_T v_temp;
+    VECTOR_3D_T a_temp;
   } ASTRO_T;
 
   ASTRO_T M_euler[N_OBJECTS];
@@ -2587,30 +2589,33 @@ int main()
     return accel;
   }
 
-  void future_accel_and_vel(ASTRO_T M[], int i, FLOAT_T delta, VECTOR_3D_T *vel, VECTOR_3D_T *acc)
+  VECTOR_3D_T future_acc(ASTRO_T M[], int i, FLOAT_T delta_t, FLOAT_T delta_v_x,FLOAT_T delta_v_y, FLOAT_T delta_v_z)
   {
-    VECTOR_3D_T tmp_pos, tmp_vel;
+    VECTOR_3D_T tmp_pos, tmp_vel, acceleration;
   
     /* we must back-up the current position and velocity */
     tmp_pos=M[i].p;
     tmp_vel=M[i].v;
-  
-    M[i].p.x +=  (*vel).x*delta;
-    M[i].p.y +=  (*vel).y*delta;
-    M[i].p.z +=  (*vel).z*delta;
 
-    M[i].v.x += (*acc).x*delta;
-    M[i].v.y += (*acc).y*delta;
-    M[i].v.z += (*acc).z*delta;
 
-    *vel = M[i].v;
-    *acc = calc_acceleration(M,i);
+    M[i].v.x += delta_v_x;
+    M[i].v.y += delta_v_y;
+    M[i].v.z += delta_v_z;
 
+    M[i].p.x +=  M[i].v.x*delta_t;
+    M[i].p.y +=  M[i].v.y*delta_t;
+    M[i].p.z +=  M[i].v.z*delta_t;
+
+
+    acceleration = calc_acceleration(M,i);
+
+    /* We restore the previous values, since we just wanted to get an estimate for the acceleration at (t+dt, vel+dv)*/
     M[i].p = tmp_pos;
     M[i].v = tmp_vel;
+    return acceleration;
   }
 
-  VECTOR_3D_T ka, kv, k1, k2, k3, k3, k4;
+  VECTOR_3D_T k1, k2, k3, k4, temp_acc;
   SDL_Event event;
   FONT_T my_font;
   char text[40];
@@ -2647,7 +2652,7 @@ int main()
   my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
 
       
-  dt=60*60;  /* seconds */
+  dt=60*10;  /* seconds */
   t=0;      /* tracks the elapsed time */
 
   
@@ -2662,13 +2667,13 @@ int main()
   M_euler[0].v.y=0;
   M_euler[0].v.z=0;
 
-  M_euler[0].dp.x=0;
-  M_euler[0].dp.y=0;
-  M_euler[0].dp.z=0;
+  M_euler[0].v_temp.x=0;
+  M_euler[0].v_temp.y=0;
+  M_euler[0].v_temp.z=0;
 
-  M_euler[0].dv.x=0;
-  M_euler[0].dv.y=0;
-  M_euler[0].dv.z=0;
+  M_euler[0].a_temp.x=0;
+  M_euler[0].a_temp.y=0;
+  M_euler[0].a_temp.z=0;
 
 
   /* Second object */
@@ -2683,13 +2688,13 @@ int main()
   M_euler[1].v.y=sqrt(G*(M_euler[0].m+M_euler[1].m)/1.496e11);
   M_euler[1].v.z=0;
 
-  M_euler[1].dp.x=0;
-  M_euler[1].dp.y=0;
-  M_euler[1].dp.z=0;
+  M_euler[1].v_temp.x=0;
+  M_euler[1].v_temp.y=0;
+  M_euler[1].v_temp.z=0;
 
-  M_euler[1].dv.x=0;
-  M_euler[1].dv.y=0;
-  M_euler[1].dv.z=0;
+  M_euler[1].a_temp.x=0;
+  M_euler[1].a_temp.y=0;
+  M_euler[1].a_temp.z=0;
 
 
   /* Initialize values for Runge-Kutta-4 Matrix (make them the same) */
@@ -2704,13 +2709,13 @@ int main()
       M_rk4[i].v.y = M_euler[i].v.y;
       M_rk4[i].v.z = M_euler[i].v.z;
 
-      M_rk4[i].dp.x = M_euler[i].dp.x;
-      M_rk4[i].dp.y = M_euler[i].dp.y;
-      M_rk4[i].dp.z = M_euler[i].dp.z;
+      M_rk4[i].v_temp.x = M_euler[i].v_temp.x;
+      M_rk4[i].v_temp.y = M_euler[i].v_temp.y;
+      M_rk4[i].v_temp.z = M_euler[i].v_temp.z;
 
-      M_rk4[i].dp.x = M_euler[i].dv.x;
-      M_rk4[i].dp.y = M_euler[i].dv.y;
-      M_rk4[i].dp.z = M_euler[i].dv.z;
+      M_rk4[i].v_temp.x = M_euler[i].v_temp.x;
+      M_rk4[i].v_temp.y = M_euler[i].v_temp.y;
+      M_rk4[i].v_temp.z = M_euler[i].v_temp.z;
 
       M_rk4[i].m = M_euler[i].m;
     }
@@ -2721,83 +2726,58 @@ int main()
 	{
 	  for (i=0;i<N_OBJECTS;i++)
 	    {
-	      M_euler[i].dv = calc_acceleration(M_euler,i);
+	      M_euler[i].v_temp = M_euler[i].v;
+	      M_euler[i].a_temp = calc_acceleration(M_euler,i);
 
-	      /* oxo */
-	      M_euler[i].dp.x = M_euler[i].v.x;
-	      M_euler[i].dp.y = M_euler[i].v.y;
-	      M_euler[i].dp.z = M_euler[i].v.z;
+	      
+	      M_rk4[i].v_temp = M_rk4[i].v;
 
-	      kv.x = 0;
-	      kv.y = 0;
-	      kv.z = 0;
-      
-	      ka.x = 0;
-	      ka.y = 0;
-	      ka.z = 0;
+	      	      temp_acc = calc_acceleration(M_rk4, i);
+		      //temp_acc = future_acc(M_rk4, i , 0,0,0,0);
+	      k1.x = temp_acc.x*dt;
+	      k1.y = temp_acc.y*dt;
+	      k1.z = temp_acc.z*dt;
+	      
+	      temp_acc = future_acc(M_rk4, i ,0.5*dt , 0.5*k1.x, 0.5*k1.y, 0.5*k1.z);
+	      k2.x = temp_acc.x*dt;
+	      k2.y = temp_acc.y*dt;
+	      k2.z = temp_acc.z*dt;
+	      
+	      temp_acc = future_acc(M_rk4, i ,0.5*dt ,0.5*k2.x, 0.5*k2.y, 0.5*k2.z);
+	      k3.x = temp_acc.x*dt;
+	      k3.y = temp_acc.y*dt;
+	      k3.z = temp_acc.z*dt;
 
-	        void future_accel_and_vel(ASTRO_T M[], int i, FLOAT_T delta, VECTOR_3D_T *vel, VECTOR_3D_T *acc)
+	      temp_acc = future_acc(M_rk4, i ,dt, k3.x, k3.y, k3.z);
+	      k4.x = temp_acc.x*dt;
+	      k4.y = temp_acc.y*dt;
+	      k4.z = temp_acc.z*dt;
 
-	      future_accel(M_rk4, i ,       ,0      ,&kv ,&ka);
-	      k1v=kv;
-	      k1a=ka;
-
-	      kv.x = 0.5*k1v.x;
-	      kv.y = 0.5*k1v.y;
-	      kv.z = 0.5*k1v.z;
-
-	      ka.x = 0.5*k1a.x;
-	      ka.y = 0.5*k1a.y;
-	      ka.z = 0.5*k1a.z;
-
-	      future_accel(M_rk4, i ,dt ,0.5*dt ,&kv ,&ka);
-	      k2v=kv;
-	      k2a=ka;
-
-	      kv.x = 0.5*k2v.x;
-	      kv.y = 0.5*k2v.y;
-	      kv.z = 0.5*k2v.z;
-
-	      ka.x = 0.5*k2a.x;
-	      ka.y = 0.5*k2a.y;
-	      ka.z = 0.5*k2a.z;
-
-	      future_accel(M_rk4, i ,0.5*dt ,&kv ,&ka);
-	      k3v=kv;
-	      k3a=ka;
-      
-	      future_accel(M_rk4, i ,t+dt     ,dt     ,&kv ,&ka);
-	      k4v=kv;
-	      k4a=ka;
-
-	      M_rk4[i].dv.x = (k1a.x + 2*k2a.x + 2*k3a.x + k4a.x)/6.0;
-	      M_rk4[i].dv.y = (k1a.y + 2*k2a.y + 2*k3a.y + k4a.y)/6.0;
-	      M_rk4[i].dv.z = (k1a.z + 2*k2a.z + 2*k3a.z + k4a.z)/6.0;
-      
-	      M_rk4[i].dp.x = (k1v.x + 2*k2v.x + 2*k3v.x + k4v.x)/6.0;
-	      M_rk4[i].dp.y = (k1v.y + 2*k2v.y + 2*k3v.y + k4v.y)/6.0;
-	      M_rk4[i].dp.z = (k1v.z + 2*k2v.z + 2*k3v.z + k4v.z)/6.0;
+	      M_rk4[i].a_temp.x = (k1.x + 2*k2.x + 2*k3.x + k4.x)/(dt*6.0);
+	      M_rk4[i].a_temp.y = (k1.y + 2*k2.y + 2*k3.y + k4.y)/(dt*6.0);
+	      M_rk4[i].a_temp.z = (k1.z + 2*k2.z + 2*k3.z + k4.z)/(dt*6.0);
+	      
 	    }
     
 	  for (i=0;i<N_OBJECTS;i++)
 	    {
 	      /* Euler Integration */
-	      M_euler[i].p.x += M_euler[i].dp.x*dt;
-	      M_euler[i].p.y += M_euler[i].dp.y*dt;
-	      M_euler[i].p.z += M_euler[i].dp.z*dt;
+	      M_euler[i].p.x += M_euler[i].v_temp.x*dt;
+	      M_euler[i].p.y += M_euler[i].v_temp.y*dt;
+	      M_euler[i].p.z += M_euler[i].v_temp.z*dt;
  
-	      M_euler[i].v.x += M_euler[i].dv.x*dt;
-	      M_euler[i].v.y += M_euler[i].dv.y*dt;
-	      M_euler[i].v.z += M_euler[i].dv.z*dt;
+	      M_euler[i].v.x += M_euler[i].a_temp.x*dt;
+	      M_euler[i].v.y += M_euler[i].a_temp.y*dt;
+	      M_euler[i].v.z += M_euler[i].a_temp.z*dt;
 
 	      /* Runge-Kutta 4 Integration */  
-	      M_rk4[i].p.x += M_rk4[i].dp.x*dt;  
-	      M_rk4[i].p.y += M_rk4[i].dp.y*dt; 
-	      M_rk4[i].p.z += M_rk4[i].dp.z*dt; 
+	      M_rk4[i].p.x += M_rk4[i].v_temp.x*dt;  
+	      M_rk4[i].p.y += M_rk4[i].v_temp.y*dt; 
+	      M_rk4[i].p.z += M_rk4[i].v_temp.z*dt; 
 
-	      M_rk4[i].v.x += M_rk4[i].dv.x*dt;
-	      M_rk4[i].v.y += M_rk4[i].dv.y*dt;
-	      M_rk4[i].v.z += M_rk4[i].dv.z*dt;
+	      M_rk4[i].v.x += M_rk4[i].a_temp.x*dt;
+	      M_rk4[i].v.y += M_rk4[i].a_temp.y*dt;
+	      M_rk4[i].v.z += M_rk4[i].a_temp.z*dt;
 
 	  
 	      if (i==1) 
@@ -2811,7 +2791,7 @@ int main()
 		      if (t/(365*24*3600)>199)
 			flag_paused=TRUE;
 		    }
-		  if ((step_counter % 60) == 0)
+		  if ((step_counter % 50) == 0)
 		    {
 		      sprintf(text,"dt: %02.2f [s]",dt);
 		      lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
