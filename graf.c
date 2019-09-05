@@ -2406,7 +2406,6 @@ int main()
 #endif
 
 
-    
   //#define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
@@ -2487,6 +2486,7 @@ int main()
 #endif
 
 
+
   //#define RK4_2ND_ORDER
 #ifdef RK4_2ND_ORDER
 
@@ -2538,7 +2538,59 @@ int main()
 #endif
 
   
-#define DEMO_ORBITS
+#define DEMO_SHAKER
+#ifdef DEMO_SHAKER
+#define N_DISK 100
+  FLOAT_T alpha, vel, d, L, t, w, temp, r, r_prev, vel_prev;
+  S_INT_16_T i;
+  
+  typedef struct
+  {
+    FLOAT_T r;
+    FLOAT_T t;
+  } POINT_POLAR_T;
+
+
+  d=0.5;
+  w=3600.0*2*M_PI/60.0; /* rad per sec */
+  
+  POINT_POLAR_T disk[N_DISK];
+  for (i=0;i<N_DISK; i++)
+    {
+      disk[i].t = i*2*M_PI/N_DISK;
+      disk[i].r = 0.1+0.01*sin(disk[i].t);
+    }
+
+  t=0;
+  printf("hello\r\n");
+
+  r_prev=0;
+  vel_prev=0;
+  while (t<=1/60.0)
+    {
+      alpha=0;
+      for (i=0;i<N_DISK; i++)
+	{
+	  temp=atan2(disk[i].r*sin(disk[i].t + w*t),d + disk[i].r*cos(disk[i].t + w*t));
+	  if ((temp>alpha) && (temp>00))
+	    alpha=temp;
+	}
+      r=
+      //printf("t=%4.4f, alpha=%4.4f\r\n",t,alpha);
+      printf("%4.4f\r\n",alpha);
+
+      alpha_prev=alpha;
+      vel_prev
+      t+=(1/60.0)/60.0;
+    }
+     
+
+#endif
+
+
+
+  
+  //#define DEMO_ORBITS
 #ifdef DEMO_ORBITS
 #define G 6.674e-11
 #define N_OBJECTS 2
@@ -2589,6 +2641,7 @@ int main()
     return accel;
   }
 
+ 
   VECTOR_3D_T future_acc(ASTRO_T M[], int i, FLOAT_T delta_t, FLOAT_T delta_v_x,FLOAT_T delta_v_y, FLOAT_T delta_v_z)
   {
     VECTOR_3D_T tmp_pos, tmp_vel, acceleration;
@@ -2628,7 +2681,7 @@ int main()
 
   lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
  
-  //oxo
+  
   win.xp_min=0;
   win.yp_min=0;
   win.xp_max=ty_screen.w;
@@ -4202,7 +4255,7 @@ int main()
 
   lb_au_SDL_audio_close_DTMF();
 
-  lb_fb_exit(1);
+  exit(1);
 #endif
 
   
