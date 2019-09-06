@@ -52,7 +52,7 @@ typedef struct
 
 #define MATRIX_MAX_ROWS  1000
 #define MATRIX_MAX_COLS  1000
-#define VECTOR_MAX_ITEMS 1000
+#define VECTOR_MAX_ITEMS 65535
 
 /******************************************************/
 /* Linear Algebra data types */

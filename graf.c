@@ -2540,50 +2540,119 @@ int main()
   
 #define DEMO_SHAKER
 #ifdef DEMO_SHAKER
-#define N_DISK 100
-  FLOAT_T alpha, vel, d, L, t, w, temp, r, r_prev, vel_prev;
-  S_INT_16_T i;
+#define N_DISK 10000
+  FLOAT_T alpha, RPM, d, L, t, dt, t_max, w, temp, s, v, s_prev, v_prev, a, xp, yp;
+  S_INT_32_T i;
+  VIEWPORT_2D_T win_s, win_v, win_a;
+  SDL_Event event;
+
+  VECTOR_R_T R;
+  VECTOR_R_T T;
+  R.items=N_DISK;
+  T.items=N_DISK;
+  lb_al_create_vector_r(&R);
+  lb_al_create_vector_r(&T);
+
   
-  typedef struct
-  {
-    FLOAT_T r;
-    FLOAT_T t;
-  } POINT_POLAR_T;
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
+  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
 
   d=0.5;
-  w=3600.0*2*M_PI/60.0; /* rad per sec */
+  L=0.7;
+  RPM=1200.0;
+  w=RPM*2*M_PI/60.0; /* rad per sec */
+
+  t_max=2*60/RPM;
+  dt=t_max/(800.0);
+
+
+  win_s.xp_min=5;
+  win_s.xp_max=ty_screen.w-5;
+  win_s.yp_min=5;
+  win_s.yp_max=ty_screen.h-5;
+
+  win_s.xr_min= 0.0;
+  win_s.xr_max=  t_max;
+  win_s.yr_min=  0.1;
+  win_s.yr_max=  0.2; 
+
+
+  win_v.xp_min=5;
+  win_v.xp_max=ty_screen.w-5;
+  win_v.yp_min=5;
+  win_v.yp_max=ty_screen.h-5;
+
+  win_v.xr_min= 0.0;
+  win_v.xr_max=  t_max;
+  win_v.yr_min=  5;
+  win_v.yr_max=  -5; 
+
+
+  win_a.xp_min=5;
+  win_a.xp_max=ty_screen.w-5;
+  win_a.yp_min=5;
+  win_a.yp_max=ty_screen.h-5;
+
+  win_a.xr_min= 0.0;
+  win_a.xr_max=  t_max;
+  win_a.yr_min=  500;
+  win_a.yr_max= -500; 
+
+
   
-  POINT_POLAR_T disk[N_DISK];
   for (i=0;i<N_DISK; i++)
     {
-      disk[i].t = i*2*M_PI/N_DISK;
-      disk[i].r = 0.1+0.01*sin(disk[i].t);
+      T.array[i] = i*2*M_PI/N_DISK;
+      R.array[i] = 0.1+0.01*sin(T.array[i]);
     }
 
   t=0;
   printf("hello\r\n");
 
-  r_prev=0;
-  vel_prev=0;
-  while (t<=1/60.0)
+  s_prev=0;
+  v_prev=0;
+  while (t<=t_max)
     {
       alpha=0;
       for (i=0;i<N_DISK; i++)
 	{
-	  temp=atan2(disk[i].r*sin(disk[i].t + w*t),d + disk[i].r*cos(disk[i].t + w*t));
-	  if ((temp>alpha) && (temp>00))
+	  temp=atan2(R.array[i]*sin(T.array[i] + w*t),d + R.array[i]*cos(T.array[i] + w*t));
+	  if ((temp>alpha) && (temp>0.0))
 	    alpha=temp;
 	}
-      r=
-      //printf("t=%4.4f, alpha=%4.4f\r\n",t,alpha);
-      printf("%4.4f\r\n",alpha);
+      s=L*alpha;
+      v=(s-s_prev)/dt;
+      a=(v-v_prev)/dt;
 
-      alpha_prev=alpha;
-      vel_prev
-      t+=(1/60.0)/60.0;
+      lb_gr_project_2d(win_s, t, s, &xp, &yp);
+      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+      lb_gr_project_2d(win_v, t, v, &xp, &yp);
+     lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_GREEN),COPYMODE_COPY);
+      lb_gr_project_2d(win_a, t, a, &xp, &yp);
+      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_YELLOW),COPYMODE_COPY);
+      lb_gr_refresh();
+      
+      printf("t=%4.5f, alpha=%4.5f, s=%4.5f, v=%4.5f, a=%4.5f\r\n",t,alpha,s,v,a);
+      //printf("%4.4f\r\n",a);
+
+      s_prev=s;
+      v_prev=v;
+      t+=dt;
     }
-     
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+
+  lb_al_release_vector_r(&R);
+  lb_al_release_vector_r(&T);
 
 #endif
 
