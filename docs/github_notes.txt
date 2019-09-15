@@ -46,6 +46,8 @@ git remote remove origin
 Check a remote:
 git remote -v
 
+Update a local copy from the repository:
+git pull htts://github.com/deltavelez/gss.git master
 
 Github certificate error:  Try either
 export GIT_SSL_NO_VERIFY

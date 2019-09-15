@@ -2540,14 +2540,22 @@ int main()
   
 #define DEMO_SHAKER
 #ifdef DEMO_SHAKER
-#define N_DISK 10000
+#define N_DISK 1000
   /* Graphical variables */
-  FLOAT_T arm_radius=0.04;
-  FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt, yt;
+  FLOAT_T bar_radius=0.05;
+  FLOAT_T bar_length=1.5;
+  FLOAT_T disk_distance=0.7;
+  FLOAT_T disk_max_radius=0.0;
+  FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_r_2, yt_r_2, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
 
-  /* Dynamics variables */
+  /* General use variables */
+  FLOAT_T xr, yr;
   
-    FLOAT_T alpha, RPM, d, L, t, dt, t_max, w, temp, s, v, s_prev, v_prev, a, xp, yp, xp2, yp2;
+  /* Dynamics variables */
+  FLOAT_T Pos_x, Pos_y, Pos_x_prev, Pos_y_prev, Vel_x, Vel_y, Vel_x_prev, Vel_y_prev, Acc_x, Acc_y;
+  FLOAT_T Pos_xp, Pos_yp;
+  
+  FLOAT_T RPM, L, t, dt, t_max, w, temp, s, v, s_prev, v_prev, a, xp, yp, xp2, yp2;
   S_INT_32_T i;
   VIEWPORT_2D_T win_s, win_v, win_a, win_sim;
   SDL_Event event;
@@ -2560,19 +2568,38 @@ int main()
   lb_al_create_vector_r(&T);
 
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
 
-  d=0.5;
   L=0.7;
   RPM=1200.0;
   w=RPM*2*M_PI/60.0; /* rad per sec */
 
-  t_max=2*60/RPM;
+  t_max=8*60/RPM;
   dt=t_max/(800.0);
 
+  /* Load the disk */
+  for (i=0;i<N_DISK; i++)
+    {
+      T.array[i] = i*2*M_PI/N_DISK;
+      R.array[i] = 0.1+0.05*sin(T.array[i]);
+      if (R.array[i]>disk_max_radius)
+	disk_max_radius=R.array[i];
+    }
 
+  win_sim.xp_min=0;
+  win_sim.xp_max=ty_screen.w;
+  win_sim.yp_min=0;
+  win_sim.yp_max=ty_screen.h;
+
+  win_sim.xr_min= -5*bar_radius;
+  win_sim.xr_max=  bar_length+disk_max_radius+5*bar_radius;
+  win_sim.yr_min=  -0.5*(win_sim.yp_max-win_sim.yp_min)*(win_sim.xr_max-win_sim.xr_min)/(win_sim.xp_max-win_sim.xp_min);
+  win_sim.yr_max=   -win_sim.yr_min; 
+
+
+  
   win_s.xp_min=5;
   win_s.xp_max=ty_screen.w-5;
   win_s.yp_min=5;
@@ -2605,71 +2632,123 @@ int main()
   win_a.yr_min=  -500;
   win_a.yr_max=  500; 
 
-  win_sim.xp_min=5;
-  win_sim.xp_max=ty_screen.w-5;
-  win_sim.yp_min=5;
-  win_sim.yp_max=ty_screen.h-5;
-
-  win_sim.xr_min= -2*arm_radius;
-  win_sim.xr_max=  1.0;
-  win_sim.yr_min=  -0.5;
-  win_sim.yr_max=  0.5; 
-
-  lb_gr_project_2d(win_sim, 0, 0, &xp, &yp);
-  lb_gr_project_2d(win_sim, arm_radius, 0, &xp2, &yp2);
-  ellipse_a=fabs(xp2-xp);
-  lb_gr_project_2d(win_sim, 0, arm_radius, &xp2, &yp2);
-  ellipse_b=fabs(yp2-yp);
-    printf("a = %f, b=%f\r\n",ellipse_a, ellipse_b);
-  lb_gr_draw_ellipse(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
-
-  lb_gr_project_2d(win_sim, 0.7, 0.4, &xp, &yp);
-  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-  lb_ge_tangents_to_circle_point(0, 0, arm_radius, 0.7, 0.4, &tetha1, &tetha2);
-
-  xt=arm_radius*cos(tetha2);
-  yt=arm_radius*sin(tetha2);
-  lb_gr_project_2d(win_sim, xt, yt, &xp2, &yp2);
-  lb_gr_draw_line(NULL,xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY, LINEMODE_SOLID);
-  
-  lb_gr_refresh();
 
 
-  
-  while (1)
-    while (SDL_PollEvent(&event))
-      {
-	if (event.type == SDL_QUIT)
-	  {
-		      
-	    SDL_Quit();
-	    return EXIT_SUCCESS;
-	  }
-      }
 
 
-  
-  for (i=0;i<N_DISK; i++)
-    {
-      T.array[i] = i*2*M_PI/N_DISK;
-      R.array[i] = 0.1+0.01*sin(T.array[i]);
-    }
+  /* simulation */  
 
   t=0;
-  printf("hello\r\n");
-
   s_prev=0;
   v_prev=0;
   while (t<=t_max)
     {
-      alpha=0;
+      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_BLACK));
+
+      /* First circle */
+      lb_gr_project_2d(win_sim, 0, 0, &xp, &yp);
+      lb_gr_project_2d(win_sim, bar_radius, 0, &xp2, &yp2);
+      ellipse_a=fabs(xp2-xp);
+      lb_gr_project_2d(win_sim, 0, bar_radius, &xp2, &yp2);
+      ellipse_b=fabs(yp2-yp);
+      lb_gr_draw_ellipse(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY);
+
+      /* Motor axis */
+      lb_gr_project_2d(win_sim, -1.2*bar_radius, 0, &xp, &yp);
+      lb_gr_project_2d(win_sim, disk_distance+1.2*disk_max_radius, 0, &xp2, &yp2);
+      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+
+      lb_gr_project_2d(win_sim, disk_distance, -1.2*disk_max_radius, &xp, &yp);
+      lb_gr_project_2d(win_sim, disk_distance,  1.2*disk_max_radius, &xp2, &yp2);
+      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+
+      lb_gr_project_2d(win_sim, 0, -1.2*bar_radius, &xp, &yp);
+      lb_gr_project_2d(win_sim, 0,  1.2*bar_radius, &xp2, &yp2);
+      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+
+        
+      max_angle=-M_PI;
+      S_INT_8_T flag_first=TRUE;
       for (i=0;i<N_DISK; i++)
 	{
-	  temp=atan2(R.array[i]*sin(T.array[i] + w*t),d + R.array[i]*cos(T.array[i] + w*t));
-	  if ((temp>alpha) && (temp>0.0))
-	    alpha=temp;
+	  xr = disk_distance + R.array[i]*cos(T.array[i] + w*t);
+	  yr =                 R.array[i]*sin(T.array[i] + w*t);
+	  
+	  lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
+
+	  if (!flag_first)
+	    lb_gr_draw_line(NULL, xp_1, yp_1, xp_2, yp_2, 1, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY, LINEMODE_SOLID);
+	  flag_first = FALSE;
+	  
+	  xp_2 = xp_1;
+	  yp_2 = yp_1;
+	  
+	  //temp=atan2(R.array[i]*sin(T.array[i] + w*t),d + R.array[i]*cos(T.array[i] + w*t));
+	  lb_ge_tangents_to_circle_point(0, 0, bar_radius,
+					 xr, yr, &tetha1, &tetha2);
+	  //printf("tetha2 = %f\r\n",tetha2);
+	  if (tetha2>max_angle)
+	    max_angle=tetha2;
 	}
-      s=L*alpha;
+      /* The last segment of the disk is incomplete.  We assume a closed shape */
+      xr = disk_distance + R.array[0]*cos(T.array[0] + w*t);
+      yr =                 R.array[0]*sin(T.array[0] + w*t);
+      lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
+      lb_gr_draw_line(NULL, xp_1, yp_1, xp_2, yp_2, 1, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY, LINEMODE_SOLID);
+
+
+      /* Second circle */
+      xr=bar_length*cos(max_angle+M_PI_2);
+      yr=bar_length*sin(max_angle+M_PI_2);
+      lb_gr_project_2d(win_sim, xr, yr, &xp, &yp);
+      lb_gr_draw_ellipse(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY);
+      
+
+      
+      /* First line of the bar */
+      xt_r_1=bar_radius*cos(max_angle);
+      yt_r_1=bar_radius*sin(max_angle);
+      lb_gr_project_2d(win_sim, xt_r_1, yt_r_1, &xt_p_1, &yt_p_1);
+  
+     
+      lb_gr_project_2d(win_sim,
+		       xt_r_1 + bar_length*cos(max_angle+M_PI_2),
+		       yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
+      lb_gr_draw_line(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, 1, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY, LINEMODE_SOLID);
+
+
+      /* Second line of the bar */
+      xt_r_1=bar_radius*cos(max_angle+M_PI);
+      yt_r_1=bar_radius*sin(max_angle+M_PI);
+      lb_gr_project_2d(win_sim, xt_r_1, yt_r_1, &xt_p_1, &yt_p_1);
+  
+     
+      lb_gr_project_2d(win_sim,
+		       xt_r_1 + bar_length*cos(max_angle+M_PI_2),
+		       yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
+      lb_gr_draw_line(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, 1, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY, LINEMODE_SOLID);
+
+      
+      lb_gr_delay(10);
+
+      Pos_x=bar_length*cos(max_angle+M_PI_2);
+      Pos_y=bar_length*sin(max_angle+M_PI_2);
+      
+
+      Vel_x=(Pos_x-Pos_x_prev)/dt;
+      Vel_y=(Pos_y-Pos_y_prev)/dt;
+
+      lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
+      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 10*Vel_x, Pos_yp-10*Vel_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
+
+      Acc_x=(Vel_x-Vel_x_prev)/dt;
+      Acc_y=(Vel_y-Vel_y_prev)/dt;
+      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 0.05*Acc_x, Pos_yp-0.05*Acc_y, 1, 10, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY, LINEMODE_SOLID);
+
+      //lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
+      //lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + Acc_x, Pos_yp-Acc_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
+
+      
       v=(s-s_prev)/dt;
       a=(v-v_prev)/dt;
 
@@ -2677,15 +2756,21 @@ int main()
       lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
       printf("xp = %d, yp= %d",xp,yp);
       lb_gr_project_2d(win_v, t, v, &xp, &yp);
-     lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_GREEN),COPYMODE_COPY);
+      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_GREEN),COPYMODE_COPY);
       lb_gr_project_2d(win_a, t, a, &xp, &yp);
       lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_YELLOW),COPYMODE_COPY);
       lb_gr_refresh();
+
       
-      printf("t=%4.5f, alpha=%4.5f, s=%4.5f, v=%4.5f, a=%4.5f\r\n",t,alpha,s,v,a);
+      //printf("t=%4.5f, alpha=%4.5f, s=%4.5f, v=%4.5f, a=%4.5f\r\n",t,alpha,s,v,a);
       printf("length = %f\r\n",lb_ge_arclength_ellipse_angle_q1(3.0,1, 1.0,lb_ge_arclength_ellipse(3.0,1.0)));
       //printf("%4.4f\r\n",a);
 
+      Pos_x_prev = Pos_x;
+      Pos_y_prev = Pos_y;
+
+      Vel_x_prev = Vel_x;
+      Vel_y_prev = Vel_y;
 
       s_prev=s;
       v_prev=v;

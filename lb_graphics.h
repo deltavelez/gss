@@ -71,6 +71,8 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, FLOAT_T xp, 
 
 void       lb_gr_delay(S_INT_32_T delay);
 
+void lb_gr_draw_arrow(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T w, FLOAT_T arrow_size, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
+
 void       lb_gr_draw_circle(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode); 
 void       lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOAT_T radius, FLOAT_T w, PIXEL_T color,
 					  COPYMODE_T copymode); 

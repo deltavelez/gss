@@ -2846,6 +2846,30 @@ void       lb_gr_implicit_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, MATRIX_R_T *M, 
     }
 }
 
+void lb_gr_draw_arrow(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T w, FLOAT_T arrow_size, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
+{
+  FLOAT_T ux, uy, xr, yr, temp;
+  FLOAT_T alpha=30.0*M_PI/180;
+  
+  lb_gr_draw_line(Pic, x0, y0, x1, y1, w, color, copymode, linemode);
+  temp= (x1-x0)*(x1-x0) + (y1-y0)*(y1-y0);
+  if (temp>0)
+    {
+      temp=arrow_size/sqrt(temp);
+    }
+  ux=(x1-x0)*temp;
+  uy=(y1-y0)*temp;
+  xr= -ux*cos(alpha) - uy*sin(alpha);
+  yr=  ux*sin(alpha) - uy*cos(alpha);
+
+  lb_gr_draw_line(Pic, x1, y1, x1 + xr, y1 + yr, w, color, copymode, linemode);
+  xr= -ux*cos(-alpha) - uy*sin(-alpha);
+  yr=  ux*sin(-alpha) - uy*cos(-alpha);
+  lb_gr_draw_line(Pic, x1, y1, x1 + xr, y1 + yr, w, color, copymode, linemode);
+}
+
+ 
+
 void lb_gr_draw_line(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   S_INT_16_T w_int;
