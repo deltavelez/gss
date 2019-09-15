@@ -5846,13 +5846,12 @@ void lb_gr_plot3d_line(VIEWPORT_3D_T vp3d, FLOAT_T Rot[3][3], LINE_3D_FLOAT_T *L
 void lb_gr_project_2d(VIEWPORT_2D_T vp2d, FLOAT_T xr, FLOAT_T yr, FLOAT_T *xp, FLOAT_T *yp)
 {
   *xp = vp2d.xp_min + ( xr-vp2d.xr_min)*(vp2d.xp_max-vp2d.xp_min)/(vp2d.xr_max-vp2d.xr_min);
-  *yp = vp2d.yp_min + ( yr-vp2d.yr_min)*(vp2d.yp_max-vp2d.yp_min)/(vp2d.yr_max-vp2d.yr_min);
+  *yp = vp2d.yp_max + ( yr-vp2d.yr_min)*(vp2d.yp_min-vp2d.yp_max)/(vp2d.yr_max-vp2d.yr_min);
 }
-
 void lb_gr_project_2d_inv(VIEWPORT_2D_T vp2d, FLOAT_T xp, FLOAT_T yp, FLOAT_T *xr, FLOAT_T *yr)
 {
   *xr =  vp2d.xr_min+(xp-vp2d.xp_min)*(vp2d.xr_max-vp2d.xr_min)/(vp2d.xp_max-vp2d.xp_min);
-  *yr =  vp2d.yr_min+(yp-vp2d.yp_min)*(vp2d.yr_max-vp2d.yr_min)/(vp2d.yp_max-vp2d.yp_min);
+  *yr =  vp2d.yr_min+(yp-vp2d.yp_max)*(vp2d.yr_max-vp2d.yr_min)/(vp2d.yp_min-vp2d.yp_max);
 }
 
 void lb_gr_project_2d_log(VIEWPORT_2D_T vp2d, FLOAT_T xr, FLOAT_T yr, FLOAT_T *xp, FLOAT_T *yp)
