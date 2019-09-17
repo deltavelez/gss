@@ -2546,7 +2546,7 @@ int main()
   FLOAT_T bar_length=1.5;
   FLOAT_T disk_distance=0.7;
   FLOAT_T disk_max_radius=0.0;
-  FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_r_2, yt_r_2, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
+  FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
 
   /* General use variables */
   FLOAT_T xr, yr;
@@ -2555,13 +2555,31 @@ int main()
   FLOAT_T Pos_x, Pos_y, Pos_x_prev, Pos_y_prev, Vel_x, Vel_y, Vel_x_prev, Vel_y_prev, Acc_x, Acc_y;
   FLOAT_T Pos_xp, Pos_yp;
   
-  FLOAT_T RPM, L, t, dt, t_max, w, temp, s, v, s_prev, v_prev, a, xp, yp, xp2, yp2;
+  FLOAT_T RPM, t, dt, t_max, w,  xp, yp, xp2, yp2;
   S_INT_32_T i;
-  VIEWPORT_2D_T win_s, win_v, win_a, win_sim;
+  VIEWPORT_2D_T win_v, win_a, win_sim;
   SDL_Event event;
 
   VECTOR_R_T R;
   VECTOR_R_T T;
+
+  PICTURE_T Pic_Vel, Pic_Acc;
+  FONT_T my_font;
+  char text[80];
+
+  lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
+  my_font.scale_x=2;
+  my_font.scale_y=2;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=TRUE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
+  my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
+
+     
   R.items=N_DISK;
   T.items=N_DISK;
   lb_al_create_vector_r(&R);
@@ -2571,8 +2589,24 @@ int main()
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
+  Pic_Vel.w = ty_screen.w/2-15;
+  Pic_Vel.h = ty_screen.h*1/3-10;
+  lb_gr_create_picture(&Pic_Vel,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
+  sprintf(text,"Velocidad: componente y");
+  lb_ft_draw_text(&Pic_Vel, &my_font, 20, 20, text, COPYMODE_COPY);
+  //sprintf(text,"dt: %02.2f [s]",dt);
+ 
 
-  L=0.7;
+  Pic_Acc.w = ty_screen.w/2-15;
+  Pic_Acc.h = ty_screen.h*1/3-10;
+  lb_gr_create_picture(&Pic_Acc,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
+  sprintf(text,"Aceleracion: componente y");
+  lb_ft_draw_text(&Pic_Acc, &my_font, 20, 20, text, COPYMODE_COPY);
+  
+
+
+
+  
   RPM=1200.0;
   w=RPM*2*M_PI/60.0; /* rad per sec */
 
@@ -2599,51 +2633,34 @@ int main()
   win_sim.yr_max=   -win_sim.yr_min; 
 
 
-  
-  win_s.xp_min=5;
-  win_s.xp_max=ty_screen.w-5;
-  win_s.yp_min=5;
-  win_s.yp_max=100+0*(ty_screen.h-5);
-
-  win_s.xr_min= 0.0;
-  win_s.xr_max=  t_max;
-  win_s.yr_min=  0.1;
-  win_s.yr_max=  0.2; 
-
-
-  win_v.xp_min=5;
-  win_v.xp_max=ty_screen.w-5;
-  win_v.yp_min=5;
-  win_v.yp_max=ty_screen.h-5;
+  win_v.xp_min=0;
+  win_v.xp_max=Pic_Vel.w;
+  win_v.yp_min=0;
+  win_v.yp_max=Pic_Vel.h;
 
   win_v.xr_min= 0.0;
   win_v.xr_max=  t_max;
-  win_v.yr_min=  -5;
-  win_v.yr_max=  5; 
+  win_v.yr_min=  -30;
+  win_v.yr_max=  30; 
 
 
-  win_a.xp_min=5;
-  win_a.xp_max=ty_screen.w-5;
-  win_a.yp_min=5;
-  win_a.yp_max=ty_screen.h-5;
+  win_a.xp_min=0;
+  win_a.xp_max=Pic_Acc.w;
+  win_a.yp_min=0;
+  win_a.yp_max=Pic_Acc.h;
 
   win_a.xr_min= 0.0;
   win_a.xr_max=  t_max;
-  win_a.yr_min=  -500;
-  win_a.yr_max=  500; 
-
-
-
+  win_a.yr_min=  -2500;
+  win_a.yr_max=  2500; 
 
 
   /* simulation */  
-
+  //oxo 
   t=0;
-  s_prev=0;
-  v_prev=0;
-  while (t<=t_max)
+   while (t<=t_max)
     {
-      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_BLACK));
+      lb_gr_draw_rectangle(NULL, 0,0, ty_screen.w, ty_screen.h*2/3,lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
 
       /* First circle */
       lb_gr_project_2d(win_sim, 0, 0, &xp, &yp);
@@ -2651,20 +2668,20 @@ int main()
       ellipse_a=fabs(xp2-xp);
       lb_gr_project_2d(win_sim, 0, bar_radius, &xp2, &yp2);
       ellipse_b=fabs(yp2-yp);
-      lb_gr_draw_ellipse(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY);
+      lb_gr_draw_ellipse_antialiasing3(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
       /* Motor axis */
       lb_gr_project_2d(win_sim, -1.2*bar_radius, 0, &xp, &yp);
       lb_gr_project_2d(win_sim, disk_distance+1.2*disk_max_radius, 0, &xp2, &yp2);
-      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
 
       lb_gr_project_2d(win_sim, disk_distance, -1.2*disk_max_radius, &xp, &yp);
       lb_gr_project_2d(win_sim, disk_distance,  1.2*disk_max_radius, &xp2, &yp2);
-      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
 
       lb_gr_project_2d(win_sim, 0, -1.2*bar_radius, &xp, &yp);
       lb_gr_project_2d(win_sim, 0,  1.2*bar_radius, &xp2, &yp2);
-      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
 
         
       max_angle=-M_PI;
@@ -2677,7 +2694,7 @@ int main()
 	  lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
 
 	  if (!flag_first)
-	    lb_gr_draw_line(NULL, xp_1, yp_1, xp_2, yp_2, 1, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY, LINEMODE_SOLID);
+	    lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_WHITE), COPYMODE_BLEND);
 	  flag_first = FALSE;
 	  
 	  xp_2 = xp_1;
@@ -2694,14 +2711,14 @@ int main()
       xr = disk_distance + R.array[0]*cos(T.array[0] + w*t);
       yr =                 R.array[0]*sin(T.array[0] + w*t);
       lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
-      lb_gr_draw_line(NULL, xp_1, yp_1, xp_2, yp_2, 1, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_WHITE), COPYMODE_BLEND);
 
 
       /* Second circle */
       xr=bar_length*cos(max_angle+M_PI_2);
       yr=bar_length*sin(max_angle+M_PI_2);
       lb_gr_project_2d(win_sim, xr, yr, &xp, &yp);
-      lb_gr_draw_ellipse(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY);
+      lb_gr_draw_ellipse_antialiasing3(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
       
 
       
@@ -2714,7 +2731,7 @@ int main()
       lb_gr_project_2d(win_sim,
 		       xt_r_1 + bar_length*cos(max_angle+M_PI_2),
 		       yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
-      lb_gr_draw_line(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, 1, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
 
       /* Second line of the bar */
@@ -2726,7 +2743,7 @@ int main()
       lb_gr_project_2d(win_sim,
 		       xt_r_1 + bar_length*cos(max_angle+M_PI_2),
 		       yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
-      lb_gr_draw_line(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, 1, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
       
       lb_gr_delay(10);
@@ -2739,32 +2756,29 @@ int main()
       Vel_y=(Pos_y-Pos_y_prev)/dt;
 
       lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
-      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 10*Vel_x, Pos_yp-10*Vel_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 10*Vel_x, Pos_yp-10*Vel_y, 5, 10, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND, LINEMODE_FILTERED);
 
       Acc_x=(Vel_x-Vel_x_prev)/dt;
       Acc_y=(Vel_y-Vel_y_prev)/dt;
-      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 0.05*Acc_x, Pos_yp-0.05*Acc_y, 1, 10, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY, LINEMODE_SOLID);
+      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 0.05*Acc_x, Pos_yp-0.05*Acc_y, 5, 10, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
 
       //lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
       //lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + Acc_x, Pos_yp-Acc_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
 
       
-      v=(s-s_prev)/dt;
-      a=(v-v_prev)/dt;
+      //Vel_mag=sqrt(Vel_x*Vel_x + Vel_y*Vel_y);
+      //Acc_mag=sqrt(Acc_x*Acc_x + Acc_y*Acc_y);
 
-      lb_gr_project_2d(win_s, t, s, &xp, &yp);
-      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-      printf("xp = %d, yp= %d",xp,yp);
-      lb_gr_project_2d(win_v, t, v, &xp, &yp);
-      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_GREEN),COPYMODE_COPY);
-      lb_gr_project_2d(win_a, t, a, &xp, &yp);
-      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_YELLOW),COPYMODE_COPY);
-      lb_gr_refresh();
+      lb_gr_project_2d(win_v, t, Vel_y, &xp, &yp);
+      //lb_gr_draw_pixel(&Pic_Vel,round(xp),round(yp),lb_gr_12RGB(COLOR_RED),COPYMODE_COPY);
+      lb_gr_draw_circle_filled_antialiasing(&Pic_Vel, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND);
+      lb_gr_render_picture(&Pic_Vel, 10, ty_screen.h*2/3+5, COPYMODE_COPY, 0);
+		    
 
-      
-      //printf("t=%4.5f, alpha=%4.5f, s=%4.5f, v=%4.5f, a=%4.5f\r\n",t,alpha,s,v,a);
-      printf("length = %f\r\n",lb_ge_arclength_ellipse_angle_q1(3.0,1, 1.0,lb_ge_arclength_ellipse(3.0,1.0)));
-      //printf("%4.4f\r\n",a);
+      lb_gr_project_2d(win_a, t, Acc_y, &xp, &yp);
+      //lb_gr_draw_pixel(&Pic_Acc,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+      lb_gr_draw_circle_filled_antialiasing(&Pic_Acc, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND);
+      lb_gr_render_picture(&Pic_Acc, ty_screen.w/2+5, ty_screen.h*2/3+5, COPYMODE_COPY,0);
 
       Pos_x_prev = Pos_x;
       Pos_y_prev = Pos_y;
@@ -2772,9 +2786,9 @@ int main()
       Vel_x_prev = Vel_x;
       Vel_y_prev = Vel_y;
 
-      s_prev=s;
-      v_prev=v;
       t+=dt;
+
+      lb_gr_refresh();
     }
   while (1)
     while (SDL_PollEvent(&event))
@@ -2789,6 +2803,8 @@ int main()
 
   lb_al_release_vector_r(&R);
   lb_al_release_vector_r(&T);
+  lb_gr_release_picture(&Pic_Vel);
+  lb_gr_release_picture(&Pic_Acc);
 
 #endif
 

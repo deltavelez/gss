@@ -362,7 +362,7 @@ typedef FLOAT_T(*FUNCTION_X)(FLOAT_T, ERR_T*);
 #define COLOR_GRAY	            0x888
 #define COLOR_DARKGRAY	            0xAAA
 #define COLOR_SILVER	            0xBBB
-#define COLOR_LIGHTGREY	            0xCCC
+#define COLOR_LIGHTGRAY	            0xCCC
 #define COLOR_GAINSBORO	            0xDDD
 #define COLOR_WHITESMOKE	    0xEEE
 #define COLOR_WHITE	            0xFFF
