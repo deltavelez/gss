@@ -28,6 +28,7 @@
 #include "lb_console.h"
 #include "lb_numer.h"
 #include "lb_serial.h"
+#include "lb_gpio.h"
 
 #define DEBUGGING
 #define N_HALF_SAMPLES 1024
@@ -2537,8 +2538,55 @@ int main()
   
 #endif
 
+#define GPIO
+#ifdef GPIO
+
+ 
+if(lb_gp_map_peripheral(&lb_gp_gpio) == -1) 
+  {
+    printf("Failed to map the physical GPIO registers into the virtual memory space.\n");
+    return -1;
+  }
+ 
+  // Define pin 7 as output
+ INP_GPIO(4);
+//   INP_GPIO(4);
+//  OUT_GPIO(4);
+
+//   *(lb_gp_gpio.addr + 37)=0;
+//   lb_gr_delay(1);
+//   *(lb_gp_gpio.addr + 38)=0xFFFFFFFF;
+//   lb_gr_delay(1);
+//   *(lb_gp_gpio.addr + 37)=0;
+//   *(lb_gp_gpio.addr + 38)=0b0;
   
-#define DEMO_SHAKER
+  while(1)
+    {
+      unsigned int value;
+      value= *(lb_gp_gpio.addr + 0x34/4);
+      for (i=0; i<32; i++)
+	{
+	  unsigned char bit_value;
+	  bit_value= (value >> (31-i)) & 0x01;
+	  if (bit_value)
+	    printf("1");
+	  else
+	    printf("0");
+	}
+        printf("\r\n");
+	
+      	GPIO_SET = 1 << 4;
+      	lb_gr_delay(100);
+	
+	GPIO_CLR = 1 << 4;
+	lb_gr_delay(100);
+    
+    }
+  
+#endif
+  
+  
+  //#define DEMO_SHAKER
 #ifdef DEMO_SHAKER
 #define N_DISK 1000
   /* Graphical variables */
