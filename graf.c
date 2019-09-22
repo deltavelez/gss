@@ -2538,7 +2538,7 @@ int main()
   
 #endif
 
-#define GPIO
+  //#define GPIO
 #ifdef GPIO
 
   if(  lb_gp_init_gpio() == -1) 
@@ -2582,9 +2582,9 @@ int main()
 #endif
   
   
-  //#define DEMO_SHAKER
+#define DEMO_SHAKER
 #ifdef DEMO_SHAKER
-#define N_DISK 1000
+#define N_DISK 4000
   /* Graphical variables */
   FLOAT_T bar_radius=0.05;
   FLOAT_T bar_length=1.5;
@@ -2620,7 +2620,7 @@ int main()
   my_font.angle=0;
   my_font.flag_fg=TRUE;
   my_font.flag_bg=TRUE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
+  my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
   my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
 
      
@@ -2631,31 +2631,30 @@ int main()
 
   
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
+  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   Pic_Vel.w = ty_screen.w/2-15;
   Pic_Vel.h = ty_screen.h*1/3-10;
   lb_gr_create_picture(&Pic_Vel,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
-  sprintf(text,"Velocidad: componente y");
-  lb_ft_draw_text(&Pic_Vel, &my_font, 20, 20, text, COPYMODE_COPY);
+
   //sprintf(text,"dt: %02.2f [s]",dt);
+  lb_gr_draw_rectangle_line(&Pic_Vel, 0, 0, Pic_Vel.w-2, Pic_Vel.h-2, 2,
+			    lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+ 
  
 
   Pic_Acc.w = ty_screen.w/2-15;
   Pic_Acc.h = ty_screen.h*1/3-10;
   lb_gr_create_picture(&Pic_Acc,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
-  sprintf(text,"Aceleracion: componente y");
-  lb_ft_draw_text(&Pic_Acc, &my_font, 20, 20, text, COPYMODE_COPY);
+  lb_gr_draw_rectangle_line(&Pic_Acc, 0, 0, Pic_Acc.w-2, Pic_Acc.h-2, 2,
+			    lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
   
 
-
-
-  
   RPM=1200.0;
   w=RPM*2*M_PI/60.0; /* rad per sec */
 
   t_max=8*60/RPM;
-  dt=t_max/(800.0);
+  dt=t_max/(1200.0);
 
   /* Load the disk */
   for (i=0;i<N_DISK; i++)
@@ -2704,8 +2703,13 @@ int main()
   t=0;
    while (t<=t_max)
     {
-      lb_gr_draw_rectangle(NULL, 0,0, ty_screen.w, ty_screen.h*2/3,lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
-
+      my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
+      lb_gr_draw_rectangle(NULL, 0,0, ty_screen.w, ty_screen.h*2/3,lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+      sprintf(text,"Velocidad: componente y");
+      lb_ft_draw_text(NULL, &my_font, 30, ty_screen.h*2/3-20, text, COPYMODE_COPY);
+      sprintf(text,"Aceleracion: componente y");
+      lb_ft_draw_text(NULL, &my_font, ty_screen.w/2+30, ty_screen.h*2/3-20, text, COPYMODE_COPY);
+  
       /* First circle */
       lb_gr_project_2d(win_sim, 0, 0, &xp, &yp);
       lb_gr_project_2d(win_sim, bar_radius, 0, &xp2, &yp2);
@@ -2738,7 +2742,7 @@ int main()
 	  lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
 
 	  if (!flag_first)
-	    lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_WHITE), COPYMODE_BLEND);
+	    lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_BLEND);
 	  flag_first = FALSE;
 	  
 	  xp_2 = xp_1;
@@ -2755,7 +2759,7 @@ int main()
       xr = disk_distance + R.array[0]*cos(T.array[0] + w*t);
       yr =                 R.array[0]*sin(T.array[0] + w*t);
       lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
-      lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_WHITE), COPYMODE_BLEND);
+      lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_BLEND);
 
 
       /* Second circle */
@@ -2790,7 +2794,7 @@ int main()
       lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
       
-      lb_gr_delay(10);
+      //      lb_gr_delay(10);
 
       Pos_x=bar_length*cos(max_angle+M_PI_2);
       Pos_y=bar_length*sin(max_angle+M_PI_2);
@@ -2801,11 +2805,17 @@ int main()
 
       lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
       lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 10*Vel_x, Pos_yp-10*Vel_y, 5, 10, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND, LINEMODE_FILTERED);
+      my_font.color_fg=lb_gr_12RGB(COLOR_RED);
+      sprintf(text,"V");
+      lb_ft_draw_text(NULL, &my_font, Pos_xp + 10*Vel_x+20, Pos_yp-10*Vel_y, text, COPYMODE_COPY);
+
 
       Acc_x=(Vel_x-Vel_x_prev)/dt;
       Acc_y=(Vel_y-Vel_y_prev)/dt;
       lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 0.05*Acc_x, Pos_yp-0.05*Acc_y, 5, 10, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
-
+      my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
+      sprintf(text,"A");
+      lb_ft_draw_text(NULL, &my_font, Pos_xp + 0.05*Acc_x + 20, Pos_yp-0.05*Acc_y, text, COPYMODE_COPY);		       
       //lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
       //lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + Acc_x, Pos_yp-Acc_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
 
@@ -2834,6 +2844,8 @@ int main()
 
       lb_gr_refresh();
     }
+   lb_gr_BMPfile_save("leva.bmp", NULL);
+  
   while (1)
     while (SDL_PollEvent(&event))
       {

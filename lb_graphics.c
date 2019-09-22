@@ -6752,7 +6752,7 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
   scale_x = 1 + ((rendermode & RENDERMODE_SCALE_X_MASK) >> RENDERMODE_SCALE_X_SHIFT );
   scale_y = 1 + ((rendermode & RENDERMODE_SCALE_Y_MASK) >> RENDERMODE_SCALE_Y_SHIFT );
 
-  printf("rendermode=0x%x, scale_x=%d, scale_y=%d\r\n",rendermode,scale_x, scale_y);
+  //  printf("rendermode=0x%x, scale_x=%d, scale_y=%d\r\n",rendermode,scale_x, scale_y);
   if ((scale_x==1) && (scale_y==1))
     for (y=0;y<(*Pic).h;y++)
       for (x=0;x<(*Pic).w;x++)
