@@ -29,6 +29,7 @@
 #include "lb_numer.h"
 #include "lb_serial.h"
 #include "lb_gpio.h"
+#include "lb_time.h" 
 
 #define DEBUGGING
 #define N_HALF_SAMPLES 1024
@@ -2538,52 +2539,110 @@ int main()
   
 #endif
 
-  //#define GPIO
+#define GPIO
 #ifdef GPIO
 
-  if(  lb_gp_init_gpio() == -1) 
-  {
-    printf("Failed to map the physical GPIO registers into the virtual memory space.\n");
-    return -1;
-  }
- 
-  // Define pin 7 as output
-  //  INP_GPIO(4);
-  //INP_GPIO(4);
-  //GPIO_SET_OUT(4);
-  //GPIO_SET_INP(4);
+#define PIN_CS   17
+#define PIN_MOSI  3
+#define PIN_CLK   4
+#define PIN_MISO  2
 
-  lb_gp_setup_gpio_pin(4, GPIO_INPUT);
+  SPI_PORT_T my_port;
+  my_port.MOSI=PIN_MOSI;
+  my_port.CLK=PIN_CLK;
+  my_port.MISO=PIN_MISO;
+  my_port.delay_clk=1;
+  my_port.delay_byte=10;
+  my_port.CPOL=0;
+  my_port.CPHA=1;
 
-  //   *(lb_gp_gpio.addr + 37)=0;
-  //   lb_gr_delay(1);
-//   *(lb_gp_gpio.addr + 38)=0xFFFFFFFF;
-//   lb_gr_delay(1);
-//   *(lb_gp_gpio.addr + 37)=0;
-//   *(lb_gp_gpio.addr + 38)=0b0;
-  
+  lb_gp_gpio_open();
+  lb_gp_gpio_setup_pin(PIN_CS,   GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
+
+  lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
+  lb_ti_delay(10);
+
   while(1)
     {
-      unsigned int value;
-      value= *(lb_gp_gpio + 0x34/4);
-      lb_gp_print_as_binary(value, 32);
+      union Record
+      {
+	float  f;
+	unsigned char uc[4];
+      };
+      
+      int i;
+
+      union Record temp, press;
+      
+      lb_gp_gpio_wr(PIN_CS, GPIO_LOW);
+      lb_ti_delay(10);
+
+      lb_gp_gpio_SPI_rw(&my_port, 0x03);
+      for (i=0;i<7;i++)
+	{
+	  lb_gp_gpio_SPI_rw(&my_port, 0x03);
+	  lb_ti_delay(10);
+	}
+      lb_ti_delay(250);
+
+      for (i=0;i<4;i++)
+	{
+	  temp.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	  lb_ti_delay(10);
+	}
+
+      for (i=0;i<4;i++)
+	{
+	  press.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	  lb_ti_delay(10);
+	}
+      lb_gp_print_u32_as_binary(temp.uc[0], 8);
+      printf("\r\n");
+      lb_gp_print_u32_as_binary(temp.uc[1], 8);
+      printf("\r\n");
+      lb_gp_print_u32_as_binary(temp.uc[2], 8);
+      printf("\r\n");
+      lb_gp_print_u32_as_binary(temp.uc[3], 8);
+      printf("\r\n");
 
       
-        printf("\r\n");
+      lb_gp_print_u32_as_binary(press.uc[0], 8);
+      printf("\r\n");
+      lb_gp_print_u32_as_binary(press.uc[1], 8);
+      printf("\r\n");
+      lb_gp_print_u32_as_binary(press.uc[2], 8);
+      printf("\r\n");
+      lb_gp_print_u32_as_binary(press.uc[3], 8);
+      printf("\r\n");
 
 
-	lb_gp_gpio_wr(1);
-      	lb_gr_delay(100);
-
-	lb_gp_gpio_wr(0);
-	
-	lb_gr_delay(100);
+      printf("Temp = %f,  Press = %f\r\n",temp.f, press.f);
+      lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
+      lb_ti_delay(1000);
+     
     }
+  lb_gp_gpio_close();
   
 #endif
+
+  /*
+    unsigned int value;
+    value= lb_gp_gpio_rd_all();
+    value= lb_gp_gpio_rd(4);
+    lb_gp_print_u32_as_binary(value, 32);
+      
+    printf("VALUE=%d\r\n", value);
+    
+    lb_gp_gpio_wr(4,0);
+    lb_ti_delay(100);
+    lb_gp_gpio_wr(4,1);
+    lb_ti_delay(100); */
   
   
-#define DEMO_SHAKER
+  //#define DEMO_SHAKER
 #ifdef DEMO_SHAKER
 #define N_DISK 4000
   /* Graphical variables */
