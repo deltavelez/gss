@@ -844,17 +844,7 @@ void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
   fclose(outfile);
 }
 
-void lb_gr_delay(S_INT_32_T delay)
-{
-  clock_t stamp, delta;
-  stamp=clock();
-  delta=round(0.001*delay*CLOCKS_PER_SEC);
-  while ( clock()<=(stamp+delta) )
-    {
-      ;
-    }
-}
-   
+  
 S_INT_8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, U_INT_8_T quality)
 {
   FILE* outfile;

@@ -2570,13 +2570,14 @@ int main()
 
       
         printf("\r\n");
-	
-	GPIO_SET = 1 << 4;
+
+
+	lb_gp_gpio_wr(1);
       	lb_gr_delay(100);
+
+	lb_gp_gpio_wr(0);
 	
-	GPIO_CLR = 1 << 4;
 	lb_gr_delay(100);
-    
     }
   
 #endif

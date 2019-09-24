@@ -1,4 +1,7 @@
-/* GPIO library based on the work of Pieter-Jan Van de Maele */ 
+#ifndef LB_GPIO_H
+#define LB_GPIO_H
+
+
 #include <stdio.h>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -25,7 +28,6 @@
 // IO Acces
 
  
-
 extern volatile unsigned int *lb_gp_gpio;  // They have to be found somewhere, but can't be in the header
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x)
@@ -42,7 +44,24 @@ extern volatile unsigned int *lb_gp_gpio;  // They have to be found somewhere, b
 #define GPIO_PULL *(lb_gp_gpio + 37)
 #define GPIO_PULLCLK0 *(lb_gp_gpio + 38)
 
+/* This structure defines a general SPI port, supporting all 4 modes and a programmable delay parameters between clocks and between bytes */
+typedef struct
+{
+  unsigned char MISO;
+  unsigned char MOSI;
+  unsigned char CLK;
+  unsigned char CPOL;
+  unsigned char CPHA;
+  unsigned int  delay_clk;
+  unsigned int  delay_byte;
+} SPI_PORT_T;
 
 int lb_gp_init_gpio();
 void lb_gp_print_as_binary(U_INT_32_T value, U_INT_8_T n_bits);
 void lb_gp_setup_gpio_pin(U_INT_8_T pin_number, U_INT_8_T mode);
+U_INT_8_T lb_gp_gpio_rd(U_INT_8_T pin_number);
+void lb_gp_gpio_wr(U_INT_8_T pin_number, U_INT_8_T value);
+U_INT_8_T lb_gp_SPI_rw(SPI_PORT_T port, U_INT_8_T byte_out);
+void lb_gp_SPI_rw_buffer(SPI_PORT_T port, U_INT_8_T *buffer_out, U_INT_8_T *buffer_in, U_INT_8_T n_bytes);
+
+#endif /* LB_GPIO_H */
