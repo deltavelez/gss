@@ -74,28 +74,29 @@ U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
   U_INT_8_T i, buffer;
   buffer=0x00;
   lb_gp_gpio_wr((*port).CLK,(*port).CPOL);
-  lb_ti_delay((*port).delay_clk);
+  lb_ti_delay_us((*port).delay_clk);
  
   for(i=0;i<8;i++)
     {
       if ((*port).CPHA) /* Phase == 1*/
 	{
-	  lb_ti_delay((*port).delay_clk);
 	  lb_gp_gpio_wr((*port).CLK,!(*port).CPOL);
 	  lb_gp_gpio_wr((*port).MOSI,(byte_out >> (7-i)) & 0x01);
-	  lb_ti_delay((*port).delay_clk);
+	  lb_ti_delay_us((*port).delay_clk);
 	  buffer=buffer<<1;
 	  buffer |= lb_gp_gpio_rd((*port).MISO);
 	  lb_gp_gpio_wr((*port).CLK,(*port).CPOL);
+	  lb_ti_delay_us((*port).delay_clk);
+	
         }
       else /* Phase ==0 */
 	{
 	  lb_gp_gpio_wr((*port).MOSI, (byte_out >> (7-i)) & 0x01);
-	  lb_ti_delay((*port).delay_clk);
+	  lb_ti_delay_us((*port).delay_clk);
 	  lb_gp_gpio_wr((*port).CLK,!(*port).CPOL);
 	  buffer=buffer<<1;
 	  buffer |= lb_gp_gpio_rd((*port).MISO);
-	  lb_ti_delay((*port).delay_clk);
+	  lb_ti_delay_us((*port).delay_clk);
 	  lb_gp_gpio_wr((*port).CLK, (*port).CPOL);
 	}
     }
@@ -108,26 +109,17 @@ void lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT_8_T *buffer_out, U_INT_8_T
   for (j=0; j<n_bytes; j++)
     {
       buffer_in[j]=lb_gp_gpio_SPI_rw(port,buffer_out[j]);
-      lb_ti_delay((*port).delay_byte);
+      lb_ti_delay_us((*port).delay_byte);
     }
 }
 
 void lb_gp_gpio_wr(U_INT_8_T pin_number, U_INT_8_T value)
 {
-  if (value==0)
-    {
-      *(lb_gp_gpio + 10) =1<<pin_number;  /* clears */
-      return;
-    }
-  if (value==1)
-    {
+ 
+  if (value & 0x01)
       *(lb_gp_gpio + 7) = 1<<pin_number;  /* sets */
-      return;
-    }
-  {
-    printf("Error: lb_gp_gpio_wr() --> Writting a value other than 0 or 1.  This may be unintended.\r\n");
-    exit(EXIT_FAILURE);
-  }
+  else
+      *(lb_gp_gpio + 10) =1<<pin_number;  /* clears */
 }
 
 

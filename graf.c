@@ -2551,10 +2551,10 @@ int main()
   my_port.MOSI=PIN_MOSI;
   my_port.CLK=PIN_CLK;
   my_port.MISO=PIN_MISO;
-  my_port.delay_clk=1;
-  my_port.delay_byte=10;
-  my_port.CPOL=0;
-  my_port.CPHA=1;
+  my_port.delay_clk=100;
+  my_port.delay_byte=100;
+  my_port.CPOL=GPIO_HIGH;
+  my_port.CPHA=GPIO_HIGH;
 
   lb_gp_gpio_open();
   lb_gp_gpio_setup_pin(PIN_CS,   GPIO_OUTPUT);
@@ -2563,7 +2563,7 @@ int main()
   lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
 
   lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
-  lb_ti_delay(10);
+  lb_ti_delay_us(1000);
 
   while(1)
     {
@@ -2578,50 +2578,56 @@ int main()
       union Record temp, press;
       
       lb_gp_gpio_wr(PIN_CS, GPIO_LOW);
-      lb_ti_delay(10);
-
-      lb_gp_gpio_SPI_rw(&my_port, 0x03);
-      for (i=0;i<7;i++)
+      lb_ti_delay_us(10000);
+      int value;
+      for (i=0;i<8;i++)
 	{
 	  lb_gp_gpio_SPI_rw(&my_port, 0x03);
-	  lb_ti_delay(10);
+	  lb_ti_delay_us(1000);
 	}
-      lb_ti_delay(250);
+      lb_ti_delay_us(1000000);
 
       for (i=0;i<4;i++)
 	{
 	  temp.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-	  lb_ti_delay(10);
+	  lb_ti_delay_us(1000);
 	}
 
       for (i=0;i<4;i++)
 	{
 	  press.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-	  lb_ti_delay(10);
+	  lb_ti_delay_us(10);
 	}
-      lb_gp_print_u32_as_binary(temp.uc[0], 8);
-      printf("\r\n");
-      lb_gp_print_u32_as_binary(temp.uc[1], 8);
-      printf("\r\n");
-      lb_gp_print_u32_as_binary(temp.uc[2], 8);
-      printf("\r\n");
-      lb_gp_print_u32_as_binary(temp.uc[3], 8);
-      printf("\r\n");
+
+      printf(" temp.uc= 0x%.2x%.2x:%.2x%.2x\t\t",temp.uc[0],temp.uc[1],temp.uc[2],temp.uc[3]);
+      printf(" pres.uc= 0x%.2x%.2x:%.2x%.2x\r\n",press.uc[0],press.uc[1],press.uc[2],press.uc[3]);
+
+
+      if (0)
+	{
+	  lb_gp_print_u32_as_binary(temp.uc[0], 8);
+	  printf("\r\n");
+	  lb_gp_print_u32_as_binary(temp.uc[1], 8);
+	  printf("\r\n");
+	  lb_gp_print_u32_as_binary(temp.uc[2], 8);
+	  printf("\r\n");
+	  lb_gp_print_u32_as_binary(temp.uc[3], 8);
+	  printf("\r\n");
 
       
-      lb_gp_print_u32_as_binary(press.uc[0], 8);
-      printf("\r\n");
-      lb_gp_print_u32_as_binary(press.uc[1], 8);
-      printf("\r\n");
-      lb_gp_print_u32_as_binary(press.uc[2], 8);
-      printf("\r\n");
-      lb_gp_print_u32_as_binary(press.uc[3], 8);
-      printf("\r\n");
-
+	  lb_gp_print_u32_as_binary(press.uc[0], 8);
+	  printf("\r\n");
+	  lb_gp_print_u32_as_binary(press.uc[1], 8);
+	  printf("\r\n");
+	  lb_gp_print_u32_as_binary(press.uc[2], 8);
+	  printf("\r\n");
+	  lb_gp_print_u32_as_binary(press.uc[3], 8);
+	  printf("\r\n");
+	}
 
       printf("Temp = %f,  Press = %f\r\n",temp.f, press.f);
       lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
-      lb_ti_delay(1000);
+      lb_ti_delay_ms(1000);
      
     }
   lb_gp_gpio_close();
