@@ -5258,6 +5258,7 @@ void lb_gr_draw_rectangle_line(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_I
       }
 }
 
+/* oxo */
 
 void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1,
 				PIXEL_T color)
@@ -5288,23 +5289,52 @@ void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_
   
   if( Pic==NULL)
     {
-      //      lb_fb_rectangle(ty_fb_main,x0, y0, ty_scale_x*(x1-x0),ty_scale_y*(y1-y0),
-      //	      round(FACTOR_N_TO_8_R*color.r),
-      //	      round(FACTOR_N_TO_8_G*color.g),
-      //	      round(FACTOR_N_TO_8_B*color.b),
-      //	      round(FACTOR_N_TO_8_K*color.a) );
+      U_INT_32_T dat_offset;
 
-      //      if (lb_fb_use_shadow())
-      //	for (i=y_l;i<=y_h;i++)
-      //  for (j=x_l;j<=x_h;j++)
-      //    ty_pic_shadow.pic[i][j]=color;
-      
-      // else
-      {
-	for (i=y_l;i<=y_h;i++)
-	  for (j=x_l;j<=x_h;j++)
-	    (*Pic).pic[i][j]=color;
-      }
+      if (x_l<0)
+	x_l=0;
+
+      if (x_l>=ty_screen.w)
+	x_l=ty_screen.w-1;
+
+      if (x_h<0)
+	x_h=0;
+
+      if (x_h>=ty_screen.w)
+	x_h=ty_screen.w-1;
+
+      if (y_l<0)
+	y_l=0;
+
+      if (y_l>=ty_screen.h)
+	y_l=ty_screen.h-1;
+
+      if (y_h<0)
+	y_h=0;
+
+      if (y_h>=ty_screen.h)
+	y_h=ty_screen.h-1;
+
+      for (i=y_l;i<=y_h;i++)
+	for (j=x_l;j<=x_h;j++)
+	  {
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+	    dat_offset = ty_screen.w*i + j;
+	    *((U_INT_32_T*)ty_screen.dat + dat_offset) =   color.r<<16 | color.g<<8 |  color.b ;
+#else
+	    dat_offset=4*(ty_screen.w*i+j);
+	    *((U_INT_8_T*)ty_screen.dat + dat_offset    ) = FACTOR_N_TO_8_B*color.b;
+	    *((U_INT_8_T*)ty_screen.dat + dat_offset + 1) = FACTOR_N_TO_8_G*color.g; 
+	    *((U_INT_8_T*)ty_screen.dat + dat_offset + 2) = FACTOR_N_TO_8_R*color.r;
+	    *((U_INT_8_T*)ty_screen.dat + dat_offset + 3) = 0xFF;
+#endif
+	  }
+    }
+  else
+    {
+      for (i=y_l;i<=y_h;i++)
+	for (j=x_l;j<=x_h;j++)
+	  (*Pic).pic[i][j]=color;
     }
 }
 

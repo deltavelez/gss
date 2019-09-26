@@ -2539,7 +2539,7 @@ int main()
   
 #endif
 
-#define GPIO
+  //#define GPIO
 #ifdef GPIO
 
 #define PIN_CS   17
@@ -4192,11 +4192,9 @@ int main()
   exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* Simulation of Telecoil modulation */
-  /******************************************************************************************************************/
-
-  //#define DEMO_ZERO_CROSSING
+  /* BER vs Noise using a Montecarlo simulation */
+  
+#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
   VECTOR_C_T signal, frequencies, W;
   FLOAT_T variance=0.1, RMS_noise, t_min=-0.25/FREQ_1, t_max=1/FREQ_2+1.25/FREQ_1, t, xp, yp;
@@ -4205,16 +4203,15 @@ int main()
   VIEWPORT_2D_T win, win2;
   FONT_T my_font;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
+  lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 900, 0, 0, 0);
 
     
   //FLOAT_T w1=2*M_PI*FREQ_2, w2=2*M_PI*FREQ_1;
   
   win.xp_min=50;
-  win.xp_max=ty_width-50;
+  win.xp_max=ty_screen.w-50;
   win.yp_min=50;
-  win.yp_max=ty_height/2-50;
+  win.yp_max=ty_screen.h/2-50;
       
   win.xr_min= t_min;
   win.xr_max=  t_max;
@@ -4223,9 +4220,9 @@ int main()
 
 
   win2.xp_min=50;
-  win2.xp_max=ty_width-50;
-  win2.yp_min=ty_height/2+50;
-  win2.yp_max=ty_height-50;
+  win2.xp_max=ty_screen.w-50;
+  win2.yp_min=ty_screen.h/2+50;
+  win2.yp_max=ty_screen.h-50;
       
   win2.xr_min=   4;
   win2.xr_max=  12;
@@ -4281,7 +4278,7 @@ int main()
 	      signal.array[k].r=lb_st_marsaglia_polar(variance);
 	      signal.array[k].i=0.0;
 	    }
-	    
+
 	  /* Noise using the time's Domain */
 	  // printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time_complex(signal_complex,0,N_SAMPLES));
 
@@ -4319,7 +4316,7 @@ int main()
 
 	  /* Digital filter */
 	  lb_fo_FFT_C(&frequencies, &signal, &W, 1); 
-	   
+	      
 	  //RMS_noise=RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1));
 	  //printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
 	  // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
@@ -4329,6 +4326,7 @@ int main()
 	    {
 	      signal.array[i].i=0;
 	    }
+	   
 	  RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/FREQ_1),
 					   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/FREQ_1));
 
@@ -4341,7 +4339,8 @@ int main()
 
 	  if ((n_experiment % 64) == 0)
 	    {
-	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_width, ty_height/2, lb_gr_12RGB(COLOR_DARKSLATEGRAY));
+	      printf("hello  experiment=%d\r\n",n_experiment);
+	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h/2, lb_gr_12RGB(COLOR_DARKSLATEGRAY));
 
 	      //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
 	      //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
@@ -4367,6 +4366,9 @@ int main()
 		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
 		}
 	    }
+	  
+	  if ((n_experiment % 64) == 0)
+	    lb_gr_refresh();
 
 	  if (!parse_vector(&signal))
 	    errors_count++;
@@ -4381,7 +4383,7 @@ int main()
 	  //lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 	  lb_gr_draw_circle_filled_fast(NULL, xp, yp, 4, lb_gr_12RGB(0xFFFF), COPYMODE_COPY);
 	}
-	  
+
       printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
 	     noise_step,
 	     NOISE_STEPS_MAX,
