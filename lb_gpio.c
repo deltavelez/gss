@@ -73,9 +73,7 @@ U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
 {
   U_INT_8_T i, buffer;
   buffer=0x00;
-  lb_gp_gpio_wr((*port).CLK,(*port).CPOL);
-  lb_ti_delay_us((*port).delay_clk);
- 
+  
   for(i=0;i<8;i++)
     {
       if ((*port).CPHA) /* Phase == 1*/
@@ -83,12 +81,13 @@ U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
 	  lb_gp_gpio_wr((*port).CLK,!(*port).CPOL);
 	  lb_gp_gpio_wr((*port).MOSI,(byte_out >> (7-i)) & 0x01);
 	  lb_ti_delay_us((*port).delay_clk);
+	  	  
+	  lb_gp_gpio_wr((*port).CLK,(*port).CPOL);
 	  buffer=buffer<<1;
 	  buffer |= lb_gp_gpio_rd((*port).MISO);
-	  lb_gp_gpio_wr((*port).CLK,(*port).CPOL);
 	  lb_ti_delay_us((*port).delay_clk);
-	
-        }
+
+	}
       else /* Phase ==0 */
 	{
 	  lb_gp_gpio_wr((*port).MOSI, (byte_out >> (7-i)) & 0x01);
@@ -100,7 +99,8 @@ U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
 	  lb_gp_gpio_wr((*port).CLK, (*port).CPOL);
 	}
     }
-  return buffer;
+
+   return buffer;
 }
 
 void lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT_8_T *buffer_out, U_INT_8_T *buffer_in, U_INT_8_T n_bytes)
