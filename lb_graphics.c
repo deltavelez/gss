@@ -2167,7 +2167,7 @@ void lb_gr_draw_circle_filled_antialiasing_f(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T
       }
 }
 
-void lb_gr_draw_circle_filled_fast(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
   S_INT_16_T x = radius;
   S_INT_16_T y = 0;
@@ -4453,7 +4453,7 @@ void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_INT_T *L, FLOAT_T w, PIXEL_T c
 	    if(w<=1.0)
 	      lb_gr_draw_pixel(Pic, (*L).array[k].x, (*L).array[k].y, color, copymode);
 	    else
-	      lb_gr_draw_circle_filled_fast(Pic, (*L).array[k].x, (*L).array[k].y, w, color, copymode);
+	      lb_gr_draw_circle_filled(Pic, (*L).array[k].x, (*L).array[k].y, w, color, copymode);
 	  }
       break;
     case LINEMODE_DOTS_FILTERED:
@@ -4483,7 +4483,7 @@ void lb_gr_draw_polygon_f(PICTURE_T *Pic, LINE_2D_FLOAT_T *L, FLOAT_T w, PIXEL_T
 	      lb_gr_draw_pixel(Pic, round((*L).array[k].x), round((*L).array[k].y), color, copymode);
 	    else
 	      for(k=0;k<(*L).items;k++)
-		lb_gr_draw_circle_filled_fast(Pic, (*L).array[k].x, (*L).array[k].y, w, color, copymode);
+		lb_gr_draw_circle_filled(Pic, (*L).array[k].x, (*L).array[k].y, w, color, copymode);
 	  }
       break;
     case LINEMODE_DOTS_FILTERED:
@@ -5568,7 +5568,7 @@ void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FLOAT_T xr, FLOAT_T 
       if (w<=1.0)
 	lb_gr_draw_pixel(Pic, round(xp), round(yp), color, copymode);
       else
-	lb_gr_draw_circle_filled_fast(Pic, round(xp), round(yp), w, color, copymode);
+	lb_gr_draw_circle_filled(Pic, round(xp), round(yp), w, color, copymode);
       break;
     case LINEMODE_DOTS_FILTERED:
       lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color, copymode);
@@ -5595,7 +5595,7 @@ void lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_FLOAT_T *L, F
 	  if (w<=1.0)
 	    lb_gr_draw_pixel(Pic, round(xp), round(yp), color, copymode);
 	  else
-	    lb_gr_draw_circle_filled_fast(Pic, round(xp), round(yp), w, color, copymode);
+	    lb_gr_draw_circle_filled(Pic, round(xp), round(yp), w, color, copymode);
 	}
       break;
     case LINEMODE_DOTS_FILTERED:
@@ -5814,7 +5814,7 @@ void lb_gr_plot3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  FLOAT_T Rot[3][3], POINT_
       if (w<=1.0)
 	lb_gr_draw_pixel(Pic, round(xp), round(yp), color, copymode);
       else
-	lb_gr_draw_circle_filled_fast(Pic, round(xp), round(yp), w, color, copymode);
+	lb_gr_draw_circle_filled(Pic, round(xp), round(yp), w, color, copymode);
       break;
     case LINEMODE_DOTS_FILTERED:
       lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color, copymode);
@@ -6096,11 +6096,11 @@ S_INT_8_T lb_gr_return_octant(S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT
 }
 
 void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, FLOAT_T w_axis, PIXEL_T color_axis,
-			      FLOAT_T w_grid, PIXEL_T color_grid_x, FLOAT_T delta_grid_x, PIXEL_T color_grid_y,
+			      FLOAT_T w_grid, FLOAT_T arrow_size, PIXEL_T color_grid_x, FLOAT_T delta_grid_x, PIXEL_T color_grid_y,
 			      FLOAT_T delta_grid_y, U_INT_16_T options, COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  FLOAT_T xr, yr, xr_min, xr_max, yr_min, yr_max, xp0, yp0, arrow_size;
-  S_INT_8_T flag, sign_re_x, sign_re_y, sign_sc_x, sign_sc_y;
+  FLOAT_T xr, yr, xr_min, xr_max, yr_min, yr_max, xp0, yp0;
+  S_INT_8_T flag, sign_re_x, sign_re_y;
   S_INT_16_T k, delta, exp_inc;
   PIXEL_T color;
 	       
@@ -6153,17 +6153,6 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
       yr_max=vp2d.yr_min;
       sign_re_y=-1.0;
     }
-
-  if (vp2d.xp_min<vp2d.xp_max)
-    sign_sc_x= 1.0;
-  else
-    sign_sc_x=-1.0;
-
-  if (vp2d.yp_min<vp2d.yp_max)
-    sign_sc_y= 1.0;
-  else
-    sign_sc_y=-1.0;
-
 
   if (options & AXIS_DRAW_X_GRID_LOG)
     {
@@ -6307,26 +6296,18 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
       flag=lb_nu_find_zero(vp2d.yp_min, vp2d.yr_min, vp2d.yp_max, vp2d.yr_max,  &yp0);
       if (flag==1)
 	{
-	  lb_gr_draw_line(Pic, vp2d.xp_min, yp0, vp2d.xp_max, yp0, w_axis, color_axis, copymode, linemode);
 	  if (options & AXIS_DRAW_X_ARROWS)
 	    {
 	      /* The arrow indicates positive numbers */
-	      arrow_size=0.025*fabs(vp2d.xp_max-vp2d.xp_min);
 	      if(sign_re_x==1)
-		{
-		  lb_gr_draw_line(Pic, vp2d.xp_max, yp0, vp2d.xp_max-sign_sc_x*arrow_size, yp0-0.5*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		  lb_gr_draw_line(Pic, vp2d.xp_max, yp0, vp2d.xp_max-sign_sc_x*arrow_size, yp0+0.5*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		}
+		lb_gr_draw_arrow(Pic, vp2d.xp_min, yp0, vp2d.xp_max, yp0, w_axis, arrow_size,
+				 color_axis, copymode, linemode);
 	      else
-		{
-		  lb_gr_draw_line(Pic, vp2d.xp_min, yp0, vp2d.xp_min+sign_sc_x*arrow_size, yp0-0.5*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		  lb_gr_draw_line(Pic, vp2d.xp_min, yp0, vp2d.xp_min+sign_sc_x*arrow_size, yp0+0.5*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		}
+		lb_gr_draw_arrow(Pic, vp2d.xp_max, yp0, vp2d.xp_min, yp0, w_axis, arrow_size,
+				 color_axis, copymode, linemode);
 	    }
+	  else
+	    lb_gr_draw_line(Pic, vp2d.xp_min, yp0, vp2d.xp_max, yp0, w_axis, color_axis, copymode, linemode);
 	}
     }
 
@@ -6336,29 +6317,22 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
       flag=lb_nu_find_zero(vp2d.xp_min, vp2d.xr_min, vp2d.xp_max, vp2d.xr_max,  &xp0);
       if (flag==1)
 	{
-	  lb_gr_draw_line(Pic, xp0, vp2d.yp_min, xp0, vp2d.yp_max, w_axis, color_axis, copymode, linemode);
 	  if (options & AXIS_DRAW_Y_ARROWS)
 	    {
 	      /* The arrow indicates positive numbers */
-	      arrow_size=0.025*fabs(vp2d.yp_max-vp2d.yp_min);
 	      if(sign_re_y==1)
-		{
-		  lb_gr_draw_line(Pic, xp0, vp2d.yp_max, xp0-0.5*arrow_size, vp2d.yp_max-sign_sc_y*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		  lb_gr_draw_line(Pic, xp0, vp2d.yp_max, xp0+0.5*arrow_size, vp2d.yp_max-sign_sc_y*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		}
+		lb_gr_draw_arrow(Pic, xp0, vp2d.yp_max, xp0, vp2d.yp_min, w_axis, arrow_size,
+				 color_axis, copymode, linemode);
 	      else
-		{
-		  lb_gr_draw_line(Pic, xp0, vp2d.yp_min, xp0-0.5*arrow_size, vp2d.yp_min+sign_sc_y*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		  lb_gr_draw_line(Pic, xp0, vp2d.yp_min, xp0+0.5*arrow_size, vp2d.yp_min+sign_sc_y*arrow_size, w_axis,
-				  color_axis, copymode, linemode);
-		}
+		lb_gr_draw_arrow(Pic, xp0, vp2d.yp_min, xp0, vp2d.yp_max, w_axis, arrow_size,
+				color_axis, copymode, linemode);
 	    }
+	  else
+	    lb_gr_draw_line(Pic, xp0, vp2d.yp_min, xp0, vp2d.yp_max, w_axis, color_axis, copymode, linemode);
 	}
     }
 }
+
 
 
 void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,

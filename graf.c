@@ -32,11 +32,6 @@
 #include "lb_time.h" 
 
 #define DEBUGGING
-#define N_HALF_SAMPLES 1024
-#define N_EXPERIMENT_MAX 100000
-#define NOISE_STEPS_MAX 100
-#define FREQ_1 4291.0
-#define FREQ_2 5464.0
 
 
 extern PICTURE_T ty_pic_shadow;
@@ -99,39 +94,6 @@ FLOAT_T f(FLOAT_T t, FLOAT_T w1, FLOAT_T w2)
   return sin(w1*t);
 }
 
-S_INT_8_T parse_vector(VECTOR_C_T *buffer)
-{
-  S_INT_8_T sign;
-  U_INT_16_T time_stamp[5];
-  U_INT_16_T k, i, time_thereshold;
-  time_thereshold=round((*buffer).items*0.25*(1.0/FREQ_1+1.0/FREQ_2)/(1.0/FREQ_2+1.5/FREQ_1));
-  //printf("Thereshold = %i\r\n",time_thereshold);
-  k=0;
-  i=0;
-  sign=lb_re_sign((*buffer).array[0].r);
-  while ((i<(*buffer).items) && (k<5))
-    {
-      if (lb_re_sign((*buffer).array[i].r) != sign)
-	{ 
-	  sign=lb_re_sign((*buffer).array[i].r);
-	  time_stamp[k]=i;
-	  k++;
-	}
-      i++;
-    }
-  /*  for (k=0;k<5;k++)
-      {
-      printf("K [%i] =  %i\r\n",k,time_stamp[k]);
-      }
-  */
-
-  if ( ((time_stamp[1]-time_stamp[0])<= time_thereshold) &&
-       ((time_stamp[2]-time_stamp[1])<= time_thereshold) &&
-       ((time_stamp[3]-time_stamp[2])>  time_thereshold) &&
-       ((time_stamp[4]-time_stamp[3])>  time_thereshold) )
-    return 1; 
-  return 0;
-}
 
 FLOAT_T RMS_noise_time_complex(VECTOR_C_T *V, U_INT_16_T a, U_INT_16_T b)
 {
@@ -4196,42 +4158,85 @@ int main()
   
 #define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
+#define N_HALF_SAMPLES 1024
+#define N_EXPERIMENT_MAX 10000000
+#define NOISE_STEPS_MAX 1000
+#define FREQ_1 4291.0
+#define FREQ_2 5464.0
+
   VECTOR_C_T signal, frequencies, W;
   FLOAT_T variance=0.1, RMS_noise, t_min=-0.25/FREQ_1, t_max=1/FREQ_2+1.25/FREQ_1, t, xp, yp;
   S_INT_32_T n_experiment, errors_count;
   S_INT_16_T i, k, noise_step;
   VIEWPORT_2D_T win, win2;
   FONT_T my_font;
+  char text[80];
 
-  lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 900, 0, 0, 0);
+  S_INT_8_T parse_vector(VECTOR_C_T *buffer)
+  {
+    S_INT_8_T sign;
+    U_INT_16_T time_stamp[5];
+    U_INT_16_T k, i, time_thereshold;
+    time_thereshold=round((*buffer).items*0.25*(1.0/FREQ_1+1.0/FREQ_2)/(1.0/FREQ_2+1.5/FREQ_1));
+    //printf("Thereshold = %i\r\n",time_thereshold);
+    k=0;
+    i=0;
+    sign=lb_re_sign((*buffer).array[0].r);
+    while ((i<(*buffer).items) && (k<5))
+      {
+	if (lb_re_sign((*buffer).array[i].r) != sign)
+	  { 
+	    sign=lb_re_sign((*buffer).array[i].r);
+	    time_stamp[k]=i;
+	    k++;
+	  }
+	i++;
+      }
+    /*  for (k=0;k<5;k++)
+	{
+	printf("K [%i] =  %i\r\n",k,time_stamp[k]);
+	}
+    */
+
+    if ( ((time_stamp[1]-time_stamp[0])<= time_thereshold) &&
+	 ((time_stamp[2]-time_stamp[1])<= time_thereshold) &&
+	 ((time_stamp[3]-time_stamp[2])>  time_thereshold) &&
+	 ((time_stamp[4]-time_stamp[3])>  time_thereshold) )
+      return 1; 
+    return 0;
+  }
+
+  
+  lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
 
     
   //FLOAT_T w1=2*M_PI*FREQ_2, w2=2*M_PI*FREQ_1;
   
-  win.xp_min=50;
-  win.xp_max=ty_screen.w-50;
-  win.yp_min=50;
-  win.yp_max=ty_screen.h/2-50;
-      
+  win.xp_min=20;
+  win.xp_max=ty_screen.w-20;
+  win.yp_min=20;
+  win.yp_max=ty_screen.h/4-20;
+
+  
   win.xr_min= t_min;
   win.xr_max=  t_max;
-  win.yr_min=  2*sqrt(2);
-  win.yr_max=  -2*sqrt(2);
+  win.yr_min=  -2*sqrt(2);
+  win.yr_max=  2*sqrt(2);
 
 
-  win2.xp_min=50;
-  win2.xp_max=ty_screen.w-50;
-  win2.yp_min=ty_screen.h/2+50;
-  win2.yp_max=ty_screen.h-50;
+  win2.xp_min=20;
+  win2.xp_max=ty_screen.w-20;
+  win2.yp_min=ty_screen.h/4+20;
+  win2.yp_max=ty_screen.h-20;
       
   win2.xr_min=   4;
   win2.xr_max=  12;
   win2.yr_min=  1e-1;
   win2.yr_max=  1e-5;
 
-  lg_gr_draw_axis_2d(NULL, win2, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 1,
-		     lb_gr_12RGB(COLOR_GRAY), 1.0,
-		     lb_gr_12RGB(COLOR_BLUE), 10,
+  lg_gr_draw_axis_2d(NULL, win2, &my_font, 3, lb_gr_12RGB(COLOR_YELLOW), 1, 25,
+		     lb_gr_12RGB(COLOR_BLACK), 1.0,
+		     lb_gr_12RGB(COLOR_BLACK), 10,
 		     AXIS_DRAW_X | AXIS_DRAW_X_GRID |   
 		     AXIS_DRAW_Y_GRID_LOG | AXIS_DRAW_COLORVALUES_Y_1,
 		     COPYMODE_COPY, LINEMODE_SOLID); 
@@ -4337,10 +4342,10 @@ int main()
 	  // RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1)));
 	  // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(signal_complex,N_SAMPLES));
 
-	  if ((n_experiment % 64) == 0)
+	  if ((n_experiment % 256) == 0)
 	    {
-	      printf("hello  experiment=%d\r\n",n_experiment);
-	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h/2, lb_gr_12RGB(COLOR_DARKSLATEGRAY));
+	      printf("experiment=%d\r\n",n_experiment);
+	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h/4, lb_gr_12RGB(COLOR_WHITE));
 
 	      //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
 	      //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
@@ -4348,7 +4353,7 @@ int main()
 	      //lb_gr_draw_rectangle_bar(NULL, 70, 70, 512, 512, 8, lb_gr_12RGB(COLOR_PINK | COLOR_SEMI_SOLID),
 	      //			     lb_gr_12RGB(COLOR_GREEN | COLOR_SEMI_SOLID), COPYMODE_ADD);
 	   
-	      lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 2.5,
+	      lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_BLACK), 1, 10,
 				 lb_gr_12RGB(COLOR_GREEN), 1e-3, lb_gr_12RGB(COLOR_ORANGE), 0.5,
 				 AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
 				 AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
@@ -4360,14 +4365,14 @@ int main()
 	      t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
 	      signal.array[i].r += sqrt(2)*f(t,2*M_PI*FREQ_2,2*M_PI*FREQ_1);
 	      /* We don have to plot all experiments, just some would be representative */
-	      if ((n_experiment % 64) == 0)
+	      if ((n_experiment % 256) == 0)
 		{
 		  lb_gr_project_2d(win, t, signal.array[i].r, &xp, &yp);
-		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
+		  lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 		}
 	    }
 	  
-	  if ((n_experiment % 64) == 0)
+	  if ((n_experiment % 256) == 0)
 	    lb_gr_refresh();
 
 	  if (!parse_vector(&signal))
@@ -4381,9 +4386,12 @@ int main()
 	  lb_gr_project_2d_x(win2, -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX), &xp);
 	  lb_gr_project_2d_y_log(win2, (FLOAT_T)errors_count/N_EXPERIMENT_MAX, &yp);
 	  //lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-	  lb_gr_draw_circle_filled_fast(NULL, xp, yp, 4, lb_gr_12RGB(0xFFFF), COPYMODE_COPY);
+	  lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 	}
-
+      //oxo
+      sprintf(text,"noise_%0.3d.bmp",noise_step);
+      lb_gr_BMPfile_save(text, NULL);
+  
       printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
 	     noise_step,
 	     NOISE_STEPS_MAX,

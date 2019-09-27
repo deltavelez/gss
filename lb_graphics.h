@@ -71,7 +71,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, FLOAT_T xp, 
 
 void       lb_gr_delay(S_INT_32_T delay);
 
-void lb_gr_draw_arrow(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T w, FLOAT_T arrow_size, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
+void       lb_gr_draw_arrow(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T w, FLOAT_T arrow_size, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 
 void       lb_gr_draw_circle(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode); 
 void       lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOAT_T radius, FLOAT_T w, PIXEL_T color,
@@ -88,7 +88,7 @@ void       lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, S_INT_16_T xc, 
 						 COPYMODE_T copymode);
 void       lb_gr_draw_circle_filled_antialiasing_f(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOAT_T radius, PIXEL_T color, COPYMODE_T copymode); 
 
-void       lb_gr_draw_circle_filled_fast(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color,
+void       lb_gr_draw_circle_filled(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color,
 					 COPYMODE_T mode);
 void       lb_gr_draw_circle_filled_slow(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color,
 					 COPYMODE_T copymode);
@@ -110,9 +110,11 @@ void       lb_gr_draw_histogram(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *
 void       lb_gr_implicit_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, MATRIX_R_T *M, FLOAT_T w, PIXEL_T pixel,
 			     COPYMODE_T copymode, LINEMODE_T linemode);
 
-void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, FLOAT_T w_axis, PIXEL_T color_axis, FLOAT_T w_grid,
-			      PIXEL_T color_grid_x, FLOAT_T delta_grid_x, PIXEL_T color_grid_y, FLOAT_T delta_grid_y,
-			      U_INT_16_T options, COPYMODE_T copymode, LINEMODE_T linemode);
+
+void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, FLOAT_T w_axis, PIXEL_T color_axis,
+			      FLOAT_T w_grid, FLOAT_T arrow_size, PIXEL_T color_grid_x, FLOAT_T delta_grid_x, PIXEL_T color_grid_y,
+			      FLOAT_T delta_grid_y, U_INT_16_T options, COPYMODE_T copymode, LINEMODE_T linemode);
+
 
 void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
 				    FLOAT_T r0, FLOAT_T r1, FLOAT_T delta_r, PIXEL_T color_r, 
