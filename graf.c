@@ -4159,59 +4159,74 @@ int main()
 #define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
 #define N_HALF_SAMPLES 1024
-#define N_EXPERIMENT_MAX 10000000
-#define NOISE_STEPS_MAX 1000
-#define FREQ_1 4291.0
-#define FREQ_2 5464.0
 
   VECTOR_C_T signal, frequencies, W;
-  FLOAT_T variance=0.1, RMS_noise, t_min=-0.25/FREQ_1, t_max=1/FREQ_2+1.25/FREQ_1, t, xp, yp;
-  S_INT_32_T n_experiment, errors_count;
-  S_INT_16_T i, k, noise_step;
+
+  /* User-defined simulation parameters */
+  const FLOAT_T freq_0=4291.0;    /* Frequency associated to one of the symbols */
+  const FLOAT_  freq_1=5464.0;    /* Frequency associated to the other symbolsymbol */
+  S_INT_32 n_experiments=1000000; /* Maximum number of experiments. Not declared as a const to allow a possible
+				    upgrade to variable-step size */
+  const S_INT_32 timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
+  FLOAT_T variance=0.1            /* The variance of the noise in a Gaussian model */
+  FLOAT_T R_exp_max=1.0;           /* Maximum (initial) amound of noise tried out during a series of experiments */;
+  FLOAT_T R_exp_min=1.0e-6;        /* Minimum (final) amound of noise to be reached during a series of experiments */;
+   
+  /* Simulation variables */
+  S_INT_32_T experiment;       /* Keeps track of the current experiment */
+  S_INT_32_T errors_count;     /* Keeps track of the number of errors detected during a series of experiments */
+  FLOAT_T R_exp;               /* Current value of the noise energy during a series of experiments (R: 'Ruido') */
+  S_INT_8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
+				  a) The last series of experiments with the minimum noise level was completed.
+				  b) The maximum time allowed for running the simulation has been exceeded. 
+				  c) The user interrupted the simulation. */
+
+  FLOAT_T t_min=-0.25/freq_0;             /* Initial time for parsing the waveform */
+  FLOAT_T t_max=0.5/freq_0+0.75/freq_1 ;  /* Final time for parsing the waveform */
+  FLOAT_T t;
+
   VIEWPORT_2D_T win, win2;
+  FLOAT_T xp, yp;                        /* Graphic variables */
+  S_INT_16_T i, k;                       /* General-use counters */
+
   FONT_T my_font;
   char text[80];
 
   S_INT_8_T parse_vector(VECTOR_C_T *buffer)
   {
     S_INT_8_T sign;
-    U_INT_16_T time_stamp[5];
-    U_INT_16_T k, i, time_thereshold;
-    time_thereshold=round((*buffer).items*0.25*(1.0/FREQ_1+1.0/FREQ_2)/(1.0/FREQ_2+1.5/FREQ_1));
+    U_INT_16_T time_stamp_crossings[5];
+    U_INT_16_T i, crossings_counter=0, time_thereshold;
+
+    /* Half-way between the half-periods of f0 and f1 to decide if a symbol is 0 or 1 */
+    time_thereshold=round((*buffer).items*0.5*(1.0/freq_0 + 1.0/freq_1));
+    
     //printf("Thereshold = %i\r\n",time_thereshold);
-    k=0;
-    i=0;
+    crossings=0;
     sign=lb_re_sign((*buffer).array[0].r);
-    while ((i<(*buffer).items) && (k<5))
+    i=1;
+    while ((i<(*buffer).items) && (crossings_counter<=3))
       {
 	if (lb_re_sign((*buffer).array[i].r) != sign)
-	  { 
-	    sign=lb_re_sign((*buffer).array[i].r);
-	    time_stamp[k]=i;
-	    k++;
+	  {
+	    sign=!sign;
+	    time_stamp_crossings[k]=i;
+	    crossings_counter++;
 	  }
 	i++;
       }
-    /*  for (k=0;k<5;k++)
-	{
-	printf("K [%i] =  %i\r\n",k,time_stamp[k]);
-	}
-    */
-
     if ( ((time_stamp[1]-time_stamp[0])<= time_thereshold) &&
-	 ((time_stamp[2]-time_stamp[1])<= time_thereshold) &&
 	 ((time_stamp[3]-time_stamp[2])>  time_thereshold) &&
-	 ((time_stamp[4]-time_stamp[3])>  time_thereshold) )
-      return 1; 
-    return 0;
+	 (crossings_couner==3) )
+      return 1; /* Success: bit 0 and bit 1 are valid */
+    return 0; /* Failure: one of the bits was incorrectly decoded */
   }
 
   
   lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
 
-    
-  //FLOAT_T w1=2*M_PI*FREQ_2, w2=2*M_PI*FREQ_1;
   
+ 
   win.xp_min=20;
   win.xp_max=ty_screen.w-20;
   win.yp_min=20;
@@ -4259,10 +4274,6 @@ int main()
   // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
 
             
-  system("clear");
-  printf("Simulation running... please wait... \r\n");
-  srand(time(NULL));
-
   signal.items=2*N_HALF_SAMPLES;
   frequencies.items=2*N_HALF_SAMPLES;
   W.items=N_HALF_SAMPLES;
@@ -4273,7 +4284,8 @@ int main()
   lb_al_create_vector_c(&W);
   lb_fo_calculate_W(&W, 1);
 
-  for (noise_step=10;noise_step<=NOISE_STEPS_MAX;noise_step++)
+  R_exp=R_exp_max;
+  while (flag_running)
     {
       errors_count=0;
       for (n_experiment=0;n_experiment<N_EXPERIMENT_MAX;n_experiment++)
@@ -4332,8 +4344,8 @@ int main()
 	      signal.array[i].i=0;
 	    }
 	   
-	  RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/FREQ_1),
-					   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/FREQ_1));
+	  RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/freq_0),
+					   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/freq_0));
 
  
 	  lb_al_multiply_vector_c_real(&signal,(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX)/RMS_noise);
@@ -4363,7 +4375,7 @@ int main()
 	  for(i=0;i<2*N_HALF_SAMPLES;i++)
 	    {
 	      t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
-	      signal.array[i].r += sqrt(2)*f(t,2*M_PI*FREQ_2,2*M_PI*FREQ_1);
+	      signal.array[i].r += sqrt(2)*f(t,2*M_PI*freq_1,2*M_PI*freq_0);
 	      /* We don have to plot all experiments, just some would be representative */
 	      if ((n_experiment % 256) == 0)
 		{
