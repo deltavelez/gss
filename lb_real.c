@@ -416,6 +416,12 @@ FLOAT_T lb_re_frac(FLOAT_T x)
   return fmod(x,1.0);
 }
 
+S_INT_8_T lb_re_ispos(FLOAT_T x)
+{
+  if (x>=0) return 1.0;
+  return 0.0;
+}
+
 FLOAT_T lb_re_ramp(FLOAT_T x)
 {
   if(x>=0) return x;
@@ -424,7 +430,7 @@ FLOAT_T lb_re_ramp(FLOAT_T x)
 
 S_INT_8_T lb_re_sign(FLOAT_T x)
 {
-  if (x>0) return 1.0;
+  if (x>=0) return 1.0;
   if (x<0) return -1.0;
   return 0.0;
 }

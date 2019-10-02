@@ -43,6 +43,7 @@ FLOAT_T lb_re_min(FLOAT_T x, FLOAT_T y);
 
 /* Singular functions */
 FLOAT_T lb_re_frac(FLOAT_T x);
+S_INT_8_T lb_re_ispos(FLOAT_T x);
 FLOAT_T lb_re_ramp(FLOAT_T x);
 
 S_INT_8_T lb_re_sign(FLOAT_T x);

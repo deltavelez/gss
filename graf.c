@@ -4141,13 +4141,13 @@ int main()
   /* User-defined simulation parameters */
   const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
   const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-  S_INT_32_T n_experiments=1000; /* Maximum number of experiments. Not declared as a const to allow a possible
+  S_INT_32_T n_experiments=100; /* Maximum number of experiments. Not declared as a const to allow a possible
 				       upgrade to variable-step size */
   const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
   FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
   FLOAT_T f_max_noise=20000.0;  /* Maximum noise frequency */
   FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
-  FLOAT_T N_exp_min=1.0e-6;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
+  FLOAT_T N_exp_min=1.0e-10;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
    
   /* Simulation variables */
   S_INT_32_T experiment;       /* Keeps track of the current experiment */
@@ -4176,6 +4176,7 @@ int main()
     if (t<1.0/(2.0*f0)) 
       return sin(2*M_PI*f0*t);
     else
+      
       return sin(2*M_PI*f1*(t-1.0/(2.0*f0)+1.0/(2.0*f1)));
   }
 
@@ -4192,32 +4193,36 @@ int main()
 
   S_INT_8_T parse_vector(VECTOR_R_T *buffer)
   {
-    S_INT_8_T sign;
     U_INT_16_T time_stamp[4];
-    U_INT_16_T i, crossings_counter=0, time_thereshold;
+   
+    U_INT_16_T i, crossings_counter=0;
+    FLOAT_T delta_0, delta_1, margin;
 
-    /* Half-way between the half-periods of f0 and f1 to decide if a symbol is 0 or 1 */
-    time_thereshold=round((*buffer).items*0.5*(1.0/freq_0 + 1.0/freq_1));
+    delta_0=(*buffer).items*freq_1/(1.5*freq_0+1.5*freq_1);
+    delta_1=(*buffer).items*freq_0/(1.5*freq_0+1.5*freq_1);
+    margin=0.5*(delta_0-delta_1);
     
-    //printf("Thereshold = %i\r\n",time_thereshold);
+    
+    printf("delta_0=%f delta_1=%f\r\n",delta_0,delta_1);
     crossings_counter=0;
-    sign=lb_re_sign((*buffer).array[0]);
-    i=1;
-    while ((i<(*buffer).items) && (crossings_counter<=3))
+    i=0;
+    while ((i<(*buffer).items-1) && (crossings_counter<=3))
       {
-	if (lb_re_sign((*buffer).array[i]) != sign)
+	if (lb_re_ispos((*buffer).array[i]) != lb_re_ispos((*buffer).array[i+1]) )
 	  {
-	    sign=!sign;
-	    time_stamp[k]=i;
+	    time_stamp[crossings_counter]=i;
 	    crossings_counter++;
+	    printf("crossing # %d, crossing at = %i\r\n",crossings_counter,i);
 	  }
 	i++;
       }
-    if ( ((time_stamp[1]-time_stamp[0])<= time_thereshold) &&
-	 ((time_stamp[3]-time_stamp[2])>  time_thereshold) &&
+    if ( ((time_stamp[1]-time_stamp[0])>= (delta_0-margin)) &&
+	 ((time_stamp[1]-time_stamp[0])<  (delta_0+margin)) &&
+	 ((time_stamp[2]-time_stamp[1])>  (delta_1-margin)) &&
+	 ((time_stamp[2]-time_stamp[1])<  (delta_1+margin)) &&
 	 (crossings_counter==3) )
-      return 1; /* Success: bit 0 and bit 1 are valid */
-    return 0; /* Failure: one of the bits was incorrectly decoded */
+      return 0; /* Success: bit 0 and bit 1 are valid */
+    return 1; /* Failure: one of the bits was incorrectly decoded */
   }
 
   
@@ -4304,7 +4309,6 @@ int main()
 		Noise.array[k]=scale_factor*Noise.array[k];
 	      N_total=energy_signal(&Noise);
 	      
-	      printf("N_experiment=%f N_total = %f  \r\n",N_experiment,N_total);
 
 	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h, lb_gr_12RGB(COLOR_WHITE));
 	      for (k=0;k<Signal.items;k++)
@@ -4320,6 +4324,11 @@ int main()
 		  lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
 		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(rand()% 0xFFFF), COPYMODE_COPY);
 		}
+	      if (parse_vector(&Signal))
+		errors_count++;
+
+	      printf("N_experiment=%f\tN_total=%f\tErrors=%d\r\n",N_experiment,N_total, errors_count);
+
 	      lb_gr_refresh();
 	      while (SDL_PollEvent(&event))
 		{
