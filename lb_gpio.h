@@ -59,6 +59,7 @@ U_INT_8_T  lb_gp_gpio_rd(U_INT_8_T pin_number);
 U_INT_32_T lb_gp_gpio_rd_all(void);
 void       lb_gp_gpio_setup_pin(U_INT_8_T pin_number, U_INT_8_T mode);
 U_INT_8_T  lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out);
+U_INT_16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, U_INT_16_T int16_out, U_INT_8_T n_bits);
 void       lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT_8_T *buffer_out, U_INT_8_T *buffer_in, U_INT_8_T n_bytes);
 void       lb_gp_gpio_wr(U_INT_8_T pin_number, U_INT_8_T value);
 void       lb_gp_print_u32_as_binary(U_INT_32_T value, U_INT_8_T n_bits);

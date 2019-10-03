@@ -103,6 +103,42 @@ U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
    return buffer;
 }
 
+U_INT_16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, U_INT_16_T int16_out, U_INT_8_T n_bits)
+{
+  U_INT_16_T buffer;
+  U_INT_8_T i;
+  buffer=0x00;
+  
+  for(i=0;i<n_bits;i++)
+    {
+      if ((*port).CPHA) /* Phase == 1*/
+	{
+	  lb_gp_gpio_wr((*port).CLK,!(*port).CPOL);
+	  lb_gp_gpio_wr((*port).MOSI,(int16_out >> (n_bits-1-i)) & 0x01);
+	  lb_ti_delay_us((*port).delay_clk);
+	  	  
+	  lb_gp_gpio_wr((*port).CLK,(*port).CPOL);
+	  buffer=buffer<<1;
+	  buffer |= lb_gp_gpio_rd((*port).MISO);
+	  lb_ti_delay_us((*port).delay_clk);
+
+	}
+      else /* Phase ==0 */
+	{
+	  lb_gp_gpio_wr((*port).MOSI, (int16_out >> (n_bits-1-i)) & 0x01);
+	  lb_ti_delay_us((*port).delay_clk);
+	  lb_gp_gpio_wr((*port).CLK,!(*port).CPOL);
+	  buffer=buffer<<1;
+	  buffer |= lb_gp_gpio_rd((*port).MISO);
+	  lb_ti_delay_us((*port).delay_clk);
+	  lb_gp_gpio_wr((*port).CLK, (*port).CPOL);
+	}
+    }
+
+   return buffer;
+}
+
+
 void lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT_8_T *buffer_out, U_INT_8_T *buffer_in, U_INT_8_T n_bytes)
 {
   U_INT_8_T j;
@@ -135,7 +171,7 @@ void lb_gp_print_u32_as_binary(U_INT_32_T value, U_INT_8_T n_bits)
   for (i=0;i<n_bits;i++)
     {
       bit_value=(value>>(n_bits-1-i)) & 0x01;
-      if ( (i!=0) && ((i % 4)==0) )
+      if ( ((n_bits-i)!=0) && (((n_bits-i) % 4)==0) )
 	printf(".");
       if (bit_value)
 	printf("1");

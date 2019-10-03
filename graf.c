@@ -2478,13 +2478,15 @@ int main()
   
 #endif
 
-  //#define GPIO
+#define GPIO
 #ifdef GPIO
 
-#define PIN_CS   17
-#define PIN_MOSI  3
-#define PIN_CLK   4
-#define PIN_MISO  2
+#define PIN_CS_0   17
+#define PIN_CS_1   18
+#define PIN_CS_ADC 21
+#define PIN_MOSI   10
+#define PIN_CLK    11
+#define PIN_MISO    9
 
   union Record
   {
@@ -2494,74 +2496,100 @@ int main()
       
   int i;
 
-  union Record temp, press;
+  union Record temp0, press0, temp1, press1;
 
   SPI_PORT_T my_port;
   my_port.MOSI=PIN_MOSI;
   my_port.CLK=PIN_CLK;
   my_port.MISO=PIN_MISO;
-  my_port.delay_clk=100;
-  my_port.delay_byte=100;
+  my_port.delay_clk=400;
+  my_port.delay_byte=200;
   my_port.CPOL=GPIO_HIGH;
   my_port.CPHA=GPIO_HIGH;
 
   lb_gp_gpio_open();
-  lb_gp_gpio_setup_pin(PIN_CS,   GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_CS_0,   GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_CS_1,   GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_CS_ADC, GPIO_OUTPUT);
+
+  
   lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
   lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
-  lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
-  lb_ti_delay_ms(2500);
-  lb_gp_gpio_wr(PIN_CS, GPIO_LOW);
-  lb_ti_delay_ms(2500);
-  lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
-  lb_ti_delay_ms(2500);
+  lb_ti_delay_ms(1);
+
+  my_port.CPOL=GPIO_LOW;
+  my_port.CPHA=GPIO_LOW;
+  lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
+
+  /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
+  if (0) while(1)
+    {
+      lb_gp_gpio_wr(PIN_CS_ADC, GPIO_LOW);
+      lb_ti_delay_us(100);
+      
+      lb_gp_gpio_SPI_rw(&my_port, 0b110);
+      U_INT_16_T value;
+      lb_ti_delay_us(100);
+      value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
+      lb_gp_print_u32_as_binary(value, 16);
+      printf("   Value=%d, VOLTAGE = %f \r\n", value & 0xFFF, (value & 0xFFF)*3.3/0xFFF); 
+      lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
+      lb_ti_delay_us(100);
+
+    }
+
+  my_port.CPOL=GPIO_HIGH;
+  my_port.CPHA=GPIO_HIGH;
+
+  lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
+  lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
   
   while(1)
     {
-      lb_gp_gpio_wr(PIN_CS, GPIO_LOW);
+      /* First sensor */
+      lb_gp_gpio_wr(PIN_CS_0, GPIO_LOW);
       lb_ti_delay_us(5000);
-      int value;
       for (i=0;i<8;i++)
 	lb_gp_gpio_SPI_rw(&my_port, 0x03);
 
       lb_ti_delay_ms(250);
 
       for (i=0;i<4;i++)
-	temp.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	temp0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
 
       for (i=0;i<4;i++)
-	press.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-	
+	press0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+      lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
+
+
+      /* Second sensor */
+
+       lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+      lb_ti_delay_us(5000);
+      for (i=0;i<8;i++)
+	lb_gp_gpio_SPI_rw(&my_port, 0x03);
+
+      lb_ti_delay_ms(250);
+
+      for (i=0;i<4;i++)
+	temp1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+      for (i=0;i<4;i++)
+	press1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+      lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
+
+      printf("Temp0=%f, Press0=%f, Temp1=%f, Press1=%f\r\n",temp0.f, press0.f,temp1.f, press1.f);
+
+      
       //printf(" temp.uc= 0x%.2x%.2x:%.2x%.2x\t\t",temp.uc[0],temp.uc[1],temp.uc[2],temp.uc[3]);
       //printf(" pres.uc= 0x%.2x%.2x:%.2x%.2x\r\n",press.uc[0],press.uc[1],press.uc[2],press.uc[3]);
 
+      lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
 
-      if (0)
-	{
-	  lb_gp_print_u32_as_binary(temp.uc[0], 8);
-	  printf("\r\n");
-	  lb_gp_print_u32_as_binary(temp.uc[1], 8);
-	  printf("\r\n");
-	  lb_gp_print_u32_as_binary(temp.uc[2], 8);
-	  printf("\r\n");
-	  lb_gp_print_u32_as_binary(temp.uc[3], 8);
-	  printf("\r\n");
-
-      
-	  lb_gp_print_u32_as_binary(press.uc[0], 8);
-	  printf("\r\n");
-	  lb_gp_print_u32_as_binary(press.uc[1], 8);
-	  printf("\r\n");
-	  lb_gp_print_u32_as_binary(press.uc[2], 8);
-	  printf("\r\n");
-	  lb_gp_print_u32_as_binary(press.uc[3], 8);
-	  printf("\r\n");
-	}
-      lb_gp_gpio_wr(PIN_CS, GPIO_HIGH);
-
-      printf("Temp = %f,  Press = %f\r\n",temp.f, press.f);
       //lb_ti_delay_us(200000);
     }
   lb_gp_gpio_close();
@@ -4133,7 +4161,7 @@ int main()
 
   /* BER vs Noise using a Montecarlo simulation */
   
-#define DEMO_ZERO_CROSSING
+  //#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
   VECTOR_R_T Signal, Noise;
   SDL_Event event;
