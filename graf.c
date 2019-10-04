@@ -2502,8 +2502,8 @@ int main()
   my_port.MOSI=PIN_MOSI;
   my_port.CLK=PIN_CLK;
   my_port.MISO=PIN_MISO;
-  my_port.delay_clk=400;
-  my_port.delay_byte=200;
+  my_port.delay_clk=100;
+  my_port.delay_byte=100;
   my_port.CPOL=GPIO_HIGH;
   my_port.CPHA=GPIO_HIGH;
 
@@ -2516,15 +2516,15 @@ int main()
   lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
-  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
   lb_ti_delay_ms(1);
 
   my_port.CPOL=GPIO_LOW;
   my_port.CPHA=GPIO_LOW;
+  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
   lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
 
   /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
-  if (0) while(1)
+  if (1) while(1)
     {
       lb_gp_gpio_wr(PIN_CS_ADC, GPIO_LOW);
       lb_ti_delay_us(100);
@@ -2534,9 +2534,9 @@ int main()
       lb_ti_delay_us(100);
       value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
       lb_gp_print_u32_as_binary(value, 16);
-      printf("   Value=%d, VOLTAGE = %f \r\n", value & 0xFFF, (value & 0xFFF)*3.3/0xFFF); 
+      printf("   Value=%d, Acceleration = %6.2f \r\n", value & 0xFFF, (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3); 
       lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
-      lb_ti_delay_us(100);
+      lb_ti_delay_us(10000);
 
     }
 
