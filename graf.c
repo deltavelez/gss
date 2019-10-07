@@ -2478,7 +2478,7 @@ int main()
   
 #endif
 
-#define GPIO
+  //#define GPIO
 #ifdef GPIO
 
 #define PIN_CS_0   17
@@ -4161,7 +4161,7 @@ int main()
 
   /* BER vs Noise using a Montecarlo simulation */
   
-  //#define DEMO_ZERO_CROSSING
+#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
   VECTOR_R_T Signal, Noise;
   SDL_Event event;
@@ -4169,13 +4169,13 @@ int main()
   /* User-defined simulation parameters */
   const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
   const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-  S_INT_32_T n_experiments=100; /* Maximum number of experiments. Not declared as a const to allow a possible
+  S_INT_32_T n_experiments=10000; /* Maximum number of experiments. Not declared as a const to allow a possible
 				       upgrade to variable-step size */
   const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
   FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
-  FLOAT_T f_max_noise=20000.0;  /* Maximum noise frequency */
+  FLOAT_T f_max_noise=6.0e3;  /* Maximum noise frequency */
   FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
-  FLOAT_T N_exp_min=1.0e-10;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
+  FLOAT_T N_exp_min=1.0e-8;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
    
   /* Simulation variables */
   S_INT_32_T experiment;       /* Keeps track of the current experiment */
@@ -4186,6 +4186,9 @@ int main()
 				  a) The last series of experiments with the minimum noise level was completed.
 				  b) The maximum time allowed for running the simulation has been exceeded. 
 				  c) The user interrupted the simulation. */
+  S_INT_8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
+				 visual idea of the amount of noise and its effects. 
+				 The waveform will be only ploted in a subset of the experiments. */
 
   FLOAT_T t_min=-0.25/freq_0;             /* Initial time for parsing the waveform */
   FLOAT_T t_max=0.5/freq_0+0.75/freq_1 ;  /* Final time for parsing the waveform */
@@ -4204,7 +4207,6 @@ int main()
     if (t<1.0/(2.0*f0)) 
       return sin(2*M_PI*f0*t);
     else
-      
       return sin(2*M_PI*f1*(t-1.0/(2.0*f0)+1.0/(2.0*f1)));
   }
 
@@ -4231,7 +4233,7 @@ int main()
     margin=0.5*(delta_0-delta_1);
     
     
-    printf("delta_0=%f delta_1=%f\r\n",delta_0,delta_1);
+    //printf("delta_0=%f delta_1=%f\r\n",delta_0,delta_1);
     crossings_counter=0;
     i=0;
     while ((i<(*buffer).items-1) && (crossings_counter<=3))
@@ -4240,7 +4242,7 @@ int main()
 	  {
 	    time_stamp[crossings_counter]=i;
 	    crossings_counter++;
-	    printf("crossing # %d, crossing at = %i\r\n",crossings_counter,i);
+	    //	    printf("crossing # %d, crossing at = %i\r\n",crossings_counter,i);
 	  }
 	i++;
       }
@@ -4259,7 +4261,7 @@ int main()
   win_wave.xp_min=20;
   win_wave.xp_max=ty_screen.w-20;
   win_wave.yp_min=20;
-  win_wave.yp_max=ty_screen.h-20;
+  win_wave.yp_max=ty_screen.h*0.25-20;
 
   
   win_wave.xr_min=  t_min;
@@ -4273,10 +4275,10 @@ int main()
   win_BER.yp_min=ty_screen.h/4+20;
   win_BER.yp_max=ty_screen.h-20;
       
-  win_BER.xr_min=   4;
-  win_BER.xr_max=  12;
-  win_BER.yr_min=  1e-1;
-  win_BER.yr_max=  1e-5;
+  win_BER.xr_min=   0;
+  win_BER.xr_max=  14;
+  win_BER.yr_min=  1.0;
+  win_BER.yr_max=  1e-8;
 
   lg_gr_draw_axis_2d(NULL, win_BER, &my_font, 3, lb_gr_12RGB(COLOR_YELLOW), 1, 25,
 		     lb_gr_12RGB(COLOR_BLACK), 1.0,
@@ -4326,6 +4328,11 @@ int main()
 	  errors_count=0;
 	  for (experiment=0;experiment<n_experiments;experiment++)
 	    {
+	      if (!(experiment % 100))
+		flag_draw_wave = TRUE;
+	      else 
+		flag_draw_wave = FALSE;
+	      
 	      for (k=0; k<Noise.items; k++)
 		Noise.array[k]=lb_st_marsaglia_polar(noise_variance);
 
@@ -4337,8 +4344,8 @@ int main()
 		Noise.array[k]=scale_factor*Noise.array[k];
 	      N_total=energy_signal(&Noise);
 	      
-
-	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h, lb_gr_12RGB(COLOR_WHITE));
+	      if (flag_draw_wave)
+		lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h*0.25+19, lb_gr_12RGB(COLOR_WHITE));
 	      for (k=0;k<Signal.items;k++)
 		{
 		  t=t_min+k*(t_max-t_min)/Signal.items;
@@ -4349,13 +4356,15 @@ int main()
 		  for (i=0;i<Noise.items;i++)
 		    temp+=Noise.array[i]*sin(2*M_PI*i*t/T_base);
 		  Signal.array[k]=wave(t,freq_0, freq_1)+temp;
-		  lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
-		  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(rand()% 0xFFFF), COPYMODE_COPY);
+		  if (flag_draw_wave)
+		    {
+		      lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
+		      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+		    }
 		}
 	      if (parse_vector(&Signal))
 		errors_count++;
 
-	      printf("N_experiment=%f\tN_total=%f\tErrors=%d\r\n",N_experiment,N_total, errors_count);
 
 	      lb_gr_refresh();
 	      while (SDL_PollEvent(&event))
@@ -4366,16 +4375,34 @@ int main()
 		      exit(EXIT_SUCCESS);
 		    }
 		}
-
+	      //	      if (!(experiment % (n_experiments/10)))
+	      //	printf("%f\r\n",100.0*experiment/n_experiments);
 	    }
+	  printf("N_experiment=%f\tN_total=%f\tErrors=%d\r\n",N_experiment,N_total, errors_count);
+	  if (errors_count!=0) 
+	    {
+	      FLOAT_T temp1, temp2;
+	      lb_gr_project_2d_x(win_BER, -10*log10(N_experiment), &xp);
+	      temp1=(FLOAT_T)errors_count/n_experiments;
+	      lb_gr_project_2d_y_log(win_BER, temp1, &yp);
+	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 
+	      ERR_T error;
+	      temp2 = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(FLOAT_T)1.0/N_experiment, &error));
+	      lb_gr_project_2d_y_log(win_BER, temp2, &yp);
+	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
+	      
+	      printf("x=%f dB, BER_zero=%f, BER_FSK=%f\r\n",10*log10(N_experiment), temp1, temp2);
+	      
+	      lb_gr_refresh();
+	    }
 
 	}
 
-      N_experiment*=0.5;
+      N_experiment/=1.25892541179;
       lb_ti_delay_ms(1000);
-      if (N_experiment<N_exp_min)
-	flag_running=FALSE;
+      //    if (N_experiment<N_exp_min)
+	 //	flag_running=FALSE;
       
       if (!flag_running)
 	{
