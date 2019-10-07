@@ -2478,7 +2478,7 @@ int main()
   
 #endif
 
-  //#define GPIO
+#define GPIO
 #ifdef GPIO
 
 #define PIN_CS_0   17
@@ -2487,7 +2487,15 @@ int main()
 #define PIN_MOSI   10
 #define PIN_CLK    11
 #define PIN_MISO    9
+#define PIN_RELAY  13
 
+  clock_t time_begin, time_end;
+  
+  S_INT_8_T flag_running;
+  S_INT_8_T relay_status=0;
+  S_INT_16_T shock_counter=0;
+  FLOAT_T accel, accel_max;
+  
   union Record
   {
     float  f;
@@ -2499,58 +2507,47 @@ int main()
   union Record temp0, press0, temp1, press1;
 
   SPI_PORT_T my_port;
+
+  time_begin = clock();
+  flag_running=TRUE;
+
   my_port.MOSI=PIN_MOSI;
   my_port.CLK=PIN_CLK;
   my_port.MISO=PIN_MISO;
   my_port.delay_clk=100;
   my_port.delay_byte=100;
-  my_port.CPOL=GPIO_HIGH;
-  my_port.CPHA=GPIO_HIGH;
 
   lb_gp_gpio_open();
   lb_gp_gpio_setup_pin(PIN_CS_0,   GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_CS_1,   GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_CS_ADC, GPIO_OUTPUT);
-
-  
   lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RELAY,  GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
-  lb_ti_delay_ms(1);
 
-  my_port.CPOL=GPIO_LOW;
-  my_port.CPHA=GPIO_LOW;
-  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
+  lb_gp_gpio_wr(PIN_CS_0,   GPIO_HIGH);
+  lb_gp_gpio_wr(PIN_CS_1,   GPIO_HIGH);
   lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
 
-  /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
-  if (1) while(1)
-    {
-      lb_gp_gpio_wr(PIN_CS_ADC, GPIO_LOW);
-      lb_ti_delay_us(100);
-      
-      lb_gp_gpio_SPI_rw(&my_port, 0b110);
-      U_INT_16_T value;
-      lb_ti_delay_us(100);
-      value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
-      lb_gp_print_u32_as_binary(value, 16);
-      printf("   Value=%d, Acceleration = %6.2f \r\n", value & 0xFFF, (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3); 
-      lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
-      lb_ti_delay_us(10000);
-
-    }
-
-  my_port.CPOL=GPIO_HIGH;
-  my_port.CPHA=GPIO_HIGH;
-
-  lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
-  lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
   
-  while(1)
+  while (flag_running)
     {
-      /* First sensor */
+      /* Schedule:
+	 Log P, T, accel_max 
+	 Trigger device
+	 accel_max=0
+	 Log acceleration, save accel_max
+	 wait until t= 5.0 */
+
+      /* Firts, we set the required parameters for transducer 0 */
+
+      my_port.CPOL=GPIO_HIGH;
+      lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
+      my_port.CPHA=GPIO_HIGH;
+      	 
       lb_gp_gpio_wr(PIN_CS_0, GPIO_LOW);
-      lb_ti_delay_us(5000);
+      lb_ti_delay_us(100);
       for (i=0;i<8;i++)
 	lb_gp_gpio_SPI_rw(&my_port, 0x03);
 
@@ -2566,9 +2563,8 @@ int main()
 
 
       /* Second sensor */
-
-       lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
-      lb_ti_delay_us(5000);
+      lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+      lb_ti_delay_us(500);
       for (i=0;i<8;i++)
 	lb_gp_gpio_SPI_rw(&my_port, 0x03);
 
@@ -2582,15 +2578,41 @@ int main()
 
       lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
 
-      printf("Temp0=%f, Press0=%f, Temp1=%f, Press1=%f\r\n",temp0.f, press0.f,temp1.f, press1.f);
+      /* We measure the acceleration */
+      lb_ti_delay_ms(1);
 
+      my_port.CPOL=GPIO_LOW;
+      my_port.CPHA=GPIO_LOW;
+      lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
+
+      time_end = time_begin + 5.0*shock_counter*CLOCKS_PER_SEC;
+      accel_max = 0.0;
+
+      relay_status = !relay_status;
+      lb_gp_gpio_wr(PIN_RELAY,   relay_status);
+
+      while (clock() < time_end)
+	{
+	  /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
+
+	  lb_gp_gpio_wr(PIN_CS_ADC, GPIO_LOW);
+	  lb_ti_delay_us(100);
       
-      //printf(" temp.uc= 0x%.2x%.2x:%.2x%.2x\t\t",temp.uc[0],temp.uc[1],temp.uc[2],temp.uc[3]);
-      //printf(" pres.uc= 0x%.2x%.2x:%.2x%.2x\r\n",press.uc[0],press.uc[1],press.uc[2],press.uc[3]);
+	  lb_gp_gpio_SPI_rw(&my_port, 0b110);
+	  U_INT_16_T value;
+	  lb_ti_delay_us(100);
+	  value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
+	  //lb_gp_print_u32_as_binary(value, 16);
+	  lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
+	  lb_ti_delay_us(100);
 
-      lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
-
-      //lb_ti_delay_us(200000);
+	  value = value & 0xFFF;
+	  accel = (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3;
+	  if (accel>accel_max)
+	    accel_max = accel;
+	}
+      printf("n=%d;T0=%f; P0=%f; T1=%f; P1=%f; a=%f\r\n",shock_counter,temp0.f, press0.f,temp1.f, press1.f, accel_max);
+       shock_counter++;
     }
   lb_gp_gpio_close();
   
@@ -4161,936 +4183,936 @@ int main()
 
   /* BER vs Noise using a Montecarlo simulation */
   
-#define DEMO_ZERO_CROSSING
+  //#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
-  VECTOR_R_T Signal, Noise;
-  SDL_Event event;
+    VECTOR_R_T Signal, Noise;
+    SDL_Event event;
   
-  /* User-defined simulation parameters */
-  const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
-  const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-  S_INT_32_T n_experiments=10000; /* Maximum number of experiments. Not declared as a const to allow a possible
+    /* User-defined simulation parameters */
+    const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
+    const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
+    S_INT_32_T n_experiments=10000; /* Maximum number of experiments. Not declared as a const to allow a possible
 				       upgrade to variable-step size */
-  const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
-  FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
-  FLOAT_T f_max_noise=6.0e3;  /* Maximum noise frequency */
-  FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
-  FLOAT_T N_exp_min=1.0e-8;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
+    const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
+    FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
+    FLOAT_T f_max_noise=6.0e3;  /* Maximum noise frequency */
+    FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
+    FLOAT_T N_exp_min=1.0e-8;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
    
-  /* Simulation variables */
-  S_INT_32_T experiment;       /* Keeps track of the current experiment */
-  S_INT_32_T errors_count;     /* Keeps track of the number of errors detected during a series of experiments */
-  FLOAT_T N_experiment;        /* Current value of the noise energy during a series of experiments */
-  FLOAT_T N_total;             /* Total energy of a frequency vector  */
-  S_INT_8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
-				  a) The last series of experiments with the minimum noise level was completed.
-				  b) The maximum time allowed for running the simulation has been exceeded. 
-				  c) The user interrupted the simulation. */
-  S_INT_8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
-				 visual idea of the amount of noise and its effects. 
-				 The waveform will be only ploted in a subset of the experiments. */
+    /* Simulation variables */
+    S_INT_32_T experiment;       /* Keeps track of the current experiment */
+    S_INT_32_T errors_count;     /* Keeps track of the number of errors detected during a series of experiments */
+    FLOAT_T N_experiment;        /* Current value of the noise energy during a series of experiments */
+    FLOAT_T N_total;             /* Total energy of a frequency vector  */
+    S_INT_8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
+				    a) The last series of experiments with the minimum noise level was completed.
+				    b) The maximum time allowed for running the simulation has been exceeded. 
+				    c) The user interrupted the simulation. */
+    S_INT_8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
+				   visual idea of the amount of noise and its effects. 
+				   The waveform will be only ploted in a subset of the experiments. */
 
-  FLOAT_T t_min=-0.25/freq_0;             /* Initial time for parsing the waveform */
-  FLOAT_T t_max=0.5/freq_0+0.75/freq_1 ;  /* Final time for parsing the waveform */
-  FLOAT_T t;
-  FLOAT_T T_base;
+    FLOAT_T t_min=-0.25/freq_0;             /* Initial time for parsing the waveform */
+    FLOAT_T t_max=0.5/freq_0+0.75/freq_1 ;  /* Final time for parsing the waveform */
+    FLOAT_T t;
+    FLOAT_T T_base;
 
-  VIEWPORT_2D_T win_wave, win_BER;
-  FLOAT_T xp, yp;                        /* Graphic variables */
-  S_INT_16_T i, k;                       /* General-use counters */
+    VIEWPORT_2D_T win_wave, win_BER;
+    FLOAT_T xp, yp;                        /* Graphic variables */
+    S_INT_16_T i, k;                       /* General-use counters */
  
-  FONT_T my_font;
-  char text[80];
+    FONT_T my_font;
+    char text[80];
 
-  FLOAT_T wave(FLOAT_T t, FLOAT_T f0, FLOAT_T f1) 
-  {
-    if (t<1.0/(2.0*f0)) 
-      return sin(2*M_PI*f0*t);
-    else
-      return sin(2*M_PI*f1*(t-1.0/(2.0*f0)+1.0/(2.0*f1)));
-  }
+    FLOAT_T wave(FLOAT_T t, FLOAT_T f0, FLOAT_T f1) 
+    {
+      if (t<1.0/(2.0*f0)) 
+	return sin(2*M_PI*f0*t);
+      else
+	return sin(2*M_PI*f1*(t-1.0/(2.0*f0)+1.0/(2.0*f1)));
+    }
 
-  FLOAT_T energy_signal(VECTOR_R_T *V)
-  {
-    FLOAT_T temp;
-    U_INT_16_T j;
+    FLOAT_T energy_signal(VECTOR_R_T *V)
+    {
+      FLOAT_T temp;
+      U_INT_16_T j;
 
-    temp=0.0;
-    for(j=0;j<(*V).items;j++)
-      temp+=(*V).array[j]*(*V).array[j];
-    return 0.5*temp;
-  } 
+      temp=0.0;
+      for(j=0;j<(*V).items;j++)
+	temp+=(*V).array[j]*(*V).array[j];
+      return 0.5*temp;
+    } 
 
-  S_INT_8_T parse_vector(VECTOR_R_T *buffer)
-  {
-    U_INT_16_T time_stamp[4];
+    S_INT_8_T parse_vector(VECTOR_R_T *buffer)
+    {
+      U_INT_16_T time_stamp[4];
    
-    U_INT_16_T i, crossings_counter=0;
-    FLOAT_T delta_0, delta_1, margin;
+      U_INT_16_T i, crossings_counter=0;
+      FLOAT_T delta_0, delta_1, margin;
 
-    delta_0=(*buffer).items*freq_1/(1.5*freq_0+1.5*freq_1);
-    delta_1=(*buffer).items*freq_0/(1.5*freq_0+1.5*freq_1);
-    margin=0.5*(delta_0-delta_1);
+      delta_0=(*buffer).items*freq_1/(1.5*freq_0+1.5*freq_1);
+      delta_1=(*buffer).items*freq_0/(1.5*freq_0+1.5*freq_1);
+      margin=0.5*(delta_0-delta_1);
     
     
-    //printf("delta_0=%f delta_1=%f\r\n",delta_0,delta_1);
-    crossings_counter=0;
-    i=0;
-    while ((i<(*buffer).items-1) && (crossings_counter<=3))
+      //printf("delta_0=%f delta_1=%f\r\n",delta_0,delta_1);
+      crossings_counter=0;
+      i=0;
+      while ((i<(*buffer).items-1) && (crossings_counter<=3))
+	{
+	  if (lb_re_ispos((*buffer).array[i]) != lb_re_ispos((*buffer).array[i+1]) )
+	    {
+	      time_stamp[crossings_counter]=i;
+	      crossings_counter++;
+	      //	    printf("crossing # %d, crossing at = %i\r\n",crossings_counter,i);
+	    }
+	  i++;
+	}
+      if ( ((time_stamp[1]-time_stamp[0])>= (delta_0-margin)) &&
+	   ((time_stamp[1]-time_stamp[0])<  (delta_0+margin)) &&
+	   ((time_stamp[2]-time_stamp[1])>  (delta_1-margin)) &&
+	   ((time_stamp[2]-time_stamp[1])<  (delta_1+margin)) &&
+	   (crossings_counter==3) )
+	return 0; /* Success: bit 0 and bit 1 are valid */
+      return 1; /* Failure: one of the bits was incorrectly decoded */
+    }
+
+  
+    lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
+
+    win_wave.xp_min=20;
+    win_wave.xp_max=ty_screen.w-20;
+    win_wave.yp_min=20;
+    win_wave.yp_max=ty_screen.h*0.25-20;
+
+  
+    win_wave.xr_min=  t_min;
+    win_wave.xr_max=  t_max;
+    win_wave.yr_min= -2*sqrt(2);
+    win_wave.yr_max=  2*sqrt(2);
+
+
+    win_BER.xp_min=20;
+    win_BER.xp_max=ty_screen.w-20;
+    win_BER.yp_min=ty_screen.h/4+20;
+    win_BER.yp_max=ty_screen.h-20;
+      
+    win_BER.xr_min=   0;
+    win_BER.xr_max=  14;
+    win_BER.yr_min=  1.0;
+    win_BER.yr_max=  1e-8;
+
+    lg_gr_draw_axis_2d(NULL, win_BER, &my_font, 3, lb_gr_12RGB(COLOR_YELLOW), 1, 25,
+		       lb_gr_12RGB(COLOR_BLACK), 1.0,
+		       lb_gr_12RGB(COLOR_BLACK), 10,
+		       AXIS_DRAW_X | AXIS_DRAW_X_GRID |   
+		       AXIS_DRAW_Y_GRID_LOG | AXIS_DRAW_COLORVALUES_Y_1,
+		       COPYMODE_COPY, LINEMODE_SOLID); 
+
+    printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
+      
+    for(t=t_min;t<t_max;t+=(t_max-t_min)/1000)
       {
-	if (lb_re_ispos((*buffer).array[i]) != lb_re_ispos((*buffer).array[i+1]) )
-	  {
-	    time_stamp[crossings_counter]=i;
-	    crossings_counter++;
-	    //	    printf("crossing # %d, crossing at = %i\r\n",crossings_counter,i);
-	  }
-	i++;
+	lb_gr_project_2d(win_wave, t, wave(t,freq_0, freq_1), &xp, &yp);
+	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
       }
-    if ( ((time_stamp[1]-time_stamp[0])>= (delta_0-margin)) &&
-	 ((time_stamp[1]-time_stamp[0])<  (delta_0+margin)) &&
-	 ((time_stamp[2]-time_stamp[1])>  (delta_1-margin)) &&
-	 ((time_stamp[2]-time_stamp[1])<  (delta_1+margin)) &&
-	 (crossings_counter==3) )
-      return 0; /* Success: bit 0 and bit 1 are valid */
-    return 1; /* Failure: one of the bits was incorrectly decoded */
-  }
-
-  
-  lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
-
-  win_wave.xp_min=20;
-  win_wave.xp_max=ty_screen.w-20;
-  win_wave.yp_min=20;
-  win_wave.yp_max=ty_screen.h*0.25-20;
-
-  
-  win_wave.xr_min=  t_min;
-  win_wave.xr_max=  t_max;
-  win_wave.yr_min= -2*sqrt(2);
-  win_wave.yr_max=  2*sqrt(2);
-
-
-  win_BER.xp_min=20;
-  win_BER.xp_max=ty_screen.w-20;
-  win_BER.yp_min=ty_screen.h/4+20;
-  win_BER.yp_max=ty_screen.h-20;
-      
-  win_BER.xr_min=   0;
-  win_BER.xr_max=  14;
-  win_BER.yr_min=  1.0;
-  win_BER.yr_max=  1e-8;
-
-  lg_gr_draw_axis_2d(NULL, win_BER, &my_font, 3, lb_gr_12RGB(COLOR_YELLOW), 1, 25,
-		     lb_gr_12RGB(COLOR_BLACK), 1.0,
-		     lb_gr_12RGB(COLOR_BLACK), 10,
-		     AXIS_DRAW_X | AXIS_DRAW_X_GRID |   
-		     AXIS_DRAW_Y_GRID_LOG | AXIS_DRAW_COLORVALUES_Y_1,
-		     COPYMODE_COPY, LINEMODE_SOLID); 
-
-  printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
-      
-  for(t=t_min;t<t_max;t+=(t_max-t_min)/1000)
-    {
-      lb_gr_project_2d(win_wave, t, wave(t,freq_0, freq_1), &xp, &yp);
-      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-    }
-  lb_gr_refresh();
+    lb_gr_refresh();
 
 
   
-  /* In order to nicely draw the waveform, a f(t) per pixel is desired */ 
-  Signal.items=win_wave.xp_max - win_wave.xp_min;
+    /* In order to nicely draw the waveform, a f(t) per pixel is desired */ 
+    Signal.items=win_wave.xp_max - win_wave.xp_min;
 
-  /* We determine the number of frequency coefficients which are required, given the bandwidth */
+    /* We determine the number of frequency coefficients which are required, given the bandwidth */
 
-  T_base=1.0/(2.0*freq_0)+1.0/(2.0*freq_1);
-  Noise.items=(S_INT_16_T)ceil(f_max_noise*T_base);
+    T_base=1.0/(2.0*freq_0)+1.0/(2.0*freq_1);
+    Noise.items=(S_INT_16_T)ceil(f_max_noise*T_base);
   
-  /* We make sure the size of the signal in the time domain is at least twice as large as the vector 
-     holding the noise frequencies, due to the Shannon-Nyquist sampling theorem. */
+    /* We make sure the size of the signal in the time domain is at least twice as large as the vector 
+       holding the noise frequencies, due to the Shannon-Nyquist sampling theorem. */
 
   
-  if (Signal.items<=2*Noise.items)
-    {
-      printf("Error: more time samples are needed...\r\n");
-      exit(EXIT_FAILURE);
-    }
-  printf("Noise vector has %d items\r\n",Noise.items);
-  lb_al_create_vector_r(&Signal);
-  lb_al_create_vector_r(&Noise);
+    if (Signal.items<=2*Noise.items)
+      {
+	printf("Error: more time samples are needed...\r\n");
+	exit(EXIT_FAILURE);
+      }
+    printf("Noise vector has %d items\r\n",Noise.items);
+    lb_al_create_vector_r(&Signal);
+    lb_al_create_vector_r(&Noise);
 
 
-  N_experiment=N_exp_max;
-  while (1)
-    {
-      if (flag_running)
-	{
-	  errors_count=0;
-	  for (experiment=0;experiment<n_experiments;experiment++)
-	    {
-	      if (!(experiment % 100))
-		flag_draw_wave = TRUE;
-	      else 
-		flag_draw_wave = FALSE;
+    N_experiment=N_exp_max;
+    while (1)
+      {
+	if (flag_running)
+	  {
+	    errors_count=0;
+	    for (experiment=0;experiment<n_experiments;experiment++)
+	      {
+		if (!(experiment % 100))
+		  flag_draw_wave = TRUE;
+		else 
+		  flag_draw_wave = FALSE;
 	      
-	      for (k=0; k<Noise.items; k++)
-		Noise.array[k]=lb_st_marsaglia_polar(noise_variance);
+		for (k=0; k<Noise.items; k++)
+		  Noise.array[k]=lb_st_marsaglia_polar(noise_variance);
 
-	      N_total=energy_signal(&Noise);
-	      FLOAT_T scale_factor;
-	      scale_factor=sqrt(N_experiment/N_total);
+		N_total=energy_signal(&Noise);
+		FLOAT_T scale_factor;
+		scale_factor=sqrt(N_experiment/N_total);
 
-	      for (k=0; k<Noise.items; k++)
-		Noise.array[k]=scale_factor*Noise.array[k];
-	      N_total=energy_signal(&Noise);
+		for (k=0; k<Noise.items; k++)
+		  Noise.array[k]=scale_factor*Noise.array[k];
+		N_total=energy_signal(&Noise);
 	      
-	      if (flag_draw_wave)
-		lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h*0.25+19, lb_gr_12RGB(COLOR_WHITE));
-	      for (k=0;k<Signal.items;k++)
-		{
-		  t=t_min+k*(t_max-t_min)/Signal.items;
+		if (flag_draw_wave)
+		  lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h*0.25+19, lb_gr_12RGB(COLOR_WHITE));
+		for (k=0;k<Signal.items;k++)
+		  {
+		    t=t_min+k*(t_max-t_min)/Signal.items;
 		  
-		  FLOAT_T temp;
-		  temp=0;
+		    FLOAT_T temp;
+		    temp=0;
 
-		  for (i=0;i<Noise.items;i++)
-		    temp+=Noise.array[i]*sin(2*M_PI*i*t/T_base);
-		  Signal.array[k]=wave(t,freq_0, freq_1)+temp;
-		  if (flag_draw_wave)
-		    {
-		      lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
-		      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
-		    }
-		}
-	      if (parse_vector(&Signal))
-		errors_count++;
+		    for (i=0;i<Noise.items;i++)
+		      temp+=Noise.array[i]*sin(2*M_PI*i*t/T_base);
+		    Signal.array[k]=wave(t,freq_0, freq_1)+temp;
+		    if (flag_draw_wave)
+		      {
+			lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
+			lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+		      }
+		  }
+		if (parse_vector(&Signal))
+		  errors_count++;
 
 
-	      lb_gr_refresh();
-	      while (SDL_PollEvent(&event))
-		{
-		  if (event.type == SDL_QUIT)
-		    {
-		      SDL_Quit();
-		      exit(EXIT_SUCCESS);
-		    }
-		}
-	      //	      if (!(experiment % (n_experiments/10)))
-	      //	printf("%f\r\n",100.0*experiment/n_experiments);
-	    }
-	  printf("N_experiment=%f\tN_total=%f\tErrors=%d\r\n",N_experiment,N_total, errors_count);
-	  if (errors_count!=0) 
-	    {
-	      FLOAT_T temp1, temp2;
-	      lb_gr_project_2d_x(win_BER, -10*log10(N_experiment), &xp);
-	      temp1=(FLOAT_T)errors_count/n_experiments;
-	      lb_gr_project_2d_y_log(win_BER, temp1, &yp);
-	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+		lb_gr_refresh();
+		while (SDL_PollEvent(&event))
+		  {
+		    if (event.type == SDL_QUIT)
+		      {
+			SDL_Quit();
+			exit(EXIT_SUCCESS);
+		      }
+		  }
+		//	      if (!(experiment % (n_experiments/10)))
+		//	printf("%f\r\n",100.0*experiment/n_experiments);
+	      }
+	    printf("N_experiment=%f\tN_total=%f\tErrors=%d\r\n",N_experiment,N_total, errors_count);
+	    if (errors_count!=0) 
+	      {
+		FLOAT_T temp1, temp2;
+		lb_gr_project_2d_x(win_BER, -10*log10(N_experiment), &xp);
+		temp1=(FLOAT_T)errors_count/n_experiments;
+		lb_gr_project_2d_y_log(win_BER, temp1, &yp);
+		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 
-	      ERR_T error;
-	      temp2 = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(FLOAT_T)1.0/N_experiment, &error));
-	      lb_gr_project_2d_y_log(win_BER, temp2, &yp);
-	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
+		ERR_T error;
+		temp2 = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(FLOAT_T)1.0/N_experiment, &error));
+		lb_gr_project_2d_y_log(win_BER, temp2, &yp);
+		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
 	      
-	      printf("x=%f dB, BER_zero=%f, BER_FSK=%f\r\n",10*log10(N_experiment), temp1, temp2);
+		printf("x=%f dB, BER_zero=%f, BER_FSK=%f\r\n",10*log10(N_experiment), temp1, temp2);
 	      
-	      lb_gr_refresh();
-	    }
+		lb_gr_refresh();
+	      }
 
-	}
+	  }
 
-      N_experiment/=1.25892541179;
-      lb_ti_delay_ms(1000);
-      //    if (N_experiment<N_exp_min)
-	 //	flag_running=FALSE;
+	N_experiment/=1.25892541179;
+	lb_ti_delay_ms(1000);
+	//    if (N_experiment<N_exp_min)
+	//	flag_running=FALSE;
       
-      if (!flag_running)
-	{
-	  SDL_Quit();
-	  exit(EXIT_SUCCESS);
-	}
-    }
+	if (!flag_running)
+	  {
+	    SDL_Quit();
+	    exit(EXIT_SUCCESS);
+	  }
+      }
 
 
-  //Chart.w=win.xp_max-win.xp_min;
-  //Chart.h=win.yp_max-win.yp_min;
-  //lb_gr_create_picture(&Chart,lb_gr_12RGB(COLOR_BLUE));
+    //Chart.w=win.xp_max-win.xp_min;
+    //Chart.h=win.yp_max-win.yp_min;
+    //lb_gr_create_picture(&Chart,lb_gr_12RGB(COLOR_BLUE));
 
 
-  // printf("x=%f x 10 ^%f\r\n",lb_re_normed_significand(10.01),lb_re_normed_exponent(10.01));
-  // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
+    // printf("x=%f x 10 ^%f\r\n",lb_re_normed_significand(10.01),lb_re_normed_exponent(10.01));
+    // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
 
             
 
 
   
-  while (flag_running)
-    {
-      errors_count=0;
-      for (experiment=0;experiment<n_experiments;experiment++)
-	{
-	  //for(k=0;k<2*N_HALF_SAMPLES;k++)
-	  // {
-	  //	  Noise.array[k]=0.0;
-	      // }
+    while (flag_running)
+      {
+	errors_count=0;
+	for (experiment=0;experiment<n_experiments;experiment++)
+	  {
+	    //for(k=0;k<2*N_HALF_SAMPLES;k++)
+	    // {
+	    //	  Noise.array[k]=0.0;
+	    // }
 
-	  /* Noise using the time's Domain */
-	  // printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time_complex(signal_complex,0,N_SAMPLES));
+	    /* Noise using the time's Domain */
+	    // printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time_complex(signal_complex,0,N_SAMPLES));
 
-	  /* Noise using the frequency's Domain */
-	  //lb_fo_FFT_C(&signal, &frequencies, &W,-1); 
+	    /* Noise using the frequency's Domain */
+	    //lb_fo_FFT_C(&signal, &frequencies, &W,-1); 
 	     
-	  // printf("RMS Noise (frequency domain method) = %f\r\n", RMS_noise_frequency(frequencies,N_POINTS));
+	    // printf("RMS Noise (frequency domain method) = %f\r\n", RMS_noise_frequency(frequencies,N_POINTS));
   
-	  /* A perfect Bandpass filter: we're leaving the a fourth of the lower frequencies  */
-	  /* Why 12 ?
-	     The circuit being simulated is a 1-st order active Low Pass with R=27.4K and C=220p, hence f=26.403KHz
-	     The DFT' base period is tmax = 1/5464 + 1/4291 = 4.1606*10^-4 seg   ==> d_freq=2403.5 Hz
+	    /* A perfect Bandpass filter: we're leaving the a fourth of the lower frequencies  */
+	    /* Why 12 ?
+	       The circuit being simulated is a 1-st order active Low Pass with R=27.4K and C=220p, hence f=26.403KHz
+	       The DFT' base period is tmax = 1/5464 + 1/4291 = 4.1606*10^-4 seg   ==> d_freq=2403.5 Hz
 
-	     To fiter using a DTF we need to "keep"the base frequencies:
-	     f0  = DC
-	     f1  = 24
-	     03.5
-	     f2  = 4807
-	     f3  = 7210
-	     f4  = 9614
-	     f5  = 12017.5
-	     f6  = 24421
-	     f7  = 16824.5
-	     f8  = 19228
-	     f9  = 21631.5
-	     f10 = 24035
-	     f11 = 26438.5
-	     f12 = 0, etc. */
-	  //  for(i=13;i<2*N_HALF_SAMPLES;i++)
-	  //	
-	  // {
-	  //  frequencies.array[i].r=0;
-	  //  frequencies.array[i].i=0;
-	  //} 
+	       To fiter using a DTF we need to "keep"the base frequencies:
+	       f0  = DC
+	       f1  = 24
+	       03.5
+	       f2  = 4807
+	       f3  = 7210
+	       f4  = 9614
+	       f5  = 12017.5
+	       f6  = 24421
+	       f7  = 16824.5
+	       f8  = 19228
+	       f9  = 21631.5
+	       f10 = 24035
+	       f11 = 26438.5
+	       f12 = 0, etc. */
+	    //  for(i=13;i<2*N_HALF_SAMPLES;i++)
+	    //	
+	    // {
+	    //  frequencies.array[i].r=0;
+	    //  frequencies.array[i].i=0;
+	    //} 
 
-	  /* Digital filter */
-	  //lb_fo_FFT_C(&frequencies, &signal, &W, 1); 
+	    /* Digital filter */
+	    //lb_fo_FFT_C(&frequencies, &signal, &W, 1); 
 	      
-	  //RMS_noise=RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1));
-	  //printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
-	  // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
-	  //	  escale_complex_vector(signal_complex,(1.0*(FLOAT_TYPE)noise_step/(FLOAT_TYPE)NOISE_STEPS_MAX)/RMS_noise,N_SAMPLES
+	    //RMS_noise=RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1));
+	    //printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
+	    // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
+	    //	  escale_complex_vector(signal_complex,(1.0*(FLOAT_TYPE)noise_step/(FLOAT_TYPE)NOISE_STEPS_MAX)/RMS_noise,N_SAMPLES
 
-	  // for(i=0;i<2*N_HALF_SAMPLES;i++)
-	  // {
-	  //   signal.array[i].i=0;
-	  // }
+	    // for(i=0;i<2*N_HALF_SAMPLES;i++)
+	    // {
+	    //   signal.array[i].i=0;
+	    // }
 	   
-	  //RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/freq_0),
-	  //				   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/freq_0));
+	    //RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/freq_0),
+	    //				   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/freq_0));
 
  
-	  //lb_al_multiply_vector_c_real(&signal,(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX)/RMS_noise);
+	    //lb_al_multiply_vector_c_real(&signal,(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX)/RMS_noise);
 	      
-	  // printf("RMS Noise (time domain method) *** = %f\r\n",
-	  // RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1)));
-	  // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(signal_complex,N_SAMPLES));
+	    // printf("RMS Noise (time domain method) *** = %f\r\n",
+	    // RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1)));
+	    // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(signal_complex,N_SAMPLES));
 
-	  //if ((n_experiment % 256) == 0)
-	  // {
-	  //   printf("experiment=%d\r\n",n_experiment);
-	  //  lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h/4, lb_gr_12RGB(COLOR_WHITE));
+	    //if ((n_experiment % 256) == 0)
+	    // {
+	    //   printf("experiment=%d\r\n",n_experiment);
+	    //  lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h/4, lb_gr_12RGB(COLOR_WHITE));
 
-	  //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
-	  //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
+	    //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
+	    //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
 	   
-	  //lb_gr_draw_rectangle_bar(NULL, 70, 70, 512, 512, 8, lb_gr_12RGB(COLOR_PINK | COLOR_SEMI_SOLID),
-	  //			     lb_gr_12RGB(COLOR_GREEN | COLOR_SEMI_SOLID), COPYMODE_ADD);
+	    //lb_gr_draw_rectangle_bar(NULL, 70, 70, 512, 512, 8, lb_gr_12RGB(COLOR_PINK | COLOR_SEMI_SOLID),
+	    //			     lb_gr_12RGB(COLOR_GREEN | COLOR_SEMI_SOLID), COPYMODE_ADD);
 	   
-	  //  lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_BLACK), 1, 10,
-	  //			 lb_gr_12RGB(COLOR_GREEN), 1e-3, lb_gr_12RGB(COLOR_ORANGE), 0.5,
-	  //			 AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-	  //			 AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-	  //			 COPYMODE_COPY, LINEMODE_SOLID);
-	  // }
+	    //  lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_BLACK), 1, 10,
+	    //			 lb_gr_12RGB(COLOR_GREEN), 1e-3, lb_gr_12RGB(COLOR_ORANGE), 0.5,
+	    //			 AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+	    //			 AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
+	    //			 COPYMODE_COPY, LINEMODE_SOLID);
+	    // }
 	
-	  // for(i=0;i<2*N_HALF_SAMPLES;i++)
-	  // {
-	  //   t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
-	  //    signal.array[i].r += sqrt(2)*f(t,2*M_PI*freq_1,2*M_PI*freq_0);
-	  //    /* We don have to plot all experiments, just some would be representative */
-	  //    if ((n_experiment % 256) == 0)
-	  //	{
-	  //	  lb_gr_project_2d(win, t, signal.array[i].r, &xp, &yp);
-	  //		  lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-	  //	}
-	  // }
+	    // for(i=0;i<2*N_HALF_SAMPLES;i++)
+	    // {
+	    //   t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
+	    //    signal.array[i].r += sqrt(2)*f(t,2*M_PI*freq_1,2*M_PI*freq_0);
+	    //    /* We don have to plot all experiments, just some would be representative */
+	    //    if ((n_experiment % 256) == 0)
+	    //	{
+	    //	  lb_gr_project_2d(win, t, signal.array[i].r, &xp, &yp);
+	    //		  lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+	    //	}
+	    // }
 	  
-	  //if ((n_experiment % 256) == 0)
-	  //  lb_gr_refresh();
+	    //if ((n_experiment % 256) == 0)
+	    //  lb_gr_refresh();
 
-	  //if (!parse_vector(&signal))
-	  // errors_count++;
-	  //printf("Progress: %2.3f %% done E = %li  /  %i \r",
-	  //		 100.0*n_experiment/N_EXPERIMENT_MAX, errors_count,N_EXPERIMENT_MAX);
-	  //	}
+	    //if (!parse_vector(&signal))
+	    // errors_count++;
+	    //printf("Progress: %2.3f %% done E = %li  /  %i \r",
+	    //		 100.0*n_experiment/N_EXPERIMENT_MAX, errors_count,N_EXPERIMENT_MAX);
+	    //	}
 
-	  //if ( errors_count!=0) 
-	  //{
-	  //lb_gr_project_2d_x(win_BER, -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX), &xp);
-	  //lb_gr_project_2d_y_log(win_BER, (FLOAT_T)errors_count/N_EXPERIMENT_MAX, &yp);
-	  ////lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-	  //lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-	  //	}
-	  //oxo
-	  //sprintf(text,"noise_%0.3d.bmp",noise_step);
-	  //lb_gr_BMPfile_save(text, NULL);
+	    //if ( errors_count!=0) 
+	    //{
+	    //lb_gr_project_2d_x(win_BER, -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX), &xp);
+	    //lb_gr_project_2d_y_log(win_BER, (FLOAT_T)errors_count/N_EXPERIMENT_MAX, &yp);
+	    ////lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+	    //lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+	    //	}
+	    //oxo
+	    //sprintf(text,"noise_%0.3d.bmp",noise_step);
+	    //lb_gr_BMPfile_save(text, NULL);
   
-	  //     printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
-	  // noise_step,
-	  // NOISE_STEPS_MAX,
-	  // -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX),
-	  // errors_count, N_EXPERIMENT_MAX);
-	}
+	    //     printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
+	    // noise_step,
+	    // NOISE_STEPS_MAX,
+	    // -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX),
+	    // errors_count, N_EXPERIMENT_MAX);
+	  }
 
-      lb_al_release_vector_r(&Signal);
-      lb_al_release_vector_r(&Noise);
-    }
+	lb_al_release_vector_r(&Signal);
+	lb_al_release_vector_r(&Noise);
+      }
 
 #endif
 
-      //#define DEMO_KEYBOARD
+    //#define DEMO_KEYBOARD
 #ifdef DEMO_KEYBOARD
-      unsigned char c;
-      S_INT_8_T flag;
+    unsigned char c;
+    S_INT_8_T flag;
 
-      flag=FALSE;
-      lb_co_set_echo(0); 
+    flag=FALSE;
+    lb_co_set_echo(0); 
 
-      while (!flag)
-	{
-	  while (!(lb_co_kbhit())) ;
-	  c=lb_co_getch_pc();
-	  printf("value= dec=%d hex=%x\r\n",c,c);
-	  switch(c)
-	    {
-	    case PCKEY_UP:          printf("PCKEY_UP\r\n");          break;
-	    case PCKEY_DOWN:        printf("PCKEY_DOWN\r\n");        break;
-	    case PCKEY_RIGHT:       printf("PCKEY_RIGHT\r\n");       break;
-	    case PCKEY_LEFT:        printf("PCKEY_LEFT\r\n");        break;
-	    case PCKEY_PAGE_UP:     printf("PCKEY_PAGE_UP\r\n");     break;
-	    case PCKEY_PAGE_DOWN:   printf("PCKEY_PAGE_DOWN\r\n");   break;
-	    case PCKEY_INSERT:      printf("PCKEY_INSERT\r\n");      break;
-	    case PCKEY_BS:          printf("PCKEY_BS\r\n");          break;
-	    case PCKEY_TAB:         printf("PCKEY_TAB\r\n");         break;
-	    case PCKEY_ENTER:       printf("PCKEY_ENTER\r\n");       break;
-	    case PCKEY_F1:          printf("PCKEY_F1\r\n");          break;
-	    case PCKEY_F2:          printf("PCKEY_F2\r\n");          break;
-	    case PCKEY_F3:          printf("PCKEY_F3\r\n");          break;
-	    case PCKEY_F4:          printf("PCKEY_F4\r\n");          break;
-	    case PCKEY_F5:          printf("PCKEY_F5\r\n");          break;
-	    case PCKEY_F6:          printf("PCKEY_F6\r\n");          break;
-	    case PCKEY_F7:          printf("PCKEY_F7\r\n");          break;
-	    case PCKEY_F8:          printf("PCKEY_F8\r\n");          break;
-	    case PCKEY_F9:          printf("PCKEY_F9\r\n");          break;
-	    case PCKEY_F10:         printf("PCKEY_F10\r\n");         break;
-	    case PCKEY_F11:         printf("PCKEY_F11\r\n");         break;
-	    case PCKEY_F12:         printf("PCKEY_F12\r\n");         break;
-	    case PCKEY_HOME:        printf("PCKEY_HOME\r\n");        break;
-	    case PCKEY_PAUSE:       printf("PCKEY_PAUSE\r\n");       break;
-	    case PCKEY_ALT:         printf("PCKEY_ALT\r\n");         break;
-	    case PCKEY_SCROLL_LOCK: printf("PCKEY_SCROLL_LOCK\r\n"); break;
-	    case PCKEY_ESC:         printf("PCKEY_ESC\r\n");         break;
-	    case PCKEY_CAPS_LOCK:   printf("PCKEY_CAPS_LOCK\r\n");   break;
-	    case PCKEY_SHIFT:       printf("PCKEY_SHIFT\r\n");       break;
-	    case PCKEY_CONTROL:     printf("PCKEY_CONTROL\r\n");     break;
-	    case PCKEY_NUM_LOCK:    printf("PCKEY_NUM_LOCK\r\n");    break;
-	    case PCKEY_DEL:         printf("PCKEY_DEL\r\n");         break;
-	    case PCKEY_END:         printf("PCKEY_END\r\n");         break;
-	    case ASCII_NUL:         printf("NULL\r\n");              break;
-	    default: printf("%c\r\n",c); break;
-	    }
+    while (!flag)
+      {
+	while (!(lb_co_kbhit())) ;
+	c=lb_co_getch_pc();
+	printf("value= dec=%d hex=%x\r\n",c,c);
+	switch(c)
+	  {
+	  case PCKEY_UP:          printf("PCKEY_UP\r\n");          break;
+	  case PCKEY_DOWN:        printf("PCKEY_DOWN\r\n");        break;
+	  case PCKEY_RIGHT:       printf("PCKEY_RIGHT\r\n");       break;
+	  case PCKEY_LEFT:        printf("PCKEY_LEFT\r\n");        break;
+	  case PCKEY_PAGE_UP:     printf("PCKEY_PAGE_UP\r\n");     break;
+	  case PCKEY_PAGE_DOWN:   printf("PCKEY_PAGE_DOWN\r\n");   break;
+	  case PCKEY_INSERT:      printf("PCKEY_INSERT\r\n");      break;
+	  case PCKEY_BS:          printf("PCKEY_BS\r\n");          break;
+	  case PCKEY_TAB:         printf("PCKEY_TAB\r\n");         break;
+	  case PCKEY_ENTER:       printf("PCKEY_ENTER\r\n");       break;
+	  case PCKEY_F1:          printf("PCKEY_F1\r\n");          break;
+	  case PCKEY_F2:          printf("PCKEY_F2\r\n");          break;
+	  case PCKEY_F3:          printf("PCKEY_F3\r\n");          break;
+	  case PCKEY_F4:          printf("PCKEY_F4\r\n");          break;
+	  case PCKEY_F5:          printf("PCKEY_F5\r\n");          break;
+	  case PCKEY_F6:          printf("PCKEY_F6\r\n");          break;
+	  case PCKEY_F7:          printf("PCKEY_F7\r\n");          break;
+	  case PCKEY_F8:          printf("PCKEY_F8\r\n");          break;
+	  case PCKEY_F9:          printf("PCKEY_F9\r\n");          break;
+	  case PCKEY_F10:         printf("PCKEY_F10\r\n");         break;
+	  case PCKEY_F11:         printf("PCKEY_F11\r\n");         break;
+	  case PCKEY_F12:         printf("PCKEY_F12\r\n");         break;
+	  case PCKEY_HOME:        printf("PCKEY_HOME\r\n");        break;
+	  case PCKEY_PAUSE:       printf("PCKEY_PAUSE\r\n");       break;
+	  case PCKEY_ALT:         printf("PCKEY_ALT\r\n");         break;
+	  case PCKEY_SCROLL_LOCK: printf("PCKEY_SCROLL_LOCK\r\n"); break;
+	  case PCKEY_ESC:         printf("PCKEY_ESC\r\n");         break;
+	  case PCKEY_CAPS_LOCK:   printf("PCKEY_CAPS_LOCK\r\n");   break;
+	  case PCKEY_SHIFT:       printf("PCKEY_SHIFT\r\n");       break;
+	  case PCKEY_CONTROL:     printf("PCKEY_CONTROL\r\n");     break;
+	  case PCKEY_NUM_LOCK:    printf("PCKEY_NUM_LOCK\r\n");    break;
+	  case PCKEY_DEL:         printf("PCKEY_DEL\r\n");         break;
+	  case PCKEY_END:         printf("PCKEY_END\r\n");         break;
+	  case ASCII_NUL:         printf("NULL\r\n");              break;
+	  default: printf("%c\r\n",c); break;
+	  }
 	  
-	  if (c=='x')
-	    flag=TRUE;
-	}
-      exit(1);
+	if (c=='x')
+	  flag=TRUE;
+      }
+    exit(1);
 #endif
 
    
-      //#define DEMO_CONSOLE
+    //#define DEMO_CONSOLE
 #ifdef DEMO_CONSOLE
-      lb_co_cls();
-      printf("hello world\r\n"); 
-      lb_co_gotoxy(1,1);
-      printf("1"); 
-      lb_co_gotoxy(2,2);
-      printf("2"); 
-      lb_co_gotoxy(3,3);
-      printf("3"); 
+    lb_co_cls();
+    printf("hello world\r\n"); 
+    lb_co_gotoxy(1,1);
+    printf("1"); 
+    lb_co_gotoxy(2,2);
+    printf("2"); 
+    lb_co_gotoxy(3,3);
+    printf("3"); 
 
-      lb_co_gotox(2);
-      printf("2");
-      lb_co_gotoxy(10,10);
-      printf("DIEGO VELEZ\r\n"); 
-      lb_co_gotoxy(10+6,10);
-      lb_co_cls_from_cursor();
-      lb_co_gotoxy(20,20);
-      printf("*");
-      lb_co_gotoxy(20,20);
-      lb_co_cursor_shift(-1,0);
-      printf("-\r\n");
-      //lb_co_printf_block("DIEGO ALBERTO VELEZ HENAO", 1, 3);
-      char text[40];
+    lb_co_gotox(2);
+    printf("2");
+    lb_co_gotoxy(10,10);
+    printf("DIEGO VELEZ\r\n"); 
+    lb_co_gotoxy(10+6,10);
+    lb_co_cls_from_cursor();
+    lb_co_gotoxy(20,20);
+    printf("*");
+    lb_co_gotoxy(20,20);
+    lb_co_cursor_shift(-1,0);
+    printf("-\r\n");
+    //lb_co_printf_block("DIEGO ALBERTO VELEZ HENAO", 1, 3);
+    char text[40];
 
-      strcpy(text,"DON DIEGO VELEZ");
-      lb_co_printf_lastn(text, 5);
-      lb_co_gotoxy(2,2);
-      lb_co_color(TEXT_COLOR_BLUE);
-      lb_co_color(TEXT_COLOR_WHITE + TEXT_COLOR_BACKGROUND);
-      lb_co_color(TEXT_MODE_BOLD);
-      printf("TEXT_COLOR_BLUE\r\n");
-      lb_co_color(TEXT_MODE_NOBOLD);
-      lb_co_gotoxy(3,3);
+    strcpy(text,"DON DIEGO VELEZ");
+    lb_co_printf_lastn(text, 5);
+    lb_co_gotoxy(2,2);
+    lb_co_color(TEXT_COLOR_BLUE);
+    lb_co_color(TEXT_COLOR_WHITE + TEXT_COLOR_BACKGROUND);
+    lb_co_color(TEXT_MODE_BOLD);
+    printf("TEXT_COLOR_BLUE\r\n");
+    lb_co_color(TEXT_MODE_NOBOLD);
+    lb_co_gotoxy(3,3);
 
-      //lb_co_color(TEXT_COLOR_DEFAULT);
-      //lb_co_color(TEXT_COLOR_DEFAULT + TEXT_COLOR_BACKGROUND);
-      lb_co_cls();
-      lb_co_reset();
-      char r, g, b;
-      for (b=0;b<16;b++)
-	for (g=0;g<16;g++) 
-	  {
-	    lb_co_gotox(1);
-	    lb_co_color(TEXT_COLOR_WHITE);
-	    printf("0x%x",(b<<4)+g);
-	    lb_co_gotox(10);
-	    for (r=0;r<16;r++)
-	      {
-		lb_co_color_bg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
-		lb_co_color_fg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
-		printf("*");
-	      }
-	    lb_co_color_bg_RGB(lb_gr_12RGB(0x0000));
-	    printf("\r\n");
-	    lb_gr_delay(1000);
-	  }
-      printf("TEXT_COLOR_0x00f\r\n");
-      printf("\a");
+    //lb_co_color(TEXT_COLOR_DEFAULT);
+    //lb_co_color(TEXT_COLOR_DEFAULT + TEXT_COLOR_BACKGROUND);
+    lb_co_cls();
+    lb_co_reset();
+    char r, g, b;
+    for (b=0;b<16;b++)
+      for (g=0;g<16;g++) 
+	{
+	  lb_co_gotox(1);
+	  lb_co_color(TEXT_COLOR_WHITE);
+	  printf("0x%x",(b<<4)+g);
+	  lb_co_gotox(10);
+	  for (r=0;r<16;r++)
+	    {
+	      lb_co_color_bg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
+	      lb_co_color_fg_RGB(lb_gr_12RGB((b<<8)+(g<<4)+r));
+	      printf("*");
+	    }
+	  lb_co_color_bg_RGB(lb_gr_12RGB(0x0000));
+	  printf("\r\n");
+	  lb_gr_delay(1000);
+	}
+    printf("TEXT_COLOR_0x00f\r\n");
+    printf("\a");
 
 
-      //lb_co_cls();
-      lb_fb_exit(1);
+    //lb_co_cls();
+    lb_fb_exit(1);
 #endif
 
-      /*******************************************************************************************************************/
-      /* Audio DEMOS */
-      /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* Audio DEMOS */
+    /******************************************************************************************************************/
 
-      //#define DEMO_DTMF
+    //#define DEMO_DTMF
 #ifdef DEMO_DTMF
-      lb_au_SDL_audio_init_DTMF();
-      lb_au_SDL_audio_start();
+    lb_au_SDL_audio_init_DTMF();
+    lb_au_SDL_audio_start();
 
-      lb_au_freq_DTMF('4', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('4', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('0', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('0', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('5', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('5', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
   
-      lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('2', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('2', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
-      lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
-      SDL_Delay(200);
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
-      SDL_Delay(200);
+    lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
+    SDL_Delay(200);
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
+    SDL_Delay(200);
 
 
-      _lb_au_f0=0.0;
-      _lb_au_f1=0.0;
+    _lb_au_f0=0.0;
+    _lb_au_f1=0.0;
 
-      lb_au_SDL_audio_close_DTMF();
+    lb_au_SDL_audio_close_DTMF();
 
-      exit(1);
+    exit(1);
 #endif
 
   
 #define SAMPLES 22050
-      //#define DEMO_WAV_WRITE
+    //#define DEMO_WAV_WRITE
 #ifdef DEMO_WAV_WRITE
-      VECTOR_R_T V;
-      U_INT_16_T i;
-      FLOAT_T f1,f2;
+    VECTOR_R_T V;
+    U_INT_16_T i;
+    FLOAT_T f1,f2;
   
-      V.items=SAMPLES;
-      lb_al_create_vector_r(&V);
+    V.items=SAMPLES;
+    lb_al_create_vector_r(&V);
 
-      lb_au_freq_DTMF('3', &f1, &f2);
-      for (i=0;i<SAMPLES;i++)
-	V.array[i]=0.5*sin(2*M_PI*f1*i/SAMPLES) + 0.5*sin(2*M_PI*f2*i/SAMPLES);
+    lb_au_freq_DTMF('3', &f1, &f2);
+    for (i=0;i<SAMPLES;i++)
+      V.array[i]=0.5*sin(2*M_PI*f1*i/SAMPLES) + 0.5*sin(2*M_PI*f2*i/SAMPLES);
       
-      lb_au_wave_write_or_append_from_vector_r("test2.wav", &V, SAMPLES, 8);
+    lb_au_wave_write_or_append_from_vector_r("test2.wav", &V, SAMPLES, 8);
 
-      lb_al_release_vector_r(&V);
+    lb_al_release_vector_r(&V);
   
-      lb_fb_exit(1);
+    lb_fb_exit(1);
 #endif
 
-      //#define PLAY_WAVE
+    //#define PLAY_WAVE
 #ifdef PLAY_WAVE
-      // Initialize SDL.
-      if (SDL_Init(SDL_INIT_AUDIO) < 0)
-	return 1;
+    // Initialize SDL.
+    if (SDL_Init(SDL_INIT_AUDIO) < 0)
+      return 1;
 
-      // local variables
-      extern Uint32 lb_au_audio_len; /* Extern variable declared in lb_audio.h */
-      extern Uint8 *lb_au_audio_pos; /* Extern variable declared in lb_audio.h */
+    // local variables
+    extern Uint32 lb_au_audio_len; /* Extern variable declared in lb_audio.h */
+    extern Uint8 *lb_au_audio_pos; /* Extern variable declared in lb_audio.h */
 
-      static Uint32 wav_length; // length of our sample
-      static Uint8 *wav_buffer; // buffer containing our audio file
-      static SDL_AudioSpec wav_spec; // the specs of our piece of music
+    static Uint32 wav_length; // length of our sample
+    static Uint8 *wav_buffer; // buffer containing our audio file
+    static SDL_AudioSpec wav_spec; // the specs of our piece of music
   
 	
-      /* Load the WAV */
-      // the specs, length and buffer of our wav are filled
-      if( SDL_LoadWAV("toto.wav", &wav_spec, &wav_buffer, &wav_length) == NULL )
-	{
-	  printf("Error loading wav file\r\n");
-	  lb_fb_exit(1);
-	}
-      // set the callback function
-      wav_spec.callback = lb_au_callback_copy;
-      wav_spec.userdata = NULL;
-      // set our global static variables
-      lb_au_audio_pos = wav_buffer; // copy sound buffer
-      lb_au_audio_len = wav_length; // copy file length
+    /* Load the WAV */
+    // the specs, length and buffer of our wav are filled
+    if( SDL_LoadWAV("toto.wav", &wav_spec, &wav_buffer, &wav_length) == NULL )
+      {
+	printf("Error loading wav file\r\n");
+	lb_fb_exit(1);
+      }
+    // set the callback function
+    wav_spec.callback = lb_au_callback_copy;
+    wav_spec.userdata = NULL;
+    // set our global static variables
+    lb_au_audio_pos = wav_buffer; // copy sound buffer
+    lb_au_audio_len = wav_length; // copy file length
 	
-      /* Open the audio device */
-      printf("hello\r\n");
-      if ( SDL_OpenAudio(&wav_spec, NULL) < 0 )
-	{
-	  fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-	  lb_fb_exit(-1);
-	}
+    /* Open the audio device */
+    printf("hello\r\n");
+    if ( SDL_OpenAudio(&wav_spec, NULL) < 0 )
+      {
+	fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+	lb_fb_exit(-1);
+      }
 	
-      /* Start playing */
-      SDL_PauseAudio(0);
+    /* Start playing */
+    SDL_PauseAudio(0);
 
-      // wait until we're don't playing
-      while ( lb_au_audio_len > 0 )
-	{
-	  SDL_Delay(100); 
-	}
+    // wait until we're don't playing
+    while ( lb_au_audio_len > 0 )
+      {
+	SDL_Delay(100); 
+      }
 	
-      // shut everything down
-      SDL_CloseAudio();
-      SDL_FreeWAV(wav_buffer);
+    // shut everything down
+    SDL_CloseAudio();
+    SDL_FreeWAV(wav_buffer);
 #endif
 
   
-      //#define DEMO_WAV
+    //#define DEMO_WAV
 #ifdef DEMO_WAV
-      VECTOR_R_T V;
-      U_INT_16_T i;
-      V.items=VECTOR_MAX_ITEMS;
-      lb_al_create_vector_r(&V);
+    VECTOR_R_T V;
+    U_INT_16_T i;
+    V.items=VECTOR_MAX_ITEMS;
+    lb_al_create_vector_r(&V);
 
-      for (i=0;i<V.items;i++)
-	V.array[i]=sin(2*M_PI*500.0*i/11025);
-      lb_au_wave_write_from_vector_r("wav2.wav",&V, 11025,8);
+    for (i=0;i<V.items;i++)
+      V.array[i]=sin(2*M_PI*500.0*i/11025);
+    lb_au_wave_write_from_vector_r("wav2.wav",&V, 11025,8);
 
-      lb_al_release_vector_r(&V);
-      lb_fb_exit(1);
+    lb_al_release_vector_r(&V);
+    lb_fb_exit(1);
 #endif
 
 
 
-      //#define DEMO_UNICODE
+    //#define DEMO_UNICODE
 #ifdef DEMO_UNICODE
-      //https://stackoverflow.com/questions/34937375/printing-a-unicode-box-in-c
-      setlocale(LC_ALL, "");
-      //setlocale(LC_ALL, "en_US.UTF-8");
-      unsigned int i;
+    //https://stackoverflow.com/questions/34937375/printing-a-unicode-box-in-c
+    setlocale(LC_ALL, "");
+    //setlocale(LC_ALL, "en_US.UTF-8");
+    unsigned int i;
 
 
-      //printf("\n");
-      for (i=0;i<0xffff;i++)
-	{
+    //printf("\n");
+    for (i=0;i<0xffff;i++)
+      {
 
-	  // wprintf(L"%lc", (wchar_t)i);  works
-	  if ((i % 16) == 0)
-	    {
-	      printf("\n0x%x\t",i);
-	      lb_gr_delay(250);
-	    }
-	  printf("%lc", i);
+	// wprintf(L"%lc", (wchar_t)i);  works
+	if ((i % 16) == 0)
+	  {
+	    printf("\n0x%x\t",i);
+	    lb_gr_delay(250);
+	  }
+	printf("%lc", i);
  	
-	  //sprintf(text,"\\x%x\\x%x\\x%x\r\n" ,(x>>16) & 0xff, (x>>8) & 0xff, x & 0xff);
-	  //printf(text);
-	}
+	//sprintf(text,"\\x%x\\x%x\\x%x\r\n" ,(x>>16) & 0xff, (x>>8) & 0xff, x & 0xff);
+	//printf(text);
+      }
 
 #endif
 
-      //#define DEMO_SERIAL
+    //#define DEMO_SERIAL
 #ifdef DEMO_SERIAL
 
-      COMM_PORT_T port1;
-      port1.device=dev_S0;
-      port1.baud_rate=B75;
-      port1.data_bits = CS8;
-      port1.stop_bits =SB_1;
-      port1.parity=PA_none;
-      port1.flow_control=FC_none;
-      lb_se_init(&port1);
+    COMM_PORT_T port1;
+    port1.device=dev_S0;
+    port1.baud_rate=B75;
+    port1.data_bits = CS8;
+    port1.stop_bits =SB_1;
+    port1.parity=PA_none;
+    port1.flow_control=FC_none;
+    lb_se_init(&port1);
 
-      COMM_PORT_T port2;
-      port2.device=dev_S1;
-      port2.baud_rate=B75;
-      port2.data_bits = CS8;
-      port2.stop_bits =SB_1;
-      port2.parity=PA_none;
-      port2.flow_control=FC_none;
-      lb_se_init(&port2);
+    COMM_PORT_T port2;
+    port2.device=dev_S1;
+    port2.baud_rate=B75;
+    port2.data_bits = CS8;
+    port2.stop_bits =SB_1;
+    port2.parity=PA_none;
+    port2.flow_control=FC_none;
+    lb_se_init(&port2);
 
-      char a=0;
-      while(1)
-	{
-	  lb_se_tx_byte(&port1, a);
-	  lb_se_tx_byte(&port2, a);
-	  lb_se_process_rx(&port1);
-	  lb_se_process_rx(&port2);
-	  lb_co_textcolor(TEXT_COLOR_WHITE);
-	  fflush(stdout);
+    char a=0;
+    while(1)
+      {
+	lb_se_tx_byte(&port1, a);
+	lb_se_tx_byte(&port2, a);
+	lb_se_process_rx(&port1);
+	lb_se_process_rx(&port2);
+	lb_co_textcolor(TEXT_COLOR_WHITE);
+	fflush(stdout);
 
-	  lb_se_print_buffer(&port1);
-	  lb_co_textcolor(TEXT_COLOR_YELLOW);
-	  fflush(stdout);
-	  lb_se_print_buffer(&port2);
-	  a++;
-	  if (a==128)
-	    a=0;
-	}
-      lb_se_close(&port1);
-      lb_se_close(&port2);
+	lb_se_print_buffer(&port1);
+	lb_co_textcolor(TEXT_COLOR_YELLOW);
+	fflush(stdout);
+	lb_se_print_buffer(&port2);
+	a++;
+	if (a==128)
+	  a=0;
+      }
+    lb_se_close(&port1);
+    lb_se_close(&port2);
 #endif
 
-      //#define DEMO_BATTERY
+    //#define DEMO_BATTERY
 #ifdef DEMO_BATTERY
 
-      /******************************************************************************/
-      /*          B A T T E R Y    C H A R G I N G    P R O F I L E S               */
-      /******************************************************************************/
+    /******************************************************************************/
+    /*          B A T T E R Y    C H A R G I N G    P R O F I L E S               */
+    /******************************************************************************/
   
 
-      /* End of Battery Profile Definition ********************************************************************************/
-      char message[90];
-      char Key;
+    /* End of Battery Profile Definition ********************************************************************************/
+    char message[90];
+    char Key;
 
-      fd_set set;
-      struct timeval timeout;
-      int select_result;
-      int FLAG_STOP=0;
+    fd_set set;
+    struct timeval timeout;
+    int select_result;
+    int FLAG_STOP=0;
 
-      fprintf(stderr,"\r\nGot here");
+    fprintf(stderr,"\r\nGot here");
   
-      if (argc != 7)
-	{
-	  printf("Error: invalid number of parameters\r\n");
-	  printf("device [/dev/ttyS0] baud_rate [1200 2400 9600] data_bits [db8, db7] stop_bits [sb1, sb2] parity [none, even, odd] flow_control [no hw sw] \r\n");
-	  lb_fb_exit(0);
-	}
+    if (argc != 7)
+      {
+	printf("Error: invalid number of parameters\r\n");
+	printf("device [/dev/ttyS0] baud_rate [1200 2400 9600] data_bits [db8, db7] stop_bits [sb1, sb2] parity [none, even, odd] flow_control [no hw sw] \r\n");
+	lb_fb_exit(0);
+      }
   
-      if (!(strcmp(argv[1],"/dev/ttyS0"))) Data_Parameters.device=dev_S0;
-      else if (!(strcmp(argv[1],"/dev/ttyS1"))) Data_Parameters.device=dev_S1;
-      else
-	{
-	  printf("Error: invalid device");
-	  lb_fb_exit(0);
-	}
+    if (!(strcmp(argv[1],"/dev/ttyS0"))) Data_Parameters.device=dev_S0;
+    else if (!(strcmp(argv[1],"/dev/ttyS1"))) Data_Parameters.device=dev_S1;
+    else
+      {
+	printf("Error: invalid device");
+	lb_fb_exit(0);
+      }
       
-      if (!(strcmp(argv[2],"50")))
-	Data_Parameters.baud_rate=B50;
-      else if (!(strcmp(argv[2],"75")))
-	Data_Parameters.baud_rate=B75;
-      else if (!(strcmp(argv[2],"110")))
-	Data_Parameters.baud_rate=B110;
-      else if (!(strcmp(argv[2],"134")))
-	Data_Parameters.baud_rate=B134;
-      else if (!(strcmp(argv[2],"150")))
-	Data_Parameters.baud_rate=B150;
-      else if (!(strcmp(argv[2],"200")))
-	Data_Parameters.baud_rate=B200;
-      else if (!(strcmp(argv[2],"300")))
-	Data_Parameters.baud_rate=B300;
-      else if (!(strcmp(argv[2],"600")))
-	Data_Parameters.baud_rate=B600;
-      else if (!(strcmp(argv[2],"1200")))
-	Data_Parameters.baud_rate=B1200;
-      else if (!(strcmp(argv[2],"1800")))
-	Data_Parameters.baud_rate=B1800;
-      else if (!(strcmp(argv[2],"2400")))
-	Data_Parameters.baud_rate=B2400;
-      else if (!(strcmp(argv[2],"4800")))
-	Data_Parameters.baud_rate=B4800;
-      else if (!(strcmp(argv[2],"9600")))
-	Data_Parameters.baud_rate=B9600;
-      else if (!(strcmp(argv[2],"19200")))
-	Data_Parameters.baud_rate=B19200;
-      else if (!(strcmp(argv[2],"38400")))
-	Data_Parameters.baud_rate=B38400;
-      else if (!(strcmp(argv[2],"57600")))
-	Data_Parameters.baud_rate=B57600;
-      else if (!(strcmp(argv[2],"115200")))
-	Data_Parameters.baud_rate=B115200;
-      else 
-	{
-	  printf("Error: invalid baud rate");
-	  lb_fb_exit(0);
-	}
+    if (!(strcmp(argv[2],"50")))
+      Data_Parameters.baud_rate=B50;
+    else if (!(strcmp(argv[2],"75")))
+      Data_Parameters.baud_rate=B75;
+    else if (!(strcmp(argv[2],"110")))
+      Data_Parameters.baud_rate=B110;
+    else if (!(strcmp(argv[2],"134")))
+      Data_Parameters.baud_rate=B134;
+    else if (!(strcmp(argv[2],"150")))
+      Data_Parameters.baud_rate=B150;
+    else if (!(strcmp(argv[2],"200")))
+      Data_Parameters.baud_rate=B200;
+    else if (!(strcmp(argv[2],"300")))
+      Data_Parameters.baud_rate=B300;
+    else if (!(strcmp(argv[2],"600")))
+      Data_Parameters.baud_rate=B600;
+    else if (!(strcmp(argv[2],"1200")))
+      Data_Parameters.baud_rate=B1200;
+    else if (!(strcmp(argv[2],"1800")))
+      Data_Parameters.baud_rate=B1800;
+    else if (!(strcmp(argv[2],"2400")))
+      Data_Parameters.baud_rate=B2400;
+    else if (!(strcmp(argv[2],"4800")))
+      Data_Parameters.baud_rate=B4800;
+    else if (!(strcmp(argv[2],"9600")))
+      Data_Parameters.baud_rate=B9600;
+    else if (!(strcmp(argv[2],"19200")))
+      Data_Parameters.baud_rate=B19200;
+    else if (!(strcmp(argv[2],"38400")))
+      Data_Parameters.baud_rate=B38400;
+    else if (!(strcmp(argv[2],"57600")))
+      Data_Parameters.baud_rate=B57600;
+    else if (!(strcmp(argv[2],"115200")))
+      Data_Parameters.baud_rate=B115200;
+    else 
+      {
+	printf("Error: invalid baud rate");
+	lb_fb_exit(0);
+      }
 
-      if (!strcmp(argv[3],"db5")) Data_Parameters.data_bits      = CS5;
-      else if (!strcmp(argv[3],"db6")) Data_Parameters.data_bits = CS6;
-      else if (!strcmp(argv[3],"db7")) Data_Parameters.data_bits = CS7;
-      else if (!strcmp(argv[3],"db8")) Data_Parameters.data_bits = CS8;
-      else 
-	{
-	  printf("Error: invalid data bits");
-	  lb_fb_exit(0);
-	}
+    if (!strcmp(argv[3],"db5")) Data_Parameters.data_bits      = CS5;
+    else if (!strcmp(argv[3],"db6")) Data_Parameters.data_bits = CS6;
+    else if (!strcmp(argv[3],"db7")) Data_Parameters.data_bits = CS7;
+    else if (!strcmp(argv[3],"db8")) Data_Parameters.data_bits = CS8;
+    else 
+      {
+	printf("Error: invalid data bits");
+	lb_fb_exit(0);
+      }
 
-      if (!strcmp(argv[4],"sb1")) Data_Parameters.stop_bits=SB_1;
-      else if (!strcmp(argv[4],"sb2")) Data_Parameters.stop_bits=SB_2;
-      else 
-	{
-	  printf("Error: invalid stop bits");
-	  lb_fb_exit(0);
-	}
+    if (!strcmp(argv[4],"sb1")) Data_Parameters.stop_bits=SB_1;
+    else if (!strcmp(argv[4],"sb2")) Data_Parameters.stop_bits=SB_2;
+    else 
+      {
+	printf("Error: invalid stop bits");
+	lb_fb_exit(0);
+      }
 
-      if (!strcmp(argv[5],"none")) Data_Parameters.parity=PA_none;
-      else if (!strcmp(argv[5],"even")) Data_Parameters.parity=PA_even;
-      else if (!strcmp(argv[5],"odd")) Data_Parameters.parity=PA_odd;
-      else 
-	{
-	  printf("Error: invalid parity");
-	  lb_fb_exit(0);
-	}
+    if (!strcmp(argv[5],"none")) Data_Parameters.parity=PA_none;
+    else if (!strcmp(argv[5],"even")) Data_Parameters.parity=PA_even;
+    else if (!strcmp(argv[5],"odd")) Data_Parameters.parity=PA_odd;
+    else 
+      {
+	printf("Error: invalid parity");
+	lb_fb_exit(0);
+      }
 
-      if (!strcmp(argv[6],"no")) Data_Parameters.flow_control=FC_none;
-      else if (!strcmp(argv[6],"hw")) Data_Parameters.flow_control=FC_hw;
-      else if (!strcmp(argv[6],"sw")) Data_Parameters.flow_control=FC_sw;
-      else 
-	{
-	  printf("Error: invalid flow control");
-	  lb_fb_exit(0);
-	}
+    if (!strcmp(argv[6],"no")) Data_Parameters.flow_control=FC_none;
+    else if (!strcmp(argv[6],"hw")) Data_Parameters.flow_control=FC_hw;
+    else if (!strcmp(argv[6],"sw")) Data_Parameters.flow_control=FC_sw;
+    else 
+      {
+	printf("Error: invalid flow control");
+	lb_fb_exit(0);
+      }
 
-      text_file=fopen("./charge_data.txt", "w");
-      if (text_file== NULL)
-	{ 
-	  fprintf(stderr,"Error in opening text file..\r\n");
-	  return 1;
-	}
-      CONSOLE_Initialize();
-      SERCOM_Initialize();
+    text_file=fopen("./charge_data.txt", "w");
+    if (text_file== NULL)
+      { 
+	fprintf(stderr,"Error in opening text file..\r\n");
+	return 1;
+      }
+    CONSOLE_Initialize();
+    SERCOM_Initialize();
   
-      fprintf(output,"\E[H\E[2J");
-      fflush(output);
+    fprintf(output,"\E[H\E[2J");
+    fflush(output);
   
-      sprintf(message,"BATTERY TEST PROGRAM\r\n");
-      fputs(message,output);   
-      fflush(output);
-      fprintf(stderr,"--------------------------------------------------------------------------------\r\n");
+    sprintf(message,"BATTERY TEST PROGRAM\r\n");
+    fputs(message,output);   
+    fflush(output);
+    fprintf(stderr,"--------------------------------------------------------------------------------\r\n");
 
-      gettimeofday(&t_initial, NULL);
-      /* printf("\r\nt_initial = %f",(float)t_initial.tv_sec); */
-      t_previous=0;
-      t_delta=0;
-      SetupPSU(0);
+    gettimeofday(&t_initial, NULL);
+    /* printf("\r\nt_initial = %f",(float)t_initial.tv_sec); */
+    t_previous=0;
+    t_delta=0;
+    SetupPSU(0);
 
-      while (!FLAG_STOP)
-	{
-	  /************************************************************************/
-	  /*  Re-initialize the file descriptor set.                              */
-	  /************************************************************************/
-	  FD_ZERO (&set);
-	  FD_SET (fd, &set);
-	  FD_SET (tty, &set);
-	  /* Initialize the timeout data structure. */
-	  timeout.tv_sec = 0.25;
-	  timeout.tv_usec = 0;
-	  select_result=select(sizeof(set)*8,&set,NULL,NULL,&timeout);
-	  /************************************************************************/
+    while (!FLAG_STOP)
+      {
+	/************************************************************************/
+	/*  Re-initialize the file descriptor set.                              */
+	/************************************************************************/
+	FD_ZERO (&set);
+	FD_SET (fd, &set);
+	FD_SET (tty, &set);
+	/* Initialize the timeout data structure. */
+	timeout.tv_sec = 0.25;
+	timeout.tv_usec = 0;
+	select_result=select(sizeof(set)*8,&set,NULL,NULL,&timeout);
+	/************************************************************************/
 
-	  if (current_stage==N_STAGES)
-	    {
-	      fprintf(output,"Sequence completed...\r\n");
+	if (current_stage==N_STAGES)
+	  {
+	    fprintf(output,"Sequence completed...\r\n");
+	    FLAG_STOP=1;
+	  }  
+
+	if (CONSOLE_RxByte(&Key))  /* if a key was hit */
+	  {
+	    CONSOLE_TxByte(Key);
+	    SERCOM_TxByte(Key);
+	    if (Key==0x1b) 
 	      FLAG_STOP=1;
-	    }  
+	  }
 
-	  if (CONSOLE_RxByte(&Key))  /* if a key was hit */
-	    {
-	      CONSOLE_TxByte(Key);
-	      SERCOM_TxByte(Key);
-	      if (Key==0x1b) 
-		FLAG_STOP=1;
-	    }
-
-	  if (FLAG_STOP)
-	    {
-	      SERCOM_TxStr("OUTP:STAT 0\r\n");
-	      SERCOM_Flush();
-	      SERCOM_Close();
-	      CONSOLE_Close();
-	      fclose(text_file);
-	      lb_fb_exit(0);
-	    }
-	  RunProcess();
-	}
+	if (FLAG_STOP)
+	  {
+	    SERCOM_TxStr("OUTP:STAT 0\r\n");
+	    SERCOM_Flush();
+	    SERCOM_Close();
+	    CONSOLE_Close();
+	    fclose(text_file);
+	    lb_fb_exit(0);
+	  }
+	RunProcess();
+      }
 #endif
 
   
-    }
+}
 
