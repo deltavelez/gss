@@ -2478,7 +2478,7 @@ int main()
   
 #endif
 
-#define GPIO
+  //#define GPIO
 #ifdef GPIO
 
 #define PIN_CS_0   17
@@ -2489,1701 +2489,1701 @@ int main()
 #define PIN_MISO    9
 #define PIN_RELAY  13
 
-  clock_t time_begin, time_end;
+    clock_t time_begin, time_end;
   
-  S_INT_8_T flag_running;
-  S_INT_8_T relay_status=0;
-  S_INT_16_T shock_counter=0;
-  FLOAT_T accel, accel_max;
+    S_INT_8_T flag_running;
+    S_INT_8_T relay_status=0;
+    S_INT_16_T shock_counter=0;
+    FLOAT_T accel, accel_max;
   
-  union Record
-  {
-    float  f;
-    unsigned char uc[4];
-  };
-      
-  int i;
-
-  union Record temp0, press0, temp1, press1;
-
-  SPI_PORT_T my_port;
-
-  time_begin = clock();
-  flag_running=TRUE;
-
-  my_port.MOSI=PIN_MOSI;
-  my_port.CLK=PIN_CLK;
-  my_port.MISO=PIN_MISO;
-  my_port.delay_clk=100;
-  my_port.delay_byte=100;
-
-  lb_gp_gpio_open();
-  lb_gp_gpio_setup_pin(PIN_CS_0,   GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_CS_1,   GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_CS_ADC, GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_RELAY,  GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
-
-  lb_gp_gpio_wr(PIN_CS_0,   GPIO_HIGH);
-  lb_gp_gpio_wr(PIN_CS_1,   GPIO_HIGH);
-  lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
-
-  
-  while (flag_running)
+    union Record
     {
-      /* Schedule:
-	 Log P, T, accel_max 
-	 Trigger device
-	 accel_max=0
-	 Log acceleration, save accel_max
-	 wait until t= 5.0 */
-
-      /* Firts, we set the required parameters for transducer 0 */
-
-      my_port.CPOL=GPIO_HIGH;
-      lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
-      my_port.CPHA=GPIO_HIGH;
-      	 
-      lb_gp_gpio_wr(PIN_CS_0, GPIO_LOW);
-      lb_ti_delay_us(100);
-      for (i=0;i<8;i++)
-	lb_gp_gpio_SPI_rw(&my_port, 0x03);
-
-      lb_ti_delay_ms(250);
-
-      for (i=0;i<4;i++)
-	temp0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-
-      for (i=0;i<4;i++)
-	press0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-
-      lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
-
-
-      /* Second sensor */
-      lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
-      lb_ti_delay_us(500);
-      for (i=0;i<8;i++)
-	lb_gp_gpio_SPI_rw(&my_port, 0x03);
-
-      lb_ti_delay_ms(250);
-
-      for (i=0;i<4;i++)
-	temp1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-
-      for (i=0;i<4;i++)
-	press1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
-
-      lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
-
-      /* We measure the acceleration */
-      lb_ti_delay_ms(1);
-
-      my_port.CPOL=GPIO_LOW;
-      my_port.CPHA=GPIO_LOW;
-      lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
-
-      time_end = time_begin + 5.0*shock_counter*CLOCKS_PER_SEC;
-      accel_max = 0.0;
-
-      relay_status = !relay_status;
-      lb_gp_gpio_wr(PIN_RELAY,   relay_status);
-
-      while (clock() < time_end)
-	{
-	  /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
-
-	  lb_gp_gpio_wr(PIN_CS_ADC, GPIO_LOW);
-	  lb_ti_delay_us(100);
+      float  f;
+      unsigned char uc[4];
+    };
       
-	  lb_gp_gpio_SPI_rw(&my_port, 0b110);
-	  U_INT_16_T value;
-	  lb_ti_delay_us(100);
-	  value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
-	  //lb_gp_print_u32_as_binary(value, 16);
-	  lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
-	  lb_ti_delay_us(100);
+    int i;
 
-	  value = value & 0xFFF;
-	  accel = (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3;
-	  if (accel>accel_max)
-	    accel_max = accel;
-	}
-      printf("n=%d;T0=%f; P0=%f; T1=%f; P1=%f; a=%f\r\n",shock_counter,temp0.f, press0.f,temp1.f, press1.f, accel_max);
-       shock_counter++;
-    }
-  lb_gp_gpio_close();
+    union Record temp0, press0, temp1, press1;
+
+    SPI_PORT_T my_port;
+
+    time_begin = clock();
+    flag_running=TRUE;
+
+    my_port.MOSI=PIN_MOSI;
+    my_port.CLK=PIN_CLK;
+    my_port.MISO=PIN_MISO;
+    my_port.delay_clk=100;
+    my_port.delay_byte=100;
+
+    lb_gp_gpio_open();
+    lb_gp_gpio_setup_pin(PIN_CS_0,   GPIO_OUTPUT);
+    lb_gp_gpio_setup_pin(PIN_CS_1,   GPIO_OUTPUT);
+    lb_gp_gpio_setup_pin(PIN_CS_ADC, GPIO_OUTPUT);
+    lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
+    lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
+    lb_gp_gpio_setup_pin(PIN_RELAY,  GPIO_OUTPUT);
+    lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
+
+    lb_gp_gpio_wr(PIN_CS_0,   GPIO_HIGH);
+    lb_gp_gpio_wr(PIN_CS_1,   GPIO_HIGH);
+    lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
+
+  
+    while (flag_running)
+      {
+	/* Schedule:
+	   Log P, T, accel_max 
+	   Trigger device
+	   accel_max=0
+	   Log acceleration, save accel_max
+	   wait until t= 5.0 */
+
+	/* Firts, we set the required parameters for transducer 0 */
+
+	my_port.CPOL=GPIO_HIGH;
+	lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
+	my_port.CPHA=GPIO_HIGH;
+      	 
+	lb_gp_gpio_wr(PIN_CS_0, GPIO_LOW);
+	lb_ti_delay_us(100);
+	for (i=0;i<8;i++)
+	  lb_gp_gpio_SPI_rw(&my_port, 0x03);
+
+	lb_ti_delay_ms(250);
+
+	for (i=0;i<4;i++)
+	  temp0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+	for (i=0;i<4;i++)
+	  press0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+	lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
+
+
+	/* Second sensor */
+	lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+	lb_ti_delay_us(500);
+	for (i=0;i<8;i++)
+	  lb_gp_gpio_SPI_rw(&my_port, 0x03);
+
+	lb_ti_delay_ms(250);
+
+	for (i=0;i<4;i++)
+	  temp1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+	for (i=0;i<4;i++)
+	  press1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
+
+	lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
+
+	/* We measure the acceleration */
+	lb_ti_delay_ms(1);
+
+	my_port.CPOL=GPIO_LOW;
+	my_port.CPHA=GPIO_LOW;
+	lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
+
+	time_end = time_begin + 5.0*shock_counter*CLOCKS_PER_SEC;
+	accel_max = 0.0;
+
+	relay_status = !relay_status;
+	lb_gp_gpio_wr(PIN_RELAY,   relay_status);
+
+	while (clock() < time_end)
+	  {
+	    /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
+
+	    lb_gp_gpio_wr(PIN_CS_ADC, GPIO_LOW);
+	    lb_ti_delay_us(100);
+      
+	    lb_gp_gpio_SPI_rw(&my_port, 0b110);
+	    U_INT_16_T value;
+	    lb_ti_delay_us(100);
+	    value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
+	    //lb_gp_print_u32_as_binary(value, 16);
+	    lb_gp_gpio_wr(PIN_CS_ADC, GPIO_HIGH);
+	    lb_ti_delay_us(100);
+
+	    value = value & 0xFFF;
+	    accel = (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3;
+	    if (accel>accel_max)
+	      accel_max = accel;
+	  }
+	printf("n=%d;T0=%f; P0=%f; T1=%f; P1=%f; a=%f\r\n",shock_counter,temp0.f, press0.f,temp1.f, press1.f, accel_max);
+	shock_counter++;
+      }
+    lb_gp_gpio_close();
   
 #endif
 
-  /*
-    unsigned int value;
-    value= lb_gp_gpio_rd_all();
-    value= lb_gp_gpio_rd(4);
-    lb_gp_print_u32_as_binary(value, 32);
+    /*
+      unsigned int value;
+      value= lb_gp_gpio_rd_all();
+      value= lb_gp_gpio_rd(4);
+      lb_gp_print_u32_as_binary(value, 32);
       
-    printf("VALUE=%d\r\n", value);
+      printf("VALUE=%d\r\n", value);
     
-    lb_gp_gpio_wr(4,0);
-    lb_ti_delay(100);
-    lb_gp_gpio_wr(4,1);
-    lb_ti_delay(100); */
+      lb_gp_gpio_wr(4,0);
+      lb_ti_delay(100);
+      lb_gp_gpio_wr(4,1);
+      lb_ti_delay(100); */
   
   
-  //#define DEMO_SHAKER
+    //#define DEMO_SHAKER
 #ifdef DEMO_SHAKER
 #define N_DISK 4000
-  /* Graphical variables */
-  FLOAT_T bar_radius=0.05;
-  FLOAT_T bar_length=1.5;
-  FLOAT_T disk_distance=0.7;
-  FLOAT_T disk_max_radius=0.0;
-  FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
+    /* Graphical variables */
+    FLOAT_T bar_radius=0.05;
+    FLOAT_T bar_length=1.5;
+    FLOAT_T disk_distance=0.7;
+    FLOAT_T disk_max_radius=0.0;
+    FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
 
-  /* General use variables */
-  FLOAT_T xr, yr;
+    /* General use variables */
+    FLOAT_T xr, yr;
   
-  /* Dynamics variables */
-  FLOAT_T Pos_x, Pos_y, Pos_x_prev, Pos_y_prev, Vel_x, Vel_y, Vel_x_prev, Vel_y_prev, Acc_x, Acc_y;
-  FLOAT_T Pos_xp, Pos_yp;
+    /* Dynamics variables */
+    FLOAT_T Pos_x, Pos_y, Pos_x_prev, Pos_y_prev, Vel_x, Vel_y, Vel_x_prev, Vel_y_prev, Acc_x, Acc_y;
+    FLOAT_T Pos_xp, Pos_yp;
   
-  FLOAT_T RPM, t, dt, t_max, w,  xp, yp, xp2, yp2;
-  S_INT_32_T i;
-  VIEWPORT_2D_T win_v, win_a, win_sim;
-  SDL_Event event;
+    FLOAT_T RPM, t, dt, t_max, w,  xp, yp, xp2, yp2;
+    S_INT_32_T i;
+    VIEWPORT_2D_T win_v, win_a, win_sim;
+    SDL_Event event;
 
-  VECTOR_R_T R;
-  VECTOR_R_T T;
+    VECTOR_R_T R;
+    VECTOR_R_T T;
 
-  PICTURE_T Pic_Vel, Pic_Acc;
-  FONT_T my_font;
-  char text[80];
+    PICTURE_T Pic_Vel, Pic_Acc;
+    FONT_T my_font;
+    char text[80];
 
-  lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
-  my_font.scale_x=2;
-  my_font.scale_y=2;
-  my_font.gap_x=2;
-  my_font.gap_y=1;
-  my_font.max_x=40;
-  my_font.angle=0;
-  my_font.flag_fg=TRUE;
-  my_font.flag_bg=TRUE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
-  my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
+    lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
+    my_font.scale_x=2;
+    my_font.scale_y=2;
+    my_font.gap_x=2;
+    my_font.gap_y=1;
+    my_font.max_x=40;
+    my_font.angle=0;
+    my_font.flag_fg=TRUE;
+    my_font.flag_bg=TRUE;
+    my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
+    my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
 
      
-  R.items=N_DISK;
-  T.items=N_DISK;
-  lb_al_create_vector_r(&R);
-  lb_al_create_vector_r(&T);
+    R.items=N_DISK;
+    T.items=N_DISK;
+    lb_al_create_vector_r(&R);
+    lb_al_create_vector_r(&T);
 
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
+    lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
-  Pic_Vel.w = ty_screen.w/2-15;
-  Pic_Vel.h = ty_screen.h*1/3-10;
-  lb_gr_create_picture(&Pic_Vel,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
+    Pic_Vel.w = ty_screen.w/2-15;
+    Pic_Vel.h = ty_screen.h*1/3-10;
+    lb_gr_create_picture(&Pic_Vel,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
 
-  //sprintf(text,"dt: %02.2f [s]",dt);
-  lb_gr_draw_rectangle_line(&Pic_Vel, 0, 0, Pic_Vel.w-2, Pic_Vel.h-2, 2,
-			    lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+    //sprintf(text,"dt: %02.2f [s]",dt);
+    lb_gr_draw_rectangle_line(&Pic_Vel, 0, 0, Pic_Vel.w-2, Pic_Vel.h-2, 2,
+			      lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
  
  
 
-  Pic_Acc.w = ty_screen.w/2-15;
-  Pic_Acc.h = ty_screen.h*1/3-10;
-  lb_gr_create_picture(&Pic_Acc,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
-  lb_gr_draw_rectangle_line(&Pic_Acc, 0, 0, Pic_Acc.w-2, Pic_Acc.h-2, 2,
-			    lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+    Pic_Acc.w = ty_screen.w/2-15;
+    Pic_Acc.h = ty_screen.h*1/3-10;
+    lb_gr_create_picture(&Pic_Acc,lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID));
+    lb_gr_draw_rectangle_line(&Pic_Acc, 0, 0, Pic_Acc.w-2, Pic_Acc.h-2, 2,
+			      lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
   
 
-  RPM=1200.0;
-  w=RPM*2*M_PI/60.0; /* rad per sec */
+    RPM=1200.0;
+    w=RPM*2*M_PI/60.0; /* rad per sec */
 
-  t_max=8*60/RPM;
-  dt=t_max/(1200.0);
+    t_max=8*60/RPM;
+    dt=t_max/(1200.0);
 
-  /* Load the disk */
-  for (i=0;i<N_DISK; i++)
-    {
-      T.array[i] = i*2*M_PI/N_DISK;
-      R.array[i] = 0.1+0.05*sin(T.array[i]);
-      if (R.array[i]>disk_max_radius)
-	disk_max_radius=R.array[i];
-    }
+    /* Load the disk */
+    for (i=0;i<N_DISK; i++)
+      {
+	T.array[i] = i*2*M_PI/N_DISK;
+	R.array[i] = 0.1+0.05*sin(T.array[i]);
+	if (R.array[i]>disk_max_radius)
+	  disk_max_radius=R.array[i];
+      }
 
-  win_sim.xp_min=0;
-  win_sim.xp_max=ty_screen.w;
-  win_sim.yp_min=0;
-  win_sim.yp_max=ty_screen.h;
+    win_sim.xp_min=0;
+    win_sim.xp_max=ty_screen.w;
+    win_sim.yp_min=0;
+    win_sim.yp_max=ty_screen.h;
 
-  win_sim.xr_min= -5*bar_radius;
-  win_sim.xr_max=  bar_length+disk_max_radius+5*bar_radius;
-  win_sim.yr_min=  -0.5*(win_sim.yp_max-win_sim.yp_min)*(win_sim.xr_max-win_sim.xr_min)/(win_sim.xp_max-win_sim.xp_min);
-  win_sim.yr_max=   -win_sim.yr_min; 
-
-
-  win_v.xp_min=0;
-  win_v.xp_max=Pic_Vel.w;
-  win_v.yp_min=0;
-  win_v.yp_max=Pic_Vel.h;
-
-  win_v.xr_min= 0.0;
-  win_v.xr_max=  t_max;
-  win_v.yr_min=  -30;
-  win_v.yr_max=  30; 
+    win_sim.xr_min= -5*bar_radius;
+    win_sim.xr_max=  bar_length+disk_max_radius+5*bar_radius;
+    win_sim.yr_min=  -0.5*(win_sim.yp_max-win_sim.yp_min)*(win_sim.xr_max-win_sim.xr_min)/(win_sim.xp_max-win_sim.xp_min);
+    win_sim.yr_max=   -win_sim.yr_min; 
 
 
-  win_a.xp_min=0;
-  win_a.xp_max=Pic_Acc.w;
-  win_a.yp_min=0;
-  win_a.yp_max=Pic_Acc.h;
+    win_v.xp_min=0;
+    win_v.xp_max=Pic_Vel.w;
+    win_v.yp_min=0;
+    win_v.yp_max=Pic_Vel.h;
 
-  win_a.xr_min= 0.0;
-  win_a.xr_max=  t_max;
-  win_a.yr_min=  -2500;
-  win_a.yr_max=  2500; 
+    win_v.xr_min= 0.0;
+    win_v.xr_max=  t_max;
+    win_v.yr_min=  -30;
+    win_v.yr_max=  30; 
 
 
-  /* simulation */  
-  //oxo 
-  t=0;
-  while (t<=t_max)
-    {
-      my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
-      lb_gr_draw_rectangle(NULL, 0,0, ty_screen.w, ty_screen.h*2/3,lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-      sprintf(text,"Velocidad: componente y");
-      lb_ft_draw_text(NULL, &my_font, 30, ty_screen.h*2/3-20, text, COPYMODE_COPY);
-      sprintf(text,"Aceleracion: componente y");
-      lb_ft_draw_text(NULL, &my_font, ty_screen.w/2+30, ty_screen.h*2/3-20, text, COPYMODE_COPY);
+    win_a.xp_min=0;
+    win_a.xp_max=Pic_Acc.w;
+    win_a.yp_min=0;
+    win_a.yp_max=Pic_Acc.h;
+
+    win_a.xr_min= 0.0;
+    win_a.xr_max=  t_max;
+    win_a.yr_min=  -2500;
+    win_a.yr_max=  2500; 
+
+
+    /* simulation */  
+    //oxo 
+    t=0;
+    while (t<=t_max)
+      {
+	my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
+	lb_gr_draw_rectangle(NULL, 0,0, ty_screen.w, ty_screen.h*2/3,lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+	sprintf(text,"Velocidad: componente y");
+	lb_ft_draw_text(NULL, &my_font, 30, ty_screen.h*2/3-20, text, COPYMODE_COPY);
+	sprintf(text,"Aceleracion: componente y");
+	lb_ft_draw_text(NULL, &my_font, ty_screen.w/2+30, ty_screen.h*2/3-20, text, COPYMODE_COPY);
   
-      /* First circle */
-      lb_gr_project_2d(win_sim, 0, 0, &xp, &yp);
-      lb_gr_project_2d(win_sim, bar_radius, 0, &xp2, &yp2);
-      ellipse_a=fabs(xp2-xp);
-      lb_gr_project_2d(win_sim, 0, bar_radius, &xp2, &yp2);
-      ellipse_b=fabs(yp2-yp);
-      lb_gr_draw_ellipse_antialiasing3(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
+	/* First circle */
+	lb_gr_project_2d(win_sim, 0, 0, &xp, &yp);
+	lb_gr_project_2d(win_sim, bar_radius, 0, &xp2, &yp2);
+	ellipse_a=fabs(xp2-xp);
+	lb_gr_project_2d(win_sim, 0, bar_radius, &xp2, &yp2);
+	ellipse_b=fabs(yp2-yp);
+	lb_gr_draw_ellipse_antialiasing3(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
-      /* Motor axis */
-      lb_gr_project_2d(win_sim, -1.2*bar_radius, 0, &xp, &yp);
-      lb_gr_project_2d(win_sim, disk_distance+1.2*disk_max_radius, 0, &xp2, &yp2);
-      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
+	/* Motor axis */
+	lb_gr_project_2d(win_sim, -1.2*bar_radius, 0, &xp, &yp);
+	lb_gr_project_2d(win_sim, disk_distance+1.2*disk_max_radius, 0, &xp2, &yp2);
+	lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
 
-      lb_gr_project_2d(win_sim, disk_distance, -1.2*disk_max_radius, &xp, &yp);
-      lb_gr_project_2d(win_sim, disk_distance,  1.2*disk_max_radius, &xp2, &yp2);
-      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
+	lb_gr_project_2d(win_sim, disk_distance, -1.2*disk_max_radius, &xp, &yp);
+	lb_gr_project_2d(win_sim, disk_distance,  1.2*disk_max_radius, &xp2, &yp2);
+	lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
 
-      lb_gr_project_2d(win_sim, 0, -1.2*bar_radius, &xp, &yp);
-      lb_gr_project_2d(win_sim, 0,  1.2*bar_radius, &xp2, &yp2);
-      lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
+	lb_gr_project_2d(win_sim, 0, -1.2*bar_radius, &xp, &yp);
+	lb_gr_project_2d(win_sim, 0,  1.2*bar_radius, &xp2, &yp2);
+	lb_gr_draw_line(NULL, xp, yp, xp2, yp2, 1, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY, LINEMODE_SOLID);
 
         
-      max_angle=-M_PI;
-      S_INT_8_T flag_first=TRUE;
-      for (i=0;i<N_DISK; i++)
-	{
-	  xr = disk_distance + R.array[i]*cos(T.array[i] + w*t);
-	  yr =                 R.array[i]*sin(T.array[i] + w*t);
+	max_angle=-M_PI;
+	S_INT_8_T flag_first=TRUE;
+	for (i=0;i<N_DISK; i++)
+	  {
+	    xr = disk_distance + R.array[i]*cos(T.array[i] + w*t);
+	    yr =                 R.array[i]*sin(T.array[i] + w*t);
 	  
-	  lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
+	    lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
 
-	  if (!flag_first)
-	    lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_BLEND);
-	  flag_first = FALSE;
+	    if (!flag_first)
+	      lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_BLEND);
+	    flag_first = FALSE;
 	  
-	  xp_2 = xp_1;
-	  yp_2 = yp_1;
+	    xp_2 = xp_1;
+	    yp_2 = yp_1;
 	  
-	  //temp=atan2(R.array[i]*sin(T.array[i] + w*t),d + R.array[i]*cos(T.array[i] + w*t));
-	  lb_ge_tangents_to_circle_point(0, 0, bar_radius,
-					 xr, yr, &tetha1, &tetha2);
-	  //printf("tetha2 = %f\r\n",tetha2);
-	  if (tetha2>max_angle)
-	    max_angle=tetha2;
-	}
-      /* The last segment of the disk is incomplete.  We assume a closed shape */
-      xr = disk_distance + R.array[0]*cos(T.array[0] + w*t);
-      yr =                 R.array[0]*sin(T.array[0] + w*t);
-      lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
-      lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_BLEND);
+	    //temp=atan2(R.array[i]*sin(T.array[i] + w*t),d + R.array[i]*cos(T.array[i] + w*t));
+	    lb_ge_tangents_to_circle_point(0, 0, bar_radius,
+					   xr, yr, &tetha1, &tetha2);
+	    //printf("tetha2 = %f\r\n",tetha2);
+	    if (tetha2>max_angle)
+	      max_angle=tetha2;
+	  }
+	/* The last segment of the disk is incomplete.  We assume a closed shape */
+	xr = disk_distance + R.array[0]*cos(T.array[0] + w*t);
+	yr =                 R.array[0]*sin(T.array[0] + w*t);
+	lb_gr_project_2d(win_sim, xr, yr, &xp_1, &yp_1);
+	lb_gr_draw_line_antialiasing3(NULL, xp_1, yp_1, xp_2, yp_2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_BLEND);
 
 
-      /* Second circle */
-      xr=bar_length*cos(max_angle+M_PI_2);
-      yr=bar_length*sin(max_angle+M_PI_2);
-      lb_gr_project_2d(win_sim, xr, yr, &xp, &yp);
-      lb_gr_draw_ellipse_antialiasing3(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
+	/* Second circle */
+	xr=bar_length*cos(max_angle+M_PI_2);
+	yr=bar_length*sin(max_angle+M_PI_2);
+	lb_gr_project_2d(win_sim, xr, yr, &xp, &yp);
+	lb_gr_draw_ellipse_antialiasing3(NULL, xp, yp, ellipse_a, ellipse_b, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
       
 
       
-      /* First line of the bar */
-      xt_r_1=bar_radius*cos(max_angle);
-      yt_r_1=bar_radius*sin(max_angle);
-      lb_gr_project_2d(win_sim, xt_r_1, yt_r_1, &xt_p_1, &yt_p_1);
+	/* First line of the bar */
+	xt_r_1=bar_radius*cos(max_angle);
+	yt_r_1=bar_radius*sin(max_angle);
+	lb_gr_project_2d(win_sim, xt_r_1, yt_r_1, &xt_p_1, &yt_p_1);
   
      
-      lb_gr_project_2d(win_sim,
-		       xt_r_1 + bar_length*cos(max_angle+M_PI_2),
-		       yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
-      lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
+	lb_gr_project_2d(win_sim,
+			 xt_r_1 + bar_length*cos(max_angle+M_PI_2),
+			 yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
+	lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
 
-      /* Second line of the bar */
-      xt_r_1=bar_radius*cos(max_angle+M_PI);
-      yt_r_1=bar_radius*sin(max_angle+M_PI);
-      lb_gr_project_2d(win_sim, xt_r_1, yt_r_1, &xt_p_1, &yt_p_1);
+	/* Second line of the bar */
+	xt_r_1=bar_radius*cos(max_angle+M_PI);
+	yt_r_1=bar_radius*sin(max_angle+M_PI);
+	lb_gr_project_2d(win_sim, xt_r_1, yt_r_1, &xt_p_1, &yt_p_1);
   
      
-      lb_gr_project_2d(win_sim,
-		       xt_r_1 + bar_length*cos(max_angle+M_PI_2),
-		       yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
-      lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
+	lb_gr_project_2d(win_sim,
+			 xt_r_1 + bar_length*cos(max_angle+M_PI_2),
+			 yt_r_1 + bar_length*sin(max_angle+M_PI_2), &xt_p_2, &yt_p_2);
+	lb_gr_draw_line_antialiasing3(NULL,xt_p_1, yt_p_1, xt_p_2, yt_p_2, lb_gr_12RGB(COLOR_ORANGE), COPYMODE_BLEND);
 
       
-      //      lb_gr_delay(10);
+	//      lb_gr_delay(10);
 
-      Pos_x=bar_length*cos(max_angle+M_PI_2);
-      Pos_y=bar_length*sin(max_angle+M_PI_2);
+	Pos_x=bar_length*cos(max_angle+M_PI_2);
+	Pos_y=bar_length*sin(max_angle+M_PI_2);
       
 
-      Vel_x=(Pos_x-Pos_x_prev)/dt;
-      Vel_y=(Pos_y-Pos_y_prev)/dt;
+	Vel_x=(Pos_x-Pos_x_prev)/dt;
+	Vel_y=(Pos_y-Pos_y_prev)/dt;
 
-      lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
-      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 10*Vel_x, Pos_yp-10*Vel_y, 5, 10, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND, LINEMODE_FILTERED);
-      my_font.color_fg=lb_gr_12RGB(COLOR_RED);
-      sprintf(text,"V");
-      lb_ft_draw_text(NULL, &my_font, Pos_xp + 10*Vel_x+20, Pos_yp-10*Vel_y, text, COPYMODE_COPY);
+	lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
+	lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 10*Vel_x, Pos_yp-10*Vel_y, 5, 10, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND, LINEMODE_FILTERED);
+	my_font.color_fg=lb_gr_12RGB(COLOR_RED);
+	sprintf(text,"V");
+	lb_ft_draw_text(NULL, &my_font, Pos_xp + 10*Vel_x+20, Pos_yp-10*Vel_y, text, COPYMODE_COPY);
 
 
-      Acc_x=(Vel_x-Vel_x_prev)/dt;
-      Acc_y=(Vel_y-Vel_y_prev)/dt;
-      lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 0.05*Acc_x, Pos_yp-0.05*Acc_y, 5, 10, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
-      my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
-      sprintf(text,"A");
-      lb_ft_draw_text(NULL, &my_font, Pos_xp + 0.05*Acc_x + 20, Pos_yp-0.05*Acc_y, text, COPYMODE_COPY);		       
-      //lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
-      //lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + Acc_x, Pos_yp-Acc_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
+	Acc_x=(Vel_x-Vel_x_prev)/dt;
+	Acc_y=(Vel_y-Vel_y_prev)/dt;
+	lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + 0.05*Acc_x, Pos_yp-0.05*Acc_y, 5, 10, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
+	my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
+	sprintf(text,"A");
+	lb_ft_draw_text(NULL, &my_font, Pos_xp + 0.05*Acc_x + 20, Pos_yp-0.05*Acc_y, text, COPYMODE_COPY);		       
+	//lb_gr_project_2d(win_sim, Pos_x, Pos_y, &Pos_xp, &Pos_yp);
+	//lb_gr_draw_arrow(NULL, Pos_xp, Pos_yp, Pos_xp + Acc_x, Pos_yp-Acc_y, 1, 10, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_SOLID);
 
       
-      //Vel_mag=sqrt(Vel_x*Vel_x + Vel_y*Vel_y);
-      //Acc_mag=sqrt(Acc_x*Acc_x + Acc_y*Acc_y);
+	//Vel_mag=sqrt(Vel_x*Vel_x + Vel_y*Vel_y);
+	//Acc_mag=sqrt(Acc_x*Acc_x + Acc_y*Acc_y);
 
-      lb_gr_project_2d(win_v, t, Vel_y, &xp, &yp);
-      //lb_gr_draw_pixel(&Pic_Vel,round(xp),round(yp),lb_gr_12RGB(COLOR_RED),COPYMODE_COPY);
-      lb_gr_draw_circle_filled_antialiasing(&Pic_Vel, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND);
-      lb_gr_render_picture(&Pic_Vel, 10, ty_screen.h*2/3+5, COPYMODE_COPY, 0);
+	lb_gr_project_2d(win_v, t, Vel_y, &xp, &yp);
+	//lb_gr_draw_pixel(&Pic_Vel,round(xp),round(yp),lb_gr_12RGB(COLOR_RED),COPYMODE_COPY);
+	lb_gr_draw_circle_filled_antialiasing(&Pic_Vel, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_RED), COPYMODE_BLEND);
+	lb_gr_render_picture(&Pic_Vel, 10, ty_screen.h*2/3+5, COPYMODE_COPY, 0);
 		    
 
-      lb_gr_project_2d(win_a, t, Acc_y, &xp, &yp);
-      //lb_gr_draw_pixel(&Pic_Acc,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-      lb_gr_draw_circle_filled_antialiasing(&Pic_Acc, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND);
-      lb_gr_render_picture(&Pic_Acc, ty_screen.w/2+5, ty_screen.h*2/3+5, COPYMODE_COPY,0);
+	lb_gr_project_2d(win_a, t, Acc_y, &xp, &yp);
+	//lb_gr_draw_pixel(&Pic_Acc,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+	lb_gr_draw_circle_filled_antialiasing(&Pic_Acc, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND);
+	lb_gr_render_picture(&Pic_Acc, ty_screen.w/2+5, ty_screen.h*2/3+5, COPYMODE_COPY,0);
 
-      Pos_x_prev = Pos_x;
-      Pos_y_prev = Pos_y;
+	Pos_x_prev = Pos_x;
+	Pos_y_prev = Pos_y;
 
-      Vel_x_prev = Vel_x;
-      Vel_y_prev = Vel_y;
+	Vel_x_prev = Vel_x;
+	Vel_y_prev = Vel_y;
 
-      t+=dt;
+	t+=dt;
 
-      lb_gr_refresh();
-    }
-  lb_gr_BMPfile_save("leva.bmp", NULL);
-  
-  while (1)
-    while (SDL_PollEvent(&event))
-      {
-	if (event.type == SDL_QUIT)
-	  {
-		      
-	    SDL_Quit();
-	    return EXIT_SUCCESS;
-	  }
+	lb_gr_refresh();
       }
-
-  lb_al_release_vector_r(&R);
-  lb_al_release_vector_r(&T);
-  lb_gr_release_picture(&Pic_Vel);
-  lb_gr_release_picture(&Pic_Acc);
-
-#endif
-
-
-
+    lb_gr_BMPfile_save("leva.bmp", NULL);
   
-  //#define DEMO_ORBITS
-#ifdef DEMO_ORBITS
-#define G 6.674e-11
-#define N_OBJECTS 2
-    
-  typedef struct
-  {
-    FLOAT_T x;
-    FLOAT_T y;
-    FLOAT_T z;
-  } VECTOR_3D_T;
-
-  typedef struct
-  {
-    FLOAT_T m;
-    VECTOR_3D_T p;
-    VECTOR_3D_T v;
-    VECTOR_3D_T v_temp;
-    VECTOR_3D_T a_temp;
-  } ASTRO_T;
-
-  ASTRO_T M_euler[N_OBJECTS];
-  ASTRO_T M_rk4[N_OBJECTS];
-
-
-  VECTOR_3D_T calc_acceleration(const ASTRO_T M[], int i)
-  {
-    VECTOR_3D_T accel;
-    FLOAT_T denom;
-    int j;
-  
-    accel.x=0;
-    accel.y=0;
-    accel.z=0;
-  
-    for (j=0;j<N_OBJECTS;j++)
-      {
-	if (i!=j)
-	  {
-	    denom=1/pow( (M[j].p.x-M[i].p.x)*(M[j].p.x-M[i].p.x) + 
-			 (M[j].p.y-M[i].p.y)*(M[j].p.y-M[i].p.y) +
-			 (M[j].p.z-M[i].p.z)*(M[j].p.z-M[i].p.z), 1.5);
-
-	    accel.x += (M[j].p.x - M[i].p.x)*G*M[j].m*denom;
-	    accel.y += (M[j].p.y - M[i].p.y)*G*M[j].m*denom;
-	    accel.z += (M[j].p.z - M[i].p.z)*G*M[j].m*denom;
-	  }
-      }
-    return accel;
-  }
-
- 
-  VECTOR_3D_T future_acc(ASTRO_T M[], int i, FLOAT_T delta_t, FLOAT_T delta_v_x,FLOAT_T delta_v_y, FLOAT_T delta_v_z)
-  {
-    VECTOR_3D_T tmp_pos, tmp_vel, acceleration;
-  
-    /* we must back-up the current position and velocity */
-    tmp_pos=M[i].p;
-    tmp_vel=M[i].v;
-
-
-    M[i].v.x += delta_v_x;
-    M[i].v.y += delta_v_y;
-    M[i].v.z += delta_v_z;
-
-    M[i].p.x +=  M[i].v.x*delta_t;
-    M[i].p.y +=  M[i].v.y*delta_t;
-    M[i].p.z +=  M[i].v.z*delta_t;
-
-
-    acceleration = calc_acceleration(M,i);
-
-    /* We restore the previous values, since we just wanted to get an estimate for the acceleration at (t+dt, vel+dv)*/
-    M[i].p = tmp_pos;
-    M[i].v = tmp_vel;
-    return acceleration;
-  }
-
-  VECTOR_3D_T k1, k2, k3, k4, temp_acc;
-  SDL_Event event;
-  FONT_T my_font;
-  char text[40];
-  FLOAT_T t;
-  FLOAT_T dt;
-  VIEWPORT_2D_T win;
-  FLOAT_T xp, yp;
-  S_INT_32_T step_counter=0;
-  S_INT_8_T flag_paused=FALSE;
-
-  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
- 
-  
-  win.xp_min=0;
-  win.yp_min=0;
-  win.xp_max=ty_screen.w;
-  win.yp_max=ty_screen.h;
-  win.xr_max= 2.0*1.496e11;
-  win.xr_min=-win.xr_max;
-  win.yr_min=win.xr_max*ty_screen.h/ty_screen.w;
-  win.yr_max=-win.yr_min; 
-
-
-  lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
-  my_font.scale_x=3;
-  my_font.scale_y=3;
-  my_font.gap_x=2;
-  my_font.gap_y=1;
-  my_font.max_x=40;
-  my_font.angle=0;
-  my_font.flag_fg=TRUE;
-  my_font.flag_bg=TRUE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
-  my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
-
-      
-  dt=60*10;  /* seconds */
-  t=0;      /* tracks the elapsed time */
-
-  
-  /* Initialize values for Euler Matrix */
-  M_euler[0].m=1.9891e30;
- 
-  M_euler[0].p.x=0;
-  M_euler[0].p.y=0;
-  M_euler[0].p.z=0;
-
-  M_euler[0].v.x=0;
-  M_euler[0].v.y=0;
-  M_euler[0].v.z=0;
-
-  M_euler[0].v_temp.x=0;
-  M_euler[0].v_temp.y=0;
-  M_euler[0].v_temp.z=0;
-
-  M_euler[0].a_temp.x=0;
-  M_euler[0].a_temp.y=0;
-  M_euler[0].a_temp.z=0;
-
-
-  /* Second object */
-  M_euler[1].m=5.9737e24;
-
-  M_euler[1].p.x=1.496e11;
-  M_euler[1].p.y=0;
-  M_euler[1].p.z=0;
-
-  M_euler[1].v.x=0;
-  //M_euler[1].v.y=29785.6783; /* m/s */;
-  M_euler[1].v.y=sqrt(G*(M_euler[0].m+M_euler[1].m)/1.496e11);
-  M_euler[1].v.z=0;
-
-  M_euler[1].v_temp.x=0;
-  M_euler[1].v_temp.y=0;
-  M_euler[1].v_temp.z=0;
-
-  M_euler[1].a_temp.x=0;
-  M_euler[1].a_temp.y=0;
-  M_euler[1].a_temp.z=0;
-
-
-  /* Initialize values for Runge-Kutta-4 Matrix (make them the same) */
-  
-  for (i=0;i<N_OBJECTS;i++)
-    {
-      M_rk4[i].p.x = M_euler[i].p.x;
-      M_rk4[i].p.y = M_euler[i].p.y;
-      M_rk4[i].p.z = M_euler[i].p.z;
-
-      M_rk4[i].v.x = M_euler[i].v.x;
-      M_rk4[i].v.y = M_euler[i].v.y;
-      M_rk4[i].v.z = M_euler[i].v.z;
-
-      M_rk4[i].v_temp.x = M_euler[i].v_temp.x;
-      M_rk4[i].v_temp.y = M_euler[i].v_temp.y;
-      M_rk4[i].v_temp.z = M_euler[i].v_temp.z;
-
-      M_rk4[i].v_temp.x = M_euler[i].v_temp.x;
-      M_rk4[i].v_temp.y = M_euler[i].v_temp.y;
-      M_rk4[i].v_temp.z = M_euler[i].v_temp.z;
-
-      M_rk4[i].m = M_euler[i].m;
-    }
-
-  while (1)
-    {
-      if (!flag_paused)
-	{
-	  for (i=0;i<N_OBJECTS;i++)
-	    {
-	      M_euler[i].v_temp = M_euler[i].v;
-	      M_euler[i].a_temp = calc_acceleration(M_euler,i);
-
-	      
-	      M_rk4[i].v_temp = M_rk4[i].v;
-
-	      temp_acc = calc_acceleration(M_rk4, i);
-	      //temp_acc = future_acc(M_rk4, i , 0,0,0,0);
-	      k1.x = temp_acc.x*dt;
-	      k1.y = temp_acc.y*dt;
-	      k1.z = temp_acc.z*dt;
-	      
-	      temp_acc = future_acc(M_rk4, i ,0.5*dt , 0.5*k1.x, 0.5*k1.y, 0.5*k1.z);
-	      k2.x = temp_acc.x*dt;
-	      k2.y = temp_acc.y*dt;
-	      k2.z = temp_acc.z*dt;
-	      
-	      temp_acc = future_acc(M_rk4, i ,0.5*dt ,0.5*k2.x, 0.5*k2.y, 0.5*k2.z);
-	      k3.x = temp_acc.x*dt;
-	      k3.y = temp_acc.y*dt;
-	      k3.z = temp_acc.z*dt;
-
-	      temp_acc = future_acc(M_rk4, i ,dt, k3.x, k3.y, k3.z);
-	      k4.x = temp_acc.x*dt;
-	      k4.y = temp_acc.y*dt;
-	      k4.z = temp_acc.z*dt;
-
-	      M_rk4[i].a_temp.x = (k1.x + 2*k2.x + 2*k3.x + k4.x)/(dt*6.0);
-	      M_rk4[i].a_temp.y = (k1.y + 2*k2.y + 2*k3.y + k4.y)/(dt*6.0);
-	      M_rk4[i].a_temp.z = (k1.z + 2*k2.z + 2*k3.z + k4.z)/(dt*6.0);
-	      
-	    }
-    
-	  for (i=0;i<N_OBJECTS;i++)
-	    {
-	      /* Euler Integration */
-	      M_euler[i].p.x += M_euler[i].v_temp.x*dt;
-	      M_euler[i].p.y += M_euler[i].v_temp.y*dt;
-	      M_euler[i].p.z += M_euler[i].v_temp.z*dt;
- 
-	      M_euler[i].v.x += M_euler[i].a_temp.x*dt;
-	      M_euler[i].v.y += M_euler[i].a_temp.y*dt;
-	      M_euler[i].v.z += M_euler[i].a_temp.z*dt;
-
-	      /* Runge-Kutta 4 Integration */  
-	      M_rk4[i].p.x += M_rk4[i].v_temp.x*dt;  
-	      M_rk4[i].p.y += M_rk4[i].v_temp.y*dt; 
-	      M_rk4[i].p.z += M_rk4[i].v_temp.z*dt; 
-
-	      M_rk4[i].v.x += M_rk4[i].a_temp.x*dt;
-	      M_rk4[i].v.y += M_rk4[i].a_temp.y*dt;
-	      M_rk4[i].v.z += M_rk4[i].a_temp.z*dt;
-
-	  
-	      if (i==1) 
-		{
-		  if ( (step_counter==0) || (U_INT_32_T)((t+dt)/(365*24*3600))>(U_INT_32_T)(t/(365*24*3600)) )
-		    {
-		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
-		      lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
-		      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
-						     fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
-		      if (t/(365*24*3600)>199)
-			flag_paused=TRUE;
-		    }
-		  if ((step_counter % 50) == 0)
-		    {
-		      sprintf(text,"dt: %02.2f [s]",dt);
-		      lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
-
-		      sprintf(text,"t: %02.2f [a]",t/(24.0*365.0*3600.0));
-		      lb_ft_draw_text(NULL, &my_font, 20, 80, text, COPYMODE_COPY);
-
-		      sprintf(text,"n: %0d",step_counter);
-		      lb_ft_draw_text(NULL, &my_font, 20, 130, text, COPYMODE_COPY);
-
-
-	    	      //
-		      //printf("EU: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_euler[i].p.x, M_euler[i].p.y, M_euler[i].p.z);
-		      //printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
-		      //printf("\n");
-		      lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
-		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF00F), COPYMODE_COPY); 
-
-
-		      lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
-		      lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
-		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY); 
-	      
-
-		      //printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
-		      //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
-		      //printf("\n\n");
-		      //delay(200);
-		      lb_gr_refresh();
-		    }
-		}
-	    }
-     
-	  t=t+dt;
-	  step_counter++;
-	}
+    while (1)
       while (SDL_PollEvent(&event))
 	{
 	  if (event.type == SDL_QUIT)
 	    {
+		      
 	      SDL_Quit();
 	      return EXIT_SUCCESS;
 	    }
-	  if (event.type== SDL_KEYDOWN)
+	}
+
+    lb_al_release_vector_r(&R);
+    lb_al_release_vector_r(&T);
+    lb_gr_release_picture(&Pic_Vel);
+    lb_gr_release_picture(&Pic_Acc);
+
+#endif
+
+
+
+  
+    //#define DEMO_ORBITS
+#ifdef DEMO_ORBITS
+#define G 6.674e-11
+#define N_OBJECTS 2
+    
+    typedef struct
+    {
+      FLOAT_T x;
+      FLOAT_T y;
+      FLOAT_T z;
+    } VECTOR_3D_T;
+
+    typedef struct
+    {
+      FLOAT_T m;
+      VECTOR_3D_T p;
+      VECTOR_3D_T v;
+      VECTOR_3D_T v_temp;
+      VECTOR_3D_T a_temp;
+    } ASTRO_T;
+
+    ASTRO_T M_euler[N_OBJECTS];
+    ASTRO_T M_rk4[N_OBJECTS];
+
+
+    VECTOR_3D_T calc_acceleration(const ASTRO_T M[], int i)
+    {
+      VECTOR_3D_T accel;
+      FLOAT_T denom;
+      int j;
+  
+      accel.x=0;
+      accel.y=0;
+      accel.z=0;
+  
+      for (j=0;j<N_OBJECTS;j++)
+	{
+	  if (i!=j)
 	    {
-	      if (event.key.keysym.sym == SDLK_SPACE)
-		{
-		  if (flag_paused)
-		    flag_paused=FALSE;
-		  else
-		    flag_paused=TRUE;
-		}
+	      denom=1/pow( (M[j].p.x-M[i].p.x)*(M[j].p.x-M[i].p.x) + 
+			   (M[j].p.y-M[i].p.y)*(M[j].p.y-M[i].p.y) +
+			   (M[j].p.z-M[i].p.z)*(M[j].p.z-M[i].p.z), 1.5);
+
+	      accel.x += (M[j].p.x - M[i].p.x)*G*M[j].m*denom;
+	      accel.y += (M[j].p.y - M[i].p.y)*G*M[j].m*denom;
+	      accel.z += (M[j].p.z - M[i].p.z)*G*M[j].m*denom;
 	    }
 	}
+      return accel;
     }
-  lb_gr_SDL_close();
-    
-#endif
-    
-  //#define DEMO_VIDEO
-#ifdef DEMO_VIDEO
-  int xp, yp, iterations, k;
-  FLOAT_T xr, yr, z_zoom;
-  char filename[12];
-  COMPLEX_T z, p;
-  VIEWPORT_2D_T win;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
-
-  z_zoom=1.0;
-  win.xp_min=0;
-  win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
-
-  for(k=0;k<1440;k++)
-    {
-      win.xr_min=0.32-1.0/z_zoom;
-      win.xr_max=0.32+1.0/z_zoom;
-      win.yr_min=-0.32/z_zoom; 
-      win.yr_max=0.32/z_zoom;
-
-      for(xp=0;xp<win.xp_max;xp++)
-	for(yp=0;yp<win.yp_max;yp++)
-	  {
-	    lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
-	    iterations=0;
-	    z.r=xr;
-	    z.i=yr;
-	    while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
-	      {
-		p.r=xr;
-		p.i=yr;
-		z=lb_cp_add(lb_cp_multiply(z,z),p);
-		iterations++;
-	      }
-	    lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations), COPYMODE_COPY);
-	  }
-      sprintf(filename,"malde%04d.jpg",k);
-      lb_gr_JPGfile_save(filename, NULL, 75);
-      z_zoom*=1.001;
-    }
-  lb_fb_exit(1);
-#endif
-
-  //#define DEMO_PLOT3D
-#ifdef DEMO_PLOT3D
-  PICTURE_T Pic, Pic_console;
-  CONSOLE_T Con;
-  
-  VIEWPORT_3D_T vp3d;
-  //FLOAT_T u_a, u_b, v_a, v_b;
-  FLOAT_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
-  S_INT_8_T flag_exit;
-    
-  //MATRIX_POINT_3D_T S;
-  MATRIX_R_T Z;
-  char c;
-  FONT_T font_console;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-    
-  
-  Pic.w=ty_width;
-  Pic.h=ty_height/2;
-  lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
-
-  Pic_console.w=ty_width;
-  Pic_console.h=ty_height/2;
-  lb_gr_create_picture(&Pic_console,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID));
-
-
-  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &font_console);
-  font_console.scale_x=1;
-  font_console.scale_y=1;
-  font_console.gap_x=2;
-  font_console.gap_y=2;
-  font_console.max_x=10;
-  font_console.angle=0;
-  font_console.flag_fg=TRUE;
-  font_console.flag_bg=FALSE;
-  font_console.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
-  font_console.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
  
-  lb_ft_resize_console(&Pic_console, &font_console, &Con);
-  Con.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
-  Con.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
-  lb_ft_create_console(&Con);
-  lb_ft_set_active_console(&Con);
-    
-  flag_exit=FALSE;
+    VECTOR_3D_T future_acc(ASTRO_T M[], int i, FLOAT_T delta_t, FLOAT_T delta_v_x,FLOAT_T delta_v_y, FLOAT_T delta_v_z)
+    {
+      VECTOR_3D_T tmp_pos, tmp_vel, acceleration;
+  
+      /* we must back-up the current position and velocity */
+      tmp_pos=M[i].p;
+      tmp_vel=M[i].v;
+
+
+      M[i].v.x += delta_v_x;
+      M[i].v.y += delta_v_y;
+      M[i].v.z += delta_v_z;
+
+      M[i].p.x +=  M[i].v.x*delta_t;
+      M[i].p.y +=  M[i].v.y*delta_t;
+      M[i].p.z +=  M[i].v.z*delta_t;
+
+
+      acceleration = calc_acceleration(M,i);
+
+      /* We restore the previous values, since we just wanted to get an estimate for the acceleration at (t+dt, vel+dv)*/
+      M[i].p = tmp_pos;
+      M[i].v = tmp_vel;
+      return acceleration;
+    }
+
+    VECTOR_3D_T k1, k2, k3, k4, temp_acc;
+    SDL_Event event;
+    FONT_T my_font;
+    char text[40];
+    FLOAT_T t;
+    FLOAT_T dt;
+    VIEWPORT_2D_T win;
+    FLOAT_T xp, yp;
+    S_INT_32_T step_counter=0;
+    S_INT_8_T flag_paused=FALSE;
+
+    lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
+ 
+  
+    win.xp_min=0;
+    win.yp_min=0;
+    win.xp_max=ty_screen.w;
+    win.yp_max=ty_screen.h;
+    win.xr_max= 2.0*1.496e11;
+    win.xr_min=-win.xr_max;
+    win.yr_min=win.xr_max*ty_screen.h/ty_screen.w;
+    win.yr_max=-win.yr_min; 
+
+
+    lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &my_font);
+    my_font.scale_x=3;
+    my_font.scale_y=3;
+    my_font.gap_x=2;
+    my_font.gap_y=1;
+    my_font.max_x=40;
+    my_font.angle=0;
+    my_font.flag_fg=TRUE;
+    my_font.flag_bg=TRUE;
+    my_font.color_fg=lb_gr_12RGB(COLOR_BLACK);
+    my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
+
       
-  vp3d.xp_min=0;
-  vp3d.yp_min=0;
-  vp3d.xp_max=Pic.w;
-  vp3d.yp_max=Pic.h;
-  vp3d.scale =200.0;    /* Zoom */
-  vp3d.cam_d= 0.0;   /* Stereoscopic */
-  vp3d.cam_h=10.0;    /* Depth */
-  vp3d.cam.x=0.0;   /* Camera's location */
-  vp3d.cam.y=0.0;   /* Camera's location */
-  vp3d.cam.z=40.0;   /* Camera's location */
+    dt=60*10;  /* seconds */
+    t=0;      /* tracks the elapsed time */
+
+  
+    /* Initialize values for Euler Matrix */
+    M_euler[0].m=1.9891e30;
+ 
+    M_euler[0].p.x=0;
+    M_euler[0].p.y=0;
+    M_euler[0].p.z=0;
+
+    M_euler[0].v.x=0;
+    M_euler[0].v.y=0;
+    M_euler[0].v.z=0;
+
+    M_euler[0].v_temp.x=0;
+    M_euler[0].v_temp.y=0;
+    M_euler[0].v_temp.z=0;
+
+    M_euler[0].a_temp.x=0;
+    M_euler[0].a_temp.y=0;
+    M_euler[0].a_temp.z=0;
+
+
+    /* Second object */
+    M_euler[1].m=5.9737e24;
+
+    M_euler[1].p.x=1.496e11;
+    M_euler[1].p.y=0;
+    M_euler[1].p.z=0;
+
+    M_euler[1].v.x=0;
+    //M_euler[1].v.y=29785.6783; /* m/s */;
+    M_euler[1].v.y=sqrt(G*(M_euler[0].m+M_euler[1].m)/1.496e11);
+    M_euler[1].v.z=0;
+
+    M_euler[1].v_temp.x=0;
+    M_euler[1].v_temp.y=0;
+    M_euler[1].v_temp.z=0;
+
+    M_euler[1].a_temp.x=0;
+    M_euler[1].a_temp.y=0;
+    M_euler[1].a_temp.z=0;
+
+
+    /* Initialize values for Runge-Kutta-4 Matrix (make them the same) */
+  
+    for (i=0;i<N_OBJECTS;i++)
+      {
+	M_rk4[i].p.x = M_euler[i].p.x;
+	M_rk4[i].p.y = M_euler[i].p.y;
+	M_rk4[i].p.z = M_euler[i].p.z;
+
+	M_rk4[i].v.x = M_euler[i].v.x;
+	M_rk4[i].v.y = M_euler[i].v.y;
+	M_rk4[i].v.z = M_euler[i].v.z;
+
+	M_rk4[i].v_temp.x = M_euler[i].v_temp.x;
+	M_rk4[i].v_temp.y = M_euler[i].v_temp.y;
+	M_rk4[i].v_temp.z = M_euler[i].v_temp.z;
+
+	M_rk4[i].v_temp.x = M_euler[i].v_temp.x;
+	M_rk4[i].v_temp.y = M_euler[i].v_temp.y;
+	M_rk4[i].v_temp.z = M_euler[i].v_temp.z;
+
+	M_rk4[i].m = M_euler[i].m;
+      }
+
+    while (1)
+      {
+	if (!flag_paused)
+	  {
+	    for (i=0;i<N_OBJECTS;i++)
+	      {
+		M_euler[i].v_temp = M_euler[i].v;
+		M_euler[i].a_temp = calc_acceleration(M_euler,i);
+
+	      
+		M_rk4[i].v_temp = M_rk4[i].v;
+
+		temp_acc = calc_acceleration(M_rk4, i);
+		//temp_acc = future_acc(M_rk4, i , 0,0,0,0);
+		k1.x = temp_acc.x*dt;
+		k1.y = temp_acc.y*dt;
+		k1.z = temp_acc.z*dt;
+	      
+		temp_acc = future_acc(M_rk4, i ,0.5*dt , 0.5*k1.x, 0.5*k1.y, 0.5*k1.z);
+		k2.x = temp_acc.x*dt;
+		k2.y = temp_acc.y*dt;
+		k2.z = temp_acc.z*dt;
+	      
+		temp_acc = future_acc(M_rk4, i ,0.5*dt ,0.5*k2.x, 0.5*k2.y, 0.5*k2.z);
+		k3.x = temp_acc.x*dt;
+		k3.y = temp_acc.y*dt;
+		k3.z = temp_acc.z*dt;
+
+		temp_acc = future_acc(M_rk4, i ,dt, k3.x, k3.y, k3.z);
+		k4.x = temp_acc.x*dt;
+		k4.y = temp_acc.y*dt;
+		k4.z = temp_acc.z*dt;
+
+		M_rk4[i].a_temp.x = (k1.x + 2*k2.x + 2*k3.x + k4.x)/(dt*6.0);
+		M_rk4[i].a_temp.y = (k1.y + 2*k2.y + 2*k3.y + k4.y)/(dt*6.0);
+		M_rk4[i].a_temp.z = (k1.z + 2*k2.z + 2*k3.z + k4.z)/(dt*6.0);
+	      
+	      }
+    
+	    for (i=0;i<N_OBJECTS;i++)
+	      {
+		/* Euler Integration */
+		M_euler[i].p.x += M_euler[i].v_temp.x*dt;
+		M_euler[i].p.y += M_euler[i].v_temp.y*dt;
+		M_euler[i].p.z += M_euler[i].v_temp.z*dt;
+ 
+		M_euler[i].v.x += M_euler[i].a_temp.x*dt;
+		M_euler[i].v.y += M_euler[i].a_temp.y*dt;
+		M_euler[i].v.z += M_euler[i].a_temp.z*dt;
+
+		/* Runge-Kutta 4 Integration */  
+		M_rk4[i].p.x += M_rk4[i].v_temp.x*dt;  
+		M_rk4[i].p.y += M_rk4[i].v_temp.y*dt; 
+		M_rk4[i].p.z += M_rk4[i].v_temp.z*dt; 
+
+		M_rk4[i].v.x += M_rk4[i].a_temp.x*dt;
+		M_rk4[i].v.y += M_rk4[i].a_temp.y*dt;
+		M_rk4[i].v.z += M_rk4[i].a_temp.z*dt;
+
+	  
+		if (i==1) 
+		  {
+		    if ( (step_counter==0) || (U_INT_32_T)((t+dt)/(365*24*3600))>(U_INT_32_T)(t/(365*24*3600)) )
+		      {
+			lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
+			lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
+			lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
+						       fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+			if (t/(365*24*3600)>199)
+			  flag_paused=TRUE;
+		      }
+		    if ((step_counter % 50) == 0)
+		      {
+			sprintf(text,"dt: %02.2f [s]",dt);
+			lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
+
+			sprintf(text,"t: %02.2f [a]",t/(24.0*365.0*3600.0));
+			lb_ft_draw_text(NULL, &my_font, 20, 80, text, COPYMODE_COPY);
+
+			sprintf(text,"n: %0d",step_counter);
+			lb_ft_draw_text(NULL, &my_font, 20, 130, text, COPYMODE_COPY);
+
+
+			//
+			//printf("EU: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_euler[i].p.x, M_euler[i].p.y, M_euler[i].p.z);
+			//printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
+			//printf("\n");
+			lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
+			lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+			//lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF00F), COPYMODE_COPY); 
+
+
+			lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
+			lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
+			//lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY); 
+	      
+
+			//printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
+			//printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
+			//printf("\n\n");
+			//delay(200);
+			lb_gr_refresh();
+		      }
+		  }
+	      }
+     
+	    t=t+dt;
+	    step_counter++;
+	  }
+	while (SDL_PollEvent(&event))
+	  {
+	    if (event.type == SDL_QUIT)
+	      {
+		SDL_Quit();
+		return EXIT_SUCCESS;
+	      }
+	    if (event.type== SDL_KEYDOWN)
+	      {
+		if (event.key.keysym.sym == SDLK_SPACE)
+		  {
+		    if (flag_paused)
+		      flag_paused=FALSE;
+		    else
+		      flag_paused=TRUE;
+		  }
+	      }
+	  }
+      }
+    lb_gr_SDL_close();
+    
+#endif
+    
+    //#define DEMO_VIDEO
+#ifdef DEMO_VIDEO
+    int xp, yp, iterations, k;
+    FLOAT_T xr, yr, z_zoom;
+    char filename[12];
+    COMPLEX_T z, p;
+    VIEWPORT_2D_T win;
+
+    lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+
+    z_zoom=1.0;
+    win.xp_min=0;
+    win.yp_min=0;
+    win.xp_max=ty_width;
+    win.yp_max=ty_height;
+
+    for(k=0;k<1440;k++)
+      {
+	win.xr_min=0.32-1.0/z_zoom;
+	win.xr_max=0.32+1.0/z_zoom;
+	win.yr_min=-0.32/z_zoom; 
+	win.yr_max=0.32/z_zoom;
+
+	for(xp=0;xp<win.xp_max;xp++)
+	  for(yp=0;yp<win.yp_max;yp++)
+	    {
+	      lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+	      iterations=0;
+	      z.r=xr;
+	      z.i=yr;
+	      while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
+		{
+		  p.r=xr;
+		  p.i=yr;
+		  z=lb_cp_add(lb_cp_multiply(z,z),p);
+		  iterations++;
+		}
+	      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations), COPYMODE_COPY);
+	    }
+	sprintf(filename,"malde%04d.jpg",k);
+	lb_gr_JPGfile_save(filename, NULL, 75);
+	z_zoom*=1.001;
+      }
+    lb_fb_exit(1);
+#endif
+
+    //#define DEMO_PLOT3D
+#ifdef DEMO_PLOT3D
+    PICTURE_T Pic, Pic_console;
+    CONSOLE_T Con;
+  
+    VIEWPORT_3D_T vp3d;
+    //FLOAT_T u_a, u_b, v_a, v_b;
+    FLOAT_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
+    S_INT_8_T flag_exit;
+    
+    //MATRIX_POINT_3D_T S;
+    MATRIX_R_T Z;
+    char c;
+    FONT_T font_console;
+
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    
+  
+    Pic.w=ty_width;
+    Pic.h=ty_height/2;
+    lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
+
+    Pic_console.w=ty_width;
+    Pic_console.h=ty_height/2;
+    lb_gr_create_picture(&Pic_console,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID));
+
+
+    lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &font_console);
+    font_console.scale_x=1;
+    font_console.scale_y=1;
+    font_console.gap_x=2;
+    font_console.gap_y=2;
+    font_console.max_x=10;
+    font_console.angle=0;
+    font_console.flag_fg=TRUE;
+    font_console.flag_bg=FALSE;
+    font_console.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
+    font_console.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
+ 
+    lb_ft_resize_console(&Pic_console, &font_console, &Con);
+    Con.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
+    Con.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
+    lb_ft_create_console(&Con);
+    lb_ft_set_active_console(&Con);
+    
+    flag_exit=FALSE;
+      
+    vp3d.xp_min=0;
+    vp3d.yp_min=0;
+    vp3d.xp_max=Pic.w;
+    vp3d.yp_max=Pic.h;
+    vp3d.scale =200.0;    /* Zoom */
+    vp3d.cam_d= 0.0;   /* Stereoscopic */
+    vp3d.cam_h=10.0;    /* Depth */
+    vp3d.cam.x=0.0;   /* Camera's location */
+    vp3d.cam.y=0.0;   /* Camera's location */
+    vp3d.cam.z=40.0;   /* Camera's location */
 		    
       
-  lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
-  lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
-  lb_al_fill_rotation_matrix33_Y(Ry_p, M_PI/90);
-  lb_al_fill_rotation_matrix33_Y(Ry_n,-M_PI/90);
-  lb_al_fill_rotation_matrix33_X(Rx_p, M_PI/90);
-  lb_al_fill_rotation_matrix33_X(Rx_n,-M_PI/90);
+    lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
+    lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
+    lb_al_fill_rotation_matrix33_Y(Ry_p, M_PI/90);
+    lb_al_fill_rotation_matrix33_Y(Ry_n,-M_PI/90);
+    lb_al_fill_rotation_matrix33_X(Rx_p, M_PI/90);
+    lb_al_fill_rotation_matrix33_X(Rx_n,-M_PI/90);
 
     
-  lb_al_print_matrix33_r(Rz_p,"Rz_p",FLOAT_FORMAT_MATRIX);
-  lb_al_print_matrix33_r(Rz_n,"Rz_n",FLOAT_FORMAT_MATRIX);
-  lb_al_print_matrix33_r(Ry_p,"Ry_p",FLOAT_FORMAT_MATRIX);
-  lb_al_print_matrix33_r(Ry_n,"Ry_n",FLOAT_FORMAT_MATRIX);
-  lb_al_print_matrix33_r(Rx_p,"Rx_p",FLOAT_FORMAT_MATRIX);
-  lb_al_print_matrix33_r(Rx_n,"Rx_n",FLOAT_FORMAT_MATRIX);
+    lb_al_print_matrix33_r(Rz_p,"Rz_p",FLOAT_FORMAT_MATRIX);
+    lb_al_print_matrix33_r(Rz_n,"Rz_n",FLOAT_FORMAT_MATRIX);
+    lb_al_print_matrix33_r(Ry_p,"Ry_p",FLOAT_FORMAT_MATRIX);
+    lb_al_print_matrix33_r(Ry_n,"Ry_n",FLOAT_FORMAT_MATRIX);
+    lb_al_print_matrix33_r(Rx_p,"Rx_p",FLOAT_FORMAT_MATRIX);
+    lb_al_print_matrix33_r(Rx_n,"Rx_n",FLOAT_FORMAT_MATRIX);
 
 
-  lb_al_fill_rotation_matrix33_tait_bryan_ZYX(Rot,0,0,-M_PI/4);
+    lb_al_fill_rotation_matrix33_tait_bryan_ZYX(Rot,0,0,-M_PI/4);
 
-  /* Surface */
-  //S.rows=20;
-  //S.cols=30;
-  //lb_al_create_matrix_p3d(&S);
-  //u_a=0.0;
-  //u_b= 2*M_PI;
-  //v_a=0;
-  //v_b=5.0;
+    /* Surface */
+    //S.rows=20;
+    //S.cols=30;
+    //lb_al_create_matrix_p3d(&S);
+    //u_a=0.0;
+    //u_b= 2*M_PI;
+    //v_a=0;
+    //v_b=5.0;
 
 
-  /* Z-buffer */
-  lb_gr_create_zbuffer(NULL, &Z);
+    /* Z-buffer */
+    lb_gr_create_zbuffer(NULL, &Z);
 
 
     
-  //for (i=0;i<S.rows;i++)
-  //  for (j=0;j<S.cols;j++)
-  //	{
-  //	  S.array[i][j].x=(j*(v_b-v_a)/(S.cols-1))*cos(u_a + i*(u_b-u_a)/(S.rows-1));
-  //	  S.array[i][j].y=(j*(v_b-v_a)/(S.cols-1))*sin(u_a + i*(u_b-u_a)/(S.rows-1));;
-  //	  S.array[i][j].z=sin(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/2.5;
-  //	  S.array[i][j].z=(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/10.0;
-  //printf("[%f\t%f\t%f]\r\n",S.array[i][j].x,S.array[i][j].y,S.array[i][j].z); 
-  //	}
+    //for (i=0;i<S.rows;i++)
+    //  for (j=0;j<S.cols;j++)
+    //	{
+    //	  S.array[i][j].x=(j*(v_b-v_a)/(S.cols-1))*cos(u_a + i*(u_b-u_a)/(S.rows-1));
+    //	  S.array[i][j].y=(j*(v_b-v_a)/(S.cols-1))*sin(u_a + i*(u_b-u_a)/(S.rows-1));;
+    //	  S.array[i][j].z=sin(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/2.5;
+    //	  S.array[i][j].z=(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/10.0;
+    //printf("[%f\t%f\t%f]\r\n",S.array[i][j].x,S.array[i][j].y,S.array[i][j].z); 
+    //	}
     
 
-  while (!flag_exit)
-    {
-      lb_gr_clear_picture(&Pic,lb_gr_12RGB(COLOR_BLACK));
+    while (!flag_exit)
+      {
+	lb_gr_clear_picture(&Pic,lb_gr_12RGB(COLOR_BLACK));
 
-      lb_gr_reset_zbuffer(&Z);
+	lb_gr_reset_zbuffer(&Z);
 	
-      //lb_gr_plot3d_surface(NULL, vp3d, Rot, &S,
-      //		     1.0, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
+	//lb_gr_plot3d_surface(NULL, vp3d, Rot, &S,
+	//		     1.0, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
 
-      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){2,2,2},
-				lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+	lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){2,2,2},
+				  lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
-      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){0,1,0},
-				lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+	lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){0,1,0},
+				  lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,1}, (POINT_3D_FLOAT_T){0,3,1},
-				  (POINT_3D_FLOAT_T){3,0,1}, lb_gr_12RGB(COLOR_SOLID | COLOR_FORESTGREEN), COPYMODE_BLEND);
+	lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,1}, (POINT_3D_FLOAT_T){0,3,1},
+				    (POINT_3D_FLOAT_T){3,0,1}, lb_gr_12RGB(COLOR_SOLID | COLOR_FORESTGREEN), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){1,2,0},
-				  (POINT_3D_FLOAT_T){1,0,2}, lb_gr_12RGB(COLOR_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
+	lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){1,2,0},
+				    (POINT_3D_FLOAT_T){1,0,2}, lb_gr_12RGB(COLOR_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){0,5,0},
-				  (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
+	lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){0,5,0},
+				    (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){5,5,0}, (POINT_3D_FLOAT_T){0,5,0},
-				  (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
+	lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){5,5,0}, (POINT_3D_FLOAT_T){0,5,0},
+				    (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){1,1,1},
-				  (POINT_3D_FLOAT_T){2,2,2}, lb_gr_12RGB(COLOR_SOLID | 0xF00), COPYMODE_BLEND);
-
-	
-      vp3d.cam_d=0;
-
-
-      lg_gr_draw_axis_3d(&Pic, vp3d, Rot, &font_console,
-			 5.0, 4.0, lb_gr_12RGB(COLOR_WHITE),
-			 0, 5.0, 1.0,
-			 0, 5.0, 1.0,
-			 0, 1.0, 1.0,
-			 2.0, lb_gr_12RGB(0xF911),
-			 0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | AXIS_DRAW_Z_GRID,
-			 "O","X","Y","Z",
-			 COPYMODE_BLEND, LINEMODE_FILTERED);
-
-      lb_gr_render_picture(&Pic, 0, 0, 1, 1, 1*RENDEROPTIONS_LINE);
+	lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){1,1,1},
+				    (POINT_3D_FLOAT_T){2,2,2}, lb_gr_12RGB(COLOR_SOLID | 0xF00), COPYMODE_BLEND);
 
 	
-      // Wait for the user to press a character.
+	vp3d.cam_d=0;
 
-      lb_gr_clear_picture(&Pic_console, lb_gr_12RGB(COLOR_GRAY));
-      lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
-      lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
 
-      S_INT_8_T flag_process_keys=TRUE;
-      while (!lb_co_kbhit()) ;
-      while (flag_process_keys)
-	{
-	  c=lb_co_getch_pc();
+	lg_gr_draw_axis_3d(&Pic, vp3d, Rot, &font_console,
+			   5.0, 4.0, lb_gr_12RGB(COLOR_WHITE),
+			   0, 5.0, 1.0,
+			   0, 5.0, 1.0,
+			   0, 1.0, 1.0,
+			   2.0, lb_gr_12RGB(0xF911),
+			   0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | AXIS_DRAW_Z_GRID,
+			   "O","X","Y","Z",
+			   COPYMODE_BLEND, LINEMODE_FILTERED);
+
+	lb_gr_render_picture(&Pic, 0, 0, 1, 1, 1*RENDEROPTIONS_LINE);
+
+	
+	// Wait for the user to press a character.
+
+	lb_gr_clear_picture(&Pic_console, lb_gr_12RGB(COLOR_GRAY));
+	lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
+	lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
+
+	S_INT_8_T flag_process_keys=TRUE;
+	while (!lb_co_kbhit()) ;
+	while (flag_process_keys)
+	  {
+	    c=lb_co_getch_pc();
 	  
-	  switch(c)
-	    {
-	    case 'r':
-	      vp3d.xp_min=0;
-	      vp3d.yp_min=0;
-	      vp3d.xp_max=ty_width;
-	      vp3d.yp_max=ty_height;
-	      vp3d.scale =100.0;    /* Zoom */
-	      vp3d.cam_d= 0.0;   /* Stereoscopic */
-	      vp3d.cam_h=10.0;    /* Depth */
-	      vp3d.cam.x=0.0;   /* Camera's location */
-	      vp3d.cam.y=0.0;   /* Camera's location */
-	      vp3d.cam.z=20.0;   /* Camera's location */
-	      break;
-	    case 'h':
-	      vp3d.cam_h*=1.1;
-	      break;
-	    case 'H':
-	      vp3d.cam_h/=1.1;
-	      break;
-	    case 'x':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
-	      break;
-	    case 'X':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
-	      break;
-	    case 'y':
-	      lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
-	      break;
-	    case 'Y':
-	      lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
-	      break;
-	    case 'z':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
-	      break;
-	    case 'Z':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
-	      break;
-	    case PCKEY_PAGE_UP:
-	      vp3d.scale*=1.1;
-	      break;
-	    case PCKEY_PAGE_DOWN:
-	      vp3d.scale/=1.1;
-	      break;
-	    case PCKEY_UP:
-	      vp3d.cam.y+=1.0;
-	      break;
-	    case PCKEY_DOWN:
-	      vp3d.cam.y-=1.0;
-	      break;
-	    case PCKEY_LEFT:
-	      vp3d.cam.x+=1.0;
-	      break;
-	    case PCKEY_RIGHT:
-	      vp3d.cam.x-=1.0;
-	      break;
-	    case PCKEY_ESC:
-	      flag_exit=TRUE;
-	      break;
-	    }
-	  if(lb_co_kbhit())
-	    flag_process_keys=TRUE;
-	  else
-	    flag_process_keys=FALSE;
-	}
-    }
-  lb_ft_release_GLCDfont(&font_console);
-  lb_gr_release_picture(&Pic);
-  lb_gr_release_picture(&Pic_console);
-  lb_ft_release_console(&Con);
-  lb_fb_exit_msg("Closing program\r\n");    
-  //lb_al_release_matrix_p3d(&S);
+	    switch(c)
+	      {
+	      case 'r':
+		vp3d.xp_min=0;
+		vp3d.yp_min=0;
+		vp3d.xp_max=ty_width;
+		vp3d.yp_max=ty_height;
+		vp3d.scale =100.0;    /* Zoom */
+		vp3d.cam_d= 0.0;   /* Stereoscopic */
+		vp3d.cam_h=10.0;    /* Depth */
+		vp3d.cam.x=0.0;   /* Camera's location */
+		vp3d.cam.y=0.0;   /* Camera's location */
+		vp3d.cam.z=20.0;   /* Camera's location */
+		break;
+	      case 'h':
+		vp3d.cam_h*=1.1;
+		break;
+	      case 'H':
+		vp3d.cam_h/=1.1;
+		break;
+	      case 'x':
+		lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
+		break;
+	      case 'X':
+		lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
+		break;
+	      case 'y':
+		lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
+		break;
+	      case 'Y':
+		lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
+		break;
+	      case 'z':
+		lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
+		break;
+	      case 'Z':
+		lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
+		break;
+	      case PCKEY_PAGE_UP:
+		vp3d.scale*=1.1;
+		break;
+	      case PCKEY_PAGE_DOWN:
+		vp3d.scale/=1.1;
+		break;
+	      case PCKEY_UP:
+		vp3d.cam.y+=1.0;
+		break;
+	      case PCKEY_DOWN:
+		vp3d.cam.y-=1.0;
+		break;
+	      case PCKEY_LEFT:
+		vp3d.cam.x+=1.0;
+		break;
+	      case PCKEY_RIGHT:
+		vp3d.cam.x-=1.0;
+		break;
+	      case PCKEY_ESC:
+		flag_exit=TRUE;
+		break;
+	      }
+	    if(lb_co_kbhit())
+	      flag_process_keys=TRUE;
+	    else
+	      flag_process_keys=FALSE;
+	  }
+      }
+    lb_ft_release_GLCDfont(&font_console);
+    lb_gr_release_picture(&Pic);
+    lb_gr_release_picture(&Pic_console);
+    lb_ft_release_console(&Con);
+    lb_fb_exit_msg("Closing program\r\n");    
+    //lb_al_release_matrix_p3d(&S);
   
 #endif
 
 
-  /*******************************************************************************************************************/
-  /* Fonts */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* Fonts */
+    /******************************************************************************************************************/
 
-  //#define DEMO_NEW_FONT
+    //#define DEMO_NEW_FONT
 #ifdef DEMO_NEW_FONT
-  FONT_T my_font;
-  char text[40];
-  FLOAT_T x;
+    FONT_T my_font;
+    char text[40];
+    FLOAT_T x;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
 
-  //printf("-10/10=%d\r\n",lb_in_round_div_up(1000,1001));
-  //lb_fb_exit(1);
+    //printf("-10/10=%d\r\n",lb_in_round_div_up(1000,1001));
+    //lb_fb_exit(1);
     
-  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-  //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
-  my_font.scale_x=4;
-  my_font.scale_y=3;
-  my_font.gap_x=2;
-  my_font.gap_y=1;
-  my_font.max_x=40;
-  my_font.angle=0;
-  my_font.flag_fg=TRUE;
-  my_font.flag_bg=TRUE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_TEAL);
-  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+    lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+    //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
+    my_font.scale_x=4;
+    my_font.scale_y=3;
+    my_font.gap_x=2;
+    my_font.gap_y=1;
+    my_font.max_x=40;
+    my_font.angle=0;
+    my_font.flag_fg=TRUE;
+    my_font.flag_bg=TRUE;
+    my_font.color_fg=lb_gr_12RGB(COLOR_TEAL);
+    my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
-  for(x=0;x<50.0;x+=0.1)
-    {
-      sprintf(text,"%02.1f",x);
-      lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
-      lb_gr_delay(200);
-    } 
+    for(x=0;x<50.0;x+=0.1)
+      {
+	sprintf(text,"%02.1f",x);
+	lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
+	lb_gr_delay(200);
+      } 
 
-  strcpy(text,"hola \r\namigo");
-  lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
-  lb_ft_draw_text_centered(NULL, &my_font, 20, 70, 200, 50,  text, COPYMODE_COPY);
-  lb_gr_draw_rectangle(NULL, 20, 70, 200, 50, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-  lb_gr_delay(10000);
-  lb_ft_release_GLCDfont(&my_font);
-  lb_fb_exit(1);
+    strcpy(text,"hola \r\namigo");
+    lb_ft_draw_text(NULL, &my_font, ty_width/2, ty_height/2, text, COPYMODE_COPY);
+    lb_ft_draw_text_centered(NULL, &my_font, 20, 70, 200, 50,  text, COPYMODE_COPY);
+    lb_gr_draw_rectangle(NULL, 20, 70, 200, 50, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+    lb_gr_delay(10000);
+    lb_ft_release_GLCDfont(&my_font);
+    lb_fb_exit(1);
 #endif
 
     
-  /*******************************************************************************************************************/
-  /* Financial */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* Financial */
+    /******************************************************************************************************************/
 
-  //#define DEMO_FINANCIAL
+    //#define DEMO_FINANCIAL
 #ifdef DEMO_FINANCIAL
-  ERR_T e_code;
-  FLOAT_T apr, monthly;
-  apr=6.75;
-  monthly=lb_re_APR_to_monthly(apr, &e_code);
-  printf("APR = %.4f %% half yearly, not in advanced corresponds to %.4f %% monthly\r\n",
-	 apr,monthly);
-  printf("monthly = %.4f %% corresponds to %.4f %% effective yearly\r\n",
-	 monthly,lb_re_monthly_to_effective(monthly,&e_code));
-  printf("monthly = %.4f %% corresponds to %.4f %% APR\r\n",
-	 monthly,lb_re_monthly_to_APR(monthly,&e_code));
-  exit(1);
+    ERR_T e_code;
+    FLOAT_T apr, monthly;
+    apr=6.75;
+    monthly=lb_re_APR_to_monthly(apr, &e_code);
+    printf("APR = %.4f %% half yearly, not in advanced corresponds to %.4f %% monthly\r\n",
+	   apr,monthly);
+    printf("monthly = %.4f %% corresponds to %.4f %% effective yearly\r\n",
+	   monthly,lb_re_monthly_to_effective(monthly,&e_code));
+    printf("monthly = %.4f %% corresponds to %.4f %% APR\r\n",
+	   monthly,lb_re_monthly_to_APR(monthly,&e_code));
+    exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* Parsing */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* Parsing */
+    /******************************************************************************************************************/
 
-  //#define DEMO_PARSER_REAL
+    //#define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
-  ERR_T e_code;
-  FLOAT_T x,y,z,result;
-  char variables[]="x,y,i"; 
-  x=1;
-  y=M_PI*60/180;
-  z=3;  
+    ERR_T e_code;
+    FLOAT_T x,y,z,result;
+    char variables[]="x,y,i"; 
+    x=1;
+    y=M_PI*60/180;
+    z=3;  
     
       
-  /* Example: pi as an infinite addition - Machin */
-  //char expression[]="4*SIGMA(1,20000,(-1)^(i+1)/(2*i-1),i,1)";   
+    /* Example: pi as an infinite addition - Machin */
+    //char expression[]="4*SIGMA(1,20000,(-1)^(i+1)/(2*i-1),i,1)";   
      
-  /* Example: pi as an infinite product */
-  //char expression[]="2*PROD(1,100000,4*i^2/(4*i^2-1),i,1)";   
+    /* Example: pi as an infinite product */
+    //char expression[]="2*PROD(1,100000,4*i^2/(4*i^2-1),i,1)";   
         
-  /* Example: sin(x) as an infinite addition */
-  //char expression[]="sigma(0,10,(-1)^i*y^(2*i+1)/(2*i+1)!,i,1)"; 
+    /* Example: sin(x) as an infinite addition */
+    //char expression[]="sigma(0,10,(-1)^i*y^(2*i+1)/(2*i+1)!,i,1)"; 
 
-  /* Example: cos(x) as an infinite addition */
-  //char expression[]="sigma(0,2,(-1)^i*y^(2*i)/(2*i)!,i,1)";    
+    /* Example: cos(x) as an infinite addition */
+    //char expression[]="sigma(0,2,(-1)^i*y^(2*i)/(2*i)!,i,1)";    
       
-  /* Example: first order derivate */
-  //char expression[]="diff(sin(x)/cos(x+pi/8),x,30*pi/180,1e-2)";   
-  //char expression[]="sin(y)/cos(y+pi/8)";   
+    /* Example: first order derivate */
+    //char expression[]="diff(sin(x)/cos(x+pi/8),x,30*pi/180,1e-2)";   
+    //char expression[]="sin(y)/cos(y+pi/8)";   
 
-  /* Example: first order derivate */
-  //char expression[]="diff(sin(x),x,30*pi/180,1e-4)";   
+    /* Example: first order derivate */
+    //char expression[]="diff(sin(x),x,30*pi/180,1e-4)";   
 
-  /* Example: second order derivate */
-  //char expression[]="diff2(sin(x),x,30*pi/180,1e-4)";   
+    /* Example: second order derivate */
+    //char expression[]="diff2(sin(x),x,30*pi/180,1e-4)";   
 
-  /* Example: integral */
-  //char expression[]="idef(0,pi/6,sin(x),x,2)"; 
+    /* Example: integral */
+    //char expression[]="idef(0,pi/6,sin(x),x,2)"; 
       
-  /* Example: double integral */
-  char expression[]="idef2(1,5,0,2,x^2*y^3,x,y,5)"; 
+    /* Example: double integral */
+    char expression[]="idef2(1,5,0,2,x^2*y^3,x,y,5)"; 
 
-  /* Example: first order differential */
-  //char expression[]="diff(-x^2,x,10,1e-5)";   
+    /* Example: first order differential */
+    //char expression[]="diff(-x^2,x,10,1e-5)";   
       
-  /* Example: second order differential */
-  //char expression[]="diff2(sin(x),x,30*pi/180,1e-2)";   
+    /* Example: second order differential */
+    //char expression[]="diff2(sin(x),x,30*pi/180,1e-2)";   
 
-  /* Example: Gauss' childhood sum */
-  // char expression[]="sigma(0,100,i,i,1)";   
+    /* Example: Gauss' childhood sum */
+    // char expression[]="sigma(0,100,i,i,1)";   
 
-  /* Example: product */
-  //char expression[]="prod(2,7,i,i,1)";   
+    /* Example: product */
+    //char expression[]="prod(2,7,i,i,1)";   
 
-  /* Example: comparison */
-  //char expression[]="100*((10=10)*(10=4))";   
+    /* Example: comparison */
+    //char expression[]="100*((10=10)*(10=4))";   
 
-  // char expression[]="diff(idef(0,y,sin(x),x,1000),y,pi/6,0.0001)";   
-  //char expression[]="rand(2)";   
+    // char expression[]="diff(idef(0,y,sin(x),x,1000),y,pi/6,0.0001)";   
+    //char expression[]="rand(2)";   
       
-  //char expression[]="(0+10+idef(0,pi/2,sin(x),x,10))/11";   
+    //char expression[]="(0+10+idef(0,pi/2,sin(x),x,10))/11";   
       
-  //char expression[]="avg(1,2,3,4,5,6,7,8,sin(3+x*pi/4),10)";
-  //char expression[]="diff(1+2+3+sin(x),x,0.4,0.01)";   
-  //char expression[]="diff(idef(0,y,x^2,x,10),x,0.444,0.01)";   
-  //char expression[]="45+idef(4.25,z,1,x,10)";   
-  //char expression[]="diff(sin(x+y),x,0.4,0.0001)";   
-  //char expression[]="diff(idef(0,y,sin(x),x,10),y,0.4,0.01)";   
-  //char expression[]="diff(cos(x),x,pi/2,0.001)";   
-  //char expression[]="exp(3.25)";   
-  //char expression[]="idef(pi/2,pi,sin(x),x,65000)";   
-  //char expression[]="sin(1+y*cos(3+pi/4))";   
-  //char expression[]="1+2-avg(x,2,3,4,5,6,7,8)+10*sin(pi/4)+1000+2000+1+2+3";   
-  //char expression[]="100+250+10*sin(pi/4)+1000+2000+sin(pi/4)";   
-  //char expression[]="sin(sin(1,2,3,4,5)+2+3,sin(1,2,3,4,5,6),sin(1))"; 
-  //char expression[]="avg(10,20)";
+    //char expression[]="avg(1,2,3,4,5,6,7,8,sin(3+x*pi/4),10)";
+    //char expression[]="diff(1+2+3+sin(x),x,0.4,0.01)";   
+    //char expression[]="diff(idef(0,y,x^2,x,10),x,0.444,0.01)";   
+    //char expression[]="45+idef(4.25,z,1,x,10)";   
+    //char expression[]="diff(sin(x+y),x,0.4,0.0001)";   
+    //char expression[]="diff(idef(0,y,sin(x),x,10),y,0.4,0.01)";   
+    //char expression[]="diff(cos(x),x,pi/2,0.001)";   
+    //char expression[]="exp(3.25)";   
+    //char expression[]="idef(pi/2,pi,sin(x),x,65000)";   
+    //char expression[]="sin(1+y*cos(3+pi/4))";   
+    //char expression[]="1+2-avg(x,2,3,4,5,6,7,8)+10*sin(pi/4)+1000+2000+1+2+3";   
+    //char expression[]="100+250+10*sin(pi/4)+1000+2000+sin(pi/4)";   
+    //char expression[]="sin(sin(1,2,3,4,5)+2+3,sin(1,2,3,4,5,6),sin(1))"; 
+    //char expression[]="avg(10,20)";
      
       
-  e_code=e_none;
-  system("clear");
-  printf("Formula: %s\r\n",expression);
-  printf(" Variables: %s\r\n", variables);
-  printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
-  result=lb_pa_formula(expression,variables,x,y,z,&e_code);
-  printf("Error: %s\r\n", errors[e_code].msg);
-  printf("Result=%0.6f\r\n",result);
-  exit(1);
+    e_code=e_none;
+    system("clear");
+    printf("Formula: %s\r\n",expression);
+    printf(" Variables: %s\r\n", variables);
+    printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
+    result=lb_pa_formula(expression,variables,x,y,z,&e_code);
+    printf("Error: %s\r\n", errors[e_code].msg);
+    printf("Result=%0.6f\r\n",result);
+    exit(1);
 #endif
 
   
-  //#define DEMO_PARSER_COMPLEX
+    //#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
-  ERR_T e_code;
-  COMPLEX_T var1,var2,imag,result;
-  var1.r=0;
-  var1.i=0;
-  var2.r=0;
-  var2.i=0;
-  imag.r=0;
-  imag.i=1;
+    ERR_T e_code;
+    COMPLEX_T var1,var2,imag,result;
+    var1.r=0;
+    var1.i=0;
+    var2.r=0;
+    var2.i=0;
+    imag.r=0;
+    imag.i=1;
 
-  /* Example: pi as a product */
-  char variables[]="x,k,i";
-  //char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k+1,1)";   
+    /* Example: pi as a product */
+    char variables[]="x,k,i";
+    //char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k+1,1)";   
     
-  /* Example: Gauss'childhood sum, using complex numbers  */
-  char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
+    /* Example: Gauss'childhood sum, using complex numbers  */
+    char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
     
   
-  /* Example: first order derivate */
-  //char expression[]="diff(e^x,x,30*pi/180+0.5*i,1e-4)";   
+    /* Example: first order derivate */
+    //char expression[]="diff(e^x,x,30*pi/180+0.5*i,1e-4)";   
 
-  /* Error: Example: complex integral */
-  //char expression[]="idef(0,abs(pi*30/180,sin(x)+cos(x)*i),x,100)";   
+    /* Error: Example: complex integral */
+    //char expression[]="idef(0,abs(pi*30/180,sin(x)+cos(x)*i),x,100)";   
 
-  /* Error: Example: complex integral */
-  //char expression[]="idef(0,pi*30/180,abs(sin(x)+cos(x)*i),x,100)";   
+    /* Error: Example: complex integral */
+    //char expression[]="idef(0,pi*30/180,abs(sin(x)+cos(x)*i),x,100)";   
      
-  /* Example: double integral */
-  //char expression[]="idef2(0,pi/4,0,pi/2,sin(x+y*i),x,y,1.1)"; 
+    /* Example: double integral */
+    //char expression[]="idef2(0,pi/4,0,pi/2,sin(x+y*i),x,y,1.1)"; 
 
-  /* Example: integral */
-  //char expression[]="idef(i,pi/4+i/3,cos(x)+sin(x)*i,x,10)"; 
+    /* Example: integral */
+    //char expression[]="idef(i,pi/4+i/3,cos(x)+sin(x)*i,x,10)"; 
  
-  /* Example: first order differential  */
-  //char expression[]="diff(sin(x)+i*cos(x),x,30*pi/180,0.001)"; 
+    /* Example: first order differential  */
+    //char expression[]="diff(sin(x)+i*cos(x),x,30*pi/180,0.001)"; 
  
-  /* Example: second order differential  */
-  //char expression[]="diff2(sin(x)+i*cos(x),x,30*pi/180,0.01)"; 
+    /* Example: second order differential  */
+    //char expression[]="diff2(sin(x)+i*cos(x),x,30*pi/180,0.01)"; 
 
-  /* Example: larger of two complex numbers  */
-  //char expression[]="max2(5+4*i,-3*i)"; 
+    /* Example: larger of two complex numbers  */
+    //char expression[]="max2(5+4*i,-3*i)"; 
  
-  /* Example: Gauss'childhood sum, using complex numbers  */
-  //char expression[]="sigma(100,1,0.5*x+x*i,x,-1)";   
+    /* Example: Gauss'childhood sum, using complex numbers  */
+    //char expression[]="sigma(100,1,0.5*x+x*i,x,-1)";   
     
-  /* Example: product  */
-  //char expression[]="prod(1,3,x+i,x,1)";   
+    /* Example: product  */
+    //char expression[]="prod(1,3,x+i,x,1)";   
     
-  /*
-    x.r=-1.0;
-    x.i=0.0;
-    y.r=1.0;
-    y.i=0.0;
-    lb_cp_print_c(x,"X",FLOAT_FORMAT);
-    printf("\r\n");
-    lb_cp_print_c(y,"Y",FLOAT_FORMAT);
-    printf("\r\n");
-    lb_cp_print_c(lb_cp_power(x,y,&e_code),"(-1)^1",FLOAT_FORMAT);
-    printf("\r\n"); */
+    /*
+      x.r=-1.0;
+      x.i=0.0;
+      y.r=1.0;
+      y.i=0.0;
+      lb_cp_print_c(x,"X",FLOAT_FORMAT);
+      printf("\r\n");
+      lb_cp_print_c(y,"Y",FLOAT_FORMAT);
+      printf("\r\n");
+      lb_cp_print_c(lb_cp_power(x,y,&e_code),"(-1)^1",FLOAT_FORMAT);
+      printf("\r\n"); */
       
-  //char expression[]="sigma(0,10,(-1)^k,k,1)";   
-  //char expression[]="sigma(0,10,x^(2*k+1),k,1)";   
-  //char expression[]="sigma(0,4+0*0.01*i,(-1)^k*x^(2*k+1)/(2*k+1)!,k,1+0.1*0.01*i)";   
+    //char expression[]="sigma(0,10,(-1)^k,k,1)";   
+    //char expression[]="sigma(0,10,x^(2*k+1),k,1)";   
+    //char expression[]="sigma(0,4+0*0.01*i,(-1)^k*x^(2*k+1)/(2*k+1)!,k,1+0.1*0.01*i)";   
       
-  /* Problem */
-  // char expression[]="(20)^2";   
-  //char expression[]="(-1)^1*x^(2.0*1.0+1.0)/(2.0*1.0+1.0)!";   
-  //char expression[]="(-1)^k*x^(2*k+1)/(2*k+2)";   
+    /* Problem */
+    // char expression[]="(20)^2";   
+    //char expression[]="(-1)^1*x^(2.0*1.0+1.0)/(2.0*1.0+1.0)!";   
+    //char expression[]="(-1)^k*x^(2*k+1)/(2*k+2)";   
 
        
-  e_code=e_none;
-  system("clear");
-  printf("Expression: %s\r\n",expression);
-  printf(" Variables: %s\r\n", variables);
-  printf(" Values: x=[%0.4f , %0.4f]  y=[%0.4f , %0.4f]\r\n", var1.r,var1.i,var2.r,var2.i);
-  result=lb_pa_formula_complex(expression,variables,var1,var2,imag,&e_code);
-  printf("Error: %s\r\n", errors[e_code].msg);
-  printf("Result= [%0.8f , %0.8f] \r\n",result.r, result.i);
-  exit(1);
+    e_code=e_none;
+    system("clear");
+    printf("Expression: %s\r\n",expression);
+    printf(" Variables: %s\r\n", variables);
+    printf(" Values: x=[%0.4f , %0.4f]  y=[%0.4f , %0.4f]\r\n", var1.r,var1.i,var2.r,var2.i);
+    result=lb_pa_formula_complex(expression,variables,var1,var2,imag,&e_code);
+    printf("Error: %s\r\n", errors[e_code].msg);
+    printf("Result= [%0.8f , %0.8f] \r\n",result.r, result.i);
+    exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* GIS demos */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* GIS demos */
+    /******************************************************************************************************************/
 
-  //#define DEMO_GIS
+    //#define DEMO_GIS
 #ifdef DEMO_GIS
-  FLOAT_T lon, lat;
-  FILE *fp;
-  int i_lat, i_lon, parsing_lon;
-  S_INT_16_T i, j;
-  char c, str_lat[128], str_lon[128];
+    FLOAT_T lon, lat;
+    FILE *fp;
+    int i_lat, i_lon, parsing_lon;
+    S_INT_16_T i, j;
+    char c, str_lat[128], str_lon[128];
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_clear(ty_fb_main, 0,0,0,255);
   
-  if (!(fp = fopen("world_map_large.csv", "r")))
-    {
-      perror("invalid world data file");
-      lb_fb_exit(1);
-    }
-
-  i_lat=0; i_lon=0;
-  parsing_lon=TRUE;
-  while ((c = fgetc(fp)) != EOF)
-    {
-      if (parsing_lon)
-	{
-	  if(isdigit(c) || (c=='.') || (c=='-'))
-	    {
-	      str_lon[i_lon]=c;
-	      i_lon++;
-	    }
-	  else
-	    {
-	      if ((i_lon>0) && (c==' '))
-		{
-		  str_lon[i_lon]='\0';
-		  lon=atof(str_lon);
-		  //printf("%f",lat);
-		  parsing_lon=FALSE;
-		  i_lon=0;		      
-		}
-	    }
-	}
-      else
-	{
-	  if(isdigit(c) || (c=='.') || (c=='-'))
-	    {
-	      str_lat[i_lat]=c;
-	      i_lat++;
-	    }
-	  else
-	    {
-	      if ((i_lat>0) && ((c==',') || (c==')')))
-		{
-		  str_lat[i_lat]='\0';
-		  lat=atof(str_lat);
-		  //printf("***%f\r\n",lon);
-		  fflush(stdout);
-		  parsing_lon=TRUE;
-		  i_lat=0;
-
-		  j=0.5*ty_width*(1.0+lon/180.0);
-		  i=0.3*ty_height*(1.0-lat/90.0);
-
-		  if ( (-90.0<lat) && (lat<90.0) && (-180.0<lon) && (lon<180.0))
-		    lb_gr_draw_pixel(NULL,j,i,lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-		}
-	    }
-	}
-      //printf("%c",c);
-    }
-  fclose(fp);
-  lb_gr_delay(30000);
-  lb_fb_exit(1);
-#endif
-
-  //#define DEMO_GIS_HEIGHT
-#ifdef DEMO_GIS_HEIGHT
-  S_INT_16_T i, j, height, height_max;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
-
-  height_max=0;
-      
-  for (i=0;i<ty_height;i++)
-    for (j=0;j<ty_width;j++)
+    if (!(fp = fopen("world_map_large.csv", "r")))
       {
-	height=lb_gis_height(-73+(FLOAT_T)j/ty_width, 8.0+(FLOAT_T)i/ty_height);
-
-	if (height>height_max)
-	  height_max=height;
-	    
-	//printf("height=%d\r\n",height);
-
-	PIXEL_T pix;
-	pix.r=0;
-	pix.g=round(MAX_R*(FLOAT_T)height/3619.0);
-	pix.b=0;
-	pix.k=MAX_K;
-	  
-	lb_gr_draw_pixel(NULL,j,i,pix,COPYMODE_COPY);
-
-	//lb_gr_delay(50);
+	perror("invalid world data file");
+	lb_fb_exit(1);
       }
-  printf("height-max=%d\r\n",height_max);      
 
-  char c;
-  while ((c=lb_co_getch())!='x') ;
-  lb_fb_exit(1);
+    i_lat=0; i_lon=0;
+    parsing_lon=TRUE;
+    while ((c = fgetc(fp)) != EOF)
+      {
+	if (parsing_lon)
+	  {
+	    if(isdigit(c) || (c=='.') || (c=='-'))
+	      {
+		str_lon[i_lon]=c;
+		i_lon++;
+	      }
+	    else
+	      {
+		if ((i_lon>0) && (c==' '))
+		  {
+		    str_lon[i_lon]='\0';
+		    lon=atof(str_lon);
+		    //printf("%f",lat);
+		    parsing_lon=FALSE;
+		    i_lon=0;		      
+		  }
+	      }
+	  }
+	else
+	  {
+	    if(isdigit(c) || (c=='.') || (c=='-'))
+	      {
+		str_lat[i_lat]=c;
+		i_lat++;
+	      }
+	    else
+	      {
+		if ((i_lat>0) && ((c==',') || (c==')')))
+		  {
+		    str_lat[i_lat]='\0';
+		    lat=atof(str_lat);
+		    //printf("***%f\r\n",lon);
+		    fflush(stdout);
+		    parsing_lon=TRUE;
+		    i_lat=0;
+
+		    j=0.5*ty_width*(1.0+lon/180.0);
+		    i=0.3*ty_height*(1.0-lat/90.0);
+
+		    if ( (-90.0<lat) && (lat<90.0) && (-180.0<lon) && (lon<180.0))
+		      lb_gr_draw_pixel(NULL,j,i,lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+		  }
+	      }
+	  }
+	//printf("%c",c);
+      }
+    fclose(fp);
+    lb_gr_delay(30000);
+    lb_fb_exit(1);
 #endif
 
-  //#define DEMO_PARALELL
-#ifdef DEMO_PARALELL
-  pthread_t threads[4];
-  int rc;
-  double l0, l1, l2, l3;
-  l3=200;
-  l2=200;
-  l1=200;
-  l0=200;
-  rc=pthread_create(&threads[0],NULL, floatsum, (void *) &l0);
-  rc=pthread_create(&threads[1],NULL, floatsum, (void *) &l1);
-  rc=pthread_create(&threads[2],NULL, floatsum, (void *) &l2);
-  rc=pthread_create(&threads[3],NULL, floatsum, (void *) &l3);
+    //#define DEMO_GIS_HEIGHT
+#ifdef DEMO_GIS_HEIGHT
+    S_INT_16_T i, j, height, height_max;
 
-  rc=pthread_join(threads[0],NULL);;
-  rc=pthread_join(threads[1],NULL);;
-  rc=pthread_join(threads[2],NULL);;
-  rc=pthread_join(threads[3],NULL);;
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_clear(ty_fb_main, 0,0,0,255);
+
+    height_max=0;
+      
+    for (i=0;i<ty_height;i++)
+      for (j=0;j<ty_width;j++)
+	{
+	  height=lb_gis_height(-73+(FLOAT_T)j/ty_width, 8.0+(FLOAT_T)i/ty_height);
+
+	  if (height>height_max)
+	    height_max=height;
+	    
+	  //printf("height=%d\r\n",height);
+
+	  PIXEL_T pix;
+	  pix.r=0;
+	  pix.g=round(MAX_R*(FLOAT_T)height/3619.0);
+	  pix.b=0;
+	  pix.k=MAX_K;
+	  
+	  lb_gr_draw_pixel(NULL,j,i,pix,COPYMODE_COPY);
+
+	  //lb_gr_delay(50);
+	}
+    printf("height-max=%d\r\n",height_max);      
+
+    char c;
+    while ((c=lb_co_getch())!='x') ;
+    lb_fb_exit(1);
+#endif
+
+    //#define DEMO_PARALELL
+#ifdef DEMO_PARALELL
+    pthread_t threads[4];
+    int rc;
+    double l0, l1, l2, l3;
+    l3=200;
+    l2=200;
+    l1=200;
+    l0=200;
+    rc=pthread_create(&threads[0],NULL, floatsum, (void *) &l0);
+    rc=pthread_create(&threads[1],NULL, floatsum, (void *) &l1);
+    rc=pthread_create(&threads[2],NULL, floatsum, (void *) &l2);
+    rc=pthread_create(&threads[3],NULL, floatsum, (void *) &l3);
+
+    rc=pthread_join(threads[0],NULL);;
+    rc=pthread_join(threads[1],NULL);;
+    rc=pthread_join(threads[2],NULL);;
+    rc=pthread_join(threads[3],NULL);;
   
 #endif
       
-  /*******************************************************************************************************************/
-  /* Statistics */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* Statistics */
+    /******************************************************************************************************************/
 
-  //#define DEMO_HISTOGRAM
+    //#define DEMO_HISTOGRAM
 #ifdef DEMO_HISTOGRAM
-  VIEWPORT_2D_T win;
-  VECTOR_R_T Data, Bins;
-  FONT_T my_font;
-  char text[40];
-  FLOAT_T x;
-  S_INT_16_T i;
-  FLOAT_T mu, sigma2;
+    VIEWPORT_2D_T win;
+    VECTOR_R_T Data, Bins;
+    FONT_T my_font;
+    char text[40];
+    FLOAT_T x;
+    S_INT_16_T i;
+    FLOAT_T mu, sigma2;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
-  win.xp_min=0;
-  win.xp_max=ty_width;
-  win.yp_min=0;
-  win.yp_max=ty_height;
-  win.xr_min=-40;
-  win.xr_max=400;
-  win.yr_min=3000.0; 
-  win.yr_max=-30;
+    win.xp_min=0;
+    win.xp_max=ty_width;
+    win.yp_min=0;
+    win.yp_max=ty_height;
+    win.xr_min=-40;
+    win.xr_max=400;
+    win.yr_min=3000.0; 
+    win.yr_max=-30;
 
-  /* Data generation */
-  Data.items=30000;
-  lb_al_create_vector_r(&Data);
-  for(i=0;i<Data.items;i++)
-    Data.array[i]=lb_st_marsaglia_polar(30);
+    /* Data generation */
+    Data.items=30000;
+    lb_al_create_vector_r(&Data);
+    for(i=0;i<Data.items;i++)
+      Data.array[i]=lb_st_marsaglia_polar(30);
       
-  Bins.items=40;
-  lb_al_create_vector_r(&Bins);
-  lb_st_histogram(&Data,&Bins,-100,100,&mu, &sigma2);
-  lb_al_print_vector_r(&Bins, "Bin", "%04.2f\r\n");
+    Bins.items=40;
+    lb_al_create_vector_r(&Bins);
+    lb_st_histogram(&Data,&Bins,-100,100,&mu, &sigma2);
+    lb_al_print_vector_r(&Bins, "Bin", "%04.2f\r\n");
 
-  printf("mu=%f,  sigma2=%f\r\n",mu,sigma2);
-  lb_gr_draw_histogram(NULL, win, &Bins, 
-		       lb_gr_12RGB(COLOR_WHITE), lb_gr_12RGB(COLOR_DIMGRAY),
-		       lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_DARKBLUE));
+    printf("mu=%f,  sigma2=%f\r\n",mu,sigma2);
+    lb_gr_draw_histogram(NULL, win, &Bins, 
+			 lb_gr_12RGB(COLOR_WHITE), lb_gr_12RGB(COLOR_DIMGRAY),
+			 lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_DARKBLUE));
            
-  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-  //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
-  my_font.scale_x=2;
-  my_font.scale_y=2;
-  my_font.gap_x=1;
-  my_font.gap_y=1;
-  my_font.max_x=40;
-  my_font.angle=0;
-  my_font.flag_fg=TRUE;
-  my_font.flag_bg=FALSE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
-  my_font.color_bg=lb_gr_12RGB(COLOR_RED);
+    lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+    //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
+    my_font.scale_x=2;
+    my_font.scale_y=2;
+    my_font.gap_x=1;
+    my_font.gap_y=1;
+    my_font.max_x=40;
+    my_font.angle=0;
+    my_font.flag_fg=TRUE;
+    my_font.flag_bg=FALSE;
+    my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
+    my_font.color_bg=lb_gr_12RGB(COLOR_RED);
 
-  lb_gr_delay(10000);
-  lb_ft_release_GLCDfont(&my_font);
-  lb_al_release_vector_r(&Data);
-  lb_fb_exit(1);
+    lb_gr_delay(10000);
+    lb_ft_release_GLCDfont(&my_font);
+    lb_al_release_vector_r(&Data);
+    lb_fb_exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* General Mathematics */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* General Mathematics */
+    /******************************************************************************************************************/
 
-  //#define DEMO_PRIMES
+    //#define DEMO_PRIMES
 #ifdef DEMO_PRIMES
-  VIEWPORT_2D_T win;
-  FONT_T my_font;
-  VECTOR_S_INT_16_T P;
-  S_INT_32_T k,j;
-  FLOAT_T t, x, y, xp, yp;
+    VIEWPORT_2D_T win;
+    FONT_T my_font;
+    VECTOR_S_INT_16_T P;
+    S_INT_32_T k,j;
+    FLOAT_T t, x, y, xp, yp;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
-  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-  my_font.scale_x=1;
-  my_font.scale_y=1;
-  my_font.gap_x=2;
-  my_font.gap_y=1;
-  my_font.max_x=40;
-  my_font.angle=0;
-  my_font.flag_fg=TRUE;
-  my_font.flag_bg=FALSE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
-  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+    lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+    my_font.scale_x=1;
+    my_font.scale_y=1;
+    my_font.gap_x=2;
+    my_font.gap_y=1;
+    my_font.max_x=40;
+    my_font.angle=0;
+    my_font.flag_fg=TRUE;
+    my_font.flag_bg=FALSE;
+    my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
+    my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
           
-  win.xp_min=5;
-  win.xp_max=ty_width-5;
-  win.yp_min=5;
-  win.yp_max=ty_height-5;
+    win.xp_min=5;
+    win.xp_max=ty_width-5;
+    win.yp_min=5;
+    win.yp_max=ty_height-5;
 
    
-  win.xr_min= 0.0;
-  win.xr_max=  10.0;
-  win.yr_min=  10.0;
-  win.yr_max= 0.0; 
+    win.xr_min= 0.0;
+    win.xr_max=  10.0;
+    win.yr_min=  10.0;
+    win.yr_max= 0.0; 
 
 
-  P.items=100;
-  lb_al_create_vector_si16(&P);
+    P.items=100;
+    lb_al_create_vector_si16(&P);
 
 
 
-  lb_sieve_erathostenes_2(&P, 32500);
-  lb_al_print_vector_si16(&P,"Primes");
+    lb_sieve_erathostenes_2(&P, 32500);
+    lb_al_print_vector_si16(&P,"Primes");
 
-  j=0;
-  for(k=1;k<10000000;k++)
-    {
-      if(lb_in_is_perfectsquare(k)==TRUE)
-	{
-	  printf("%d\r\n",k);
-	  j++;
-	}
-    }
+    j=0;
+    for(k=1;k<10000000;k++)
+      {
+	if(lb_in_is_perfectsquare(k)==TRUE)
+	  {
+	    printf("%d\r\n",k);
+	    j++;
+	  }
+      }
 
-  k=10000000000;
-  printf("isqrt(%d)=%d\r\n",k,lb_in_isqrt(k));
+    k=10000000000;
+    printf("isqrt(%d)=%d\r\n",k,lb_in_isqrt(k));
 
-  for (k=1;k<P.items;k++)
-    {
-      x=log(k);
-      y=log(P.array[k]);
-      lb_gr_project_2d(win, x, y, &xp, &yp);
-      lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-    }
-  lb_gr_delay(10000);
-  lb_al_release_vector_si16(&P);
-  lb_fb_exit(1);
+    for (k=1;k<P.items;k++)
+      {
+	x=log(k);
+	y=log(P.array[k]);
+	lb_gr_project_2d(win, x, y, &xp, &yp);
+	lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
+      }
+    lb_gr_delay(10000);
+    lb_al_release_vector_si16(&P);
+    lb_fb_exit(1);
 #endif
 
     
-  /*******************************************************************************************************************/
-  /* Numerical Methods */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* Numerical Methods */
+    /******************************************************************************************************************/
 
-  //#define DEMO_RK4
+    //#define DEMO_RK4
 #ifdef DEMO_RK4
-  FLOAT_T t_n, y_rk4, y_euler, xp, yp;
-  VIEWPORT_2D_T win;
-  ERR_T error;
+    FLOAT_T t_n, y_rk4, y_euler, xp, yp;
+    VIEWPORT_2D_T win;
+    ERR_T error;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_clear(ty_fb_main, 0,0,0,255);
   
-  win.xp_min=0;
-  win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
-  win.xr_min=0.0;
-  win.xr_max=6.2832*8.0;
-  win.yr_min=-2.5; 
-  win.yr_max=2.5;
+    win.xp_min=0;
+    win.yp_min=0;
+    win.xp_max=ty_width;
+    win.yp_max=ty_height;
+    win.xr_min=0.0;
+    win.xr_max=6.2832*8.0;
+    win.yr_min=-2.5; 
+    win.yr_max=2.5;
 
-  t_n=0;
-  y_rk4=0;
-  y_euler=0;
-  error=e_none;
+    t_n=0;
+    y_rk4=0;
+    y_euler=0;
+    error=e_none;
       
-  while((t_n<=win.xr_max) && (error==e_none))
-    {
-      printf("t_n= %f, y_euler=%f, y_rk4=%f\r\n",t_n,y_euler, y_rk4);
-      lb_gr_project_2d(win, t_n, y_rk4, &xp, &yp);
-      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-      lb_gr_project_2d(win, t_n, y_euler, &xp, &yp);
-      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
-      rk4(&t_n, &y_rk4, 0.1, &error, diego_sin);
-      rk4(&t_n, &y_euler, 0.1, &error, diego_sin);
-    }
-  lb_gr_delay(20000);
-  lb_fb_exit(1); 
+    while((t_n<=win.xr_max) && (error==e_none))
+      {
+	printf("t_n= %f, y_euler=%f, y_rk4=%f\r\n",t_n,y_euler, y_rk4);
+	lb_gr_project_2d(win, t_n, y_rk4, &xp, &yp);
+	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+	lb_gr_project_2d(win, t_n, y_euler, &xp, &yp);
+	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
+	rk4(&t_n, &y_rk4, 0.1, &error, diego_sin);
+	rk4(&t_n, &y_euler, 0.1, &error, diego_sin);
+      }
+    lb_gr_delay(20000);
+    lb_fb_exit(1); 
 #endif
 
-  //#define DEMO_GENERAL_RUNGE_KUTTA
+    //#define DEMO_GENERAL_RUNGE_KUTTA
 #ifdef DEMO_GENERAL_RUNGE_KUTTA
-  VECTOR_R_T C, B, K;
-  MATRIX_R_T A;
-  S_INT_16_T i, j;
-  FLOAT_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
-  VIEWPORT_2D_T win;
+    VECTOR_R_T C, B, K;
+    MATRIX_R_T A;
+    S_INT_16_T i, j;
+    FLOAT_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
+    VIEWPORT_2D_T win;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
+    lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+    lb_fb_clear(ty_fb_main, 0,0,0,255);
 
   
-  win.xp_min=0;
-  win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
-  win.xr_min=-5.0;
-  win.xr_max=5.0;
-  win.yr_min=-3.5; 
-  win.yr_max=3.5;
+    win.xp_min=0;
+    win.yp_min=0;
+    win.xp_max=ty_width;
+    win.yp_max=ty_height;
+    win.xr_min=-5.0;
+    win.xr_max=5.0;
+    win.yr_min=-3.5; 
+    win.yr_max=3.5;
 
-  /* This defines the coeficients for RK4 */
-  A.cols=4;
-  A.rows=4;
-  lb_al_create_matrix_r(&A);
-  A.array[0][0]=0.0;   A.array[0][1]=0.0;   A.array[0][2]=0.0; A.array[0][3]=0.0;
-  A.array[1][0]=1.0/2; A.array[1][1]=0.0;   A.array[1][2]=0.0; A.array[1][3]=0.0;
-  A.array[2][0]=0.0;   A.array[2][1]=1.0/2; A.array[2][2]=0.0; A.array[2][3]=0.0;
-  A.array[3][0]=0.0;   A.array[3][1]=0.0;   A.array[3][2]=1.0; A.array[3][3]=0.0;
+    /* This defines the coeficients for RK4 */
+    A.cols=4;
+    A.rows=4;
+    lb_al_create_matrix_r(&A);
+    A.array[0][0]=0.0;   A.array[0][1]=0.0;   A.array[0][2]=0.0; A.array[0][3]=0.0;
+    A.array[1][0]=1.0/2; A.array[1][1]=0.0;   A.array[1][2]=0.0; A.array[1][3]=0.0;
+    A.array[2][0]=0.0;   A.array[2][1]=1.0/2; A.array[2][2]=0.0; A.array[2][3]=0.0;
+    A.array[3][0]=0.0;   A.array[3][1]=0.0;   A.array[3][2]=1.0; A.array[3][3]=0.0;
       
-  B.items=4;
-  lb_al_create_vector_r(&B);
-  B.array[0]=1.0/6;  B.array[1]=1.0/3;  B.array[2]=1.0/3;  B.array[3]=1.0/6;
+    B.items=4;
+    lb_al_create_vector_r(&B);
+    B.array[0]=1.0/6;  B.array[1]=1.0/3;  B.array[2]=1.0/3;  B.array[3]=1.0/6;
  
-  C.items=4;
-  lb_al_create_vector_r(&C);
-  C.array[0]=0.0;  C.array[1]=1.0/2;  C.array[2]=1.0/2;  C.array[3]=1.0;
+    C.items=4;
+    lb_al_create_vector_r(&C);
+    C.array[0]=0.0;  C.array[1]=1.0/2;  C.array[2]=1.0/2;  C.array[3]=1.0;
 
-  K.items=4;
-  lb_al_create_vector_r(&K);
+    K.items=4;
+    lb_al_create_vector_r(&K);
      
     
-  t_n=-3.1416;
-  y_n=1.0;
-  h=0.01;
+    t_n=-3.1416;
+    y_n=1.0;
+    h=0.01;
 
-  while(t_n<=3.1416)
-    {
-      printf("t_n= %f, y_n= %f\r\n",t_n,y_n);
-      lb_gr_project_2d(win, t_n, y_n, &xp, &yp);
-      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+    while(t_n<=3.1416)
+      {
+	printf("t_n= %f, y_n= %f\r\n",t_n,y_n);
+	lb_gr_project_2d(win, t_n, y_n, &xp, &yp);
+	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
     	
-      for(i=0;i<K.items;i++)
-	{
-	  temp_t = t_n + h*C.array[i];
-	  temp_y = 0.0;
-	  for(j=0;j<=(i-1);j++)
-	    {
-	      //printf("A[%d][%d]*K[%d] = %f * %f = %f\r\n",i,j,j,A.array[i][j],K.array[j],A.array[i][j]*K.array[j]);
-	      temp_y+=A.array[i][j]*K.array[j];
-	    }
-	  temp_y*=h;
-	  temp_y+=y_n;
-	  /* test function f(temp_t, temp_y) */
-	  K.array[i]=-sin(temp_t);
-	}
+	for(i=0;i<K.items;i++)
+	  {
+	    temp_t = t_n + h*C.array[i];
+	    temp_y = 0.0;
+	    for(j=0;j<=(i-1);j++)
+	      {
+		//printf("A[%d][%d]*K[%d] = %f * %f = %f\r\n",i,j,j,A.array[i][j],K.array[j],A.array[i][j]*K.array[j]);
+		temp_y+=A.array[i][j]*K.array[j];
+	      }
+	    temp_y*=h;
+	    temp_y+=y_n;
+	    /* test function f(temp_t, temp_y) */
+	    K.array[i]=-sin(temp_t);
+	  }
 
-      y_next=0;
-      for(i=0;i<A.cols;i++)
-	{
-	  //printf("B[%d] * K[%d] = %f, * %f\r\n",i,i,B.array[i],K.array[i]);
-	  y_next+=B.array[i]*K.array[i];
-	}
-      y_next*=h;
-      y_next+=y_n;
-      printf("y_next=%f\r\n",y_next);
+	y_next=0;
+	for(i=0;i<A.cols;i++)
+	  {
+	    //printf("B[%d] * K[%d] = %f, * %f\r\n",i,i,B.array[i],K.array[i]);
+	    y_next+=B.array[i]*K.array[i];
+	  }
+	y_next*=h;
+	y_next+=y_n;
+	printf("y_next=%f\r\n",y_next);
 
-      y_n=y_next;
-      t_n+=h;
-    }
-  lb_gr_delay(4000);
+	y_n=y_next;
+	t_n+=h;
+      }
+    lb_gr_delay(4000);
       
-  lb_al_release_matrix_r(&A);
-  lb_al_release_vector_r(&B);
-  lb_al_release_vector_r(&C);
-  lb_fb_exit(1); 
+    lb_al_release_matrix_r(&A);
+    lb_al_release_vector_r(&B);
+    lb_al_release_vector_r(&C);
+    lb_fb_exit(1); 
 #endif
 
-  /*******************************************************************************************************************/
-  /* System Functions */
-  /******************************************************************************************************************/
+    /*******************************************************************************************************************/
+    /* System Functions */
+    /******************************************************************************************************************/
       
-  //#define DEMO_TIME_TEST
+    //#define DEMO_TIME_TEST
 #ifdef DEMO_TIME_TEST
-  unsigned long i, max;
-  S_INT_16_T j;
-  clock_t begin, end;
+    unsigned long i, max;
+    S_INT_16_T j;
+    clock_t begin, end;
 
-  max=1000000000;
+    max=1000000000;
 
-  begin=clock();
-  for (i=0;i<max;i++)
-    j=round(12.232);
-  end = clock();
-  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
+    begin=clock();
+    for (i=0;i<max;i++)
+      j=round(12.232);
+    end = clock();
+    printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
 
-  begin=clock();
-  for (i=0;i<max;i++)
-    j=lround(12.232);
-  end = clock();
-  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
+    begin=clock();
+    for (i=0;i<max;i++)
+      j=lround(12.232);
+    end = clock();
+    printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
 
-  begin=clock();
-  for (i=0;i<max;i++)
-    j=0.5+12.232;
-  end = clock();
-  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
+    begin=clock();
+    for (i=0;i<max;i++)
+      j=0.5+12.232;
+    end = clock();
+    printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
 
-  exit(1);
+    exit(1);
 #endif
 
-  /* BER vs Noise using a Montecarlo simulation */
+    /* BER vs Noise using a Montecarlo simulation */
   
-  //#define DEMO_ZERO_CROSSING
+#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
     VECTOR_R_T Signal, Noise;
     SDL_Event event;
@@ -4191,17 +4191,17 @@ int main()
     /* User-defined simulation parameters */
     const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
     const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-    S_INT_32_T n_experiments=10000; /* Maximum number of experiments. Not declared as a const to allow a possible
+    S_INT_32_T n_experiments=1000000; /* Maximum number of experiments. Not declared as a const to allow a possible
 				       upgrade to variable-step size */
     const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
     FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
     FLOAT_T f_max_noise=6.0e3;  /* Maximum noise frequency */
     FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
-    FLOAT_T N_exp_min=1.0e-8;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
+    FLOAT_T N_exp_min;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
    
     /* Simulation variables */
     S_INT_32_T experiment;       /* Keeps track of the current experiment */
-    S_INT_32_T errors_count;     /* Keeps track of the number of errors detected during a series of experiments */
+    S_INT_32_T errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02;     /* Keeps track of the number of errors detected during a series of experiments */
     FLOAT_T N_experiment;        /* Current value of the noise energy during a series of experiments */
     FLOAT_T N_total;             /* Total energy of a frequency vector  */
     S_INT_8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
@@ -4243,7 +4243,7 @@ int main()
       return 0.5*temp;
     } 
 
-    S_INT_8_T parse_vector(VECTOR_R_T *buffer)
+    S_INT_8_T parse_vector(VECTOR_R_T *buffer, FLOAT_T threshold_h, FLOAT_T threshold_l)
     {
       U_INT_16_T time_stamp[4];
    
@@ -4260,7 +4260,8 @@ int main()
       i=0;
       while ((i<(*buffer).items-1) && (crossings_counter<=3))
 	{
-	  if (lb_re_ispos((*buffer).array[i]) != lb_re_ispos((*buffer).array[i+1]) )
+	  if ( ( ((*buffer).array[i]<threshold_h) && ((*buffer).array[i+1]>=threshold_h) ) ||
+	       ( ((*buffer).array[i]>threshold_l) && ((*buffer).array[i+1]<=threshold_l)) )
 	    {
 	      time_stamp[crossings_counter]=i;
 	      crossings_counter++;
@@ -4294,11 +4295,12 @@ int main()
 
     win_BER.xp_min=20;
     win_BER.xp_max=ty_screen.w-20;
-    win_BER.yp_min=ty_screen.h/4+20;
+    win_BER.yp_min=0*ty_screen.h/4+20;
     win_BER.yp_max=ty_screen.h-20;
       
     win_BER.xr_min=   0;
-    win_BER.xr_max=  14;
+    win_BER.xr_max=  15;
+    N_exp_min = 1.0/pow(10.0,15.0/10.0);
     win_BER.yr_min=  1.0;
     win_BER.yr_max=  1e-8;
 
@@ -4311,14 +4313,6 @@ int main()
 
     printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
       
-    for(t=t_min;t<t_max;t+=(t_max-t_min)/1000)
-      {
-	lb_gr_project_2d(win_wave, t, wave(t,freq_0, freq_1), &xp, &yp);
-	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-      }
-    lb_gr_refresh();
-
-
   
     /* In order to nicely draw the waveform, a f(t) per pixel is desired */ 
     Signal.items=win_wave.xp_max - win_wave.xp_min;
@@ -4343,237 +4337,131 @@ int main()
 
 
     N_experiment=N_exp_max;
-    while (1)
-      {
-	if (flag_running)
-	  {
-	    errors_count=0;
-	    for (experiment=0;experiment<n_experiments;experiment++)
-	      {
-		if (!(experiment % 100))
-		  flag_draw_wave = TRUE;
-		else 
-		  flag_draw_wave = FALSE;
-	      
-		for (k=0; k<Noise.items; k++)
-		  Noise.array[k]=lb_st_marsaglia_polar(noise_variance);
-
-		N_total=energy_signal(&Noise);
-		FLOAT_T scale_factor;
-		scale_factor=sqrt(N_experiment/N_total);
-
-		for (k=0; k<Noise.items; k++)
-		  Noise.array[k]=scale_factor*Noise.array[k];
-		N_total=energy_signal(&Noise);
-	      
-		if (flag_draw_wave)
-		  lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h*0.25+19, lb_gr_12RGB(COLOR_WHITE));
-		for (k=0;k<Signal.items;k++)
-		  {
-		    t=t_min+k*(t_max-t_min)/Signal.items;
-		  
-		    FLOAT_T temp;
-		    temp=0;
-
-		    for (i=0;i<Noise.items;i++)
-		      temp+=Noise.array[i]*sin(2*M_PI*i*t/T_base);
-		    Signal.array[k]=wave(t,freq_0, freq_1)+temp;
-		    if (flag_draw_wave)
-		      {
-			lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
-			lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
-		      }
-		  }
-		if (parse_vector(&Signal))
-		  errors_count++;
-
-
-		lb_gr_refresh();
-		while (SDL_PollEvent(&event))
-		  {
-		    if (event.type == SDL_QUIT)
-		      {
-			SDL_Quit();
-			exit(EXIT_SUCCESS);
-		      }
-		  }
-		//	      if (!(experiment % (n_experiments/10)))
-		//	printf("%f\r\n",100.0*experiment/n_experiments);
-	      }
-	    printf("N_experiment=%f\tN_total=%f\tErrors=%d\r\n",N_experiment,N_total, errors_count);
-	    if (errors_count!=0) 
-	      {
-		FLOAT_T temp1, temp2;
-		lb_gr_project_2d_x(win_BER, -10*log10(N_experiment), &xp);
-		temp1=(FLOAT_T)errors_count/n_experiments;
-		lb_gr_project_2d_y_log(win_BER, temp1, &yp);
-		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-
-		ERR_T error;
-		temp2 = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(FLOAT_T)1.0/N_experiment, &error));
-		lb_gr_project_2d_y_log(win_BER, temp2, &yp);
-		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
-	      
-		printf("x=%f dB, BER_zero=%f, BER_FSK=%f\r\n",10*log10(N_experiment), temp1, temp2);
-	      
-		lb_gr_refresh();
-	      }
-
-	  }
-
-	N_experiment/=1.25892541179;
-	lb_ti_delay_ms(1000);
-	//    if (N_experiment<N_exp_min)
-	//	flag_running=FALSE;
-      
-	if (!flag_running)
-	  {
-	    SDL_Quit();
-	    exit(EXIT_SUCCESS);
-	  }
-      }
-
-
-    //Chart.w=win.xp_max-win.xp_min;
-    //Chart.h=win.yp_max-win.yp_min;
-    //lb_gr_create_picture(&Chart,lb_gr_12RGB(COLOR_BLUE));
-
-
-    // printf("x=%f x 10 ^%f\r\n",lb_re_normed_significand(10.01),lb_re_normed_exponent(10.01));
-    // lb_gr_render_picture(&Pic, my_renderer, 0, 0, PIXEL_SIZE_X, PIXEL_SIZE_Y, RENDERMODE_BOX;
-
-            
-
-
-  
     while (flag_running)
       {
-	errors_count=0;
+	errors_count_threshold_00 = 0;
+	errors_count_threshold_01 = 0 ;
+	errors_count_threshold_02 = 0;
 	for (experiment=0;experiment<n_experiments;experiment++)
 	  {
-	    //for(k=0;k<2*N_HALF_SAMPLES;k++)
-	    // {
-	    //	  Noise.array[k]=0.0;
-	    // }
-
-	    /* Noise using the time's Domain */
-	    // printf("RMS Noise (time domain method) = %f\r\n",RMS_noise_time_complex(signal_complex,0,N_SAMPLES));
-
-	    /* Noise using the frequency's Domain */
-	    //lb_fo_FFT_C(&signal, &frequencies, &W,-1); 
-	     
-	    // printf("RMS Noise (frequency domain method) = %f\r\n", RMS_noise_frequency(frequencies,N_POINTS));
-  
-	    /* A perfect Bandpass filter: we're leaving the a fourth of the lower frequencies  */
-	    /* Why 12 ?
-	       The circuit being simulated is a 1-st order active Low Pass with R=27.4K and C=220p, hence f=26.403KHz
-	       The DFT' base period is tmax = 1/5464 + 1/4291 = 4.1606*10^-4 seg   ==> d_freq=2403.5 Hz
-
-	       To fiter using a DTF we need to "keep"the base frequencies:
-	       f0  = DC
-	       f1  = 24
-	       03.5
-	       f2  = 4807
-	       f3  = 7210
-	       f4  = 9614
-	       f5  = 12017.5
-	       f6  = 24421
-	       f7  = 16824.5
-	       f8  = 19228
-	       f9  = 21631.5
-	       f10 = 24035
-	       f11 = 26438.5
-	       f12 = 0, etc. */
-	    //  for(i=13;i<2*N_HALF_SAMPLES;i++)
-	    //	
-	    // {
-	    //  frequencies.array[i].r=0;
-	    //  frequencies.array[i].i=0;
-	    //} 
-
-	    /* Digital filter */
-	    //lb_fo_FFT_C(&frequencies, &signal, &W, 1); 
+	    if (!(experiment % 100))
+	      flag_draw_wave = TRUE;
+	    else 
+	      flag_draw_wave = FALSE;
 	      
-	    //RMS_noise=RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1));
-	    //printf("RMS Noise (time domain method) after filtering = %f\r\n",RMS_noise);
-	    // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(frequencies,N_POINTS));
-	    //	  escale_complex_vector(signal_complex,(1.0*(FLOAT_TYPE)noise_step/(FLOAT_TYPE)NOISE_STEPS_MAX)/RMS_noise,N_SAMPLES
+	    for (k=0; k<Noise.items; k++)
+	      Noise.array[k]=lb_st_marsaglia_polar(noise_variance);
 
-	    // for(i=0;i<2*N_HALF_SAMPLES;i++)
-	    // {
-	    //   signal.array[i].i=0;
-	    // }
-	   
-	    //RMS_noise=RMS_noise_time_complex(&signal,round(0.25*2*N_HALF_SAMPLES/freq_0),
-	    //				   2*N_HALF_SAMPLES-round(0.25*2*N_HALF_SAMPLES/freq_0));
+	    N_total=energy_signal(&Noise);
+	    FLOAT_T scale_factor;
+	    scale_factor=sqrt(N_experiment/N_total);
 
- 
-	    //lb_al_multiply_vector_c_real(&signal,(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX)/RMS_noise);
-	      
-	    // printf("RMS Noise (time domain method) *** = %f\r\n",
-	    // RMS_noise_time_complex(signal_complex,round(0.25*N_SAMPLES/FREQ_1),N_SAMPLES-round(0.25*N_SAMPLES/FREQ_1)));
-	    // printf("RMS Noise (frequency domain method) after filtering = %f\r\n",RMS_noise_frequency(signal_complex,N_SAMPLES));
+	    for (k=0; k<Noise.items; k++)
+	      Noise.array[k]=scale_factor*Noise.array[k];
+	    N_total=energy_signal(&Noise);
 
-	    //if ((n_experiment % 256) == 0)
-	    // {
-	    //   printf("experiment=%d\r\n",n_experiment);
-	    //  lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h/4, lb_gr_12RGB(COLOR_WHITE));
+	    flag_draw_wave=FALSE;
+	    if (flag_draw_wave)
+	      lb_gr_draw_rectangle_solid(NULL, 0, 0, ty_screen.w, ty_screen.h*0.25+19, lb_gr_12RGB(COLOR_WHITE));
+	    for (k=0;k<Signal.items;k++)
+	      {
+		t=t_min+k*(t_max-t_min)/Signal.items;
+		  
+		FLOAT_T temp;
+		temp=0;
 
-	    //lb_gr_draw_rectangle_bar(NULL, 50, 50, 500, 500, 8, lb_gr_12RGB(COLOR_BLUE | COLOR_SEMI_SOLID),
-	    //			     lb_gr_12RGB(COLOR_RED | COLOR_SEMI_SOLID), COPYMODE_ADD);
-	   
-	    //lb_gr_draw_rectangle_bar(NULL, 70, 70, 512, 512, 8, lb_gr_12RGB(COLOR_PINK | COLOR_SEMI_SOLID),
-	    //			     lb_gr_12RGB(COLOR_GREEN | COLOR_SEMI_SOLID), COPYMODE_ADD);
-	   
-	    //  lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_BLACK), 1, 10,
-	    //			 lb_gr_12RGB(COLOR_GREEN), 1e-3, lb_gr_12RGB(COLOR_ORANGE), 0.5,
-	    //			 AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-	    //			 AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-	    //			 COPYMODE_COPY, LINEMODE_SOLID);
-	    // }
-	
-	    // for(i=0;i<2*N_HALF_SAMPLES;i++)
-	    // {
-	    //   t=t_min+i*(t_max-t_min)/(2*N_HALF_SAMPLES);
-	    //    signal.array[i].r += sqrt(2)*f(t,2*M_PI*freq_1,2*M_PI*freq_0);
-	    //    /* We don have to plot all experiments, just some would be representative */
-	    //    if ((n_experiment % 256) == 0)
-	    //	{
-	    //	  lb_gr_project_2d(win, t, signal.array[i].r, &xp, &yp);
-	    //		  lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-	    //	}
-	    // }
-	  
-	    //if ((n_experiment % 256) == 0)
-	    //  lb_gr_refresh();
+		for (i=0;i<Noise.items;i++)
+		  temp+=Noise.array[i]*sin(2*M_PI*i*t/T_base);
+		Signal.array[k]=wave(t,freq_0, freq_1)+temp;
+		if (flag_draw_wave)
+		  {
+		    lb_gr_project_2d(win_wave, t, Signal.array[k], &xp, &yp);
+		    lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+		  }
+	      }
+	    if (parse_vector(&Signal, 0, 0))
+	      errors_count_threshold_00++;
+		
+	    if (parse_vector(&Signal, -0.025, 0.025))
+	      errors_count_threshold_01++;
 
-	    //if (!parse_vector(&signal))
-	    // errors_count++;
-	    //printf("Progress: %2.3f %% done E = %li  /  %i \r",
-	    //		 100.0*n_experiment/N_EXPERIMENT_MAX, errors_count,N_EXPERIMENT_MAX);
-	    //	}
+	    if (parse_vector(&Signal, -0.05, 0.05))
+	      errors_count_threshold_02++;
 
-	    //if ( errors_count!=0) 
-	    //{
-	    //lb_gr_project_2d_x(win_BER, -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX), &xp);
-	    //lb_gr_project_2d_y_log(win_BER, (FLOAT_T)errors_count/N_EXPERIMENT_MAX, &yp);
-	    ////lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-	    //lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-	    //	}
-	    //oxo
-	    //sprintf(text,"noise_%0.3d.bmp",noise_step);
-	    //lb_gr_BMPfile_save(text, NULL);
-  
-	    //     printf("Noise step = %i / %i, SNR = %f, BER = %li / %i\r\n",
-	    // noise_step,
-	    // NOISE_STEPS_MAX,
-	    // -10*log10(0.5*(FLOAT_T)noise_step/NOISE_STEPS_MAX),
-	    // errors_count, N_EXPERIMENT_MAX);
+
+	    lb_gr_refresh();
+	    while (SDL_PollEvent(&event))
+	      {
+		if (event.type == SDL_QUIT)
+		  {
+		    SDL_Quit();
+		    exit(EXIT_SUCCESS);
+		  }
+	      }
 	  }
+	printf("N_experiment=%f\tN_total=%f\tE(0,0)=%d, E(0.025, -0.025)=%d, E(0.05, -0.05)=%d\r\n",
+	       N_experiment,N_total, errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02);
 
-	lb_al_release_vector_r(&Signal);
-	lb_al_release_vector_r(&Noise);
+	FLOAT_T temp_00, temp_01, temp_02, temp;
+	if (N_experiment>0)
+	  {
+	    lb_gr_project_2d_x(win_BER, -10*log10(N_experiment), &xp);
+
+	    temp_00=(FLOAT_T)errors_count_threshold_00/n_experiments;
+	    if (temp_00>0)
+	      {
+		lb_gr_project_2d_y_log(win_BER, temp_00, &yp);
+		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+	      }
+
+	    temp_01=(FLOAT_T)errors_count_threshold_01/n_experiments;
+	    if (temp_01>0)
+	      {
+		lb_gr_project_2d_y_log(win_BER, temp_01, &yp);
+		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
+	      }
+	    temp_02=(FLOAT_T)errors_count_threshold_02/n_experiments;
+
+	    if (temp_02>0)
+	      {
+		lb_gr_project_2d_y_log(win_BER, temp_02, &yp);
+		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY);
+	      }
+	    
+	    ERR_T error;
+	    temp = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(FLOAT_T)1.0/N_experiment, &error));
+	    if (temp>0)
+	      {
+		lb_gr_project_2d_y_log(win_BER, temp, &yp);
+		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
+	      }
+	    
+	    printf("x=%f dB, BER_00=%f, BER_01=%f, BER_02=%f, BER_FSK=%f\r\n",
+		   10*log10(N_experiment), temp_00, temp_01, temp_02, temp);
+	      
+	    lb_gr_refresh();
+	  }
+	N_experiment/=pow(10.0,0.5/10.0); /* plot in 0.5 dB increments */
+	if (N_experiment<N_exp_min)
+	  flag_running=FALSE;
       }
+    lb_al_release_vector_r(&Signal);
+    lb_al_release_vector_r(&Noise);
+
+    lb_gr_BMPfile_save("zero_mod.bmp", NULL);
+
+    printf("Program completed: waiting to be closed by user\r\n");
+    while (1)
+      while (SDL_PollEvent(&event))
+	{
+	  if (event.type == SDL_QUIT)
+	    {
+	      SDL_Quit();
+	      exit(EXIT_SUCCESS);
+	    }
+	}
+
+
 
 #endif
 
