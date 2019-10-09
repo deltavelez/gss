@@ -2494,7 +2494,7 @@ int main(int argc, char *argv[])
   STATUS_T status;
   
   clock_t time_begin, time_end;
-  
+  char text[20];
   S_INT_8_T relay_status=0;
   S_INT_16_T shock_counter=1;
   FLOAT_T accel, accel_max;
@@ -2621,14 +2621,17 @@ int main(int argc, char *argv[])
 
 	  /* We measure the acceleration */
 
-
-
-	  printf("n=%d\tT0=%4.2f\tP0=%4.2f\tT1=%4.2f\tP1=%4.2f\ta=%4.5f\r\n",
-		 shock_counter,temp0.f, press0.f,temp1.f, press1.f, accel_max);
+	  if (relay_status)
+	    sprintf(text,"UP");
+	  else
+	    sprintf(text,"DO");
+	  
+	  printf("n=%d\tDir=%s\tT0=%4.2f\tP0=%4.2f\tT1=%4.2f\tP1=%4.2f\ta=%4.5f\r\n",
+		 shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max);
 
 	  if (argc==2)
-	    fprintf(fp,"n=;%d;T0=;%4.2f;P0=;%4.2f;T1=;%4.2f;P1=;%4.2f;a=;%4.5f\r\n",
-		 shock_counter,temp0.f, press0.f,temp1.f, press1.f, accel_max);
+	    fprintf(fp,"n=;%d;Dir=;%s;T0=;%4.2f;P0=;%4.2f;T1=;%4.2f;P1=;%4.2f;a=;%4.5f\r\n",
+		    shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max);
 
 
 	  shock_counter++;
