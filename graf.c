@@ -2512,7 +2512,10 @@ int main(int argc, char *argv[])
 
   SPI_PORT_T my_port;
   S_INT_32_T time_stroke=4000;
+  U_INT_16_T value;
 
+  printf("CLOCKS_PER_SEC=%u\r\n",CLOCKS_PER_SEC); 
+  printf("Size(clock_T)=%d\r\n",sizeof(clock_t));
   
   printf("argsc=%d, argsv[0]=%s, argsv[1]=%s\r\n",argc,argv[0],argv[1]);  
   if (argc==2)
@@ -2549,7 +2552,7 @@ int main(int argc, char *argv[])
 	     Log acceleration, save accel_max
 	     wait until t= 5.0 */
 
-	  /* Firts, we set the required parameters for transducer 0 */
+	  /* First, we set the required parameters for transducer 0 */
 
 	  my_port.CPOL=GPIO_LOW;
 	  my_port.CPHA=GPIO_LOW;
@@ -2569,7 +2572,6 @@ int main(int argc, char *argv[])
 	      lb_ti_delay_us(100);
       
 	      lb_gp_gpio_SPI_rw(&my_port, 0b110);
-	      U_INT_16_T value;
 	      lb_ti_delay_us(100);
 	      value=lb_gp_gpio_SPI_rw_nbits(&my_port, 0,16);
 	      //lb_gp_print_u32_as_binary(value, 16);
@@ -2625,15 +2627,19 @@ int main(int argc, char *argv[])
 	    sprintf(text,"UP");
 	  else
 	    sprintf(text,"DO");
+
+	  U_INT_32_T stamp;
+	  stamp=clock();
 	  
-	  printf("n=%d\tDir=%s\tT0=%4.2f\tP0=%4.2f\tT1=%4.2f\tP1=%4.2f\ta=%4.5f\r\n",
-		 shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max);
+	  printf("n=%d  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f  ts=%u\r\n",
+		 shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max,stamp);
 
 	  if (argc==2)
-	    fprintf(fp,"n=;%d;Dir=;%s;T0=;%4.2f;P0=;%4.2f;T1=;%4.2f;P1=;%4.2f;a=;%4.5f\r\n",
-		    shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max);
-
-
+	    {
+	      fprintf(fp,"n=;%d;Dir=;%s;T0=;%4.2f;P0=;%4.2f;T1=;%4.2f;P1=;%4.2f;a=;%4.1f;%u\r\n",
+		      shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max,stamp);
+	      fflush(fp);
+	    }
 	  shock_counter++;
 	}
 
@@ -2646,6 +2652,7 @@ int main(int argc, char *argv[])
 	{
 	  char c;
 	  c=lb_co_getch_pc();
+	  printf("lb_co_kbhit(), c=%c\r\n",c);
 	  
 	  switch(c)
 	    {
@@ -4291,7 +4298,7 @@ int main(int argc, char *argv[])
     /* User-defined simulation parameters */
     const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
     const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-    S_INT_32_T n_experiments=1000000; /* Maximum number of experiments. Not declared as a const to allow a possible
+    S_INT_32_T n_experiments=10000; /* Maximum number of experiments. Not declared as a const to allow a possible
 					 upgrade to variable-step size */
     const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
     FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
