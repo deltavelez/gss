@@ -1,4 +1,4 @@
-#ifndef LB_TYPES_H
+#ifndef LB_TYPES_HU
 #define LB_TYPES_H
 
 /******************************************************/
@@ -20,12 +20,12 @@
 /******************************************************/
 
 #define FLOAT_T double
-#define U_INT8_T unsigned char
-#define U_INT16_T unsigned short
-#define U_INT32_T unsigned int
-#define S_INT8_T char
-#define S_INT16_T short
-#define S_INT32_T long
+#define U_INT_8_T unsigned char
+#define U_INT_16_T unsigned short
+#define U_INT_32_T unsigned int
+#define S_INT_8_T char
+#define S_INT_16_T short
+#define S_INT_32_T long
 
 /******************************************************/
 /* Math data types */
@@ -60,53 +60,53 @@ typedef struct
 
 typedef struct
 {
-  S_INT8_T *array;
-  U_INT16_T items;
-} VECTOR_S_INT8_T;
+  S_INT_8_T *array;
+  U_INT_16_T items;
+} VECTOR_S_INT_8_T;
 
 typedef struct
 {
-  S_INT16_T *array;
-  U_INT16_T items;
-} VECTOR_S_INT16_T;
+  S_INT_16_T *array;
+  U_INT_16_T items;
+} VECTOR_S_INT_16_T;
 
 typedef struct
 {
   FLOAT_T *array;
-  U_INT16_T items;
+  U_INT_16_T items;
 } VECTOR_R_T;
 
 typedef struct
 {
   COMPLEX_T *array;
-  U_INT16_T items;
+  U_INT_16_T items;
 } VECTOR_C_T;
 
 typedef struct
 {
-  S_INT8_T **array;
-  U_INT16_T rows;
-  U_INT16_T cols;
-} MATRIX_S_INT8_T;
+  S_INT_8_T **array;
+  U_INT_16_T rows;
+  U_INT_16_T cols;
+} MATRIX_S_INT_8_T;
 
 typedef struct
 {
   FLOAT_T **array;
-  U_INT16_T rows;
-  U_INT16_T cols;
+  U_INT_16_T rows;
+  U_INT_16_T cols;
 } MATRIX_R_T;
 
 typedef struct
 {
   COMPLEX_T **array;
-  U_INT16_T rows;
-  U_INT16_T cols;
+  U_INT_16_T rows;
+  U_INT_16_T cols;
 } MATRIX_C_T;
 
 typedef struct
 {
-  S_INT8_T n;
-  U_INT16_T dim[5];
+  S_INT_8_T n;
+  U_INT_16_T dim[5];
   FLOAT_T *a1;
   FLOAT_T **a2;
   FLOAT_T ***a3;
@@ -687,7 +687,7 @@ typedef enum { COPYMODE_FRAMEBUFFER=0,
 	       COPYMODE_PORTERDUFF_XOR } COPYMODE_T; 
 
 
-#define RENDERMODE_T U_INT32_T
+#define RENDERMODE_T U_INT_32_T
 
 /* This section deals with the attributes passed through the "copymode" parameter. They're listed from lower to higher order. 
    For example: value = (value >> THAT_VALUE_SHIFT ) && THAT_VALUE_MASK */
@@ -727,16 +727,16 @@ typedef enum
 
 typedef struct
 {
-  S_INT16_T x;
-  S_INT16_T y;
-  S_INT8_T flag;
+  S_INT_16_T x;
+  S_INT_16_T y;
+  S_INT_8_T flag;
 } POINT_2D_INT_T;
 
 typedef struct
 {
   FLOAT_T x;
   FLOAT_T y;
-  S_INT8_T flag;
+  S_INT_8_T flag;
 } POINT_2D_FLOAT_T;
 
 typedef struct
@@ -744,47 +744,47 @@ typedef struct
   FLOAT_T x;
   FLOAT_T y;
   FLOAT_T z;
-  S_INT8_T flag;
+  S_INT_8_T flag;
 } POINT_3D_FLOAT_T;
 
 typedef struct
 {
   POINT_2D_INT_T *array;
-  S_INT16_T items;
+  S_INT_16_T items;
 } LINE_2D_INT_T;
 
 typedef struct
 {
   POINT_2D_FLOAT_T *array;
-  S_INT16_T items;
+  S_INT_16_T items;
 } LINE_2D_FLOAT_T;
 
 typedef struct
 {
   POINT_3D_FLOAT_T *array;
-  S_INT16_T items;
+  S_INT_16_T items;
 } LINE_3D_FLOAT_T;
 
 typedef struct
 {
   POINT_2D_FLOAT_T **array;
-  S_INT16_T rows;
-  S_INT16_T cols;
+  S_INT_16_T rows;
+  S_INT_16_T cols;
 } MATRIX_POINT_2D_T;
 
 typedef struct
 {
   POINT_3D_FLOAT_T **array;
-  S_INT16_T rows;
-  S_INT16_T cols;
+  S_INT_16_T rows;
+  S_INT_16_T cols;
 } MATRIX_POINT_3D_T;
 
 typedef struct 
   {
-    S_INT16_T xp_min;
-    S_INT16_T yp_min;
-    S_INT16_T xp_max;
-    S_INT16_T yp_max;
+    S_INT_16_T xp_min;
+    S_INT_16_T yp_min;
+    S_INT_16_T xp_max;
+    S_INT_16_T yp_max;
     FLOAT_T xr_min;
     FLOAT_T xr_max;
     FLOAT_T yr_min;
@@ -793,10 +793,10 @@ typedef struct
 
 typedef struct 
   {
-    S_INT16_T xp_min;
-    S_INT16_T yp_min;
-    S_INT16_T xp_max;
-    S_INT16_T yp_max;
+    S_INT_16_T xp_min;
+    S_INT_16_T yp_min;
+    S_INT_16_T xp_max;
+    S_INT_16_T yp_max;
     
     FLOAT_T scale;    /* Zoom */
     FLOAT_T cam_d;    /* Stereoscopic */
@@ -806,10 +806,10 @@ typedef struct
 
 typedef struct 
   {
-    U_INT8_T r:N_BITS_R;
-    U_INT8_T g:N_BITS_G;
-    U_INT8_T b:N_BITS_B;
-    U_INT8_T a:N_BITS_A;
+    U_INT_8_T r:N_BITS_R;
+    U_INT_8_T g:N_BITS_G;
+    U_INT_8_T b:N_BITS_B;
+    U_INT_8_T a:N_BITS_A;
   } PIXEL_T;
 
 #define RENDEROPTIONS_DEFAULT        0b00000000
@@ -818,23 +818,23 @@ typedef struct
 
 typedef struct 
   {
-    U_INT8_T r;
-    U_INT8_T g;
-    U_INT8_T b;
+    U_INT_8_T r;
+    U_INT_8_T g;
+    U_INT_8_T b;
   } RGB_T;
 
 typedef struct
 {
   PIXEL_T **pic;
-  U_INT16_T w;
-  U_INT16_T h;
+  U_INT_16_T w;
+  U_INT_16_T h;
 } PICTURE_T;
 
 typedef struct
 {
   char *dat;
-  U_INT16_T w;
-  U_INT16_T h;
+  U_INT_16_T w;
+  U_INT_16_T h;
 } SCREEN_T;
 
 /******************************************************/
@@ -843,19 +843,19 @@ typedef struct
 
 typedef struct
 {
-  U_INT8_T cols;
-  U_INT8_T rows;
-  U_INT8_T range_a;
-  U_INT8_T range_b;
+  U_INT_8_T cols;
+  U_INT_8_T rows;
+  U_INT_8_T range_a;
+  U_INT_8_T range_b;
   unsigned char* data;
-  U_INT8_T scale_x;
-  U_INT8_T scale_y;
-  U_INT8_T gap_x;
-  U_INT8_T gap_y;
-  U_INT8_T max_x;
-  S_INT16_T angle;
-  U_INT8_T flag_fg;
-  U_INT8_T flag_bg;
+  U_INT_8_T scale_x;
+  U_INT_8_T scale_y;
+  U_INT_8_T gap_x;
+  U_INT_8_T gap_y;
+  U_INT_8_T max_x;
+  S_INT_16_T angle;
+  U_INT_8_T flag_fg;
+  U_INT_8_T flag_bg;
   PIXEL_T color_fg;
   PIXEL_T color_bg;
 } FONT_T;
@@ -871,17 +871,17 @@ typedef struct
 {
   /* 2D circular buffer */
   CONSOLE_CHAR_T **screen; /* 2D circular buffer for visualization, scrollable */
-  S_INT16_T MAX_ROWS;     /* Maximum (total) number of rows stored in memory */  
-  S_INT16_T MAX_ROWS_V;   /* Visible number of rows*/
-  S_INT16_T MAX_COLS;
-  /*  S_INT16_T n_row;       Number of "rows" which have been received*/
-  S_INT16_T a_row;        /* Index of the oldest row that was written */
-  S_INT16_T b_row;        /* Index of the row of the next cell to be written */
-  S_INT16_T w_col;        /* Index of the column of the next cell to be written */
-  S_INT16_T s_row;        /* Index of the row of the next cell to be "seen" (cursor) */
-  S_INT16_T s_col;        /* Index of the column of the next cell to be "seen" (cursor) */
-  S_INT16_T n_back;       /* Number of rows "backwards" counted from the next cell to be written */
-  S_INT16_T n_back_adj;   /* Adjusted number of rows "backwards", to add hysteresis */
+  S_INT_16_T MAX_ROWS;     /* Maximum (total) number of rows stored in memory */  
+  S_INT_16_T MAX_ROWS_V;   /* Visible number of rows*/
+  S_INT_16_T MAX_COLS;
+  /*  S_INT_16_T n_row;       Number of "rows" which have been received*/
+  S_INT_16_T a_row;        /* Index of the oldest row that was written */
+  S_INT_16_T b_row;        /* Index of the row of the next cell to be written */
+  S_INT_16_T w_col;        /* Index of the column of the next cell to be written */
+  S_INT_16_T s_row;        /* Index of the row of the next cell to be "seen" (cursor) */
+  S_INT_16_T s_col;        /* Index of the column of the next cell to be "seen" (cursor) */
+  S_INT_16_T n_back;       /* Number of rows "backwards" counted from the next cell to be written */
+  S_INT_16_T n_back_adj;   /* Adjusted number of rows "backwards", to add hysteresis */
   PIXEL_T    color_fg;     /* Current foreground color */
   PIXEL_T    color_bg;     /* Current background color */
 } CONSOLE_T;
@@ -915,9 +915,9 @@ typedef struct
 CONSOLE_T  *ty_C;
 SCREEN_T ty_screen;
 PICTURE_T ty_Pic_shadow;
-U_INT8_T ty_scale_x, ty_scale_y;
+U_INT_8_T ty_scale_x, ty_scale_y;
 
-S_INT8_T  ty_SDL_initialized;
+S_INT_8_T  ty_SDL_initialized;
 
 #endif /* LB_TYPES_H */
 

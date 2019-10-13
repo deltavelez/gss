@@ -21,7 +21,7 @@
 #define MAX_ARGUMENTS 16
 #define MAX_FIXED_ARGUMENTS 5
 #define MAX_DEPTH 16
-#define INDEX_TYPE S_INT_16_T  /* Used by lb_parser.c and lb_numer.c */  
+#define INDEX_TYPE S_INT16_T  /* Used by lb_parser.c and lb_numer.c */  
 
 typedef enum { op_unary, op_binary } ARGUMENTS_T;
 
@@ -48,7 +48,7 @@ typedef struct
   OPERATORS_T id;
   char symbol[MAX_OPERATOR_SIZE];
   ASSOCIATIVITY_T asso;
-  S_INT_8_T pre; 
+  S_INT8_T pre; 
   ARGUMENTS_T op_type;
 } OPERATOR_T;
 
@@ -56,8 +56,8 @@ typedef struct
 {
   FNC_T id;
   char name[MAX_FUNCTION_SIZE];
-  S_INT_8_T n_arguments;
-  U_INT_8_T var_mask; 
+  S_INT8_T n_arguments;
+  U_INT8_T var_mask; 
 } FUNCTION_T;
 
 typedef struct
@@ -73,38 +73,38 @@ typedef struct
   STACK_ELEMENT_TYPE_T type;
   FLOAT_T float_value;
   INDEX_TYPE index; 
-  S_INT_8_T var_arg[MAX_FIXED_ARGUMENTS];
+  S_INT8_T var_arg[MAX_FIXED_ARGUMENTS];
 } STACK_ELEMENT_T; 
 
 typedef struct
 {
   STACK_ELEMENT_T out[MAX_STACK_SIZE];
-  S_INT_16_T oq;  /* output queue grows from zero */
-  S_INT_16_T arg_count;
+  S_INT16_T oq;  /* output queue grows from zero */
+  S_INT16_T arg_count;
 } FN_RECORD_T;
 
 typedef struct
 {
-  S_INT_16_T z;
-  S_INT_16_T arguments[MAX_DEPTH];
-  S_INT_16_T subitems[MAX_ARGUMENTS][MAX_DEPTH];
+  S_INT16_T z;
+  S_INT16_T arguments[MAX_DEPTH];
+  S_INT16_T subitems[MAX_ARGUMENTS][MAX_DEPTH];
 } ARGS_T;
 
-//void lb_pa_push(STACK_ELEMENT_T *stack, STACK_ELEMENT_T *item, S_INT_16_T *st, char* debug_msg);
-void lb_pa_pop(FN_RECORD_T *fnrec, STACK_ELEMENT_T *item, S_INT_16_T *s, ARGS_T *args);
+//void lb_pa_push(STACK_ELEMENT_T *stack, STACK_ELEMENT_T *item, S_INT16_T *st, char* debug_msg);
+void lb_pa_pop(FN_RECORD_T *fnrec, STACK_ELEMENT_T *item, S_INT16_T *s, ARGS_T *args);
   
-void lb_pa_inc_out(char *debug_msg,  S_INT_16_T *var);
+void lb_pa_inc_out(char *debug_msg,  S_INT16_T *var);
 FLOAT_T lb_pa_eval_real(FN_RECORD_T *fnrec, FLOAT_T *values, ERR_T *error);
 COMPLEX_T lb_pa_eval_complex(FN_RECORD_T *fnrec, COMPLEX_T *values, ERR_T *error);
 
-void lb_pa_parse(char *fnstr, FN_RECORD_T *fnrec, char *vars, S_INT_16_T *n_vars);
-void lb_pa_parse_vars(char *vars, char vars_list[MAX_NUMBER_VARIABLES][MAX_VARIABLE_SIZE+1], S_INT_16_T *n_vars);
+void lb_pa_parse(char *fnstr, FN_RECORD_T *fnrec, char *vars, S_INT16_T *n_vars);
+void lb_pa_parse_vars(char *vars, char vars_list[MAX_NUMBER_VARIABLES][MAX_VARIABLE_SIZE+1], S_INT16_T *n_vars);
 void lb_pa_shunting_yard(FN_RECORD_T *fnrec);
 void lb_pa_print_item(STACK_ELEMENT_T item);
-void lb_pa_print_output(FN_RECORD_T *fnrec, S_INT_16_T color);
-void lb_pa_print_stack(STACK_ELEMENT_T *stack, S_INT_16_T st);
+void lb_pa_print_output(FN_RECORD_T *fnrec, S_INT16_T color);
+void lb_pa_print_stack(STACK_ELEMENT_T *stack, S_INT16_T st);
 FLOAT_T lb_pa_formula(char *fnstr, char *vars, FLOAT_T f1, FLOAT_T f2, FLOAT_T f3, ERR_T *error);
 COMPLEX_T lb_pa_formula_complex(char *fnstr, char *vars, COMPLEX_T f1, COMPLEX_T f2, COMPLEX_T f3, ERR_T *error);
-S_INT_16_T lb_pa_startpos(FN_RECORD_T *fnrec, S_INT_16_T i, S_INT_16_T argument);
+S_INT16_T lb_pa_startpos(FN_RECORD_T *fnrec, S_INT16_T i, S_INT16_T argument);
 
 #endif /* LB_PARSER_H */

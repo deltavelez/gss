@@ -12,7 +12,7 @@ FLOAT_T lb_nu_diff(FN_RECORD_T *function, INDEX_TYPE var, FLOAT_T *values, FLOAT
 {
   FLOAT_T vec_var[3];
   FLOAT_T a, b;
-  S_INT_16_T i;
+  S_INT16_T i;
  
   if(lb_re_equal(delta,0))
     *error=e_div_zero;
@@ -41,7 +41,7 @@ FLOAT_T lb_nu_diff2(FN_RECORD_T *function, INDEX_TYPE var, FLOAT_T *values, FLOA
 {
   FLOAT_T vec_var[3];
   FLOAT_T a, middle, b;
-  S_INT_16_T i;
+  S_INT16_T i;
  
   if(lb_re_equal(delta*delta,0))
     *error=e_div_zero;
@@ -74,7 +74,7 @@ COMPLEX_T lb_nu_diff_c(FN_RECORD_T *function, INDEX_TYPE var, COMPLEX_T *values,
 {
   COMPLEX_T vec_var[3];
   COMPLEX_T a, b;
-  S_INT_16_T i;
+  S_INT16_T i;
  
   if(lb_re_equal(delta,0))
     *error=e_div_zero;
@@ -105,7 +105,7 @@ COMPLEX_T lb_nu_diff2_c(FN_RECORD_T *function, INDEX_TYPE var, COMPLEX_T *values
 {
   COMPLEX_T vec_var[3];
   COMPLEX_T a, b, middle, temp;
-  S_INT_16_T i;
+  S_INT16_T i;
  
   if(lb_re_equal(delta*delta,0))
     *error=e_div_zero;
@@ -138,7 +138,7 @@ COMPLEX_T lb_nu_diff2_c(FN_RECORD_T *function, INDEX_TYPE var, COMPLEX_T *values
   return temp;
 }
 
-S_INT_8_T lb_nu_find_zero(FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T *x_root)
+S_INT8_T lb_nu_find_zero(FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T *x_root)
 {
   if(lb_re_equal(y0,0) && lb_re_equal(y1,0))
       return -1; /* All points in interval are a solution */
@@ -152,7 +152,7 @@ FLOAT_T lb_nu_sigma(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE var,
 {
   FLOAT_T vec_var[3];
   FLOAT_T start, end, step, sum;
-  S_INT_16_T i;
+  S_INT16_T i;
   
   if ((b>a) && (delta>0)) 
     {
@@ -190,7 +190,7 @@ COMPLEX_T lb_nu_sigma_c(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE 
 {
   COMPLEX_T vec_var[3], sum;
   FLOAT_T start, end, step;
-  S_INT_16_T i;
+  S_INT16_T i;
   
   if ((b>a) && (delta>0)) 
     {
@@ -229,7 +229,7 @@ FLOAT_T lb_nu_prod(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE var, 
 {
   FLOAT_T vec_var[3];
   FLOAT_T start, end, step, prod;
-  S_INT_16_T i;
+  S_INT16_T i;
 
   if ((b>a) && (delta>0)) 
     {
@@ -268,7 +268,7 @@ COMPLEX_T lb_nu_prod_c(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE v
 {
   COMPLEX_T vec_var[3], prod;
   FLOAT_T start, end, step;
-  S_INT_16_T i;
+  S_INT16_T i;
   
   if ((b>a) && (delta>0)) 
     {
@@ -324,7 +324,7 @@ void euler(FLOAT_T *x_n, FLOAT_T *y_n, FLOAT_T h, ERR_T *error, FUNCTION_X_Y f_x
   *y_n += h*f_xy(*x_n, *y_n, error);
 }
 
-FLOAT_T lb_nu_simpson(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE var, S_INT_16_T n, FLOAT_T *values, ERR_T *error)
+FLOAT_T lb_nu_simpson(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE var, S_INT16_T n, FLOAT_T *values, ERR_T *error)
 /* a, b: Integration interval for var1
    m, n: Number of divisions in var1 and var2, respectively.  Both must be odd nuymbers.
    *fnrec: Address of a function as an RPN list of values
@@ -334,7 +334,7 @@ FLOAT_T lb_nu_simpson(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE va
 {
   FLOAT_T vec_var[3];
   FLOAT_T sum, delta;
-  S_INT_16_T i;
+  S_INT16_T i;
   
   if (!lb_in_is_even(n))
     *error=e_arg_non_even;  
@@ -372,11 +372,11 @@ FLOAT_T lb_nu_simpson(FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE va
   return sum*delta/3.0;
 }
 
-COMPLEX_T lb_nu_simpson_c(COMPLEX_T a, COMPLEX_T b, FN_RECORD_T *function, INDEX_TYPE var, S_INT_16_T n, COMPLEX_T *values, ERR_T *error)
+COMPLEX_T lb_nu_simpson_c(COMPLEX_T a, COMPLEX_T b, FN_RECORD_T *function, INDEX_TYPE var, S_INT16_T n, COMPLEX_T *values, ERR_T *error)
 {
   COMPLEX_T vec_var[3];
   COMPLEX_T sum, delta;
-  S_INT_16_T i;
+  S_INT16_T i;
   
   if (!lb_in_is_even(n))
     *error=e_arg_non_even;  
@@ -415,7 +415,7 @@ COMPLEX_T lb_nu_simpson_c(COMPLEX_T a, COMPLEX_T b, FN_RECORD_T *function, INDEX
 }
 
 
-FLOAT_T lb_nu_simpson2d(FLOAT_T c, FLOAT_T d, FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE var1, INDEX_TYPE var2, S_INT_16_T m, S_INT_16_T n, FLOAT_T *values, ERR_T *error)
+FLOAT_T lb_nu_simpson2d(FLOAT_T c, FLOAT_T d, FLOAT_T a, FLOAT_T b, FN_RECORD_T *function, INDEX_TYPE var1, INDEX_TYPE var2, S_INT16_T m, S_INT16_T n, FLOAT_T *values, ERR_T *error)
 /* Parameters:
    c, d: Integration interval for var2
    a, b: Integration interval for var1
@@ -427,7 +427,7 @@ FLOAT_T lb_nu_simpson2d(FLOAT_T c, FLOAT_T d, FLOAT_T a, FLOAT_T b, FN_RECORD_T 
 {
   FLOAT_T vec_vars[MAX_NUMBER_VARIABLES];
   FLOAT_T delta_x, delta_y, sum;
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
  
   /* Asserting parameters */
 
@@ -474,12 +474,12 @@ FLOAT_T lb_nu_simpson2d(FLOAT_T c, FLOAT_T d, FLOAT_T a, FLOAT_T b, FN_RECORD_T 
   return sum*delta_x*delta_y/9.0;   
 }
 
-COMPLEX_T lb_nu_simpson2d_c(COMPLEX_T c, COMPLEX_T d, COMPLEX_T a, COMPLEX_T b, FN_RECORD_T *function, INDEX_TYPE var1, INDEX_TYPE var2, S_INT_16_T m, S_INT_16_T n, COMPLEX_T *values, ERR_T *error)
+COMPLEX_T lb_nu_simpson2d_c(COMPLEX_T c, COMPLEX_T d, COMPLEX_T a, COMPLEX_T b, FN_RECORD_T *function, INDEX_TYPE var1, INDEX_TYPE var2, S_INT16_T m, S_INT16_T n, COMPLEX_T *values, ERR_T *error)
 {
   COMPLEX_T vec_vars[MAX_NUMBER_VARIABLES];
   COMPLEX_T temp_z, sum;
   FLOAT_T delta_x, delta_y;
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
  
   /* Asserting parameters  */
 

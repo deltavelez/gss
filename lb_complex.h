@@ -52,7 +52,7 @@ COMPLEX_T lb_cp_rect_to_polar(FLOAT_T x, FLOAT_T y);
 
 /* Other */
 
-S_INT_8_T lb_cp_equal(COMPLEX_T z1, COMPLEX_T z2);
+S_INT8_T lb_cp_equal(COMPLEX_T z1, COMPLEX_T z2);
 void lb_cp_print_c(COMPLEX_T z, const char *format);
 
 #endif /* LB_COMPLEX_H */

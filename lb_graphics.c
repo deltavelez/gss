@@ -36,7 +36,7 @@ int pitch;
 
 #define TEXTUREMODE_SOFTWARE
 
-void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_T height, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
+void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT16_T width, S_INT16_T height, U_INT8_T r, U_INT8_T g, U_INT8_T b)
 {
   SDL_Init(SDL_INIT_VIDEO);
 
@@ -50,8 +50,8 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, S_INT_16_T width, S_INT_16_
 	     dynamically as per the user's settings and theme. I could not find how to read these and, likely, such 
 	     a method does not exist covering all platforms.  The values below look nicely with the Linux Mint's default
 	     settings using xfce". */
-	  ty_screen.w = (U_INT_16_T)rect.w-6;  // 6: makes up for a 3 pixels border width on each side of the screen
-	  ty_screen.h = (U_INT_16_T)rect.h-28; // 6*2 + 3*2 + 10 font size
+	  ty_screen.w = (U_INT16_T)rect.w-6;  // 6: makes up for a 3 pixels border width on each side of the screen
+	  ty_screen.h = (U_INT16_T)rect.h-28; // 6*2 + 3*2 + 10 font size
 	  printf("Detected usable area: width = %d, height = %d\r\n", rect.w, rect.h);
 	}
       else
@@ -114,10 +114,10 @@ void lb_gr_refresh()
 #endif     
 }
 
-PIXEL_T lb_gr_12RGB(U_INT_16_T number)
+PIXEL_T lb_gr_12RGB(U_INT16_T number)
 {
   PIXEL_T pixel;
-  U_INT_16_T temp_r, temp_g, temp_b, temp_a;
+  U_INT16_T temp_r, temp_g, temp_b, temp_a;
 
   temp_r = number       & 0x000F;
   temp_g = (number>>4)  & 0x000F;
@@ -137,28 +137,28 @@ PIXEL_T lb_gr_12RGB(U_INT_16_T number)
   return pixel;
 }
 
-S_INT_8_T lb_gr_assert_dimensions_line2d_i(LINE_2D_INT_T *L)
+S_INT8_T lb_gr_assert_dimensions_line2d_i(LINE_2D_INT_T *L)
 {
   if ( ((*L).items <= 0) || ((*L).items > LINE_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-S_INT_8_T lb_gr_assert_dimensions_line2d_f(LINE_2D_FLOAT_T *L)
+S_INT8_T lb_gr_assert_dimensions_line2d_f(LINE_2D_FLOAT_T *L)
 {
   if ( ((*L).items <= 0) || ((*L).items > LINE_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-S_INT_8_T lb_gr_assert_dimensions_line3d_f(LINE_3D_FLOAT_T *L)
+S_INT8_T lb_gr_assert_dimensions_line3d_f(LINE_3D_FLOAT_T *L)
 {
   if ( ((*L).items <= 0) || ((*L).items > VECTOR_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-S_INT_8_T lb_gr_assert_dimensions_picture(PICTURE_T *Pic)
+S_INT8_T lb_gr_assert_dimensions_picture(PICTURE_T *Pic)
 {
   if (Pic==NULL)
     {
@@ -183,8 +183,8 @@ S_INT_8_T lb_gr_assert_dimensions_picture(PICTURE_T *Pic)
 void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, PIXEL_T default_color)
 {
   MATRIX_R_T M1_r, M1_g, M1_b, M2;
-  MATRIX_S_INT_8_T M_counter;
-  S_INT_16_T i, j, i_rot, j_rot, i_adj, j_adj, x_lowest, x_highest, y_lowest, y_highest;
+  MATRIX_S_INT8_T M_counter;
+  S_INT16_T i, j, i_rot, j_rot, i_adj, j_adj, x_lowest, x_highest, y_lowest, y_highest;
   FLOAT_T  x_rot, y_rot, distance;
   FLOAT_T x01, y01, x10, y10, x11, y11;
   ERR_T error;
@@ -267,8 +267,8 @@ void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, 
 	x_rot = -x_lowest + ((FLOAT_T)j+0.5)*cos_val - ((FLOAT_T)i+0.5)*sin_val;  
 	y_rot = -y_lowest + ((FLOAT_T)j+0.5)*sin_val + ((FLOAT_T)i+0.5)*cos_val;
 
-	j_rot = (S_INT_16_T)x_rot;
-	i_rot = (S_INT_16_T)y_rot;
+	j_rot = (S_INT16_T)x_rot;
+	i_rot = (S_INT16_T)y_rot;
 	//lb_ft_printf(ty_C, "angle=%f, x_lowest=%d, y_lowest=%d, j_rot=%d/%d, i_rot=%d/%d\r\n",
 	//       angle, x_lowest, y_lowest,j_rot,(*pic_dst).w,i_rot,(*pic_dst).h);
 	
@@ -388,8 +388,8 @@ void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, 
       x_rot = -x_lowest + ((FLOAT_T)j+0.5)*cos_val - ((FLOAT_T)i+0.5)*sin_val;  
       y_rot = -y_lowest + ((FLOAT_T)j+0.5)*sin_val + ((FLOAT_T)i+0.5)*cos_val;
 
-      j_rot = (S_INT_16_T)x_rot;
-      i_rot = (S_INT_16_T)y_rot;
+      j_rot = (S_INT16_T)x_rot;
+      i_rot = (S_INT16_T)y_rot;
 
       M1_r.array[i_rot][j_rot]=0;
       M1_g.array[i_rot][j_rot]=MAX_G;
@@ -431,10 +431,10 @@ void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, 
   lb_al_release_matrix_si8(&M_counter);
 }
 
-void lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, U_INT_8_T n_samples, PIXEL_T default_color)
+void lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_T angle, U_INT8_T n_samples, PIXEL_T default_color)
 {
   MATRIX_R_T M_r, M_g, M_b, M_k;
-  S_INT_16_T i, j, i_rot, j_rot;
+  S_INT16_T i, j, i_rot, j_rot;
   FLOAT_T x01, y01, x10, y10, x11, y11, ir, jr,
     x_lowest, x_highest,
     y_lowest, y_highest, max_r, max_g, max_b, max_k;
@@ -500,7 +500,7 @@ void lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_
   M_k.rows=(*pic_dst).h;
   lb_al_create_matrix_r(&M_k);
 
-  U_INT_16_T limit_i, limit_j;
+  U_INT16_T limit_i, limit_j;
   FLOAT_T factor, sin_val, cos_val;
   //jr=1.0/(2*n_samples)+(FLOAT_T)j/n_samples;
   //ir=1.0/(2*n_samples)+(FLOAT_T)i/n_samples;
@@ -523,10 +523,10 @@ void lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_
 	  }
 	else
 	  {
-	    M_r.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT_16_T)ir][(U_INT_16_T)jr].r;
-	    M_g.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT_16_T)ir][(U_INT_16_T)jr].g;
-	    M_b.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT_16_T)ir][(U_INT_16_T)jr].b;
-	    M_k.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT_16_T)ir][(U_INT_16_T)jr].a;
+	    M_r.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT16_T)ir][(U_INT16_T)jr].r;
+	    M_g.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT16_T)ir][(U_INT16_T)jr].g;
+	    M_b.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT16_T)ir][(U_INT16_T)jr].b;
+	    M_k.array[i_rot][j_rot]+=(FLOAT_T)(*pic_src).pic[(U_INT16_T)ir][(U_INT16_T)jr].a;
 	  }
       }
   max_r=0;
@@ -571,7 +571,7 @@ void lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, FLOAT_
   lb_al_release_matrix_r(&M_k);
 }
 
-void lb_gr_BMPfile_getsize(const char *filename, S_INT_16_T *width, S_INT_16_T *height)
+void lb_gr_BMPfile_getsize(const char *filename, S_INT16_T *width, S_INT16_T *height)
 {
   FILE *fd;
   fd = fopen(filename, "rb");
@@ -592,7 +592,7 @@ void lb_gr_BMPfile_getsize(const char *filename, S_INT_16_T *width, S_INT_16_T *
   fclose(fd);
 }
 
-void lb_gr_BMPfile_load_to_pic(const char *filename, PICTURE_T *Pic, U_INT_8_T alpha)
+void lb_gr_BMPfile_load_to_pic(const char *filename, PICTURE_T *Pic, U_INT8_T alpha)
 {
   static int width, height;
   int i,j, padding,widthnew;
@@ -733,7 +733,7 @@ void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
   int paddedsize;
   int x, y, n, width, height;
   int r, g, b;
-  U_INT_32_T dat_offset;
+  U_INT32_T dat_offset;
 
   if (Pic==NULL)
     {
@@ -808,9 +808,9 @@ void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
 	for (x=0; x<width; x++)
 	  {
 	    dat_offset=4*(ty_screen.w*y+x);
-	    b = *((U_INT_8_T*)ty_screen.dat + dat_offset    );
-	    g = *((U_INT_8_T*)ty_screen.dat + dat_offset + 1); 
-	    r = *((U_INT_8_T*)ty_screen.dat + dat_offset + 2);
+	    b = *((U_INT8_T*)ty_screen.dat + dat_offset    );
+	    g = *((U_INT8_T*)ty_screen.dat + dat_offset + 1); 
+	    r = *((U_INT8_T*)ty_screen.dat + dat_offset + 2);
 
 	    fprintf(outfile, "%c", b);
 	    fprintf(outfile, "%c", g);
@@ -845,14 +845,14 @@ void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
 }
 
   
-S_INT_8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, U_INT_8_T quality)
+S_INT8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, U_INT8_T quality)
 {
   FILE* outfile;
-  S_INT_16_T width, height;
+  S_INT16_T width, height;
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr       jerr;
   JSAMPROW row_pointer;          /* pointer to a single row */
-  U_INT_16_T j;
+  U_INT16_T j;
   unsigned  char *buffer;
   if(quality>100)
     {
@@ -933,7 +933,7 @@ S_INT_8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, U_INT_8_T qua
 
 void lb_gr_clear_picture(PICTURE_T *Pic, PIXEL_T default_color)
 {
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
   if (Pic==NULL)
     lb_gr_fb_rectangle(&ty_screen, 0, 0, ty_screen.w, ty_screen.h,
 		       FACTOR_N_TO_8_R*default_color.r, FACTOR_N_TO_8_G*default_color.g, FACTOR_N_TO_8_B*default_color.b);
@@ -957,9 +957,9 @@ void lb_gr_clear_picture(PICTURE_T *Pic, PIXEL_T default_color)
 }
 
 /* Checks if a point us at the left, on, or at the right of a line.  I*/
-S_INT_16_T lb_gr_check_left_i(POINT_2D_INT_T P0, POINT_2D_INT_T P1, POINT_2D_INT_T P)
+S_INT16_T lb_gr_check_left_i(POINT_2D_INT_T P0, POINT_2D_INT_T P1, POINT_2D_INT_T P)
 {
-  S_INT_32_T value;
+  S_INT32_T value;
   value=(P.y-P0.y)*(P1.x-P0.x)-(P.x-P0.x)*(P1.y-P0.y);
   if(value>0) return 1;
   if(value<0) return -1;
@@ -967,7 +967,7 @@ S_INT_16_T lb_gr_check_left_i(POINT_2D_INT_T P0, POINT_2D_INT_T P1, POINT_2D_INT
 }
 
 /* Checks if a point us at the left, on, or at the right of a line.  I*/
-S_INT_16_T lb_gr_check_left_f(POINT_2D_FLOAT_T P0, POINT_2D_FLOAT_T P1, POINT_2D_FLOAT_T P)
+S_INT16_T lb_gr_check_left_f(POINT_2D_FLOAT_T P0, POINT_2D_FLOAT_T P1, POINT_2D_FLOAT_T P)
 {
   FLOAT_T value;
   value=(P.y-P0.y)*(P1.x-P0.x)-(P.x-P0.x)*(P1.y-P0.y);
@@ -980,7 +980,7 @@ S_INT_16_T lb_gr_check_left_f(POINT_2D_FLOAT_T P0, POINT_2D_FLOAT_T P1, POINT_2D
 
 void lb_gr_create_line2d_i(LINE_2D_INT_T *L)
 {
-  S_INT_16_T j;
+  S_INT16_T j;
   if (!lb_gr_assert_dimensions_line2d_i(L))
     {
       printf("Error: lb_gr_line_create_i() --> invalid dimension\r\n");
@@ -1004,7 +1004,7 @@ void lb_gr_create_line2d_i(LINE_2D_INT_T *L)
 
 void lb_gr_create_line2d_f(LINE_2D_FLOAT_T *L)
 {
-  S_INT_16_T j;
+  S_INT16_T j;
 
   if (!lb_gr_assert_dimensions_line2d_f(L))
     {
@@ -1046,7 +1046,7 @@ void lb_gr_create_line3d_f(LINE_3D_FLOAT_T *L)
 
 void lb_gr_create_picture(PICTURE_T *Pic, PIXEL_T default_color)
 {
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
 
   if (!lb_gr_assert_dimensions_picture(Pic))
     {
@@ -1086,7 +1086,7 @@ void lb_gr_create_picture(PICTURE_T *Pic, PIXEL_T default_color)
 
 void lb_gr_reset_zbuffer(MATRIX_R_T *Z)
 {
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
  
   if (!lb_al_assert_dimensions_matrix_r(Z))
     {
@@ -1126,8 +1126,8 @@ void       lb_gr_plot_zbuffer_line_1(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, FLOAT_T
 {
   FLOAT_T P0_x, P0_y, P0_hz, P1_x, P1_y, P1_hz, hz, m_hz;
   FLOAT_T _x0, _y0, _hz0, _x1, _y1, _hz1, delta, m, xr, yr;
-  S_INT_16_T k;
-  S_INT_8_T flag_octant_1;
+  S_INT16_T k;
+  S_INT8_T flag_octant_1;
 
   lb_gr_project_3d(vp3d, Rot, P0, &P0_x, &P0_y, &P0_hz);
   lb_gr_project_3d(vp3d, Rot, P1, &P1_x, &P1_y, &P1_hz);
@@ -1219,9 +1219,9 @@ void       lb_gr_plot_zbuffer_line_1(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, FLOAT_T
 	    return;
 	}
 
-      if (hz>(*Z).array[(S_INT_16_T)yr][(S_INT_16_T)xr])
+      if (hz>(*Z).array[(S_INT16_T)yr][(S_INT16_T)xr])
 	{
-	  (*Z).array[(S_INT_16_T)yr][(S_INT_16_T)xr]=hz;
+	  (*Z).array[(S_INT16_T)yr][(S_INT16_T)xr]=hz;
 	  lb_gr_draw_pixel(Pic, xr, yr, color, copymode);
 	}
     }
@@ -1233,9 +1233,9 @@ void       lb_gr_plot_zbuffer_dot(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, FLOAT_T Ro
   FLOAT_T P_x, P_y, hz;
 
   lb_gr_project_3d(vp3d, Rot, P, &P_x, &P_y, &hz);
-  if (hz>(*Z).array[(S_INT_16_T)P_y][(S_INT_16_T)P_x])
+  if (hz>(*Z).array[(S_INT16_T)P_y][(S_INT16_T)P_x])
     {
-      (*Z).array[(S_INT_16_T)P_y][(S_INT_16_T)P_x]=hz;
+      (*Z).array[(S_INT16_T)P_y][(S_INT16_T)P_x]=hz;
       lb_gr_draw_pixel(Pic, P_x, P_y, color, copymode);
     }
 }
@@ -1248,10 +1248,10 @@ void       lb_gr_plot_zbuffer_triangle(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, FLOAT
   FLOAT_T VAB[3], VAC[3], Vperp[3];
   FLOAT_T PA_x, PA_y, PA_hz, PB_x, PB_y, PB_hz, PC_x, PC_y, PC_hz;
   POINT_2D_INT_T A, B, C, S, E, P_temp;
-  S_INT_16_T i, x_start, x_end;
-  S_INT_16_T ab_dx, ab_dy, ab_err, ab_e2, ab_sx, ab_sy;
-  S_INT_16_T ac_dx, ac_dy, ac_err, ac_e2, ac_sx, ac_sy;
-  S_INT_16_T bc_dx, bc_dy, bc_err, bc_e2, bc_sx, bc_sy;
+  S_INT16_T i, x_start, x_end;
+  S_INT16_T ab_dx, ab_dy, ab_err, ab_e2, ab_sx, ab_sy;
+  S_INT16_T ac_dx, ac_dy, ac_err, ac_e2, ac_sx, ac_sy;
+  S_INT16_T bc_dx, bc_dy, bc_err, bc_e2, bc_sx, bc_sy;
 
   /* First, check if the points are collinear.  If they do, do not draw as a triangle. */ 
 
@@ -1559,9 +1559,9 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, FLOAT_T xp, 
 	  exit(EXIT_FAILURE);
 	}
       
-      if (hz>(*Z).array[(S_INT_16_T)yp][(S_INT_16_T)xp])
+      if (hz>(*Z).array[(S_INT16_T)yp][(S_INT16_T)xp])
 	{
-	  (*Z).array[(S_INT_16_T)yp][(S_INT_16_T)xp]=hz;
+	  (*Z).array[(S_INT16_T)yp][(S_INT16_T)xp]=hz;
 	  lb_gr_draw_pixel(Pic, xp, yp, color, copymode);
 	}   
     }
@@ -1663,9 +1663,9 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, FLOAT_T xp, 
       lb_ft_printf(ty_C, "hz_BC=%f\r\n",hz_BC);
 
       lb_ft_printf(ty_C, "hz=%f\r\n",hz);
-      if (hz>(*Z).array[(S_INT_16_T)yp][(S_INT_16_T)xp])
+      if (hz>(*Z).array[(S_INT16_T)yp][(S_INT16_T)xp])
 	{
-	  (*Z).array[(S_INT_16_T)yp][(S_INT_16_T)xp]=hz;
+	  (*Z).array[(S_INT16_T)yp][(S_INT16_T)xp]=hz;
 	  lb_gr_draw_pixel(Pic, xp, yp, color, copymode);
 	}
     }
@@ -1673,11 +1673,11 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, FLOAT_T xp, 
 
 
 
-void lb_gr_draw_circle(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x = radius;
-  S_INT_16_T y = 0;
-  S_INT_16_T decisionOver2 = 1-x;
+  S_INT16_T x = radius;
+  S_INT16_T y = 0;
+  S_INT16_T decisionOver2 = 1-x;
 
   while (x >= y)
     {
@@ -1716,7 +1716,7 @@ void lb_gr_draw_circle(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T 
 
 void lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOAT_T radius, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_16_T x, y, x_min, x_max, x_min_bk, y_min, y_max;
+  S_INT16_T x, y, x_min, x_max, x_min_bk, y_min, y_max;
   FLOAT_T  distance, w2;
   ERR_T error;
   PIXEL_T pix_main;
@@ -1778,9 +1778,9 @@ void lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOA
     }
 }
 
-void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x, y, sign, decisionOver2;
+  S_INT16_T x, y, sign, decisionOver2;
   FLOAT_T distance, dmax;
   ERR_T error;
   PIXEL_T pix_main, pix_adj;
@@ -1859,9 +1859,9 @@ void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T y
     }
 }
 
-void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x, y, decisionOver2;
+  S_INT16_T x, y, decisionOver2;
   FLOAT_T distance;
   ERR_T error;
   PIXEL_T pix_main, pix_left, pix_right;
@@ -1951,7 +1951,7 @@ void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T y
 
 void lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOAT_T radius, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_16_T x, y, x_min, x_max, y_min, y_max;
+  S_INT16_T x, y, x_min, x_max, y_min, y_max;
   FLOAT_T  distance, w2;
   ERR_T error;
   PIXEL_T pix_main;
@@ -1980,13 +1980,13 @@ void lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T y
       }
 }
 
-void lb_gr_draw_circle_arc(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, FLOAT_T a1, FLOAT_T a2, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_arc(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, FLOAT_T a1, FLOAT_T a2, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x = radius;
-  S_INT_16_T y = 0;
-  S_INT_16_T decisionOver2 = 1-x;
-  S_INT_16_T oct_x_min[8], oct_x_max[8], oct_y_min[8], oct_y_max[8];
-  S_INT_16_T i, octant_a1, octant_a2;
+  S_INT16_T x = radius;
+  S_INT16_T y = 0;
+  S_INT16_T decisionOver2 = 1-x;
+  S_INT16_T oct_x_min[8], oct_x_max[8], oct_y_min[8], oct_y_max[8];
+  S_INT16_T i, octant_a1, octant_a2;
   FLOAT_T main_angle;
 
   if (a1>=a2) return;
@@ -2084,11 +2084,11 @@ void lb_gr_draw_circle_arc(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_1
     }
 }
 
-void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x = radius;
-  S_INT_16_T y = 0;
-  S_INT_16_T limit=radius*0.70710678118654752440084436210485;
+  S_INT16_T x = radius;
+  S_INT16_T y = 0;
+  S_INT16_T limit=radius*0.70710678118654752440084436210485;
   ERR_T error;
   FLOAT_T distance;
   PIXEL_T pixel;
@@ -2167,11 +2167,11 @@ void lb_gr_draw_circle_filled_antialiasing_f(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T
       }
 }
 
-void lb_gr_draw_circle_filled(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x = radius;
-  S_INT_16_T y = 0;
-  S_INT_16_T limit=radius*0.70710678118654752440084436210485;
+  S_INT16_T x = radius;
+  S_INT16_T y = 0;
+  S_INT16_T limit=radius*0.70710678118654752440084436210485;
   
   for(x=0; x<=limit; x++)
     for(y=limit+1; y<=radius; y++)
@@ -2194,10 +2194,10 @@ void lb_gr_draw_circle_filled(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_IN
       lb_gr_draw_pixel(Pic, x, y , color, copymode);  
 }
 
-void lb_gr_draw_circle_filled_slow(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled_slow(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
-  S_INT_16_T x = radius;
-  S_INT_16_T y = 0;
+  S_INT16_T x = radius;
+  S_INT16_T y = 0;
   
   for(y=-radius; y<=radius; y++)
     for(x=-radius; x<=radius; x++)
@@ -2205,9 +2205,9 @@ void lb_gr_draw_circle_filled_slow(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc,
 	lb_gr_draw_pixel(Pic, xc+x, yc+y, color, copymode); 
 }
 
-void lb_gr_draw_ellipse(PICTURE_T *Pic, S_INT_32_T xc, S_INT_32_T yc, S_INT_32_T a, S_INT_32_T b, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_ellipse(PICTURE_T *Pic, S_INT32_T xc, S_INT32_T yc, S_INT32_T a, S_INT32_T b, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_32_T  x, y, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
+  S_INT32_T  x, y, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
 
   if ((a==0) || (b==0))
     {
@@ -2277,11 +2277,11 @@ void lb_gr_draw_ellipse(PICTURE_T *Pic, S_INT_32_T xc, S_INT_32_T yc, S_INT_32_T
 
 
 void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T yc, FLOAT_T a, FLOAT_T b, FLOAT_T angle,
-					     FLOAT_T w, S_INT_16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
+					     FLOAT_T w, S_INT16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   FLOAT_T tetha, xr, yr, xrr, yrr, cos_val, sin_val;
   LINE_2D_FLOAT_T Pol;
-  S_INT_16_T k;
+  S_INT16_T k;
   // FLOAT length;
   // length=lb_ge_arclength_ellipse(a,b);
 
@@ -2344,9 +2344,9 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, FLOAT_T xc, FLOAT_T
 
 
 #ifdef NADA
-void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T a, S_INT_16_T b, FLOAT_T angle, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T a, S_INT16_T b, FLOAT_T angle, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
+  S_INT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   FLOAT_T xrot, yrot;
   ERR_T error;
   
@@ -2433,9 +2433,9 @@ void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_
     }
 }
 
-void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T a, S_INT_16_T b, FLOAT_T angle, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T a, S_INT16_T b, FLOAT_T angle, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
+  S_INT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   FLOAT_T xr, yr, xrot, yrot;
   ERR_T error;
   
@@ -2532,9 +2532,9 @@ void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_
 
 #endif
 
-void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T a, S_INT_16_T b, PIXEL_T color, COPYMODE_T copymode)
+void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T a, S_INT16_T b, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_32_T  xp, yp, x_change, sign, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
+  S_INT32_T  xp, yp, x_change, sign, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   FLOAT_T temp, dist_min, xr, yr;
   PIXEL_T pix_main, pix_adj;
   ERR_T error;
@@ -2647,9 +2647,9 @@ void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T
 }
 
 
-void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, S_INT_16_T a, S_INT_16_T b, PIXEL_T color, COPYMODE_T copymode)
+void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, S_INT16_T a, S_INT16_T b, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
+  S_INT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   FLOAT_T temp, xr, yr;
   PIXEL_T pix_main, pix_left, pix_right;
   ERR_T error;
@@ -2771,8 +2771,8 @@ void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T
 void       lb_gr_implicit_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, MATRIX_R_T *M, FLOAT_T w, PIXEL_T color,
 			     COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  S_INT_8_T f_00_10, f_10_11, f_01_11, f_00_01;
-  S_INT_16_T i, j;
+  S_INT8_T f_00_10, f_10_11, f_01_11, f_00_01;
+  S_INT16_T i, j;
   FLOAT_T x0, y0, x1, y1, root_00_10, root_10_11, root_01_11, root_00_01;
   FLOAT_T P00_10_x, P00_10_y, P10_11_x, P10_11_y, P01_11_x, P01_11_y, P00_01_x, P00_01_y;
   
@@ -2862,7 +2862,7 @@ void lb_gr_draw_arrow(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_
 
 void lb_gr_draw_line(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  S_INT_16_T w_int;
+  S_INT16_T w_int;
   w_int=round(w);
 
   switch(linemode)
@@ -2908,9 +2908,9 @@ void lb_gr_draw_line(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T
 void lb_gr_draw_histogram(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *bins,
 			  PIXEL_T color_border, PIXEL_T color_background, PIXEL_T color_bar_border, PIXEL_T color_bar)
 {
-  S_INT_16_T k;
+  S_INT16_T k;
   FLOAT_T xp1_f, yp1_f, xp2_f, yp2_f;
-  S_INT_16_T xp1, yp1, xp2, yp2;
+  S_INT16_T xp1, yp1, xp2, yp2;
 
   lb_gr_draw_rectangle_bar(Pic,  vp2d.xp_min, vp2d.yp_min, vp2d.xp_max, vp2d.yp_max, 2,
 			   color_border, color_background,  COPYMODE_COPY);
@@ -2930,11 +2930,11 @@ void lb_gr_draw_histogram(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *bins,
 }
 
 
-void lb_gr_draw_line1(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line1(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1, PIXEL_T color, COPYMODE_T copymode)  
 {
-  S_INT_16_T dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-  S_INT_16_T dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-  S_INT_16_T err = (dx>dy ? dx : -dy)/2, e2, steps, i;
+  S_INT16_T dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  S_INT16_T dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+  S_INT16_T err = (dx>dy ? dx : -dy)/2, e2, steps, i;
  
   if (dx>=dy)
     steps=dx;
@@ -2951,11 +2951,11 @@ void lb_gr_draw_line1(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x
 }
 
 #ifdef BACKUP
-void lb_gr_draw_line1(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line1(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1, PIXEL_T color, COPYMODE_T copymode)  
 {
-  S_INT_16_T dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-  S_INT_16_T dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-  S_INT_16_T err = (dx>dy ? dx : -dy)/2, e2;
+  S_INT16_T dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  S_INT16_T dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+  S_INT16_T err = (dx>dy ? dx : -dy)/2, e2;
  
   lb_gr_draw_pixel(Pic, x0, y0 , color, copymode);  
 
@@ -3036,11 +3036,11 @@ void lb_gr_draw_line1_f(PICTURE_T *Pic, FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOA
     }
 }
 
-void lb_gr_draw_line2(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y0, S_INT_16_T _x1, S_INT_16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line2(PICTURE_T *Pic, S_INT16_T _x0, S_INT16_T _y0, S_INT16_T _x1, S_INT16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
   {
-    S_INT_16_T x0, y0, x1, y1, i, i_max, sign;
-    S_INT_8_T flag_mirror;
+    S_INT16_T x0, y0, x1, y1, i, i_max, sign;
+    S_INT8_T flag_mirror;
     FLOAT_T y_real, x_real, m;
 
     if ((_x1==_x0) && (_y1==_y0))
@@ -3101,13 +3101,13 @@ void lb_gr_draw_line2(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y0, S_INT_16_T
   }
 }
 
-void lb_gr_draw_line3(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y0, S_INT_16_T _x1, S_INT_16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line3(PICTURE_T *Pic, S_INT16_T _x0, S_INT16_T _y0, S_INT16_T _x1, S_INT16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
   {
-    S_INT_16_T x0, y0, x1, y1, i, i_max, sign;
-    S_INT_8_T flag_mirror;
+    S_INT16_T x0, y0, x1, y1, i, i_max, sign;
+    S_INT8_T flag_mirror;
     FLOAT_T m;
-    S_INT_16_T x_int, y_int;
+    S_INT16_T x_int, y_int;
 
     if ((_x1==_x0) && (_y1==_y0))
       {
@@ -3166,8 +3166,8 @@ void lb_gr_draw_line3(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y0, S_INT_16_T
 
 void lb_gr_draw_line_antialiasing(PICTURE_T *Pic, FLOAT_T _xr0, FLOAT_T _yr0, FLOAT_T _xr1, FLOAT_T _yr1, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)  
 {
-  S_INT_16_T i_a, i_b, j_a, j_b, i, j, sign, xi, yi;
-  S_INT_8_T flag_mirror;
+  S_INT16_T i_a, i_b, j_a, j_b, i, j, sign, xi, yi;
+  S_INT8_T flag_mirror;
   FLOAT_T xr0, yr0, xr1, yr1,  m, denom, temp, distance, csc_tetha, dx_sqr, dy_sqr;
   PIXEL_T temp_color;
   ERR_T error;
@@ -3255,10 +3255,10 @@ void lb_gr_draw_line_antialiasing(PICTURE_T *Pic, FLOAT_T _xr0, FLOAT_T _yr0, FL
     }
 }
 
-void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y0, S_INT_16_T _x1, S_INT_16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, S_INT16_T _x0, S_INT16_T _y0, S_INT16_T _x1, S_INT16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
-  S_INT_16_T x0, y0, x1, y1, i, i_max, sign;
-  S_INT_8_T flag_mirror;
+  S_INT16_T x0, y0, x1, y1, i, i_max, sign;
+  S_INT8_T flag_mirror;
   PIXEL_T temp_color;
   FLOAT_T y_real, x_real, m, distance;
 
@@ -3330,8 +3330,8 @@ void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y
 void lb_gr_draw_line_antialiasing2_f(PICTURE_T *Pic, FLOAT_T _x0, FLOAT_T _y0, FLOAT_T _x1, FLOAT_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
   FLOAT_T x0, y0, x1, y1, y_real, x_real, m, distance;
-  S_INT_16_T i, i_max, sign;
-  S_INT_8_T flag_mirror;
+  S_INT16_T i, i_max, sign;
+  S_INT8_T flag_mirror;
   PIXEL_T temp_color;
  
   temp_color=color;
@@ -3399,10 +3399,10 @@ void lb_gr_draw_line_antialiasing2_f(PICTURE_T *Pic, FLOAT_T _x0, FLOAT_T _y0, F
     }
 }
 
-void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y0, S_INT_16_T _x1, S_INT_16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, S_INT16_T _x0, S_INT16_T _y0, S_INT16_T _x1, S_INT16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
-  S_INT_16_T x0, y0, x1, y1, i, i_max, sign;
-  S_INT_8_T flag_mirror;
+  S_INT16_T x0, y0, x1, y1, i, i_max, sign;
+  S_INT8_T flag_mirror;
   PIXEL_T temp_color;
   FLOAT_T y_real, x_real, m;
 
@@ -3487,8 +3487,8 @@ void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, S_INT_16_T _x0, S_INT_16_T _y
 void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, FLOAT_T _x0, FLOAT_T _y0, FLOAT_T _x1, FLOAT_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
   FLOAT_T x0, y0, x1, y1;
-  S_INT_16_T i, i_max, sign;
-  S_INT_8_T flag_mirror;
+  S_INT16_T i, i_max, sign;
+  S_INT8_T flag_mirror;
   PIXEL_T temp_color;
   FLOAT_T y_real, x_real, m;
 
@@ -3570,9 +3570,9 @@ void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, FLOAT_T _x0, FLOAT_T _y0, F
 }
 
 
-void lb_gr_fb_rectangle(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
+void lb_gr_fb_rectangle(SCREEN_T *screen, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1, U_INT8_T r, U_INT8_T g, U_INT8_T b)
 {
-  S_INT_16_T x_min, x_max, y_min, y_max, y;
+  S_INT16_T x_min, x_max, y_min, y_max, y;
   unsigned long l_color;
   unsigned int *pos, *pos_a, *pos_b;
 
@@ -3621,9 +3621,9 @@ void lb_gr_fb_rectangle(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16
 }
 
 
-void  lb_gr_fb_rectangle_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
+void  lb_gr_fb_rectangle_copymode(SCREEN_T *screen, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1, U_INT8_T r, U_INT8_T g, U_INT8_T b, U_INT8_T a, COPYMODE_T copymode)
 {
-  S_INT_16_T x_min, x_max, y_min, y_max, x, y;
+  S_INT16_T x_min, x_max, y_min, y_max, x, y;
 
   if (x0<=x1)
     {
@@ -3665,12 +3665,12 @@ void  lb_gr_fb_rectangle_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0
 }
 
 
-void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a)
+void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT16_T x, S_INT16_T y, U_INT8_T r, U_INT8_T g, U_INT8_T b, U_INT8_T a)
 {
   /* Sets a pixel in the screen buffer with no blending and no boundary checks. */
   /* Can corrupt the memory if misused. */
   
-  U_INT_32_T dat_offset;
+  U_INT32_T dat_offset;
 
 #define METHOD_1
 #ifdef METHOD_1
@@ -3689,7 +3689,7 @@ void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT
 }
 
 
-void lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a)
+void lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT16_T x, S_INT16_T y, U_INT8_T r, U_INT8_T g, U_INT8_T b, U_INT8_T a)
 {
   if ( (x<0) || (y<0) || (x>(*screen).w) || (y>(*screen).h) )
     return;
@@ -3697,18 +3697,18 @@ void lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_
 }
 
 
-void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T src_r, U_INT_8_T src_g, U_INT_8_T src_b, U_INT_8_T src_a, COPYMODE_T copymode)
+void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT16_T x, S_INT16_T y, U_INT8_T src_r, U_INT8_T src_g, U_INT8_T src_b, U_INT8_T src_a, COPYMODE_T copymode)
 {
-  U_INT_32_T dat_offset;
+  U_INT32_T dat_offset;
 
   if ( (copymode == COPYMODE_FRAMEBUFFER) || (copymode == COPYMODE_COPY) )
     {
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  src_a<<24 | src_r<<16 | src_g<<8 |  src_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  src_a<<24 | src_r<<16 | src_g<<8 |  src_b ;
       return;
     }
 
-  U_INT_8_T dst_r, dst_g, dst_b, dst_a;
+  U_INT8_T dst_r, dst_g, dst_b, dst_a;
   
   dat_offset=4*((*screen).w*y+x);
   dst_b = *((unsigned char*)(*screen).dat + dat_offset);
@@ -3724,7 +3724,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       dst_b &= src_b;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_OR: /* Performs logical OR between SRC and DST. Alpha remains unchanged. */
       dst_r |= src_r;
@@ -3732,7 +3732,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       dst_b |= src_b;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_XOR: /* Performs logical XOR between SRC and DST. Alpha remains unchanged. */
       dst_r ^= src_r;
@@ -3740,7 +3740,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       dst_b ^= src_b;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_NOT_SRC: /* Makes DST the logical NOT of SRC. Alpha remains unchanged. */
       dst_r = ~src_r;
@@ -3748,7 +3748,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       dst_b = ~src_b;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_NOT_DST: /* Performs a logical NOT on DST (regardless of SRC). Alpha remains unchanged. */
       dst_r = ~dst_r;
@@ -3756,11 +3756,11 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
       dst_b = ~dst_b;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_ADD: /* Sums each one of the color components but caps the value at the maximum if exceeded. */
       {
-	S_INT_16_T temp; /* Sets the alpha as the average of SRC and DST */
+	S_INT16_T temp; /* Sets the alpha as the average of SRC and DST */
 	      
 	temp=dst_r + src_r;  
 	if (temp>0xFF)
@@ -3781,12 +3781,12 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
 	dst_a=temp;
 
 	dat_offset = (*screen).w*y + x;
-	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	*((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
 	return;
       }
     case COPYMODE_SRC_MINUS_DST: /* Substracts each one of the color components of SRC minus DST.  Caps at zero. */
       {
-	S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+	S_INT16_T temp;           /* Sets the alpha as the average of SRC and DST */
 	      
 	temp = src_r - dst_r;
 	if (temp<0)
@@ -3807,12 +3807,12 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
 	dst_a=temp;
 
 	dat_offset = (*screen).w*y + x;
-	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	*((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
 	return;
       }
     case COPYMODE_DST_MINUS_SRC: /* Substracts each one of the color components of DST minus SRC.  Caps at zero. */
       {
-	S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+	S_INT16_T temp;           /* Sets the alpha as the average of SRC and DST */
 	
 	temp=dst_r - src_r;      
 	if (temp<0)
@@ -3833,93 +3833,93 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
 	dst_a=temp;
 	
 	dat_offset = (*screen).w*y + x;
-	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	*((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
 	return;
       }
     case COPYMODE_AVG: /* Averages each one of the components of SRC and DST as well as the alpha. */
-      dst_r = ((S_INT_16_T)src_r + (S_INT_16_T)dst_r) >> 1;
-      dst_g = ((S_INT_16_T)src_g + (S_INT_16_T)dst_g) >> 1;
-      dst_b = ((S_INT_16_T)src_b + (S_INT_16_T)dst_b) >> 1;
-      dst_a = ((S_INT_16_T)src_a + (S_INT_16_T)dst_a) >> 1;
+      dst_r = ((S_INT16_T)src_r + (S_INT16_T)dst_r) >> 1;
+      dst_g = ((S_INT16_T)src_g + (S_INT16_T)dst_g) >> 1;
+      dst_b = ((S_INT16_T)src_b + (S_INT16_T)dst_b) >> 1;
+      dst_a = ((S_INT16_T)src_a + (S_INT16_T)dst_a) >> 1;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_BLEND:
-      dst_r = (U_INT_32_T)((0xFF-src_a)*dst_r + src_a*src_r)>>8;
-      dst_g = (U_INT_32_T)((0xFF-src_a)*dst_g + src_a*src_g)>>8;
-      dst_b = (U_INT_32_T)((0xFF-src_a)*dst_b + src_a*src_b)>>8;
-      //      dst_a = (U_INT_32_T)((0xFF-src_a)*dst_a + src_a*src_a)>>8;
+      dst_r = (U_INT32_T)((0xFF-src_a)*dst_r + src_a*src_r)>>8;
+      dst_g = (U_INT32_T)((0xFF-src_a)*dst_g + src_a*src_g)>>8;
+      dst_b = (U_INT32_T)((0xFF-src_a)*dst_b + src_a*src_b)>>8;
+      //      dst_a = (U_INT32_T)((0xFF-src_a)*dst_a + src_a*src_a)>>8;
 
       dat_offset = (*screen).w*y + x;
-      //      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_r<<16 | dst_g<<8 | dst_b ;
+      //      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_MULTIPLY:
-      dst_r = (U_INT_32_T)dst_r*src_r>>8;
-      dst_g = (U_INT_32_T)dst_g*src_g>>8;
-      dst_b = (U_INT_32_T)dst_b*src_b>>8;
+      dst_r = (U_INT32_T)dst_r*src_r>>8;
+      dst_g = (U_INT32_T)dst_g*src_g>>8;
+      dst_b = (U_INT32_T)dst_b*src_b>>8;
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
       return;
     case COPYMODE_SRC_DIV_DST:
       {
-	U_INT_8_T temp;
+	U_INT8_T temp;
 	      
 	if (dst_r!=0)
-	  temp=(U_INT_32_T)(0xFF*src_r/dst_r);
+	  temp=(U_INT32_T)(0xFF*src_r/dst_r);
 	else
 	  temp=0xFF;
 	dst_r=temp;
 
 	if (dst_g!=0)
-	  temp=(U_INT_32_T)(0xFF*src_g/dst_g);
+	  temp=(U_INT32_T)(0xFF*src_g/dst_g);
 	else
 	  temp=0xFF;
 	dst_g=temp;
 
 	if (dst_b!=0)
-	  temp=(U_INT_32_T)(0xFF*src_b/dst_b);
+	  temp=(U_INT32_T)(0xFF*src_b/dst_b);
 	else
 	  temp=0xFF;
 	dst_b=temp;
 	
 	dat_offset = (*screen).w*y + x;
-	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	*((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
 	return;
       }
     case COPYMODE_DST_DIV_SRC:
       {
-	U_INT_8_T temp;
+	U_INT8_T temp;
 	      
 	if (src_r!=0)
-	  temp=(U_INT_32_T)(0xFF*dst_r/src_r);
+	  temp=(U_INT32_T)(0xFF*dst_r/src_r);
 	else
 	  temp=0xFF;
 	dst_r=temp;
 
 	if (src_g!=0)
-	  temp=(U_INT_32_T)(0xFF*dst_g/src_g);
+	  temp=(U_INT32_T)(0xFF*dst_g/src_g);
 	else
 	  temp=0xFF;
 	dst_g=temp;
 
 	if (src_b!=0)
-	  temp=(U_INT_32_T)(0xFF*dst_b/src_b);
+	  temp=(U_INT32_T)(0xFF*dst_b/src_b);
 	else
 	  temp=0xFF;
 	dst_b=temp;
 
 	dat_offset = (*screen).w*y + x;
-	*((U_INT_32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
+	*((U_INT32_T*)(*screen).dat + dat_offset) =  dst_a<<24 | dst_r<<16 | dst_g<<8 | dst_b ;
 	return;
       }
     default:
       break;
     }
 
-  S_INT_32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
+  S_INT32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
   FLOAT_T n_f;
   
   dat_offset=4*((*screen).w*y+x);
@@ -3992,12 +3992,12 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T
 	}
 
       dat_offset = (*screen).w*y + x;
-      *((U_INT_32_T*)(*screen).dat + dat_offset) =  ((U_INT_8_T)temp_k<<24) | ((U_INT_8_T)temp_r<<16) | ((U_INT_8_T)temp_g<<8) | ((U_INT_8_T)temp_b) ;
+      *((U_INT32_T*)(*screen).dat + dat_offset) =  ((U_INT8_T)temp_k<<24) | ((U_INT8_T)temp_r<<16) | ((U_INT8_T)temp_g<<8) | ((U_INT8_T)temp_b) ;
     }
   return;
 }
 
-void lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T src_r, U_INT_8_T src_g, U_INT_8_T src_b, U_INT_8_T src_a, COPYMODE_T copymode)
+void lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT16_T x, S_INT16_T y, U_INT8_T src_r, U_INT8_T src_g, U_INT8_T src_b, U_INT8_T src_a, COPYMODE_T copymode)
 {
   if ( (x<0) || (x>=(*screen).w) || (y<0) || (y>=(*screen).h) )
     return;
@@ -4005,9 +4005,9 @@ void lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T 
 }
 
   
-void _lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
+void _lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT16_T x, S_INT16_T y, U_INT8_T r, U_INT8_T g, U_INT8_T b)
 {
-  U_INT_16_T dat_offset;
+  U_INT16_T dat_offset;
 
   /* Sets a pixel in the screen buffer with no blending and no boundary checks. */
   /* Can corrupt the memory if misused. */
@@ -4027,7 +4027,7 @@ void _lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT
   return;
 }
 
-void lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
+void lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT16_T x, S_INT16_T y, U_INT8_T r, U_INT8_T g, U_INT8_T b)
 {
   if ( (x<0) || (y<0) || (x>(*screen).w) || (y>(*screen).h) )
     return;
@@ -4035,10 +4035,10 @@ void lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, S_INT_16_T x, S_INT_16_T y, U_INT_
 }
 
 
-void lb_gr_fb_line_h(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_INT_16_T x1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
+void lb_gr_fb_line_h(SCREEN_T *screen, S_INT16_T y0, S_INT16_T x0, S_INT16_T x1, U_INT8_T r, U_INT8_T g, U_INT8_T b)
 {
-  U_INT_32_T l_color, *pos, *pos_a, *pos_b;
-  S_INT_16_T x_min, x_max;
+  U_INT32_T l_color, *pos, *pos_a, *pos_b;
+  S_INT16_T x_min, x_max;
   
   if ( (y0<0) || (y0>=(*screen).h) ) return;
   
@@ -4061,16 +4061,16 @@ void lb_gr_fb_line_h(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_INT_16_T 
 
   l_color=r<<16 | g<<8 |  b;
 
-  pos_a = (U_INT_32_T*)(*screen).dat + (*screen).w*y0 + x_min;
-  pos_b = (U_INT_32_T*)(*screen).dat + (*screen).w*y0 + x_max;;
+  pos_a = (U_INT32_T*)(*screen).dat + (*screen).w*y0 + x_min;
+  pos_b = (U_INT32_T*)(*screen).dat + (*screen).w*y0 + x_max;;
   for (pos=pos_a; pos<=pos_b; pos++)
     *pos = l_color;
 }
 
 
-void lb_gr_fb_line_h_copymode(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_INT_16_T x1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
+void lb_gr_fb_line_h_copymode(SCREEN_T *screen, S_INT16_T y0, S_INT16_T x0, S_INT16_T x1, U_INT8_T r, U_INT8_T g, U_INT8_T b, U_INT8_T a, COPYMODE_T copymode)
 {
-  S_INT_16_T x_min, x_max, x;
+  S_INT16_T x_min, x_max, x;
   
   if ( (y0<0) || (y0>=(*screen).h) ) return;
   
@@ -4097,10 +4097,10 @@ void lb_gr_fb_line_h_copymode(SCREEN_T *screen, S_INT_16_T y0, S_INT_16_T x0, S_
 }
 
 
-void lb_gr_fb_line_v(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b)
+void lb_gr_fb_line_v(SCREEN_T *screen, S_INT16_T x0, S_INT16_T y0, S_INT16_T y1, U_INT8_T r, U_INT8_T g, U_INT8_T b)
 {
-  U_INT_32_T l_color, *pos, *pos_a, *pos_b;
-  S_INT_16_T y_min, y_max;
+  U_INT32_T l_color, *pos, *pos_a, *pos_b;
+  S_INT16_T y_min, y_max;
  
   if ( (x0<0) || (x0>=(*screen).w) ) return;
   
@@ -4123,8 +4123,8 @@ void lb_gr_fb_line_v(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T 
 
   l_color = r<<16 | g<<8 |  b;
 
-  pos_a = (U_INT_32_T*)(*screen).dat + (*screen).w*y_min + x0;
-  pos_b = (U_INT_32_T*)(*screen).dat + (*screen).w*y_max + x0;
+  pos_a = (U_INT32_T*)(*screen).dat + (*screen).w*y_min + x0;
+  pos_b = (U_INT32_T*)(*screen).dat + (*screen).w*y_max + x0;
 
   pos=pos_a;
   while (pos<=pos_b)
@@ -4135,9 +4135,9 @@ void lb_gr_fb_line_v(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T 
 }
 
 
-void lb_gr_fb_line_v_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T y1, U_INT_8_T r, U_INT_8_T g, U_INT_8_T b, U_INT_8_T a, COPYMODE_T copymode)
+void lb_gr_fb_line_v_copymode(SCREEN_T *screen, S_INT16_T x0, S_INT16_T y0, S_INT16_T y1, U_INT8_T r, U_INT8_T g, U_INT8_T b, U_INT8_T a, COPYMODE_T copymode)
 {
-  S_INT_16_T y_min, y_max, y;
+  S_INT16_T y_min, y_max, y;
  
   if ( (x0<0) || (x0>=(*screen).w) ) return;
   
@@ -4163,9 +4163,9 @@ void lb_gr_fb_line_v_copymode(SCREEN_T *screen, S_INT_16_T x0, S_INT_16_T y0, S_
 }
 
 
-void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel, COPYMODE_T copymode)
+void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT16_T x, S_INT16_T y, PIXEL_T pixel, COPYMODE_T copymode)
 {
-  U_INT_32_T dat_offset;
+  U_INT32_T dat_offset;
   
   if (copymode==COPYMODE_FRAMEBUFFER) /* This is the Fastest possible mode.  
 					 Draws directly to the framebuffer */
@@ -4173,13 +4173,13 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
       dat_offset = ty_screen.w*y + x;
-      *((U_INT_32_T*)ty_screen.dat + dat_offset) =   pixel.r<<16 | pixel.g<<8 |  pixel.b ;
+      *((U_INT32_T*)ty_screen.dat + dat_offset) =   pixel.r<<16 | pixel.g<<8 |  pixel.b ;
 #else
       dat_offset=4*(ty_screen.w*y+x);
-      *((U_INT_8_T*)ty_screen.dat + dat_offset    ) = FACTOR_N_TO_8_B*pixel.b;
-      *((U_INT_8_T*)ty_screen.dat + dat_offset + 1) = FACTOR_N_TO_8_G*pixel.g; 
-      *((U_INT_8_T*)ty_screen.dat + dat_offset + 2) = FACTOR_N_TO_8_R*pixel.r;
-      *((U_INT_8_T*)ty_screen.dat + dat_offset + 3) = 0xFF;
+      *((U_INT8_T*)ty_screen.dat + dat_offset    ) = FACTOR_N_TO_8_B*pixel.b;
+      *((U_INT8_T*)ty_screen.dat + dat_offset + 1) = FACTOR_N_TO_8_G*pixel.g; 
+      *((U_INT8_T*)ty_screen.dat + dat_offset + 2) = FACTOR_N_TO_8_R*pixel.r;
+      *((U_INT8_T*)ty_screen.dat + dat_offset + 3) = 0xFF;
 #endif
       return;
     }
@@ -4226,7 +4226,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	      return;
 	    case COPYMODE_ADD: /* Sums each one of the color components but caps the value at the maximum if exceeded. */
 	      {
-		S_INT_16_T temp; /* Sets the alpha as the average of SRC and DST */
+		S_INT16_T temp; /* Sets the alpha as the average of SRC and DST */
 	      
 		temp=(*Pic).pic[y][x].r + pixel.r;  
 		if (temp>MAX_R)
@@ -4248,7 +4248,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	      }
 	    case COPYMODE_SRC_MINUS_DST: /* Substracts each one of the color components of SRC minus DST.  Caps at zero. */
 	      {
-		S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+		S_INT16_T temp;           /* Sets the alpha as the average of SRC and DST */
 	      
 		temp = pixel.r - (*Pic).pic[y][x].r;
 		if (temp<0)
@@ -4271,7 +4271,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	      }
 	    case COPYMODE_DST_MINUS_SRC: /* Substracts each one of the color components of DST minus SRC.  Caps at zero. */
 	      {
-		S_INT_16_T temp;           /* Sets the alpha as the average of SRC and DST */
+		S_INT16_T temp;           /* Sets the alpha as the average of SRC and DST */
 	      
 		temp=(*Pic).pic[y][x].r - pixel.r;      
 		if (temp<0)
@@ -4293,39 +4293,39 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 		return;
 	      }
 	    case COPYMODE_AVG: /* Averages each one of the components of SRC and DST as well as the alpha. */
-	      (*Pic).pic[y][x].r = ((S_INT_16_T)(*Pic).pic[y][x].r + (S_INT_16_T)pixel.r) >> 1;
-	      (*Pic).pic[y][x].g = ((S_INT_16_T)(*Pic).pic[y][x].g + (S_INT_16_T)pixel.g) >> 1;
-	      (*Pic).pic[y][x].b = ((S_INT_16_T)(*Pic).pic[y][x].b + (S_INT_16_T)pixel.b) >> 1;
+	      (*Pic).pic[y][x].r = ((S_INT16_T)(*Pic).pic[y][x].r + (S_INT16_T)pixel.r) >> 1;
+	      (*Pic).pic[y][x].g = ((S_INT16_T)(*Pic).pic[y][x].g + (S_INT16_T)pixel.g) >> 1;
+	      (*Pic).pic[y][x].b = ((S_INT16_T)(*Pic).pic[y][x].b + (S_INT16_T)pixel.b) >> 1;
 	      return;
 	    case COPYMODE_BLEND:
-	      (*Pic).pic[y][x].r = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].r + pixel.a*pixel.r)/MAX_R;
-	      (*Pic).pic[y][x].g = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].g + pixel.a*pixel.g)/MAX_G;
-	      (*Pic).pic[y][x].b = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].b + pixel.a*pixel.b)/MAX_B;
-	      //(*Pic).pic[y][x].a = (U_INT_32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].a + pixel.a*pixel.a)/MAX_A;
+	      (*Pic).pic[y][x].r = (U_INT32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].r + pixel.a*pixel.r)/MAX_R;
+	      (*Pic).pic[y][x].g = (U_INT32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].g + pixel.a*pixel.g)/MAX_G;
+	      (*Pic).pic[y][x].b = (U_INT32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].b + pixel.a*pixel.b)/MAX_B;
+	      //(*Pic).pic[y][x].a = (U_INT32_T)((MAX_A-pixel.a)*(*Pic).pic[y][x].a + pixel.a*pixel.a)/MAX_A;
 	      return;
 	    case COPYMODE_MULTIPLY:
-	      (*Pic).pic[y][x].r = (U_INT_32_T)(*Pic).pic[y][x].r*pixel.r/MAX_R;
-	      (*Pic).pic[y][x].g = (U_INT_32_T)(*Pic).pic[y][x].g*pixel.r/MAX_G;
-	      (*Pic).pic[y][x].b = (U_INT_32_T)(*Pic).pic[y][x].b*pixel.r/MAX_B;
+	      (*Pic).pic[y][x].r = (U_INT32_T)(*Pic).pic[y][x].r*pixel.r/MAX_R;
+	      (*Pic).pic[y][x].g = (U_INT32_T)(*Pic).pic[y][x].g*pixel.r/MAX_G;
+	      (*Pic).pic[y][x].b = (U_INT32_T)(*Pic).pic[y][x].b*pixel.r/MAX_B;
 	      return;
 	    case COPYMODE_SRC_DIV_DST:
 	      {
-		U_INT_8_T temp;
+		U_INT8_T temp;
 	      
 		if ((*Pic).pic[y][x].r!=0)
-		  temp=(U_INT_32_T)(MAX_R*pixel.r/(*Pic).pic[y][x].r);
+		  temp=(U_INT32_T)(MAX_R*pixel.r/(*Pic).pic[y][x].r);
 		else
 		  temp=MAX_R;
 		(*Pic).pic[y][x].r=temp;
 
 		if ((*Pic).pic[y][x].g!=0)
-		  temp=(U_INT_32_T)(MAX_G*pixel.g/(*Pic).pic[y][x].g);
+		  temp=(U_INT32_T)(MAX_G*pixel.g/(*Pic).pic[y][x].g);
 		else
 		  temp=MAX_G;
 		(*Pic).pic[y][x].g=temp;
 
 		if ((*Pic).pic[y][x].b!=0)
-		  temp=(U_INT_32_T)(MAX_B*pixel.b/(*Pic).pic[y][x].b);
+		  temp=(U_INT32_T)(MAX_B*pixel.b/(*Pic).pic[y][x].b);
 		else
 		  temp=MAX_B;
 		(*Pic).pic[y][x].b=temp;
@@ -4333,23 +4333,23 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	      }
 	    case COPYMODE_DST_DIV_SRC:
 	      {
-		U_INT_8_T temp;
+		U_INT8_T temp;
 	      
 		if (pixel.r!=0)
-		  temp=(U_INT_32_T)(MAX_R*(*Pic).pic[y][x].r/pixel.r);
+		  temp=(U_INT32_T)(MAX_R*(*Pic).pic[y][x].r/pixel.r);
 		else
 		  temp=MAX_R;
 		(*Pic).pic[y][x].r=temp;
 
 		if (pixel.g!=0)
-		  temp=(U_INT_32_T)(MAX_G*(*Pic).pic[y][x].g/pixel.g);
+		  temp=(U_INT32_T)(MAX_G*(*Pic).pic[y][x].g/pixel.g);
 		else
 		  temp=MAX_G;
 		(*Pic).pic[y][x].g=temp;
 
 
 		if (pixel.b!=0)
-		  temp=(U_INT_32_T)(MAX_B*(*Pic).pic[y][x].b/pixel.b);
+		  temp=(U_INT32_T)(MAX_B*(*Pic).pic[y][x].b/pixel.b);
 		else
 		  temp=MAX_B;
 		(*Pic).pic[y][x].b=temp;
@@ -4359,7 +4359,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 	      break;
 	    }
 
-	  S_INT_32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
+	  S_INT32_T temp_r, temp_g, temp_b, temp_k, phi_src, phi_dst, n_xy_num, n_xy_den;
 	  FLOAT_T n_f;
 	  switch (copymode)
 	    {
@@ -4442,7 +4442,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, S_INT_16_T x, S_INT_16_T y, PIXEL_T pixel,
 
 void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_INT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  S_INT_16_T k;
+  S_INT16_T k;
 
   switch(linemode)
     {
@@ -4471,7 +4471,7 @@ void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_INT_T *L, FLOAT_T w, PIXEL_T c
 
 void lb_gr_draw_polygon_f(PICTURE_T *Pic, LINE_2D_FLOAT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  S_INT_16_T k;
+  S_INT16_T k;
 
   switch(linemode)
     {
@@ -4505,10 +4505,10 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_INT_T P0, POINT_2D_INT_
 {
   // http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
   POINT_2D_INT_T A, B, C, S, E, P_temp;
-  S_INT_16_T i, x_start, x_end;
-  S_INT_16_T ab_dx, ab_dy, ab_err, ab_e2, ab_sx, ab_sy;
-  S_INT_16_T ac_dx, ac_dy, ac_err, ac_e2, ac_sx, ac_sy;
-  S_INT_16_T bc_dx, bc_dy, bc_err, bc_e2, bc_sx, bc_sy;
+  S_INT16_T i, x_start, x_end;
+  S_INT16_T ab_dx, ab_dy, ab_err, ab_e2, ab_sx, ab_sy;
+  S_INT16_T ac_dx, ac_dy, ac_err, ac_e2, ac_sx, ac_sy;
+  S_INT16_T bc_dx, bc_dy, bc_err, bc_e2, bc_sx, bc_sy;
 
   A=P0;
   B=P1;
@@ -4739,7 +4739,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_INT_T P0, POINT_2D_INT_
 {
   // http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
   POINT_2D_INT_T A, B, C, P_temp;
-  S_INT_16_T i, x_start, x_end, line_y, temp;
+  S_INT16_T i, x_start, x_end, line_y, temp;
   
   A=P0;
   B=P1;
@@ -5025,7 +5025,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_FLOAT_T P0, POINT_2D_FL
 
 void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_INT_T *L, PIXEL_T color, COPYMODE_T copymode)  
 {
-  S_INT_16_T i, j, image_top, image_bottom, pixel_x, pixel_y, nodes, swap, nodeX[20];
+  S_INT16_T i, j, image_top, image_bottom, pixel_x, pixel_y, nodes, swap, nodeX[20];
   
   /* make sure the polygon is a closed shape */
   if ( ((*L).array[0].x != (*L).array[(*L).items-1].x) || ((*L).array[0].y != (*L).array[(*L).items-1].y))
@@ -5086,7 +5086,7 @@ void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_INT_T *L, PIXEL_T color, 
 
 void lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_FLOAT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_16_T i, j, k, width, height;
+  S_INT16_T i, j, k, width, height;
   FLOAT_T distance, temp, w_2, t0, tmp1, tmp2, tmp3;
   ERR_T error;
   PIXEL_T pixel;
@@ -5146,10 +5146,10 @@ void lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_FLOAT_T *L, FLOAT_T
       }
 }
 
-void lb_gr_draw_rectangle(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1,
+void lb_gr_draw_rectangle(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1,
 			  PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_16_T x_l, x_h, y_l, y_h, i, j;
+  S_INT16_T x_l, x_h, y_l, y_h, i, j;
 
   if (x0<=x1)
     {
@@ -5178,10 +5178,10 @@ void lb_gr_draw_rectangle(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16
       lb_gr_draw_pixel(Pic, j, i, color, copymode);
 }
 
-void lb_gr_draw_rectangle_bar(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, S_INT_16_T w,
+void lb_gr_draw_rectangle_bar(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1, S_INT16_T w,
 			      PIXEL_T color_line, PIXEL_T color_background,  COPYMODE_T copymode)
 {
-  S_INT_16_T x_l, x_h, y_l, y_h, i, j;
+  S_INT16_T x_l, x_h, y_l, y_h, i, j;
 
   if (x0<=x1)
     {
@@ -5212,10 +5212,10 @@ void lb_gr_draw_rectangle_bar(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_IN
 }
 
 
-void lb_gr_draw_rectangle_line(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1, S_INT_16_T w,
+void lb_gr_draw_rectangle_line(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1, S_INT16_T w,
 			       PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_16_T x_l, x_h, y_l, y_h, i, j;
+  S_INT16_T x_l, x_h, y_l, y_h, i, j;
 
   if (x0<=x1)
     {
@@ -5260,10 +5260,10 @@ void lb_gr_draw_rectangle_line(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_I
 
 /* oxo */
 
-void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1,
+void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1,
 				PIXEL_T color)
 {
-  S_INT_16_T x_l, x_h, y_l, y_h, i, j;
+  S_INT16_T x_l, x_h, y_l, y_h, i, j;
 
   if (x0<=x1)
     {
@@ -5289,7 +5289,7 @@ void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_
   
   if( Pic==NULL)
     {
-      U_INT_32_T dat_offset;
+      U_INT32_T dat_offset;
 
       if (x_l<0)
 	x_l=0;
@@ -5320,13 +5320,13 @@ void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_
 	  {
 #if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
 	    dat_offset = ty_screen.w*i + j;
-	    *((U_INT_32_T*)ty_screen.dat + dat_offset) =   color.r<<16 | color.g<<8 |  color.b ;
+	    *((U_INT32_T*)ty_screen.dat + dat_offset) =   color.r<<16 | color.g<<8 |  color.b ;
 #else
 	    dat_offset=4*(ty_screen.w*i+j);
-	    *((U_INT_8_T*)ty_screen.dat + dat_offset    ) = FACTOR_N_TO_8_B*color.b;
-	    *((U_INT_8_T*)ty_screen.dat + dat_offset + 1) = FACTOR_N_TO_8_G*color.g; 
-	    *((U_INT_8_T*)ty_screen.dat + dat_offset + 2) = FACTOR_N_TO_8_R*color.r;
-	    *((U_INT_8_T*)ty_screen.dat + dat_offset + 3) = 0xFF;
+	    *((U_INT8_T*)ty_screen.dat + dat_offset    ) = FACTOR_N_TO_8_B*color.b;
+	    *((U_INT8_T*)ty_screen.dat + dat_offset + 1) = FACTOR_N_TO_8_G*color.g; 
+	    *((U_INT8_T*)ty_screen.dat + dat_offset + 2) = FACTOR_N_TO_8_R*color.r;
+	    *((U_INT8_T*)ty_screen.dat + dat_offset + 3) = 0xFF;
 #endif
 	  }
     }
@@ -5339,10 +5339,10 @@ void lb_gr_draw_rectangle_solid(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_
 }
 
 #ifdef NADA
-void  lb_gr_draw_rectangle(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1,
-			   S_INT_16_T width, PIXEL_T color, COPYMODE_T copymode)
+void  lb_gr_draw_rectangle(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1,
+			   S_INT16_T width, PIXEL_T color, COPYMODE_T copymode)
 {
-  S_INT_16_T x_l, x_h, y_l, y_h, i, j, max_width_x, max_width_y;
+  S_INT16_T x_l, x_h, y_l, y_h, i, j, max_width_x, max_width_y;
 
   if(width<=0)
     return;
@@ -5406,10 +5406,10 @@ void  lb_gr_draw_rectangle(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_1
     }
 }
 
-void lb_gr_draw_rectangle_fill(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1,
-			       S_INT_16_T width, PIXEL_T color_line, PIXEL_T color_inside, COPYMODE_T copymode)
+void lb_gr_draw_rectangle_fill(PICTURE_T *Pic, S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1,
+			       S_INT16_T width, PIXEL_T color_line, PIXEL_T color_inside, COPYMODE_T copymode)
 {
-  S_INT_16_T x_l, x_h, y_l, y_h, i, j;
+  S_INT16_T x_l, x_h, y_l, y_h, i, j;
    
   if (x0<=x1)
     {
@@ -5443,9 +5443,9 @@ void lb_gr_draw_rectangle_fill(PICTURE_T *Pic, S_INT_16_T x0, S_INT_16_T y0, S_I
 #endif
  
 
-S_INT_16_T lb_gr_is_in_polygon_i(LINE_2D_INT_T *L, POINT_2D_INT_T P)
+S_INT16_T lb_gr_is_in_polygon_i(LINE_2D_INT_T *L, POINT_2D_INT_T P)
 {
-  S_INT_16_T k, wn; /* the  winding number counter */
+  S_INT16_T k, wn; /* the  winding number counter */
 
   if (!lb_gr_assert_dimensions_line2d_i(L))
     {
@@ -5473,9 +5473,9 @@ S_INT_16_T lb_gr_is_in_polygon_i(LINE_2D_INT_T *L, POINT_2D_INT_T P)
   return wn;
 }
 
-S_INT_16_T lb_gr_is_in_polygon_f(LINE_2D_FLOAT_T *L, POINT_2D_FLOAT_T P)
+S_INT16_T lb_gr_is_in_polygon_f(LINE_2D_FLOAT_T *L, POINT_2D_FLOAT_T P)
 {
-  S_INT_16_T k, wn; /* the  winding number counter */
+  S_INT16_T k, wn; /* the  winding number counter */
 
   if (!lb_gr_assert_dimensions_line2d_f(L))
     {
@@ -5503,9 +5503,9 @@ S_INT_16_T lb_gr_is_in_polygon_f(LINE_2D_FLOAT_T *L, POINT_2D_FLOAT_T P)
   return wn;
 }
 
-S_INT_8_T lb_gr_matrix_gs_to_pic(MATRIX_R_T *A, PICTURE_T *Pic)
+S_INT8_T lb_gr_matrix_gs_to_pic(MATRIX_R_T *A, PICTURE_T *Pic)
 {
-  S_INT_16_T i, j, j_max, i_max;
+  S_INT16_T i, j, j_max, i_max;
   
   if (!lb_gr_assert_dimensions_picture(Pic))
     {
@@ -5582,7 +5582,7 @@ void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FLOAT_T xr, FLOAT_T 
 
 void lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_FLOAT_T *L, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  S_INT_16_T  k;
+  S_INT16_T  k;
   FLOAT_T xp, yp;
   VECTOR_R_T Lpx, Lpy;
   
@@ -5639,11 +5639,11 @@ void lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *L
      A simpler implementation, with no efficiency improvements is: lb_gr_plot2d_line_reverse_slow */ 
 
   FLOAT_T xr, yr, distance, temp, w2;
-  S_INT_16_T i_min, i, j, i_max, j_min, j_max, k, xi, yi;
+  S_INT16_T i_min, i, j, i_max, j_min, j_max, k, xi, yi;
   ERR_T error;
   PIXEL_T pix_main;
   FLOAT_T scale;
-  MATRIX_S_INT_8_T Mflags;
+  MATRIX_S_INT8_T Mflags;
 
   pix_main=color;
   w2=0.5*w;
@@ -5741,7 +5741,7 @@ void lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *L
 void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)
 {
   FLOAT_T xr, yr, distance, temp, w2;
-  S_INT_16_T i, xi, yi, width, height;
+  S_INT16_T i, xi, yi, width, height;
   ERR_T error;
   PIXEL_T pix_main;
   FLOAT_T scale;
@@ -5829,7 +5829,7 @@ void lb_gr_plot3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  FLOAT_T Rot[3][3], POINT_
 void lb_gr_plot3d_surface(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  FLOAT_T Rot[3][3], MATRIX_POINT_3D_T *S,
 			  FLOAT_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
   FLOAT_T hz;
   MATRIX_POINT_2D_T M2d;
 
@@ -5870,7 +5870,7 @@ void lb_gr_plot3d_surface(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  FLOAT_T Rot[3][3]
 void lb_gr_plot3d_line(VIEWPORT_3D_T vp3d, FLOAT_T Rot[3][3], LINE_3D_FLOAT_T *L)
 { 
   FLOAT_T x1, y1, x2, y2, hz;
-  S_INT_16_T i;
+  S_INT16_T i;
   POINT_3D_FLOAT_T P;
 
   P=(*L).array[0]; 
@@ -5993,7 +5993,7 @@ void lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, FLOAT_T yr, FLOAT_T *yp)
 
 void lb_gr_project_2d_vector_c_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_C_T *V, LINE_2D_INT_T *L)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   FLOAT_T xr, yr;
   
   if (!lb_al_assert_dimensions_vector_c(V))
@@ -6018,7 +6018,7 @@ void lb_gr_project_2d_vector_c_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_C_T *V, LI
 
 void lb_gr_project_2d_vector_r_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_R_T *X, VECTOR_R_T *Y, LINE_2D_INT_T *L)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   FLOAT_T xr, yr;
   
   if (!lb_al_assert_dimensions_vector_r(X) || !lb_al_assert_dimensions_vector_r(Y))
@@ -6068,7 +6068,7 @@ void lb_gr_release_picture(volatile PICTURE_T *Pic)
   free((*Pic).pic);
 }
 
-S_INT_8_T lb_gr_return_octant(S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT_16_T y1)
+S_INT8_T lb_gr_return_octant(S_INT16_T x0, S_INT16_T y0, S_INT16_T x1, S_INT16_T y1)
 {
   /* Octant determination */
   if (y1>=y0) /* Quadrants 1 or 2 */
@@ -6097,11 +6097,11 @@ S_INT_8_T lb_gr_return_octant(S_INT_16_T x0, S_INT_16_T y0, S_INT_16_T x1, S_INT
 
 void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, FLOAT_T w_axis, PIXEL_T color_axis,
 			      FLOAT_T w_grid, FLOAT_T arrow_size, PIXEL_T color_grid_x, FLOAT_T delta_grid_x, PIXEL_T color_grid_y,
-			      FLOAT_T delta_grid_y, U_INT_16_T options, COPYMODE_T copymode, LINEMODE_T linemode)
+			      FLOAT_T delta_grid_y, U_INT16_T options, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   FLOAT_T xr, yr, xr_min, xr_max, yr_min, yr_max, xp0, yp0;
-  S_INT_8_T flag, sign_re_x, sign_re_y;
-  S_INT_16_T k, delta, exp_inc;
+  S_INT8_T flag, sign_re_x, sign_re_y;
+  S_INT16_T k, delta, exp_inc;
   PIXEL_T color;
 	       
   if (lb_re_equal(vp2d.xr_min, vp2d.xr_max))
@@ -6338,11 +6338,11 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
 void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
 				    FLOAT_T r0, FLOAT_T r1, FLOAT_T delta_r, PIXEL_T color_r, 
 				    FLOAT_T t0, FLOAT_T t1, FLOAT_T delta_t, PIXEL_T color_t,
-				    U_INT_16_T options, COPYMODE_T copymode)
+				    U_INT16_T options, COPYMODE_T copymode)
 {
   FLOAT_T r, t, t_temp, t_min, t_max, r_min, r_max, xr, yr, xp0, yp0, xp1, yp1, factor_delta;
-  S_INT_16_T xp0_i, yp0_i, xp1_i, yp1_i;
-  S_INT_8_T flag_adjacent, counter_adjacent, exponent;
+  S_INT16_T xp0_i, yp0_i, xp1_i, yp1_i;
+  S_INT8_T flag_adjacent, counter_adjacent, exponent;
       
   if (lb_re_equal(vp2d.xr_min, vp2d.xr_max))
     {
@@ -6487,7 +6487,7 @@ void lg_gr_draw_axis_3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, FLOAT_T Rot[3][3], F
 			FLOAT_T zr_min, FLOAT_T zr_max, FLOAT_T delta_grid_z,
 			FLOAT_T w_grid,
 			PIXEL_T color_grid,
-			U_INT_16_T options,
+			U_INT16_T options,
 			const char *label_o,
 			const char *label_x,
 			const char *label_y,
@@ -6642,7 +6642,7 @@ void lb_gr_project_3d(VIEWPORT_3D_T vp3d, FLOAT_T Rot[3][3], POINT_3D_FLOAT_T P,
   *yp=0.5*(vp3d.yp_max-vp3d.yp_min) - vp3d.scale*pp1;
 } 
 
-void lb_gr_project_3d_analytical_two_vectors(VIEWPORT_3D_T vp3d, VECTOR_R_T *V1, VECTOR_R_T *V2, VECTOR_R_T *Pa, U_INT_16_T *xp, U_INT_16_T *yp, U_INT_8_T *flag, ERR_T *error)
+void lb_gr_project_3d_analytical_two_vectors(VIEWPORT_3D_T vp3d, VECTOR_R_T *V1, VECTOR_R_T *V2, VECTOR_R_T *Pa, U_INT16_T *xp, U_INT16_T *yp, U_INT8_T *flag, ERR_T *error)
 {
   MATRIX_R_T M;
   M.rows=3;
@@ -6731,9 +6731,9 @@ void lb_gr_project_3d_analytical_two_vectors(VIEWPORT_3D_T vp3d, VECTOR_R_T *V1,
 } 
 
 
-void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE_T copymode, RENDERMODE_T rendermode)
+void lb_gr_render_picture(PICTURE_T *Pic, S_INT16_T xc, S_INT16_T yc, COPYMODE_T copymode, RENDERMODE_T rendermode)
 {
-    S_INT_16_T x, y;
+    S_INT16_T x, y;
   if (!lb_gr_assert_dimensions_picture(Pic))
     {
       printf("Error: lb_gr_render_picture() --> invalid dimension\r\n"); 
@@ -6742,7 +6742,7 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
 
   //oxo
 
-  U_INT_8_T scale_x, scale_y;
+  U_INT8_T scale_x, scale_y;
   scale_x = 1 + ((rendermode & RENDERMODE_SCALE_X_MASK) >> RENDERMODE_SCALE_X_SHIFT );
   scale_y = 1 + ((rendermode & RENDERMODE_SCALE_Y_MASK) >> RENDERMODE_SCALE_Y_SHIFT );
 
@@ -6768,7 +6768,7 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
       
       case RENDERMODE_PIXELMODE_1:
 	{
-	  U_INT_8_T border_r, border_g, border_b;
+	  U_INT8_T border_r, border_g, border_b;
 	  border_r = ((rendermode & RENDERMODE_PIXELBG_R_MASK) >> RENDERMODE_PIXELBG_R_SHIFT)*255/15;
 	  border_g = ((rendermode & RENDERMODE_PIXELBG_G_MASK) >> RENDERMODE_PIXELBG_G_SHIFT)*255/15;
 	  border_b = ((rendermode & RENDERMODE_PIXELBG_B_MASK) >> RENDERMODE_PIXELBG_B_SHIFT)*255/15;
@@ -6793,7 +6793,7 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
 	break;
       case RENDERMODE_PIXELMODE_2:
 	  {
-	    U_INT_8_T border_r, border_g, border_b;
+	    U_INT8_T border_r, border_g, border_b;
 	    border_r = ((rendermode & RENDERMODE_PIXELBG_R_MASK) >> RENDERMODE_PIXELBG_R_SHIFT)*255/15;
 	    border_g = ((rendermode & RENDERMODE_PIXELBG_G_MASK) >> RENDERMODE_PIXELBG_G_SHIFT)*255/15;
 	    border_b = ((rendermode & RENDERMODE_PIXELBG_B_MASK) >> RENDERMODE_PIXELBG_B_SHIFT)*255/15;
@@ -6822,11 +6822,11 @@ void lb_gr_render_picture(PICTURE_T *Pic, S_INT_16_T xc, S_INT_16_T yc, COPYMODE
     
 void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
 				       FLOAT_T t0, FLOAT_T t1, FLOAT_T delta,
-				       S_INT_16_T max_exp, PIXEL_T color, COPYMODE_T copymode)
+				       S_INT16_T max_exp, PIXEL_T color, COPYMODE_T copymode)
 {
   FLOAT_T t, t_temp, t_min, t_max, xr, yr, xp0, yp0, xp1, yp1, factor_delta;
-  S_INT_16_T xp0_i, yp0_i, xp1_i, yp1_i;
-  S_INT_8_T flag_adjacent, counter_adjacent, exponent;
+  S_INT16_T xp0_i, yp0_i, xp1_i, yp1_i;
+  S_INT8_T flag_adjacent, counter_adjacent, exponent;
   ERR_T error;
   if (t1>=t0)
     {
@@ -6898,14 +6898,14 @@ void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCT
 
 void lb_gr_plot_continuous_fn_2d_antialiasing(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
 					      FLOAT_T t0, FLOAT_T t1, FLOAT_T delta,
-					      S_INT_16_T max_exp, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)
+					      S_INT16_T max_exp, FLOAT_T w, PIXEL_T color, COPYMODE_T copymode)
 {
-  MATRIX_S_INT_8_T Mflags;
+  MATRIX_S_INT8_T Mflags;
   VECTOR_R_T Vx, Vy;
   FLOAT_T Vtemp_x[64], Vtemp_y[64];
   FLOAT_T t, t_temp, t_min, t_max, xr, yr, factor_delta, xp0_f, yp0_f, xp1_f, yp1_f, distance, temp, w2;
-  S_INT_8_T flag_adjacent, counter_adjacent, exponent;
-  S_INT_16_T n_temp, i, old_size_Vx, old_size_Vy, i_min, j, i_max, j_min, j_max, k;
+  S_INT8_T flag_adjacent, counter_adjacent, exponent;
+  S_INT16_T n_temp, i, old_size_Vx, old_size_Vy, i_min, j, i_max, j_min, j_max, k;
   PIXEL_T pix_main;
   ERR_T error;
  
@@ -7100,7 +7100,7 @@ void lb_gr_plot_continuous_fn_2d_antialiasing(PICTURE_T *Pic, VIEWPORT_2D_T vp2d
   lb_al_release_vector_r(&Vy);
 }		  
 
-PIXEL_T lb_gr_value_to_color(S_INT_8_T value)
+PIXEL_T lb_gr_value_to_color(S_INT8_T value)
 {
   PIXEL_T color;
   switch (value % 10)

@@ -34,26 +34,26 @@ FLOAT_T lb_re_atanh(FLOAT_T x,ERR_T *error);
 
 /* Comparison */
 
-S_INT_8_T lb_re_equal(FLOAT_T a, FLOAT_T b);
-S_INT_8_T lb_re_is_int(FLOAT_T x);
-S_INT_8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b);
-S_INT_8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b);
+S_INT8_T lb_re_equal(FLOAT_T a, FLOAT_T b);
+S_INT8_T lb_re_is_int(FLOAT_T x);
+S_INT8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b);
+S_INT8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b);
 FLOAT_T lb_re_max(FLOAT_T x, FLOAT_T y);
 FLOAT_T lb_re_min(FLOAT_T x, FLOAT_T y);
 
 /* Singular functions */
 FLOAT_T lb_re_frac(FLOAT_T x);
-S_INT_8_T lb_re_ispos(FLOAT_T x);
+S_INT8_T lb_re_ispos(FLOAT_T x);
 FLOAT_T lb_re_ramp(FLOAT_T x);
 
-S_INT_8_T lb_re_sign(FLOAT_T x);
+S_INT8_T lb_re_sign(FLOAT_T x);
 FLOAT_T lb_re_pulse(FLOAT_T a, FLOAT_T b, FLOAT_T x);
 FLOAT_T lb_re_pulse_triangle(FLOAT_T a, FLOAT_T b, FLOAT_T x);
 FLOAT_T lb_re_step(FLOAT_T x);
 FLOAT_T lb_re_step_practical(FLOAT_T t, FLOAT_T x);
 
 /* Other functions */
-S_INT_16_T lb_re_ndigits(FLOAT_T x);
+S_INT16_T lb_re_ndigits(FLOAT_T x);
 FLOAT_T lb_re_factorial(FLOAT_T n,ERR_T *error);
 FLOAT_T lb_re_normed_exponent(FLOAT_T x);
 FLOAT_T lb_re_normed_significand(FLOAT_T x);

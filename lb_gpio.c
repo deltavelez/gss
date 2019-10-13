@@ -43,17 +43,17 @@ int lb_gp_gpio_open()
 }
  
 
-U_INT_8_T lb_gp_gpio_rd(U_INT_8_T pin_number)
+U_INT8_T lb_gp_gpio_rd(U_INT8_T pin_number)
 {
   return ((*(lb_gp_gpio + 13)) >> pin_number) & 0x01;
 }
 
-U_INT_32_T lb_gp_gpio_rd_all(void)
+U_INT32_T lb_gp_gpio_rd_all(void)
 {
   return *(lb_gp_gpio + 13);
 }
 
-void lb_gp_gpio_setup_pin(U_INT_8_T pin_number, U_INT_8_T mode)
+void lb_gp_gpio_setup_pin(U_INT8_T pin_number, U_INT8_T mode)
 {
   if (mode == GPIO_OUTPUT)
     {
@@ -69,9 +69,9 @@ void lb_gp_gpio_setup_pin(U_INT_8_T pin_number, U_INT_8_T mode)
   exit(EXIT_FAILURE);
 }
 
-U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
+U_INT8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT8_T byte_out)
 {
-  U_INT_8_T i, buffer;
+  U_INT8_T i, buffer;
   buffer=0x00;
   
   for(i=0;i<8;i++)
@@ -103,10 +103,10 @@ U_INT_8_T lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT_8_T byte_out)
    return buffer;
 }
 
-U_INT_16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, U_INT_16_T int16_out, U_INT_8_T n_bits)
+U_INT16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, U_INT16_T int16_out, U_INT8_T n_bits)
 {
-  U_INT_16_T buffer;
-  U_INT_8_T i;
+  U_INT16_T buffer;
+  U_INT8_T i;
   buffer=0x00;
   
   for(i=0;i<n_bits;i++)
@@ -139,9 +139,9 @@ U_INT_16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, U_INT_16_T int16_out, U_INT
 }
 
 
-void lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT_8_T *buffer_out, U_INT_8_T *buffer_in, U_INT_8_T n_bytes)
+void lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT8_T *buffer_out, U_INT8_T *buffer_in, U_INT8_T n_bytes)
 {
-  U_INT_8_T j;
+  U_INT8_T j;
   for (j=0; j<n_bytes; j++)
     {
       buffer_in[j]=lb_gp_gpio_SPI_rw(port,buffer_out[j]);
@@ -149,7 +149,7 @@ void lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT_8_T *buffer_out, U_INT_8_T
     }
 }
 
-void lb_gp_gpio_wr(U_INT_8_T pin_number, U_INT_8_T value)
+void lb_gp_gpio_wr(U_INT8_T pin_number, U_INT8_T value)
 {
  
   if (value & 0x01)
@@ -159,10 +159,10 @@ void lb_gp_gpio_wr(U_INT_8_T pin_number, U_INT_8_T value)
 }
 
 
-void lb_gp_print_u32_as_binary(U_INT_32_T value, U_INT_8_T n_bits)
+void lb_gp_print_u32_as_binary(U_INT32_T value, U_INT8_T n_bits)
 {
-  U_INT_8_T i;
-  U_INT_8_T bit_value;
+  U_INT8_T i;
+  U_INT8_T bit_value;
   if (n_bits<1)
     {
       printf("Error: lb_gp_print_as_binary() --> n_bits <1\r\n");

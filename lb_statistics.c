@@ -99,7 +99,7 @@ FLOAT_T lb_st_gauss_area(FLOAT_T x)
   FLOAT_T p  =  0.3275911;
   
   // Save the sign of x
-  S_INT_8_T  sign = 1;
+  S_INT8_T  sign = 1;
   if (x < 0)
     sign = -1;
   x = fabs(x)/sqrt(2.0);
@@ -113,7 +113,7 @@ FLOAT_T lb_st_gauss_area(FLOAT_T x)
 
 FLOAT_T lb_st_average(VECTOR_R_T *Data)
 {
- U_INT_16_T i;
+ U_INT16_T i;
  FLOAT_T sum;
  if (!lb_al_assert_dimensions_vector_r(Data))
    {
@@ -129,7 +129,7 @@ FLOAT_T lb_st_average(VECTOR_R_T *Data)
 
 FLOAT_T lb_st_stddev2(VECTOR_R_T *Data, FLOAT_T mu)
 {
- U_INT_16_T i;
+ U_INT16_T i;
  FLOAT_T sum, temp;
  if (!lb_al_assert_dimensions_vector_r(Data))
    {
@@ -150,8 +150,8 @@ FLOAT_T lb_st_stddev2(VECTOR_R_T *Data, FLOAT_T mu)
 void lb_st_histogram(VECTOR_R_T *Data, VECTOR_R_T *Bins, FLOAT_T a, FLOAT_T b, FLOAT_T *mu, FLOAT_T *sigma2 )
 {
   FLOAT_T sum, temp;
-  U_INT_16_T i;
-  S_INT_16_T index;
+  U_INT16_T i;
+  S_INT16_T index;
   
   if (!lb_al_assert_dimensions_vector_r(Data))
     {

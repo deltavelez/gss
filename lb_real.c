@@ -339,7 +339,7 @@ FLOAT_T lb_re_atan2(FLOAT_T y, FLOAT_T x)
 /* Comparison */
 /******************************************************************************************/
 
-S_INT_8_T lb_re_equal(FLOAT_T a, FLOAT_T b)
+S_INT8_T lb_re_equal(FLOAT_T a, FLOAT_T b)
 {
   FLOAT_T max_diff, largest, diff;
   if (sizeof(FLOAT_T)==4)
@@ -366,14 +366,14 @@ S_INT_8_T lb_re_equal(FLOAT_T a, FLOAT_T b)
   return FALSE;
 }
 
-S_INT_8_T lb_re_is_int(FLOAT_T x)
+S_INT8_T lb_re_is_int(FLOAT_T x)
 {
-  if (lb_re_equal(x-(S_INT_16_T)x,0))
+  if (lb_re_equal(x-(S_INT16_T)x,0))
     return 1;
   return 0;
 }
 
-S_INT_8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b)
+S_INT8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b)
 {
   if (a>b)
     return TRUE;
@@ -384,7 +384,7 @@ S_INT_8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b)
   return FALSE;
 }
 
-S_INT_8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b)
+S_INT8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b)
 {
   if (a<b)
     return TRUE;
@@ -416,7 +416,7 @@ FLOAT_T lb_re_frac(FLOAT_T x)
   return fmod(x,1.0);
 }
 
-S_INT_8_T lb_re_ispos(FLOAT_T x)
+S_INT8_T lb_re_ispos(FLOAT_T x)
 {
   if (x>=0) return 1.0;
   return 0.0;
@@ -428,7 +428,7 @@ FLOAT_T lb_re_ramp(FLOAT_T x)
   return 0.0;
 }
 
-S_INT_8_T lb_re_sign(FLOAT_T x)
+S_INT8_T lb_re_sign(FLOAT_T x)
 {
   if (x>=0) return 1.0;
   if (x<0) return -1.0;
@@ -473,7 +473,7 @@ FLOAT_T lb_re_step_practical(FLOAT_T t, FLOAT_T x)
 /******************************************************************************************/
 
 /* Returns the minimum number of digits required to represent a number */
-S_INT_16_T lb_re_ndigits(FLOAT_T x)
+S_INT16_T lb_re_ndigits(FLOAT_T x)
 {
   if (x>0)
     return log10(x)+1.0;
@@ -484,12 +484,12 @@ S_INT_16_T lb_re_ndigits(FLOAT_T x)
 FLOAT_T lb_re_factorial(FLOAT_T n,ERR_T *error)
 {
   FLOAT_T temp_f;
-  S_INT_16_T n_int;
+  S_INT16_T n_int;
 
   if (n<0)
     *error=e_arg_negative;
   else
-    if (!lb_re_equal(n,(S_INT_16_T)n))
+    if (!lb_re_equal(n,(S_INT16_T)n))
       *error=e_arg_non_int;
     else
       if (sizeof(FLOAT_T)==4)
@@ -524,7 +524,7 @@ FLOAT_T lb_re_factorial(FLOAT_T n,ERR_T *error)
 FLOAT_T lb_re_normed_exponent(FLOAT_T x)
 {
   if (x>0)
-    return (S_INT_16_T)floor(log10(fabs(x)));
+    return (S_INT16_T)floor(log10(fabs(x)));
   return 0;
 }
 

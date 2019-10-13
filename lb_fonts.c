@@ -11,7 +11,7 @@
 #include "lb_fonts.h"
 #include "lb_integer.h"
 
-S_INT_8_T lb_ft_fsearch_str(FILE *file, const char *text)
+S_INT8_T lb_ft_fsearch_str(FILE *file, const char *text)
 {
   char c;
   int k, length;
@@ -31,10 +31,10 @@ S_INT_8_T lb_ft_fsearch_str(FILE *file, const char *text)
   return 0;
 }
 
-S_INT_8_T lb_ft_fget_next_number(FILE *file, S_INT_32_T *n)
+S_INT8_T lb_ft_fget_next_number(FILE *file, S_INT32_T *n)
 {
-  S_INT_8_T flag_start, flag_end, flag_error;
-  S_INT_16_T k;
+  S_INT8_T flag_start, flag_end, flag_error;
+  S_INT16_T k;
 
   flag_start=FALSE;
   flag_end=FALSE;
@@ -74,8 +74,8 @@ S_INT_8_T lb_ft_fget_next_number(FILE *file, S_INT_32_T *n)
 void lb_ft_load_GLCDfont(const char *filename, FONT_T *font)
 {
   FILE *file;
-  S_INT_32_T n_bytes, i, k_file, k_buff, number;
-  U_INT_8_T  bit_counter, my_byte;
+  S_INT32_T n_bytes, i, k_file, k_buff, number;
+  U_INT8_T  bit_counter, my_byte;
   
   file=fopen(filename,"r");
   if (!file)
@@ -85,15 +85,15 @@ void lb_ft_load_GLCDfont(const char *filename, FONT_T *font)
     }
 
   lb_ft_fsearch_str(file, "WIDTH=\"");
-  lb_ft_fget_next_number(file, (S_INT_32_T *)&(*font).cols);
+  lb_ft_fget_next_number(file, (S_INT32_T *)&(*font).cols);
   //printf("width=%d\r\n",(*font).cols);
   lb_ft_fsearch_str(file, "HEIGHT=\"");
-  lb_ft_fget_next_number(file, (S_INT_32_T *)&(*font).rows);
+  lb_ft_fget_next_number(file, (S_INT32_T *)&(*font).rows);
   //printf("height=%d\r\n",(*font).rows);
   lb_ft_fsearch_str(file, "FROM=\"");
-  lb_ft_fget_next_number(file, (S_INT_32_T *)&(*font).range_a);
+  lb_ft_fget_next_number(file, (S_INT32_T *)&(*font).range_a);
   //printf("range_a=%d\r\n",(*font).range_a);
-  lb_ft_fget_next_number(file, (S_INT_32_T *)&(*font).range_b);
+  lb_ft_fget_next_number(file, (S_INT32_T *)&(*font).range_b);
   //printf("range_b=%d\r\n",(*font).range_b);
   
 
@@ -146,9 +146,9 @@ void lb_ft_release_GLCDfont(FONT_T *font)
   free((*font).data);
 }
 
-void lb_ft_draw_char(PICTURE_T *Pic, FONT_T *font, S_INT_16_T xc, S_INT_16_T yc, char c, COPYMODE_T copymode)
+void lb_ft_draw_char(PICTURE_T *Pic, FONT_T *font, S_INT16_T xc, S_INT16_T yc, char c, COPYMODE_T copymode)
 {
-  U_INT_16_T index, offset, i, j, k_scale_x, k_scale_y, dx, dy;
+  U_INT16_T index, offset, i, j, k_scale_x, k_scale_y, dx, dy;
 
   if ((c=='\0') && (*font).flag_bg)
     {
@@ -334,14 +334,14 @@ void lb_ft_set_active_console(CONSOLE_T *C)
   ty_C=C;
 }
 
-void lb_ft_console_gotox(CONSOLE_T *C, S_INT_16_T x)
+void lb_ft_console_gotox(CONSOLE_T *C, S_INT16_T x)
 {
   if ((x>0) && (x<(*C).MAX_ROWS))
     (*C).w_col=x;
 }
 
 
-void lb_ft_console_gotoy(CONSOLE_T *C, S_INT_16_T y)
+void lb_ft_console_gotoy(CONSOLE_T *C, S_INT16_T y)
 {
   // if ((y>0) && (y<(*C).MAX_ROWS_V))
   //
@@ -349,7 +349,7 @@ void lb_ft_console_gotoy(CONSOLE_T *C, S_INT_16_T y)
    
 }
 
-S_INT_16_T lb_ft_console_get_n(CONSOLE_T *C)
+S_INT16_T lb_ft_console_get_n(CONSOLE_T *C)
 {
   if ((*C).b_row >= (*C).a_row)
     return (*C).b_row - (*C).a_row;
@@ -358,11 +358,11 @@ S_INT_16_T lb_ft_console_get_n(CONSOLE_T *C)
 }
 
 
-void lb_ft_console_gotoxy(CONSOLE_T *C, S_INT_16_T x, S_INT_16_T y);
+void lb_ft_console_gotoxy(CONSOLE_T *C, S_INT16_T x, S_INT16_T y);
 
 void lb_ft_printc(CONSOLE_T *C, char c)
 {
-  S_INT_16_T j, n;
+  S_INT16_T j, n;
   switch (c)
     {
     case PCKEY_UP:
@@ -516,7 +516,7 @@ void lb_ft_printc(CONSOLE_T *C, char c)
 #ifdef NADA
 void lb_ft_printc(CONSOLE_T *C, char c)
 {
-  S_INT_16_T j;
+  S_INT16_T j;
   switch (c)
     {
     case PCKEY_UP:
@@ -641,7 +641,7 @@ void lb_ft_printc(CONSOLE_T *C, char c)
 void lb_ft_printf(CONSOLE_T *C, const char *format, ...)
 {
   va_list args;
-  S_INT_16_T size, i;
+  S_INT16_T size, i;
   char *buffer;
 
   va_start(args,format);
@@ -686,7 +686,7 @@ void lb_ft_printf(CONSOLE_T *C, const char *format, ...)
 
 void lb_ft_resize_console(PICTURE_T *Pic, FONT_T *font, CONSOLE_T *C)
 {
-  S_INT_16_T width, height;
+  S_INT16_T width, height;
   if (font==NULL)
     {
       printf("Error: lb_ft_resize_console() --> Font hasn been initialized\r\n");
@@ -712,7 +712,7 @@ void lb_ft_resize_console(PICTURE_T *Pic, FONT_T *font, CONSOLE_T *C)
 
 void lb_ft_draw_console(PICTURE_T *Pic, FONT_T *font, CONSOLE_T *C, COPYMODE_T copymode)
 {
-  S_INT_16_T i, j, n_vis_rows, temp_cursor, temp_row;
+  S_INT16_T i, j, n_vis_rows, temp_cursor, temp_row;
   PIXEL_T temp_color_fg, temp_color_bg;
   //  for (i=0;i<(*C).MAX_ROWS_V;i++)
   // for (j=0;j<(*C).MAX_COLS;j++)
@@ -761,7 +761,7 @@ void lb_ft_draw_console(PICTURE_T *Pic, FONT_T *font, CONSOLE_T *C, COPYMODE_T c
 
 void lb_ft_print_console(CONSOLE_T *C)
 {
-  //  S_INT_16_T i, j;
+  //  S_INT16_T i, j;
   //for (i=0;i<(*C).max_rows;i++)
   // {
   //  for (j=0;j<(*C).max_cols;j++)
@@ -771,9 +771,9 @@ void lb_ft_print_console(CONSOLE_T *C)
 }
 
 
-void lb_ft_draw_text(PICTURE_T *Pic, FONT_T *font, S_INT_16_T xc, S_INT_16_T yc, const char *text,  COPYMODE_T copymode)
+void lb_ft_draw_text(PICTURE_T *Pic, FONT_T *font, S_INT16_T xc, S_INT16_T yc, const char *text,  COPYMODE_T copymode)
 {
-  U_INT_16_T pos_x, pos_y, k_text;
+  U_INT16_T pos_x, pos_y, k_text;
   k_text=0;
   pos_x=0;
   pos_y=0;
@@ -825,10 +825,10 @@ void lb_ft_draw_text(PICTURE_T *Pic, FONT_T *font, S_INT_16_T xc, S_INT_16_T yc,
     }
 }
 
-void lb_ft_draw_text_centered(PICTURE_T *Pic, FONT_T *font, S_INT_16_T x1, S_INT_16_T y1, S_INT_16_T x2, S_INT_16_T y2,
+void lb_ft_draw_text_centered(PICTURE_T *Pic, FONT_T *font, S_INT16_T x1, S_INT16_T y1, S_INT16_T x2, S_INT16_T y2,
 			      const char *text, COPYMODE_T copymode)
 {
-  S_INT_16_T xc, yc, x_low, y_low, x_high, y_high, pos_x, pos_y, pos_x_max, k_text;
+  S_INT16_T xc, yc, x_low, y_low, x_high, y_high, pos_x, pos_y, pos_x_max, k_text;
   if(x2>=x1)
     {
       x_low=x1;
@@ -902,7 +902,7 @@ void lb_ft_draw_text_centered(PICTURE_T *Pic, FONT_T *font, S_INT_16_T x1, S_INT
 }
 
 
-S_INT_8_T lb_ft_assert_dimensions_console(CONSOLE_T *C)
+S_INT8_T lb_ft_assert_dimensions_console(CONSOLE_T *C)
 {
   if ( ((*C).MAX_ROWS <= 0) || ((*C).MAX_ROWS > 1024) ||
        ((*C).MAX_COLS <= 0) || ((*C).MAX_COLS > 4096) )
@@ -912,7 +912,7 @@ S_INT_8_T lb_ft_assert_dimensions_console(CONSOLE_T *C)
 
 void  lb_ft_create_console(CONSOLE_T *C)
 {
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
   
   if (!lb_ft_assert_dimensions_console(C))
     {
@@ -958,7 +958,7 @@ void  lb_ft_create_console(CONSOLE_T *C)
 
 void  lb_ft_release_console(CONSOLE_T *C)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   for (i=0;i<(*C).MAX_ROWS;i++)
     free((*C).screen[i]);
   free((*C).screen);

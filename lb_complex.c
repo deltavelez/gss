@@ -409,7 +409,7 @@ COMPLEX_T lb_cp_rect_to_polar(FLOAT_T x, FLOAT_T y)
 /* Other */
 /******************************************************************************************/
 
-S_INT_8_T lb_cp_equal(COMPLEX_T z1, COMPLEX_T z2)
+S_INT8_T lb_cp_equal(COMPLEX_T z1, COMPLEX_T z2)
 {
   if (lb_re_equal(z1.r,z2.r) && lb_re_equal(z1.i,z2.i))
     return 1.0;

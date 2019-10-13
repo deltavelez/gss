@@ -1,0 +1,1787 @@
+
+graf.c,1631
+#define DEBUGGING34,683
+void *floatsum(floatsum43,786
+FLOAT_T diego_sin(70,1199
+FLOAT_T diego_x(75,1275
+FLOAT_T diego_y(80,1352
+S_INT_16_T lb_gis_height(87,1433
+int test_f1(140,2625
+int test_f2(145,2679
+int sum2(153,2796
+int sum3(158,2838
+#define pel(164,2890
+#define WIDTH 178,3150
+#define HEIGHT 179,3169
+int main(181,3189
+#define MAX_COLS 284,5945
+#define MAX_ROWS 285,5964
+#define MAX_ROWS_V 286,5984
+#define MAX_N 287,6005
+#define GPIO2481,65458
+#define PIN_CS_0 2484,65484
+#define PIN_CS_1 2485,65506
+#define PIN_CS_ADC 2486,65528
+#define PIN_MOSI 2487,65550
+#define PIN_CLK 2488,65572
+#define PIN_MISO 2489,65594
+#define PIN_RELAY 2490,65616
+  typedef enum { Status_auto=2492,65639
+  typedef enum { Status_auto=0, Status_single,2492,65639
+  typedef enum { Status_auto=0, Status_single, Status_paused,2492,65639
+  typedef enum { Status_auto=0, Status_single, Status_paused, Status_confirm,2492,65639
+  typedef enum { Status_auto=0, Status_single, Status_paused, Status_confirm, Status_end 2492,65639
+  typedef enum { Status_auto=0, Status_single, Status_paused, Status_confirm, Status_end } STATUS_T;2492,65639
+  union Record2503,65911
+    float  f;2505,65930
+    unsigned char uc[uc2506,65944
+#define N_DISK 2744,71839
+#define G 3029,81265
+#define N_OBJECTS 3030,81285
+    FLOAT_T x;3034,81331
+    FLOAT_T y;3035,81346
+    FLOAT_T z;3036,81361
+  } VECTOR_3D_T;3037,81376
+    FLOAT_T m;3041,81415
+    VECTOR_3D_T p;3042,81430
+    VECTOR_3D_T v;3043,81449
+    VECTOR_3D_T v_temp;3044,81468
+    VECTOR_3D_T a_temp;3045,81492
+  } ASTRO_T;3046,81516
+#define SAMPLES 4778,132192
+
+lb_algebra.c,4732
+void lb_al_add_vector_c(11,191
+void lb_al_add_array_r_r(37,980
+S_INT_8_T lb_al_assert_dimensions_matrix_p2d(69,1893
+S_INT_8_T lb_al_assert_dimensions_matrix_p3d(77,2110
+S_INT_8_T lb_al_assert_dimensions_array_r(85,2327
+S_INT_8_T lb_al_assert_dimensions_matrix_r(99,2593
+S_INT_8_T lb_al_assert_dimensions_matrix_si8(107,2801
+S_INT_8_T lb_al_assert_dimensions_vector_c(115,3017
+S_INT_8_T lb_al_assert_dimensions_vector_r(122,3167
+S_INT_8_T lb_al_assert_dimensions_vector_si8(129,3317
+S_INT_8_T lb_al_assert_dimensions_vector_si16(136,3475
+void lb_al_copy_matrix_r_col_to_vector_r(143,3635
+void lb_al_copy_matrix_r_row_to_vector_r(175,4581
+void lb_al_copy_matrix_r(207,5531
+void lb_al_copy_matrix33_r(234,6339
+void lb_al_copy_minor_matrix_r(244,6496
+void lb_al_copy_vector_c(289,7765
+void lb_al_copy_vector_r(315,8453
+void lb_al_create_array_r(341,9140
+void  lb_al_create_matrix_p2d(510,13902
+void  lb_al_create_matrix_p3d(547,14741
+void lb_al_create_matrix_r(583,15595
+void  lb_al_create_matrix_si8(616,16355
+void lb_al_create_vector_c(648,17131
+void lb_al_create_vector_r(673,17656
+void lb_al_create_vector_si8(697,18178
+void lb_al_create_vector_si16(720,18670
+void lb_al_cross_product_vector_r(741,19163
+void lb_al_cross_product_vector3_r(773,20308
+void lb_al_delete_item_vector_r(780,20492
+void lb_al_delete_item_vector_r(786,20616
+void lb_al_delete_item_vector_r(831,21648
+void lb_al_delete_n_items_vector_r(888,22955
+FLOAT_T lb_al_determinant_matrix_r(933,24036
+FLOAT_T lb_al_determinant_matrix_r_gauss(975,25108
+FLOAT_T   lb_al_determinant_matrix22_r(1055,27068
+FLOAT_T   lb_al_determinant_matrix33_r(1061,27175
+FLOAT_T lb_al_dot_product_vector_r(1068,27384
+void lb_al_fill_identity_matrix_r(1098,28166
+void lb_al_fill_rotation_matrix_tait_bryan_ZYX(1116,28593
+void lb_al_fill_rotation_matrix_vector(1158,29677
+void lb_al_fill_rotation_matrix_X(1181,30423
+void lb_al_fill_rotation_matrix_Y(1192,30772
+void lb_al_fill_rotation_matrix_Z(1202,31120
+void lb_al_fill_rotation_matrix33_tait_bryan_ZYX(1213,31475
+void lb_al_fill_rotation_matrix33_X(1225,31896
+void lb_al_fill_rotation_matrix33_Y(1236,32168
+void lb_al_fill_rotation_matrix33_Z(1246,32439
+void lb_al_fill_zeros_matrix_r(1257,32717
+void lb_al_insert_item_vector_r(1272,33092
+void lb_al_inter_matrix(1313,34177
+void      lb_al_load_CSV_file(1355,35882
+void lb_al_multiply_matrix_r(1362,36031
+void lb_al_multiply_matrix_r_copy(1406,37401
+void lb_al_multiply_matrix_r_vector_r(1454,38757
+void lb_al_multiply_matrix33_r(1475,39306
+void lb_al_multiply_matrix33_r_copy(1492,39739
+void lb_al_multiply_matrix33_r_vector_r(1508,40035
+void lb_al_multiply_vector_c_real(1520,40236
+void lb_al_multiply_vector_c_real_copy(1537,40619
+void lb_al_multiply_vector_r_real(1563,41314
+void lb_al_multiply_vector_r_real_copy(1577,41638
+FLOAT_T lb_al_norm_matrix_r(1609,42414
+FLOAT_T lb_al_norm_vector_r(1627,42832
+void lb_al_normalize_matrix_r(1645,43205
+void lb_al_normalize_vector_r(1676,44149
+#define UC_C_LU 1705,44959
+#define UC_C_RU 1706,44984
+#define UC_C_LD 1707,45009
+#define UC_C_RD 1708,45034
+#define UC_BAR_H 1709,45059
+#define UC_BAR_V 1710,45085
+#define UC_T_0 1711,45111
+#define UC_T_90 1712,45135
+#define UC_T_180 1713,45160
+#define UC_T_270 1714,45186
+#define UC_CROSS 1715,45212
+void lb_al_print_array_r(1718,45240
+  void lb_al_print_matrix_r(2214,55540
+void lb_al_print_matrix33_r(2241,56196
+void lb_al_print_vector_c(2262,56642
+void lb_al_print_vector_r(2288,57235
+void lb_al_print_vector_si8(2316,57872
+void lb_al_print_vector_si16(2342,58452
+void lb_al_release_array_r(2368,59031
+void  lb_al_release_matrix_p2d(2434,60442
+void  lb_al_release_matrix_p3d(2443,60593
+void lb_al_release_matrix_r(2452,60744
+void lb_al_release_matrix_si8(2461,60885
+void lb_al_release_vector_c(2470,61034
+void lb_al_release_vector_r(2476,61165
+void lb_al_release_vector_si8(2483,61280
+void lb_al_release_vector_si16(2488,61356
+void lb_al_resize_vector_r(2493,61434
+void lb_al_resize_vector_si16(2536,62295
+void lb_al_reverse_order_vector_r(2565,63013
+void lb_al_solve_linear_system_r(2592,63763
+void lb_al_sort_bubble_vector_r(2647,65279
+void lb_al_sort_bubble_vector_r_unreg(2688,66359
+void _lb_al_sort_quicksort_vector_r(2707,66666
+void lb_al_sort_quicksort_vector_r(2745,67457
+void lb_al_substract_vector_c(2770,68193
+void lb_al_substract_vector_r(2803,69163
+FLOAT_T lb_al_sum_abs_matrix_r(2837,70114
+FLOAT_T lb_al_sum_abs_vector_c(2856,70512
+FLOAT_T lb_al_sum_abs_vector_r(2873,70923
+FLOAT_T lb_al_sum_matrix_r(2911,71743
+COMPLEX_T lb_al_sum_vector_c(2929,72126
+FLOAT_T lb_al_sum_vector_r(2947,72487
+void lb_al_swap_vector_r(2964,72815
+void lb_al_transpose_matrix_r(2985,73282
+
+lb_audio.c,537
+void lb_au_callback_copy(6,82
+void lb_au_callback_DTMF(22,532
+void lb_au_freq_DTMF(67,1746
+S_INT_8_T lb_au_SDL_audio_init_DTMF(95,2585
+void lb_au_SDL_audio_start(176,4841
+void lb_au_SDL_audio_stop(181,4911
+void lb_au_SDL_audio_close_DTMF(186,4980
+void lb_au_wave_load_to_vector_r(191,5052
+void lb_au_wave_write_from_vector_r(215,5597
+void lb_au_wave_write_or_append_from_vector_r(288,7666
+void lb_au_wave_parse_header(398,11025
+U_INT_8_T lb_au_sin_from_table_8_bit(416,11766
+S_INT_16_T lb_au_sin_from_table_16_bit(441,12407
+
+lb_complex.c,1170
+COMPLEX_T lb_cp_add(27,947
+COMPLEX_T lb_cp_substract(35,1075
+COMPLEX_T lb_cp_neg(43,1209
+COMPLEX_T lb_cp_multiply(51,1314
+COMPLEX_T lb_cp_multiply_real(59,1463
+COMPLEX_T lb_cp_divide_real(67,1591
+COMPLEX_T lb_cp_divide(84,1857
+COMPLEX_T lb_cp_conjugate(94,2133
+COMPLEX_T lb_cp_sqr(104,2257
+COMPLEX_T lb_cp_sqrt(112,2414
+COMPLEX_T lb_cp_power(122,2658
+COMPLEX_T lb_cp_exp(155,3320
+COMPLEX_T lb_cp_ln(163,3489
+COMPLEX_T lb_cp_log(182,3792
+COMPLEX_T lb_cp_log2(189,3941
+COMPLEX_T lb_cp_logb(196,4090
+COMPLEX_T lb_cp_sin(211,4589
+COMPLEX_T lb_cp_cos(219,4744
+COMPLEX_T lb_cp_tan(227,4904
+COMPLEX_T lb_cp_asin(237,5105
+COMPLEX_T lb_cp_acos(248,5507
+COMPLEX_T lb_cp_atan(259,5910
+COMPLEX_T lb_cp_sinh(282,6541
+COMPLEX_T lb_cp_cosh(290,6697
+COMPLEX_T lb_cp_tanh(298,6853
+COMPLEX_T lb_cp_asinh(308,7055
+COMPLEX_T lb_cp_acosh(322,7337
+COMPLEX_T lb_cp_atanh(336,7625
+FLOAT_T lb_cp_abs(358,8230
+FLOAT_T lb_cp_arg(363,8298
+COMPLEX_T lb_cp_complex(372,8409
+FLOAT_T lb_cp_re(380,8521
+FLOAT_T lb_cp_im(385,8570
+COMPLEX_T lb_cp_polar_to_rect(390,8619
+COMPLEX_T lb_cp_rect_to_polar(398,8765
+S_INT_8_T lb_cp_equal(412,9121
+void lb_cp_print_c(419,9262
+
+lb_console.c,905
+void lb_co_cls(14,265
+void lb_co_cls_from_cursor(19,315
+void lb_co_color(24,377
+void lb_co_color_bg(30,546
+void lb_co_color_fg(36,774
+void lb_co_color_bg_216(41,901
+void lb_co_color_fg_216(51,1144
+void lb_co_color_bg_RGB(63,1577
+void lb_co_color_fg_RGB(71,1772
+void lb_co_cursor_clearfrom(79,1967
+void lb_co_cursor_clearline(84,2027
+void lb_co_cursor_clearto(89,2087
+void lb_co_cursor_hide(94,2145
+void lb_co_cursor_shift(99,2204
+void lb_co_cursor_show(109,2414
+unsigned char lb_co_getch(114,2471
+void lb_co_set_echo(127,2755
+unsigned char lb_co_getch_pc(141,3004
+void lb_co_gotox(220,5606
+void lb_co_gotoxy(225,5666
+S_INT_8_T lb_co_kbhit(231,5797
+void lb_co_printf_block(248,6144
+void lb_co_printf_firstn(263,6393
+void lb_co_printf_lastn(273,6552
+void lb_co_reset(287,6745
+void lb_co_reset_attributes(292,6796
+void lb_co_reset_colors(297,6858
+void lb_co_str_to_upper(303,6921
+
+lb_fonts.c,728
+S_INT_8_T lb_ft_fsearch_str(14,330
+S_INT_8_T lb_ft_fget_next_number(34,678
+void lb_ft_load_GLCDfont(74,1289
+void lb_ft_release_GLCDfont(144,3199
+void lb_ft_draw_char(149,3268
+void lb_ft_set_active_console(327,8234
+void lb_ft_console_gotox(337,8448
+void lb_ft_console_gotoy(344,8559
+S_INT_16_T lb_ft_console_get_n(352,8688
+void lb_ft_printc(363,8936
+void lb_ft_printc(517,12104
+void lb_ft_printf(641,14825
+void lb_ft_resize_console(687,15737
+void lb_ft_draw_console(713,16440
+void lb_ft_print_console(762,17989
+void lb_ft_draw_text(774,18199
+void lb_ft_draw_text_centered(828,19660
+S_INT_8_T lb_ft_assert_dimensions_console(905,21630
+void  lb_ft_create_console(913,21830
+void  lb_ft_release_console(959,23282
+
+lb_fourier.c,205
+void lb_fo_FFT_C_recursive(11,197
+void lb_fo_calculate_W(119,2858
+void lb_fo_DFT_C(146,3433
+void lb_fo_DFT_R(196,4608
+void lb_fo_FFT_C(239,5707
+void lb_fo_FFT_R(346,8758
+void lb_fo_IFFT_R(429,11119
+
+lb_geometry.c,339
+FLOAT_T lb_ge_distance_point_to_line_coordinates(8,213
+FLOAT_T lb_ge_angle_from_length_ellipse_q1(20,696
+FLOAT_T lb_ge_arclength_ellipse(43,1256
+FLOAT_T lb_ge_arclength_ellipse_angle_q1(59,1647
+FLOAT_T lb_ge_arclength_ellipse_angle(75,2067
+FLOAT_T lb_ge_arclength_ellipse_angles(95,2626
+void lb_ge_tangents_to_circle_point(102,2987
+
+lb_gpio.c,452
+volatile unsigned int *lb_gp_gpio;lb_gp_gpio6,85
+int mem_fd;7,120
+void *reg_map;reg_map8,132
+void lb_gp_gpio_close(10,148
+int lb_gp_gpio_open(16,225
+U_INT_8_T lb_gp_gpio_rd(46,889
+U_INT_32_T lb_gp_gpio_rd_all(51,994
+void lb_gp_gpio_setup_pin(56,1063
+U_INT_8_T lb_gp_gpio_SPI_rw(72,1387
+U_INT_16_T lb_gp_gpio_SPI_rw_nbits(106,2212
+void lb_gp_gpio_SPI_rw_buffer(142,3099
+void lb_gp_gpio_wr(152,3371
+void lb_gp_print_u32_as_binary(162,3572
+
+lb_graphics.c,5255
+#define TEXTUREMODE_SOFTWARE16,298
+SDL_Renderer *renderer;renderer30,626
+SDL_Window *window;window31,650
+SDL_Texture *texture;texture32,670
+int pitch;34,693
+#define TEXTUREMODE_SOFTWARE37,712
+void lb_gr_SDL_init(39,742
+void lb_gr_SDL_close(97,3087
+void lb_gr_refresh(102,3138
+PIXEL_T lb_gr_12RGB(117,3658
+S_INT_8_T lb_gr_assert_dimensions_line2d_i(140,4098
+S_INT_8_T lb_gr_assert_dimensions_line2d_f(147,4250
+S_INT_8_T lb_gr_assert_dimensions_line3d_f(154,4404
+S_INT_8_T lb_gr_assert_dimensions_picture(161,4560
+void lb_gr_bitmap_rotate(183,5191
+void lb_gr_bitmap_rotate_sampling(434,12808
+void lb_gr_BMPfile_getsize(574,16670
+void lb_gr_BMPfile_load_to_pic(595,17126
+void lb_gr_BMPfile_load_to_matrix(653,18594
+void lb_gr_BMPfile_save(728,20795
+S_INT_8_T lb_gr_JPGfile_save(848,24546
+void lb_gr_clear_picture(934,27016
+S_INT_16_T lb_gr_check_left_i(960,27781
+S_INT_16_T lb_gr_check_left_f(970,28081
+void lb_gr_create_line2d_i(981,28356
+void lb_gr_create_line2d_f(1005,28889
+void lb_gr_create_line3d_f(1030,29431
+void lb_gr_create_picture(1047,29837
+void lb_gr_reset_zbuffer(1087,30735
+void       lb_gr_create_zbuffer(1101,31030
+void       lb_gr_plot_zbuffer_line_1(1124,31473
+void       lb_gr_plot_zbuffer_dot(1230,33648
+void       lb_gr_plot_zbuffer_triangle(1244,34074
+void       lb_gr_plot_zbuffer_pixel(1518,39753
+void lb_gr_draw_circle(1676,44288
+void lb_gr_draw_circle_antialiasing(1717,45330
+void lb_gr_draw_circle_antialiasing2(1781,47108
+void lb_gr_draw_circle_antialiasing3(1862,49336
+void lb_gr_draw_circle_antialiasing_simple(1952,52232
+void lb_gr_draw_circle_arc(1983,53057
+void lb_gr_draw_circle_filled_antialiasing(2087,56298
+void lb_gr_draw_circle_filled_antialiasing_f(2129,57575
+void lb_gr_draw_circle_filled(2170,58929
+void lb_gr_draw_circle_filled_slow(2197,59946
+void lb_gr_draw_ellipse(2208,60293
+void lb_gr_draw_ellipse_rotated_antialiasing(2279,61982
+void lb_gr_draw_ellipse_rotated(2347,63774
+void lb_gr_draw_ellipse_rotated(2436,66269
+void  lb_gr_draw_ellipse_antialiasing2(2535,69053
+void  lb_gr_draw_ellipse_antialiasing3(2650,72401
+void       lb_gr_implicit_2d(2771,76439
+void lb_gr_draw_arrow(2839,79292
+void lb_gr_draw_line(2863,80068
+void lb_gr_draw_histogram(2908,81446
+void lb_gr_draw_line1(2933,82370
+void lb_gr_draw_line1(2954,82936
+void lb_gr_draw_line1_f(2973,83498
+void lb_gr_draw_line2(3039,84566
+void lb_gr_draw_line3(3104,85971
+void lb_gr_draw_line_antialiasing(3167,87250
+void lb_gr_draw_line_antialiasing2(3258,89727
+void lb_gr_draw_line_antialiasing2_f(3330,91484
+void lb_gr_draw_line_antialiasing3(3402,93171
+void lb_gr_draw_line_antialiasing3_f(3487,95545
+void lb_gr_fb_rectangle(3573,98023
+void  lb_gr_fb_rectangle_copymode(3624,98952
+void _lb_gr_fb_setpixel_ARGB(3668,99718
+#define METHOD_13675,100002
+void lb_gr_fb_setpixel_ARGB(3692,100552
+void _lb_gr_fb_setpixel_ARGB_copymode(3700,100811
+void lb_gr_fb_setpixel_ARGB_copymode(4000,109814
+void _lb_gr_fb_setpixel_XRGB(4008,110158
+void lb_gr_fb_setpixel_XRGB(4030,110917
+void lb_gr_fb_line_h(4038,111160
+void lb_gr_fb_line_h_copymode(4071,111819
+void lb_gr_fb_line_v(4100,112373
+void lb_gr_fb_line_v_copymode(4138,113066
+void lb_gr_draw_pixel(4166,113616
+void lb_gr_draw_polygon_i(4443,122649
+void lb_gr_draw_polygon_f(4472,123578
+void lb_gr_draw_triangle_fill_i(4503,124558
+void lb_gr_draw_triangle_fill_i(4738,129327
+void lb_gr_draw_triangle_fill_i(4838,131236
+void lb_gr_draw_triangle_fill_i(4930,134058
+void lb_gr_draw_polygon_fill_i(5026,136864
+void lb_gr_draw_polygon_antialiasing(5087,138459
+void lb_gr_draw_rectangle(5149,140227
+void lb_gr_draw_rectangle_bar(5181,140723
+void lb_gr_draw_rectangle_line(5215,141374
+void lb_gr_draw_rectangle_solid(5263,142240
+void  lb_gr_draw_rectangle(5342,143695
+void lb_gr_draw_rectangle_fill(5409,144930
+S_INT_16_T lb_gr_is_in_polygon_i(5446,145647
+S_INT_16_T lb_gr_is_in_polygon_f(5476,146568
+S_INT_8_T lb_gr_matrix_gs_to_pic(5506,147495
+void       lb_gr_plot2d(5559,148639
+void lb_gr_plot2d_line(5583,149352
+void lb_gr_plot2d_line_reverse(5632,150820
+void lb_gr_plot2d_line_reverse_slow(5741,154122
+void lb_gr_plot3d(5804,155801
+void lb_gr_plot3d_surface(5829,156539
+void lb_gr_plot3d_line(5870,157864
+void lb_gr_project_2d(5890,158294
+void lb_gr_project_2d_inv(5895,158576
+void lb_gr_project_2d_log(5901,158859
+void lb_gr_project_2d_x(5935,160131
+void lb_gr_project_2d_x_log(5940,160298
+void lb_gr_project_2d_y(5959,160960
+void lb_gr_project_2d_y_log(5964,161127
+void lb_gr_project_2d_vector_c_to_line_int(5994,162020
+void lb_gr_project_2d_vector_r_to_line_int(6019,162682
+void lb_gr_release_line2d_i(6051,163621
+void lb_gr_release_line2d_f(6056,163692
+void lb_gr_release_line3d_f(6061,163765
+void lb_gr_release_picture(6066,163838
+S_INT_8_T lb_gr_return_octant(6071,163915
+void       lg_gr_draw_axis_2d(6098,164471
+void       lg_gr_draw_axis_2d_polar(6338,170947
+void lg_gr_draw_axis_3d(6481,174449
+void lb_gr_project_3d(6602,179221
+void lb_gr_project_3d_analytical_two_vectors(6645,180507
+void lb_gr_render_picture(6734,183018
+void       lb_gr_plot_continuous_fn_2d(6823,187936
+void lb_gr_plot_continuous_fn_2d_antialiasing(6899,189765
+PIXEL_T lb_gr_value_to_color(7103,195224
+
+lb_hp6600.c,163
+void UpdateStageOnce(2,1
+void RunProcess(38,1267
+void PrintRecordOnce(69,2184
+void SetupPSU(113,3381
+void SendCmdOnce(130,3750
+void ParseBufferOnce(139,3973
+
+lb_integer.c,634
+void lb_sieve_erathostenes(9,148
+void lb_sieve_erathostenes_2(61,960
+S_INT_8_T lb_in_pos_in_sorted_vector(115,1816
+U_INT_16_T lb_in_invert_bits(147,2366
+S_INT_8_T lb_in_is_even(157,2623
+S_INT_8_T lb_in_is_odd(164,2713
+S_INT_8_T  lb_in_is_perfectsquare(171,2802
+S_INT_8_T lb_in_is_power_of_two(181,2945
+S_INT_8_T lb_in_is_prime(193,3173
+S_INT_32_T  lb_in_isqrt(221,3511
+S_INT_16_T lb_in_littleS16_to_bigS16(256,4234
+S_INT_16_T lb_in_max(261,4338
+S_INT_16_T lb_in_max_n(267,4426
+S_INT_16_T lb_in_min(293,4905
+S_INT_16_T lb_in_pow(299,4993
+S_INT_16_T lb_in_round_div_up(310,5154
+S_INT_16_T lb_in_simpson2d_coef(316,5262
+
+lb_numer.c,494
+FLOAT_T lb_nu_diff(11,177
+FLOAT_T lb_nu_diff2(40,756
+COMPLEX_T lb_nu_diff_c(73,1467
+COMPLEX_T lb_nu_diff2_c(104,2138
+S_INT_8_T lb_nu_find_zero(141,2989
+FLOAT_T lb_nu_sigma(151,3322
+COMPLEX_T lb_nu_sigma_c(189,4008
+FLOAT_T lb_nu_prod(228,4753
+COMPLEX_T lb_nu_prod_c(267,5445
+void rk4(308,6289
+void euler(321,6701
+FLOAT_T lb_nu_simpson(327,6839
+COMPLEX_T lb_nu_simpson_c(375,8111
+FLOAT_T lb_nu_simpson2d(418,9218
+COMPLEX_T lb_nu_simpson2d_c(477,10842
+#define DEBUG_IDEF2516,11785
+
+lb_parser.c,567
+OPERATOR_T ops[ops17,346
+FUNCTION_T fncs[fncs32,1288
+CONSTANT_T cons[cons76,3280
+ERRORS_T errors[errors85,3825
+void lb_pa_pop(105,5364
+void lb_pa_inc_out(210,9193
+S_INT_16_T lb_pa_startpos(220,9443
+FLOAT_T lb_pa_eval_real(241,10163
+COMPLEX_T lb_pa_eval_complex(608,19969
+void lb_pa_shunting_yard(1110,32743
+void lb_pa_parse(1290,38649
+void lb_pa_parse_vars(1527,44895
+void lb_pa_print_item(1621,47317
+void lb_pa_print_output(1660,48235
+void lb_pa_print_stack(1676,48615
+FLOAT_T lb_pa_formula(1688,48853
+COMPLEX_T lb_pa_formula_complex(1719,49767
+
+lb_real.c,1424
+FLOAT_T lb_re_divide(28,960
+FLOAT_T lb_re_pow(53,1499
+FLOAT_T lb_re_sqr(78,2041
+FLOAT_T lb_re_sqrt(96,2348
+FLOAT_T lb_re_xroot(106,2480
+FLOAT_T lb_re_exp(120,2854
+FLOAT_T lb_re_ln(142,3269
+FLOAT_T lb_re_log(167,3796
+FLOAT_T lb_re_log2(192,4326
+FLOAT_T lb_re_tan(221,5074
+FLOAT_T lb_re_asin(246,5602
+FLOAT_T lb_re_acos(256,5744
+FLOAT_T lb_re_sinh(270,6106
+FLOAT_T lb_re_cosh(290,6487
+FLOAT_T lb_re_acosh(310,6868
+FLOAT_T lb_re_atanh(320,7007
+FLOAT_T lb_re_atan2(330,7151
+S_INT_8_T lb_re_equal(342,7574
+S_INT_8_T lb_re_is_int(369,8281
+S_INT_8_T lb_re_larger_or_equal(376,8384
+S_INT_8_T lb_re_smaller_or_equal(387,8530
+FLOAT_T lb_re_max(398,8677
+FLOAT_T lb_re_min(404,8756
+FLOAT_T lb_re_frac(414,9047
+S_INT_8_T lb_re_ispos(419,9104
+FLOAT_T lb_re_ramp(425,9180
+S_INT_8_T lb_re_sign(431,9250
+FLOAT_T lb_re_pulse(438,9349
+FLOAT_T lb_re_pulse_triangle(445,9490
+FLOAT_T lb_re_step(457,9760
+FLOAT_T lb_re_step_practical(464,9879
+S_INT_16_T lb_re_ndigits(476,10280
+FLOAT_T lb_re_factorial(484,10370
+FLOAT_T lb_re_normed_exponent(524,11102
+FLOAT_T lb_re_normed_significand(531,11217
+FLOAT_T lb_re_test_interval_closed(541,11449
+FLOAT_T lb_re_test_interval_open(549,11665
+FLOAT_T lb_re_APR_to_monthly(561,12013
+FLOAT_T lb_re_monthly_to_APR(567,12205
+FLOAT_T lb_re_monthly_to_effective(573,12410
+void lb_re_inter_linear(583,12812
+void lb_re_inter_bilinear(595,13046
+void lb_re_rotate(618,13680
+
+lb_serial.c,434
+void lb_se_init(17,330
+void lb_se_close(146,3948
+void lb_se_flush(156,4213
+int lb_se_process_rx(162,4320
+void lb_se_tx_byte(196,5045
+void lb_se_tx_str(202,5123
+void lb_se_print_buffer(208,5307
+void lb_se_clear_buffer(229,6078
+void lb_se_copy_buffer(238,6230
+float  lb_se_get_timestamp(250,6501
+#define _POSIX_SOURCE 256,6673
+#define CIRC_BUFFER_SIZE 257,6734
+int wait_flag=266,7077
+void lb_se_signal_handler_IO 268,7152
+
+lb_statistics.c,312
+#define REL_ERROR 8,131
+FLOAT_T lb_st_erf(10,156
+FLOAT_T lb_st_erfc(34,769
+FLOAT_T lb_st_frand(67,1792
+FLOAT_T lb_st_marsaglia_polar(72,1859
+void lb_st_marsaglia_polar2(79,1989
+FLOAT_T lb_st_gauss_area(91,2301
+FLOAT_T lb_st_average(114,2796
+FLOAT_T lb_st_stddev2(130,3124
+void lb_st_histogram(150,3506
+
+lb_time.c,54
+void lb_ti_delay_ms(4,40
+void lb_ti_delay_us(17,235
+
+graphics.h,7326
+#define usleep(20,448
+#define delay(21,494
+#define __BGI_INCLUDED_32,690
+#define CREATE_NEW_COLORMAP36,774
+#define MAXLINELENGTH	38,803
+#define random(40,847
+#define BLACK 48,1012
+#define BLUE 49,1070
+#define GREEN 50,1128
+#define CYAN 51,1186
+#define RED 52,1244
+#define MAGENTA 53,1302
+#define BROWN 54,1360
+#define LIGHTGRAY 55,1418
+#define DARKGRAY 56,1476
+#define LIGHTBLUE 57,1534
+#define LIGHTGREEN 58,1592
+#define LIGHTCYAN 59,1651
+#define LIGHTRED 60,1710
+#define LIGHTMAGENTA 61,1769
+#define YELLOW 62,1828
+#define WHITE 63,1887
+#define CGA_LIGHTGREEN	65,1947
+#define CGA_LIGHTRED	66,1976
+#define CGA_YELLOW	67,2003
+#define CGA_LIGHTCYAN	69,2029
+#define CGA_LIGHTMAGENTA	70,2057
+#define CGA_WHITE	71,2087
+#define CGA_GREEN	73,2112
+#define CGA_RED	74,2136
+#define CGA_BROWN	75,2159
+#define CGA_CYAN	77,2184
+#define CGA_MAGENTA	78,2207
+#define CGA_LIGHTGRAY	79,2233
+#define EGA_BLACK	81,2262
+#define EGA_BLUE	82,2286
+#define EGA_GREEN	83,2309
+#define EGA_CYAN	84,2333
+#define EGA_RED	85,2356
+#define EGA_MAGENTA	86,2379
+#define EGA_LIGHTGRAY	87,2405
+#define EGA_BROWN	88,2433
+#define EGA_DARKGRAY	89,2458
+#define EGA_LIGHTBLUE	90,2486
+#define EGA_LIGHTGREEN	91,2515
+#define EGA_LIGHTCYAN	92,2545
+#define EGA_LIGHTRED	93,2574
+#define EGA_LIGHTMAGENTA	94,2602
+#define EGA_YELLOW	95,2633
+#define EGA_WHITE	96,2659
+#define MAXCOLORS	98,2685
+#define MAXRGBCOLORS	100,2716
+#define EMPTY_FILL	102,2747
+#define SOLID_FILL	103,2772
+#define LINE_FILL	104,2797
+#define LTSLASH_FILL	105,2821
+#define SLASH_FILL	106,2848
+#define BKSLASH_FILL	107,2873
+#define LTBKSLASH_FILL	108,2900
+#define HATCH_FILL	109,2929
+#define XHATCH_FILL	110,2954
+#define INTERLEAVE_FILL	111,2980
+#define WIDE_DOT_FILL	112,3010
+#define CLOSE_DOT_FILL	113,3039
+#define USER_FILL	114,3069
+#define SOLID_LINE	116,3095
+#define DOTTED_LINE	117,3120
+#define CENTER_LINE	118,3146
+#define DASHED_LINE	119,3172
+#define USERBIT_LINE	120,3198
+#define NORM_WIDTH	122,3226
+#define THICK_WIDTH	123,3251
+#define DOTTEDLINE_LENGTH	125,3278
+#define CENTRELINE_LENGTH	126,3309
+#define DASHEDLINE_LENGTH	127,3340
+#define USERBITLINE_LENGTH	128,3371
+#define DEFAULT_FONT	130,3411
+#define TRIPLEX_FONT	131,3438
+#define SMALL_FONT	132,3465
+#define SANSSERIF_FONT	133,3490
+#define GOTHIC_FONT	134,3519
+#define HORIZ_DIR	136,3546
+#define VERT_DIR	137,3570
+#define LEFT_TEXT	139,3594
+#define CENTER_TEXT	140,3618
+#define RIGHT_TEXT	141,3644
+#define BOTTOM_TEXT	142,3669
+#define TOP_TEXT	143,3695
+#define COPY_PUT	145,3719
+#define XOR_PUT	146,3742
+#define OR_PUT	147,3765
+#define AND_PUT	148,3787
+#define NOT_PUT	149,3810
+#define MAX_PAGES	151,3834
+struct arccoordstype 153,3859
+	int x;154,3882
+	int y;155,3890
+	int xstart;156,3898
+	int ystart;157,3911
+	int xend;158,3924
+	int yend;159,3935
+struct date 162,3950
+	int da_year;163,3964
+	int da_day;164,3978
+	int da_mon;165,3991
+struct fillsettingstype 168,4008
+	int pattern;169,4034
+	int color;170,4048
+struct linesettingstype 173,4064
+	int linestyle;174,4090
+	unsigned int upattern;175,4106
+	int thickness;176,4130
+struct palettetype 179,4150
+	unsigned char size;180,4171
+	signed char colors[colors181,4192
+struct textsettingstype 184,4232
+	int font;185,4258
+	int direction;186,4269
+	int charsize;187,4285
+	int horiz;188,4300
+	int vert;189,4312
+struct viewporttype 192,4327
+	int left;193,4349
+	int top;194,4360
+	int right;195,4370
+	int bottom;196,4382
+	int clip;197,4395
+struct bgi_info 200,4410
+	int colour_index;201,4428
+	char *colour_name;colour_name202,4447
+	unsigned long pixel_value;203,4467
+struct rgb_colour 207,4508
+  int colour_index;208,4528
+  unsigned long pixel_value;209,4548
+    int    width;263,6028
+    int    height;264,6046
+    Pixmap pixmap;265,6065
+} bgi_image;266,6084
+#define PROTO(274,6268
+#define PROTO(276,6303
+#define PROTO(283,6408
+enum graphics_errors 396,10710
+	grOk 397,10733
+	grNoInitGraph 398,10744
+	grNotDetected 399,10765
+	grFileNotFound 400,10786
+	grInvalidDriver	401,10808
+	grNoLoadMem 402,10831
+	grNoScanMem 403,10850
+	grNoFloodMem 404,10869
+	grFontNotFound 405,10889
+	grNoFontMem 406,10911
+	grInvalidMode 407,10930
+	grError 408,10952
+	grIOerror 409,10968
+	grInvalidFont 410,10986
+	grInvalidFontNum 411,11008
+	grInvalidDeviceNum 412,11033
+	grInvalidVersion 413,11060
+#define DETECT	418,11165
+#define CGA	419,11187
+#define MCGA	420,11206
+#define EGA	421,11226
+#define EGA64	422,11245
+#define EGAMONO	423,11266
+#define IBM8514	424,11289
+#define HERCMONO	425,11312
+#define ATT400	426,11335
+#define VGA	427,11357
+#define PC3270	428,11376
+#define X11	429,11399
+#define CGAC0	433,11453
+#define CGAC1	434,11474
+#define CGAC2	435,11495
+#define CGAC3	436,11516
+#define CGAHI	437,11537
+#define MCGAC0	439,11559
+#define MCGAC1	440,11581
+#define MCGAC2	441,11603
+#define MCGAC3	442,11625
+#define MCGAMED	443,11647
+#define MCGAHI	444,11670
+#define EGALO	446,11693
+#define EGAHI	447,11714
+#define EGA64LO	449,11736
+#define EGA64HI	450,11759
+#define EGAMONOHI	452,11783
+#define HERCMONOHI	454,11808
+#define ATT400C0	456,11834
+#define ATT400C1	457,11857
+#define ATT400C2	458,11880
+#define ATT400C3	459,11903
+#define ATT400MED	460,11926
+#define ATT400HI	461,11950
+#define VGALO	463,11974
+#define VGAMED	464,11995
+#define VGAHI	465,12017
+#define PC3270HI	467,12039
+#define IBM8514LO	469,12063
+#define IBM8514HI	470,12087
+#define X11_CGALO	472,12112
+#define X11_CGAHI	473,12136
+#define X11_EGA	474,12160
+#define X11_VGA	475,12183
+#define X11_640x480	476,12206
+#define X11_HERC	477,12232
+#define X11_PC3270	478,12255
+#define X11_SVGALO	479,12280
+#define X11_800x600	480,12305
+#define X11_SVGAMED1	481,12331
+#define X11_1024x768	482,12358
+#define X11_SVGAMED2	483,12385
+#define X11_1152x900	484,12412
+#define X11_SVGAHI	485,12439
+#define X11_1280x1024	486,12464
+#define X11_WXGA	487,12492
+#define X11_1366x768	488,12516
+#define X11_USER	489,12544
+#define X11_FULLSCREEN	490,12568
+#define KEY_HOME	493,12612
+#define KEY_LEFT	494,12632
+#define KEY_UP	495,12652
+#define KEY_RIGHT	496,12671
+#define KEY_DOWN	497,12692
+#define KEY_PGUP	498,12712
+#define KEY_PGDN	499,12732
+#define KEY_END	500,12752
+#define KEY_INSERT	501,12772
+#define KEY_DELETE	502,12794
+#define KEY_F1	503,12816
+#define KEY_F2	504,12836
+#define KEY_F3	505,12856
+#define KEY_F4	506,12876
+#define KEY_F5	507,12896
+#define KEY_F6	508,12916
+#define KEY_F7	509,12936
+#define KEY_F8	510,12956
+#define KEY_F9	511,12976
+#define KEY_F10	512,12996
+#define KEY_F11	513,13017
+#define KEY_F12	514,13038
+#define KEY_LEFT_CTRL	515,13059
+#define KEY_RIGHT_CTRL	516,13085
+#define KEY_LEFT_SHIFT	517,13112
+#define KEY_RIGHT_SHIFT	518,13139
+#define KEY_LEFT_ALT	519,13167
+#define KEY_LEFT_WIN	520,13192
+#define KEY_RIGHT_WIN	521,13217
+#define KEY_ALT_GR	522,13243
+#define KEY_TAB	523,13264
+#define KEY_BS	524,13283
+#define KEY_RET	525,13301
+#define KEY_PAUSE	526,13321
+#define KEY_SCR_LOCK	527,13342
+#define KEY_ESC	528,13366
+#define WM_LBUTTONDOWN 532,13411
+#define WM_MBUTTONDOWN 533,13452
+#define WM_RBUTTONDOWN 534,13495
+#define WM_WHEELUP 535,13537
+#define WM_WHEELDOWN 536,13575
+#define WM_MOUSEMOVE 537,13615
+#define RED_VALUE(541,13673
+#define GREEN_VALUE(542,13723
+#define BLUE_VALUE(543,13772
+
+lb_algebra.h,26
+#define LB_ALGEBRA_H4,43
+
+lb_audio.h,1063
+#define LB_AUDIO_H2,19
+typedef struct wavfile_header 7,84
+	char	riff_tag[riff_tag8,116
+	int	riff_length;9,135
+	char	wave_tag[wave_tag10,153
+	char	fmt_tag[fmt_tag11,172
+	int	fmt_length;12,190
+	short	audio_format;13,207
+	short	num_channels;14,228
+	int	sample_rate;15,249
+	int	byte_rate;16,267
+	short	block_align;17,283
+	short	bits_per_sample;18,303
+	char	data_tag[data_tag19,327
+	int	data_length;20,346
+} WAVE_HEADER_T;21,364
+#define AUDIO_RATE 23,382
+#define AUDIO_SAMPLES 24,407
+#define AUDIO_BUFFER_SIZE 25,434
+#define AUDIO_BYTES_PER_SAMPLE 26,465
+#define AUDIO_N_CHANNELS 27,498
+Uint32 lb_au_audio_len;29,526
+Uint8 *lb_au_audio_pos;lb_au_audio_pos30,550
+SDL_AudioSpec want,31,574
+SDL_AudioSpec want, have;31,574
+SDL_AudioDeviceID dev;32,600
+U_INT_8_T _lb_au_sin_table8[_lb_au_sin_table834,624
+S_INT_16_T _lb_au_sin_table16[_lb_au_sin_table1635,668
+FLOAT_T _lb_au_ph0,36,714
+FLOAT_T _lb_au_ph0, _lb_au_ph1,36,714
+FLOAT_T _lb_au_ph0, _lb_au_ph1, _lb_au_f0,36,714
+FLOAT_T _lb_au_ph0, _lb_au_ph1, _lb_au_f0, _lb_au_f1;36,714
+
+lb_complex.h,26
+#define LB_COMPLEX_H4,43
+
+lb_console.h,739
+#define LB_CONSOLE_H4,43
+#define TEXT_MODE_BOLD 6,65
+#define TEXT_MODE_FAINT 7,91
+#define TEXT_MODE_UNDERLINE 8,119
+#define TEXT_MODE_NEGATIVE 9,150
+#define TEXT_MODE_CONCEAL 10,179
+#define TEXT_MODE_CROSSEDOUT 11,207
+#define TEXT_MODE_NOBOLD 12,238
+#define TEXT_MODE_NOUNDERLINE 13,266
+#define TEXT_MODE_POSITIVE 14,299
+#define TEXT_MODE_REVEAL 15,329
+#define TEXT_MODE_NOCROSSEDOUT 16,357
+#define TEXT_COLOR_BLACK 17,391
+#define TEXT_COLOR_RED 18,419
+#define TEXT_COLOR_GREEN 19,445
+#define TEXT_COLOR_YELLOW 20,473
+#define TEXT_COLOR_BLUE 21,502
+#define TEXT_COLOR_MAGENTA 22,529
+#define TEXT_COLOR_CYAN 23,559
+#define TEXT_COLOR_WHITE 24,586
+#define TEXT_COLOR_DEFAULT 25,614
+#define TEXT_COLOR_BACKGROUND 26,644
+
+lb_fonts.h,24
+#define LB_FONTS_H2,19
+
+lb_fourier.h,26
+#define LB_FOURIER_H2,21
+
+lb_geometry.h,27
+#define LB_GEOMETRY_H4,45
+
+lb_gpio.h,685
+#define LB_GPIO_H2,18
+#define PHYSICAL_ADDRESS 20,554
+#define GPIO_OFFSET 21,594
+#define BLOCK_SIZE 22,634
+#define GPIO_INPUT 23,664
+#define GPIO_OUTPUT 24,686
+#define GPIO_HIGH 25,708
+#define GPIO_LOW 26,730
+#define GPIO_SET_INP(31,930
+#define GPIO_SET_OUT(32,1003
+#define GPIO_SET_ALT(33,1076
+#define GPIO_SET 35,1178
+#define GPIO_CLR 36,1267
+#define GPIO_READ(38,1358
+#define GPIO_PULL 41,1414
+#define GPIO_PULLCLK0 42,1451
+  unsigned char MOSI;47,1651
+  unsigned char CLK;48,1673
+  unsigned char MISO;49,1694
+  unsigned char CPOL;50,1716
+  unsigned char CPHA;51,1738
+  unsigned int  delay_clk;52,1760
+  unsigned int  delay_byte;53,1787
+} SPI_PORT_T;54,1815
+
+lb_graphics.h,27
+#define LB_GRAPHICS_H6,88
+
+lb_hp6600.h,1417
+#define LB_HP6600_H2,20
+#define ONE_DAY 4,41
+#define ONE_HOUR 5,63
+#define T_INTERVAL 6,86
+  char label[label9,128
+  float lim_volt;10,146
+  float lim_curr;11,164
+  int output_enabled;12,182
+  float v_min;14,207
+  int v_min_trigger;15,222
+  int v_min_pointer;16,243
+  float v_max;18,265
+  int v_max_trigger;19,280
+  int v_max_pointer;20,301
+  float i_min;22,323
+  int i_min_trigger;23,338
+  int i_min_pointer;24,359
+  float i_max;26,383
+  int i_max_trigger;27,398
+  int i_max_pointer;28,419
+  float t_max;30,441
+  int t_max_trigger;31,456
+  int t_max_pointer;32,477
+  float watt_hour;34,499
+  float t_cycle;35,518
+} t_charge_stage;36,535
+float t_previous,38,554
+float t_previous, t_delta;38,554
+float volt,39,581
+float volt, curr;39,581
+int current_stage=40,599
+int flag_volt_sent=41,620
+#define LEAD_ACID_TEST 51,1250
+#define N_STAGES 55,1415
+t_charge_stage stages[stages57,1435
+#define N_STAGES 90,2601
+t_charge_stage stages[stages92,2621
+#define N_STAGES 123,3640
+#define N_CELLS 124,3659
+#define LEAD_VOLT_UCH 125,3677
+#define LEAD_VOLT_OCH 126,3704
+#define LEAD_NOM_CURR 127,3730
+t_charge_stage stages[stages129,3758
+#define N_STAGES 180,5724
+t_charge_stage stages[stages182,5744
+#define N_STAGES 195,6128
+#define N_CELLS 196,6147
+#define LI_VOLT_CHG 197,6167
+#define LI_VOLT_DCH 198,6191
+#define LI_NOM_CURR 199,6215
+t_charge_stage stages[stages201,6241
+
+lb_integer.h,26
+#define LB_INTEGER_H2,21
+
+lb_numer.h,24
+#define LB_NUMER_H5,65
+
+lb_parser.h,6829
+#define LB_PARSER_H2,20
+#define MAX_FORMULA_SIZE 8,180
+#define MAX_FUNCTION_SIZE 9,208
+#define MAX_OPERATOR_SIZE 10,236
+#define MAX_VARIABLE_SIZE 11,264
+#define MAX_CONSTANT_SIZE 12,292
+#define MAX_ERROR_MESSAGE 13,320
+#define MAX_NUMBER_VARIABLES 14,350
+#define MAX_STACK_SIZE 15,382
+#define MAX_FUNCTIONS 16,408
+#define MAX_OPERATORS 17,433
+#define MAX_OPERATORS_DUAL 18,458
+#define MAX_CONSTANTS 19,488
+#define MAX_ERRORS 20,513
+#define MAX_ARGUMENTS 21,535
+#define MAX_FIXED_ARGUMENTS 22,560
+#define MAX_DEPTH 23,590
+#define INDEX_TYPE 24,611
+typedef enum { op_unary,26,686
+typedef enum { op_unary, op_binary 26,686
+typedef enum { op_unary, op_binary } ARGUMENTS_T;26,686
+typedef enum { a_left,28,737
+typedef enum { a_left, a_right 28,737
+typedef enum { a_left, a_right } ASSOCIATIVITY_T;28,737
+typedef enum { op_positive,30,788
+typedef enum { op_positive, op_negative,30,788
+typedef enum { op_positive, op_negative, op_factorial,30,788
+typedef enum { op_positive, op_negative, op_factorial, op_power,30,788
+typedef enum { op_positive, op_negative, op_factorial, op_power, op_division,30,788
+typedef enum { op_positive, op_negative, op_factorial, op_power, op_division, op_product,30,788
+typedef enum { op_positive, op_negative, op_factorial, op_power, op_division, op_product, op_substraction,30,788
+typedef enum { op_positive, op_negative, op_factorial, op_power, op_division, op_product, op_substraction, op_addition,30,788
+	       op_equal_than,31,909
+	       op_equal_than, op_larger_than,31,909
+	       op_equal_than, op_larger_than, op_smaller_than,31,909
+	       op_equal_than, op_larger_than, op_smaller_than, op_different_than,31,909
+	       op_equal_than, op_larger_than, op_smaller_than, op_different_than, op_larger_or_equal_than,31,909
+	       op_smaller_or_equal_than 32,1010
+	       op_smaller_or_equal_than } OPERATORS_T;32,1010
+typedef enum { fn_sin,34,1059
+typedef enum { fn_sin, fn_cos,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin, fn_acos,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin, fn_acos, fn_atan,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin, fn_acos, fn_atan, fn_sinh,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin, fn_acos, fn_atan, fn_sinh, fn_cosh,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin, fn_acos, fn_atan, fn_sinh, fn_cosh, fn_tanh,34,1059
+typedef enum { fn_sin, fn_cos, fn_tan, fn_asin, fn_acos, fn_atan, fn_sinh, fn_cosh, fn_tanh, fn_asinh,34,1059
+	       fn_acosh,35,1163
+	       fn_acosh, fn_atanh,35,1163
+	       fn_acosh, fn_atanh, fn_exp,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log, fn_log2,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log, fn_log2, fn_logb,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log, fn_log2, fn_logb, fn_max2,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log, fn_log2, fn_logb, fn_max2, fn_min2,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log, fn_log2, fn_logb, fn_max2, fn_min2, fn_if,35,1163
+	       fn_acosh, fn_atanh, fn_exp, fn_ln, fn_log, fn_log2, fn_logb, fn_max2, fn_min2, fn_if, fn_sqr,35,1163
+	       fn_sqrt,36,1266
+	       fn_sqrt, fn_abs,36,1266
+	       fn_sqrt, fn_abs, fn_erf,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef, fn_idef2,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef, fn_idef2, fn_sigma,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef, fn_idef2, fn_sigma, fn_prod,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef, fn_idef2, fn_sigma, fn_prod, fn_diff,36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef, fn_idef2, fn_sigma, fn_prod, fn_diff, fn_diff2 36,1266
+	       fn_sqrt, fn_abs, fn_erf, fn_erfc, fn_rand, fn_marsa, fn_dstd, fn_real, fn_imag, fn_polar, fn_rect, fn_avg, fn_idef, fn_idef2, fn_sigma, fn_prod, fn_diff, fn_diff2 } FNC_T;36,1266
+  ERR_T id;40,1465
+  char msg[msg41,1477
+} ERRORS_T;42,1508
+  OPERATORS_T id;48,1575
+  char symbol[symbol49,1593
+  ASSOCIATIVITY_T asso;50,1627
+  S_INT_8_T pre;51,1651
+  ARGUMENTS_T op_type;52,1669
+} OPERATOR_T;53,1692
+  FNC_T id;57,1724
+  char name[name58,1736
+  S_INT_8_T n_arguments;59,1768
+  U_INT_8_T var_mask;60,1793
+} FUNCTION_T;61,1816
+  char name[name65,1848
+  FLOAT_T value;66,1880
+} CONSTANT_T;67,1897
+typedef enum { st_constant,69,1912
+typedef enum { st_constant, st_variable,69,1912
+typedef enum { st_constant, st_variable, st_function,69,1912
+typedef enum { st_constant, st_variable, st_function, st_separator,69,1912
+typedef enum { st_constant, st_variable, st_function, st_separator, st_operator,69,1912
+typedef enum { st_constant, st_variable, st_function, st_separator, st_operator, st_lpar,69,1912
+typedef enum { st_constant, st_variable, st_function, st_separator, st_operator, st_lpar, st_rpar 69,1912
+typedef enum { st_constant, st_variable, st_function, st_separator, st_operator, st_lpar, st_rpar } STACK_ELEMENT_TYPE_T;69,1912
+  STACK_ELEMENT_TYPE_T type;73,2052
+  FLOAT_T float_value;74,2081
+  INDEX_TYPE index;75,2104
+  S_INT_8_T var_arg[var_arg76,2125
+} STACK_ELEMENT_T;77,2167
+  STACK_ELEMENT_T out[out81,2205
+  S_INT_16_T oq;82,2244
+  S_INT_16_T arg_count;83,2297
+} FN_RECORD_T;84,2321
+  S_INT_16_T z;88,2354
+  S_INT_16_T arguments[arguments89,2370
+  S_INT_16_T subitems[subitems90,2405
+} ARGS_T;91,2454
+
+lb_real.h,23
+#define LB_REAL_H4,41
+
+lb_serial.h,804
+#define LB_SERIAL_H2,20
+#define _POSIX_SOURCE 4,41
+#define CIRC_BUFFER_SIZE 5,102
+  speed_t  baud_rate;11,169
+  tcflag_t data_bits;12,212
+      dev_S0,15,250
+      dev_S0, dev_S1 15,250
+    } device;16,276
+      SB_1,19,317
+      SB_1, SB_2 19,317
+    } stop_bits;20,339
+      PA_none,23,391
+      PA_none, PA_even,23,391
+      PA_none, PA_even, PA_odd 23,391
+    } parity;24,427
+      FC_none,27,473
+      FC_none, FC_hw,27,473
+      FC_none, FC_hw, FC_sw 27,473
+    } flow_control;28,506
+  int a;29,544
+  int n;30,614
+  int fd;31,678
+  char data_buffer[data_buffer32,710
+} COMM_PORT_T;33,795
+int i;37,813
+char Key;38,820
+struct termios oldtio,39,830
+struct termios oldtio, newtio;39,830
+struct sigaction saio;40,931
+char buf[buf42,1004
+struct timeval t_initial;43,1076
+
+lb_statistics.h,27
+#define LB_STATISTICS2,22
+
+lb_time.h,23
+#define LB_TIME_H4,48
+
+lb_types.h,22324
+#define LB_TYPES_H2,19
+#define FLOAT_FORMAT 8,180
+#define FLOAT_FORMAT_MATRIX 9,209
+#define TRUE 15,418
+#define FALSE 16,433
+#define FLOAT_T 22,588
+#define U_INT_8_T 23,611
+#define U_INT_16_T 24,643
+#define U_INT_32_T 25,677
+#define S_INT_8_T 26,709
+#define S_INT_16_T 27,732
+#define S_INT_32_T 28,757
+typedef enum { e_none=34,919
+typedef enum { e_none=0, e_div_zero,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small, e_arg_inf_loop,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small, e_arg_inf_loop, e_arg_non_real,34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small, e_arg_inf_loop, e_arg_non_real, e_arg_not_var 34,919
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small, e_arg_inf_loop, e_arg_non_real, e_arg_not_var } ERR_T;34,919
+  FLOAT_T r,42,1361
+  FLOAT_T r, i;42,1361
+} COMPLEX_T;43,1377
+#define ZERO_C 45,1391
+#define ARRAY_MAX_DIM 50,1574
+#define ARRAY_MAX_N 51,1603
+#define MATRIX_MAX_ROWS 53,1637
+#define MATRIX_MAX_COLS 54,1667
+#define VECTOR_MAX_ITEMS 55,1697
+  S_INT_8_T *array;array63,1893
+  U_INT_16_T items;64,1913
+} VECTOR_S_INT_8_T;65,1933
+  S_INT_16_T *array;array69,1971
+  U_INT_16_T items;70,1992
+} VECTOR_S_INT_16_T;71,2012
+  FLOAT_T *array;array75,2051
+  U_INT_16_T items;76,2069
+} VECTOR_R_T;77,2089
+  COMPLEX_T *array;array81,2121
+  U_INT_16_T items;82,2141
+} VECTOR_C_T;83,2161
+  S_INT_8_T **array;array87,2193
+  U_INT_16_T rows;88,2214
+  U_INT_16_T cols;89,2233
+} MATRIX_S_INT_8_T;90,2252
+  FLOAT_T **array;array94,2290
+  U_INT_16_T rows;95,2309
+  U_INT_16_T cols;96,2328
+} MATRIX_R_T;97,2347
+  COMPLEX_T **array;array101,2379
+  U_INT_16_T rows;102,2400
+  U_INT_16_T cols;103,2419
+} MATRIX_C_T;104,2438
+  S_INT_8_T n;108,2470
+  U_INT_16_T dim[dim109,2485
+  FLOAT_T *a1;a1110,2506
+  FLOAT_T **a2;a2111,2521
+  FLOAT_T ***a3;a3112,2537
+  FLOAT_T ****a4;a4113,2554
+  FLOAT_T *****a5;a5114,2572
+} ARRAY_R_T;115,2591
+typedef FLOAT_T(*FUNCTION_X_Y)FUNCTION_X_Y118,2606
+typedef FLOAT_T(*FUNCTION_X)FUNCTION_X119,2664
+#define PICTURE_MAX_HEIGHT 124,2860
+#define PICTURE_MAX_WIDTH 125,2892
+#define N_BITS_R 127,2924
+#define N_BITS_G 128,3009
+#define N_BITS_B 129,3096
+#define N_BITS_A 130,3182
+#define MAX_R 134,3285
+#define FACTOR_N_TO_8_R 135,3350
+#define MAX_R 139,3422
+#define FACTOR_N_TO_8_R 140,3451
+#define MAX_R 144,3510
+#define FACTOR_N_TO_8_R 145,3539
+#define MAX_R 149,3597
+#define FACTOR_N_TO_8_R 150,3627
+#define MAX_R 154,3686
+#define FACTOR_N_TO_8_R 155,3716
+#define MAX_R 159,3776
+#define FACTOR_N_TO_8_R 160,3806
+#define MAX_R 164,3866
+#define FACTOR_N_TO_8_R 165,3897
+#define MAX_R 169,3958
+#define FACTOR_N_TO_8_R 170,3989
+#define MAX_G 176,4059
+#define FACTOR_N_TO_8_G 177,4124
+#define MAX_G 181,4196
+#define FACTOR_N_TO_8_G 182,4225
+#define MAX_G 186,4285
+#define FACTOR_N_TO_8_G 187,4314
+#define MAX_G 191,4372
+#define FACTOR_N_TO_8_G 192,4402
+#define MAX_G 196,4461
+#define FACTOR_N_TO_8_G 197,4491
+#define MAX_G 201,4550
+#define FACTOR_N_TO_8_G 202,4580
+#define MAX_G 206,4639
+#define FACTOR_N_TO_8_G 207,4670
+#define MAX_G 211,4730
+#define FACTOR_N_TO_8_G 212,4761
+#define MAX_B 219,4831
+#define FACTOR_N_TO_8_B 220,4896
+#define MAX_B 224,4968
+#define FACTOR_N_TO_8_B 225,4997
+#define MAX_B 229,5057
+#define FACTOR_N_TO_8_B 230,5086
+#define MAX_B 234,5144
+#define FACTOR_N_TO_8_B 235,5174
+#define MAX_B 239,5233
+#define FACTOR_N_TO_8_B 240,5263
+#define MAX_B 244,5322
+#define FACTOR_N_TO_8_B 245,5352
+#define MAX_B 249,5411
+#define FACTOR_N_TO_8_B 250,5442
+#define MAX_B 254,5502
+#define FACTOR_N_TO_8_B 255,5533
+#define MAX_A 261,5602
+#define FACTOR_N_TO_8_A 262,5667
+#define MAX_A 266,5739
+#define FACTOR_N_TO_8_A 267,5768
+#define MAX_A 271,5828
+#define FACTOR_N_TO_8_A 272,5857
+#define MAX_A 276,5915
+#define FACTOR_N_TO_8_A 277,5945
+#define MAX_A 281,6004
+#define FACTOR_N_TO_8_A 282,6034
+#define MAX_A 286,6093
+#define FACTOR_N_TO_8_A 287,6123
+#define MAX_A 291,6182
+#define FACTOR_N_TO_8_A 292,6213
+#define MAX_A 296,6275
+#define FACTOR_N_TO_8_A 297,6306
+#define COLOR_SOLID 315,6738
+#define COLOR_SEMI_SOLID 316,6782
+#define COLOR_TRANSPARENT 317,6826
+#define COLOR_RED	320,6891
+#define COLOR_DARKRED	321,6927
+#define COLOR_ORANGE	322,6967
+#define COLOR_DARKORANGE	323,7006
+#define COLOR_GOLD	324,7041
+#define COLOR_LIME	326,7079
+#define COLOR_GREEN	327,7116
+#define COLOR_OLIVE	328,7154
+#define COLOR_LIGHTGREEN	329,7192
+#define COLOR_LIMEGREEN	330,7227
+#define COLOR_DARKGREEN	331,7269
+#define COLOR_SPRINGGREEN	332,7311
+#define COLOR_BLUE	334,7348
+#define COLOR_LIGHTBLUE	335,7385
+#define COLOR_SKYBLUE	336,7427
+#define COLOR_DARKBLUE	337,7467
+#define COLOR_YELLOW	339,7509
+#define COLOR_LIGHTYELLOW	340,7548
+#define COLOR_CYAN	342,7585
+#define COLOR_TEAL	343,7622
+#define COLOR_LIGHTCYAN	344,7659
+#define COLOR_MAGENTA	346,7702
+#define COLOR_PURPLE	347,7742
+#define COLOR_PINK	350,7808
+#define COLOR_LIGHTPINK	351,7845
+#define COLOR_BROWN	353,7888
+#define COLOR_KHAKI	354,7926
+#define COLOR_BEIGE	355,7964
+#define COLOR_VIOLET	356,8002
+#define COLOR_BLUEVIOLET	357,8041
+#define COLOR_BLACK	360,8094
+#define COLOR_DIMGRAY	361,8132
+#define COLOR_GRAY	362,8172
+#define COLOR_DARKGRAY	363,8209
+#define COLOR_SILVER	364,8250
+#define COLOR_LIGHTGRAY	365,8289
+#define COLOR_GAINSBORO	366,8331
+#define COLOR_WHITESMOKE	367,8373
+#define COLOR_WHITE	368,8408
+#define COLOR_HOTPINK	371,8484
+#define COLOR_DEEPPINK	372,8524
+#define COLOR_PALEVIOLETRED	373,8565
+#define COLOR_MEDIUMVIOLETRED	374,8603
+#define COLOR_LIGHTSALMON	375,8643
+#define COLOR_SALMON	376,8679
+#define COLOR_DARKSALMON	377,8718
+#define COLOR_LIGHTCORAL	378,8753
+#define COLOR_INDIANRED	379,8788
+#define COLOR_CRIMSON	380,8830
+#define COLOR_ORANGERED	381,8870
+#define COLOR_TOMATO	382,8912
+#define COLOR_CORAL	383,8951
+#define COLOR_LEMONCHIFFON	384,8989
+#define COLOR_LIGHTGOLDENRODYELLOW 385,9026
+#define COLOR_MOCCASIN	386,9068
+#define COLOR_PALEGOLDENROD	387,9109
+#define COLOR_DARKKHAKI	388,9147
+#define COLOR_CORNSILK	389,9189
+#define COLOR_BLANCHEDALMOND	390,9230
+#define COLOR_BISQUE	391,9269
+#define COLOR_NAVAJOWHITE	392,9308
+#define COLOR_WHEAT	393,9344
+#define COLOR_BURLYWOOD	394,9382
+#define COLOR_TAN	395,9424
+#define COLOR_ROSYBROWN	396,9460
+#define COLOR_SANDYBROWN	397,9502
+#define COLOR_GOLDENROD	398,9537
+#define COLOR_DARKGOLDENROD	399,9579
+#define COLOR_PERU	400,9617
+#define COLOR_CHOCOLATE	401,9654
+#define COLOR_SADDLEBROWN	402,9696
+#define COLOR_SIENNA	403,9732
+#define COLOR_DARKOLIVEGREEN	404,9771
+#define COLOR_OLIVEDRAB	405,9810
+#define COLOR_YELLOWGREEN	406,9852
+#define COLOR_LAWNGREEN	407,9888
+#define COLOR_CHARTREUSE	408,9930
+#define COLOR_GREENYELLOW	409,9965
+#define COLOR_MEDIUMSPRINGGREEN	410,10001
+#define COLOR_PALEGREEN	411,10043
+#define COLOR_DARKSEAGREEN	412,10085
+#define COLOR_MEDIUMSEAGREEN	413,10122
+#define COLOR_SEAGREEN	414,10161
+#define COLOR_FORESTGREEN	415,10202
+#define COLOR_MEDIUMAQUAMARINE	416,10238
+#define COLOR_PALETURQUOISE	417,10279
+#define COLOR_AQUAMARINE	418,10317
+#define COLOR_TURQUOISE	419,10352
+#define COLOR_MEDIUMTURQUOISE	420,10394
+#define COLOR_DARKTURQUOISE	421,10434
+#define COLOR_LIGHTSEAGREEN	422,10472
+#define COLOR_CADETBLUE	423,10510
+#define COLOR_LIGHTSTEELBLUE	424,10552
+#define COLOR_LIGHTSKYBLUE	425,10591
+#define COLOR_DEEPSKYBLUE	426,10628
+#define COLOR_DODGERBLUE	427,10664
+#define COLOR_CORNFLOWERBLUE	428,10699
+#define COLOR_STEELBLUE	429,10738
+#define COLOR_ROYALBLUE	430,10780
+#define COLOR_MEDIUMBLUE	431,10822
+#define COLOR_MIDNIGHTBLUE	432,10857
+#define COLOR_LAVENDER	433,10894
+#define COLOR_THISTLE	434,10935
+#define COLOR_PLUM	435,10975
+#define COLOR_ORCHID	436,11012
+#define COLOR_MEDIUMORCHID	437,11051
+#define COLOR_MEDIUMPURPLE	438,11088
+#define COLOR_DARKORCHID	439,11125
+#define COLOR_INDIGO	440,11160
+#define COLOR_DARKSLATEBLUE	441,11199
+#define COLOR_REBECCAPURPLE	442,11237
+#define COLOR_SLATEBLUE	443,11275
+#define COLOR_MEDIUMSLATEBLUE	444,11317
+#define COLOR_HONEYDEW	445,11357
+#define COLOR_AZURE	446,11398
+#define COLOR_SEASHELL	447,11436
+#define COLOR_FLORALWHITE	448,11477
+#define COLOR_IVORY	449,11513
+#define COLOR_ANTIQUEWHITE	450,11551
+#define COLOR_MISTYROSE	451,11588
+#define COLOR_LIGHTSLATEGRAY	452,11630
+#define COLOR_SLATEGRAY	453,11669
+#define COLOR_DARKSLATEGRAY	454,11711
+#define COLOR_MAROON	457,11773
+#define COLOR_NAVY	458,11812
+#define COLOR_AQUA	459,11849
+#define COLOR_FUCHSIA	460,11886
+#define COLOR_DARKMAGENTA	461,11926
+#define COLOR_DARKCYAN	462,11962
+#define COLOR_DARKVIOLET	463,12003
+#define COLOR_GHOSTWHITE	464,12038
+#define COLOR_BROWN	465,12073
+#define COLOR_POWDERBLUE	466,12111
+#define COLOR_SNOW	467,12146
+#define COLOR_OLDLACE	468,12183
+#define COLOR_PEACHPUFF	469,12223
+#define COLOR_LINEN	470,12265
+#define COLOR_LAVENDERBLUSH	471,12303
+#define COLOR_MINTCREAM	472,12341
+#define COLOR_ALICEBLUE	473,12383
+#define COLOR_PAPAYAWHIP	474,12425
+#define ASCII_NUL 480,12594
+#define ASCII_SOH 481,12647
+#define ASCII_STX 482,12712
+#define ASCII_ETX 483,12774
+#define ASCII_EOT 484,12833
+#define ASCII_ENQ 485,12900
+#define ASCII_ACK 486,12955
+#define ASCII_BEL 487,13015
+#define ASCII_BS 488,13067
+#define ASCII_TAB 489,13124
+#define ASCII_LF 490,13186
+#define ASCII_VT 491,13257
+#define ASCII_FF 492,13317
+#define ASCII_CR 493,13393
+#define ASCII_SO 494,13456
+#define ASCII_SI 495,13513
+#define ASCII_DLE 497,13570
+#define ASCII_DC1 498,13635
+#define ASCII_DC2 499,13699
+#define ASCII_DC3 500,13763
+#define ASCII_DC4 501,13827
+#define ASCII_NAK 502,13891
+#define ASCII_SYN 503,13960
+#define ASCII_ETB 504,14024
+#define ASCII_CAN 505,14096
+#define ASCII_EM 506,14151
+#define ASCII_SUB 507,14212
+#define ASCII_ESC 508,14270
+#define ASCII_FS 509,14324
+#define ASCII_GS 510,14386
+#define ASCII_RS 511,14449
+#define ASCII_US 512,14514
+#define ASCII_SPACE 514,14577
+#define ASCII_EXCLAMATION 515,14626
+#define ASCII_QUOTATION 516,14675
+#define ASCII_NUMBER 517,14724
+#define ASCII_DOLLAR 518,14773
+#define ASCII_PERCENT 519,14822
+#define ASCII_AMPERSAND 520,14871
+#define ASCII_APOSTOPHE 521,14920
+#define ASCII_PARENTHESES_L 522,14969
+#define ASCII_PARENTHESES_R 523,15018
+#define ASCII_ASTERISK 524,15067
+#define ASCII_PLUS 525,15116
+#define ASCII_COMMA 526,15165
+#define ASCII_MINUS 527,15214
+#define ASCII_POINT 528,15263
+#define ASCII_SLASH 529,15338
+#define ASCII_0 531,15388
+#define ASCII_1 532,15426
+#define ASCII_2 533,15463
+#define ASCII_3 534,15500
+#define ASCII_4 535,15536
+#define ASCII_5 536,15572
+#define ASCII_6 537,15608
+#define ASCII_7 538,15644
+#define ASCII_8 539,15680
+#define ASCII_9 540,15716
+#define ASCII_COLON 541,15752
+#define ASCII_SEMICOLON 542,15800
+#define ASCII_LESS_THAN 543,15848
+#define ASCII_EQUALS 544,15896
+#define ASCII_GREATER_THAN 545,15944
+#define ASCII_QUESTION 546,15992
+#define ASCII_AT 548,16041
+#define ASCII_A 549,16090
+#define ASCII_B 550,16127
+#define ASCII_C 551,16164
+#define ASCII_D 552,16200
+#define ASCII_E 553,16236
+#define ASCII_F 554,16272
+#define ASCII_G 555,16308
+#define ASCII_H 556,16344
+#define ASCII_I 557,16380
+#define ASCII_J 558,16416
+#define ASCII_K 559,16452
+#define ASCII_L 560,16488
+#define ASCII_M 561,16524
+#define ASCII_N 562,16560
+#define ASCII_O 563,16596
+#define ASCII_P 565,16633
+#define ASCII_Q 566,16669
+#define ASCII_R 567,16706
+#define ASCII_S 568,16743
+#define ASCII_T 569,16779
+#define ASCII_U 570,16815
+#define ASCII_V 571,16851
+#define ASCII_W 572,16887
+#define ASCII_X 573,16923
+#define ASCII_Y 574,16959
+#define ASCII_Z 575,16995
+#define ASCII_SQUARE_BRACKET_L 576,17031
+#define ASCII_BACKSLASH 577,17067
+#define ASCII_SQUARE_BRACKET_R 578,17103
+#define ASCII_CARET 579,17139
+#define ASCII_UNDERSCORE 580,17175
+#define ASCII_GRAVE_ACCENT 582,17212
+#define ASCII_a 583,17261
+#define ASCII_b 584,17298
+#define ASCII_c 585,17335
+#define ASCII_d 586,17371
+#define ASCII_e 587,17407
+#define ASCII_f 588,17443
+#define ASCII_g 589,17479
+#define ASCII_h 590,17515
+#define ASCII_i 591,17551
+#define ASCII_j 592,17587
+#define ASCII_k 593,17623
+#define ASCII_l 594,17659
+#define ASCII_m 595,17695
+#define ASCII_n 596,17731
+#define ASCII_o 597,17767
+#define ASCII_p 599,17804
+#define ASCII_q 600,17840
+#define ASCII_r 601,17877
+#define ASCII_s 602,17914
+#define ASCII_t 603,17950
+#define ASCII_u 604,17986
+#define ASCII_v 605,18022
+#define ASCII_w 606,18058
+#define ASCII_x 607,18094
+#define ASCII_y 608,18130
+#define ASCII_z 609,18166
+#define ASCII_CURLY_BRACKET_L 610,18202
+#define ASCII_VERTICAL_BAR 611,18238
+#define ASCII_CURLY_BRACKET_R 612,18274
+#define ASCII_TILDE 613,18310
+#define ASCII_DEL 614,18346
+#define PCKEY_UP 620,18516
+#define PCKEY_DOWN 621,18549
+#define PCKEY_RIGHT 622,18581
+#define PCKEY_LEFT 623,18613
+#define PCKEY_PAGE_UP 624,18646
+#define PCKEY_PAGE_DOWN 625,18679
+#define PCKEY_INSERT 626,18711
+#define PCKEY_BS 627,18743
+#define PCKEY_TAB 628,18824
+#define PCKEY_ENTER 629,18900
+#define PCKEY_F1 630,18989
+#define PCKEY_F2 631,19021
+#define PCKEY_F3 632,19053
+#define PCKEY_F4 633,19085
+#define PCKEY_F5 634,19118
+#define PCKEY_F6 635,19150
+#define PCKEY_F7 636,19182
+#define PCKEY_F8 637,19214
+#define PCKEY_F9 638,19246
+#define PCKEY_F10 639,19278
+#define PCKEY_F11 640,19310
+#define PCKEY_F12 641,19342
+#define PCKEY_HOME 642,19374
+#define PCKEY_PAUSE 643,19406
+#define PCKEY_ALT 644,19438
+#define PCKEY_SCROLL_LOCK 645,19521
+#define PCKEY_ESC 646,19604
+#define PCKEY_CAPS_LOCK 647,19691
+#define PCKEY_SHIFT 648,19774
+#define PCKEY_CONTROL 649,19857
+#define PCKEY_NUM_LOCK 650,19940
+#define PCKEY_DEL 651,20023
+#define PCKEY_END 652,20110
+#define LINE_MAX_ITEMS 658,20293
+typedef enum { COPYMODE_FRAMEBUFFER=661,20324
+	       COPYMODE_COPY,662,20363
+	       COPYMODE_AND,663,20386
+	       COPYMODE_OR,664,20408
+	       COPYMODE_XOR,665,20429
+	       COPYMODE_NOT_SRC,666,20451
+	       COPYMODE_NOT_DST,667,20477
+	       COPYMODE_ADD,668,20503
+	       COPYMODE_SRC_MINUS_DST,669,20525
+	       COPYMODE_DST_MINUS_SRC,670,20557
+	       COPYMODE_AVG,671,20589
+	       COPYMODE_BLEND,672,20611
+	       COPYMODE_MULTIPLY,673,20635
+	       COPYMODE_SRC_DIV_DST,674,20662
+	       COPYMODE_DST_DIV_SRC,675,20692
+	       COPYMODE_PORTERDUFF_CLEAR_DST,676,20722
+	       COPYMODE_PORTERDUFF_COPY_SRC,677,20761
+	       COPYMODE_PORTERDUFF_LEAVES_DST,678,20799
+	       COPYMODE_PORTERDUFF_SRC_OVER_DST,679,20839
+	       COPYMODE_PORTERDUFF_DST_OVER_SRC,680,20881
+	       COPYMODE_PORTERDUFF_SRC_IN_DST,681,20923
+	       COPYMODE_PORTERDUFF_DST_IN_SRC,682,20963
+	       COPYMODE_PORTERDUFF_SRC_OUT_DST,683,21003
+	       COPYMODE_PORTERDUFF_DST_OUT_SRC,684,21044
+	       COPYMODE_PORTERDUFF_SRC_ATOP_DST,685,21085
+	       COPYMODE_PORTERDUFF_DST_ATOP_SRC,686,21127
+	       COPYMODE_PORTERDUFF_XOR 687,21169
+	       COPYMODE_PORTERDUFF_XOR } COPYMODE_T;687,21169
+#define RENDERMODE_T 690,21218
+#define RENDERMODE_PIXELBG_R_MASK 694,21453
+#define RENDERMODE_PIXELBG_G_MASK 695,21525
+#define RENDERMODE_PIXELBG_B_MASK 696,21597
+#define RENDERMODE_PIXELMODE_MASK 697,21669
+#define RENDERMODE_SCALE_X_MASK 698,21741
+#define RENDERMODE_SCALE_Y_MASK 699,21813
+#define RENDERMODE_PIXELMODE_0 701,21886
+#define RENDERMODE_PIXELMODE_1 702,21958
+#define RENDERMODE_PIXELMODE_2 703,22030
+#define RENDERMODE_PIXELMODE_3 704,22102
+#define RENDERMODE_PIXELMODE_SHIFT 706,22175
+#define RENDERMODE_PIXELBG_R_SHIFT 707,22219
+#define RENDERMODE_PIXELBG_G_SHIFT 708,22262
+#define RENDERMODE_PIXELBG_B_SHIFT 709,22305
+#define RENDERMODE_SCALE_X_SHIFT 710,22348
+#define RENDERMODE_SCALE_Y_SHIFT 711,22392
+#define RENDERMODE_SCALE_X(714,22504
+#define RENDERMODE_SCALE_Y(715,22596
+#define RENDERMODE_BGCOLOR(716,22688
+    LINEMODE_DOTS_SOLID,721,22829
+    LINEMODE_DOTS_FILTERED,722,22855
+    LINEMODE_SOLID,723,22883
+    LINEMODE_FILTERED 724,22928
+  } LINEMODE_T;725,22977
+  S_INT_16_T x;730,23015
+  S_INT_16_T y;731,23031
+  S_INT_8_T flag;732,23047
+} POINT_2D_INT_T;733,23065
+  FLOAT_T x;737,23101
+  FLOAT_T y;738,23114
+  S_INT_8_T flag;739,23127
+} POINT_2D_FLOAT_T;740,23145
+  FLOAT_T x;744,23183
+  FLOAT_T y;745,23196
+  FLOAT_T z;746,23209
+  S_INT_8_T flag;747,23222
+} POINT_3D_FLOAT_T;748,23240
+  POINT_2D_INT_T *array;array752,23278
+  S_INT_16_T items;753,23303
+} LINE_2D_INT_T;754,23323
+  POINT_2D_FLOAT_T *array;array758,23358
+  S_INT_16_T items;759,23385
+} LINE_2D_FLOAT_T;760,23405
+  POINT_3D_FLOAT_T *array;array764,23442
+  S_INT_16_T items;765,23469
+} LINE_3D_FLOAT_T;766,23489
+  POINT_2D_FLOAT_T **array;array770,23526
+  S_INT_16_T rows;771,23554
+  S_INT_16_T cols;772,23573
+} MATRIX_POINT_2D_T;773,23592
+  POINT_3D_FLOAT_T **array;array777,23631
+  S_INT_16_T rows;778,23659
+  S_INT_16_T cols;779,23678
+} MATRIX_POINT_3D_T;780,23697
+    S_INT_16_T xp_min;784,23739
+    S_INT_16_T yp_min;785,23762
+    S_INT_16_T xp_max;786,23785
+    S_INT_16_T yp_max;787,23808
+    FLOAT_T xr_min;788,23831
+    FLOAT_T xr_max;789,23851
+    FLOAT_T yr_min;790,23871
+    FLOAT_T yr_max;791,23891
+  } VIEWPORT_2D_T;792,23911
+    S_INT_16_T xp_min;796,23951
+    S_INT_16_T yp_min;797,23974
+    S_INT_16_T xp_max;798,23997
+    S_INT_16_T yp_max;799,24020
+    FLOAT_T scale;801,24048
+    FLOAT_T cam_d;802,24081
+    FLOAT_T cam_h;803,24122
+    POINT_3D_FLOAT_T cam;804,24156
+} VIEWPORT_3D_T;805,24208
+    U_INT_8_T r:N_BITS_R;N_BITS_R809,24246
+    U_INT_8_T g:N_BITS_G;N_BITS_G810,24272
+    U_INT_8_T b:N_BITS_B;N_BITS_B811,24298
+    U_INT_8_T a:N_BITS_A;N_BITS_A812,24324
+  } PIXEL_T;813,24350
+#define RENDEROPTIONS_DEFAULT 815,24364
+#define RENDEROPTIONS_LINE 816,24412
+#define RENDEROPTIONS_GRAPHICS_ONLY 817,24460
+    U_INT_8_T r;821,24529
+    U_INT_8_T g;822,24546
+    U_INT_8_T b;823,24563
+  } RGB_T;824,24580
+  PIXEL_T **pic;pic828,24609
+  U_INT_16_T w;829,24626
+  U_INT_16_T h;830,24642
+} PICTURE_T;831,24658
+  char *dat;dat835,24689
+  U_INT_16_T w;836,24702
+  U_INT_16_T h;837,24718
+} SCREEN_T;838,24734
+  U_INT_8_T cols;846,24902
+  U_INT_8_T rows;847,24920
+  U_INT_8_T range_a;848,24938
+  U_INT_8_T range_b;849,24959
+  unsigned char* data;850,24980
+  U_INT_8_T scale_x;851,25003
+  U_INT_8_T scale_y;852,25024
+  U_INT_8_T gap_x;853,25045
+  U_INT_8_T gap_y;854,25064
+  U_INT_8_T max_x;855,25083
+  S_INT_16_T angle;856,25102
+  U_INT_8_T flag_fg;857,25122
+  U_INT_8_T flag_bg;858,25143
+  PIXEL_T color_fg;859,25164
+  PIXEL_T color_bg;860,25184
+} FONT_T;861,25204
+  char c;865,25232
+  PIXEL_T color_fg;866,25242
+  PIXEL_T color_bg;867,25262
+} CONSOLE_CHAR_T;868,25282
+  CONSOLE_CHAR_T **screen;screen873,25345
+  S_INT_16_T MAX_ROWS;874,25427
+  S_INT_16_T MAX_ROWS_V;875,25510
+  S_INT_16_T MAX_COLS;876,25565
+  S_INT_16_T a_row;878,25662
+  S_INT_16_T b_row;879,25736
+  S_INT_16_T w_col;880,25817
+  S_INT_16_T s_row;881,25901
+  S_INT_16_T s_col;882,25990
+  S_INT_16_T n_back;883,26082
+  S_INT_16_T n_back_adj;884,26183
+  PIXEL_T    color_fg;885,26271
+  PIXEL_T    color_bg;886,26329
+} CONSOLE_T;887,26387
+#define AXIS_DRAW_X 890,26402
+#define AXIS_DRAW_X_ARROWS 891,26455
+#define AXIS_DRAW_X_GRID 892,26508
+#define AXIS_DRAW_X_GRID_LOG 893,26561
+#define AXIS_DRAW_X_LABEL 894,26614
+#define AXIS_DRAW_Y 895,26667
+#define AXIS_DRAW_Y_ARROWS 896,26720
+#define AXIS_DRAW_Y_GRID 897,26773
+#define AXIS_DRAW_Y_GRID_LOG 898,26826
+#define AXIS_DRAW_Z_GRID 899,26879
+#define AXIS_DRAW_COLORVALUES_X_1 901,26933
+#define AXIS_DRAW_COLORVALUES_X_2 902,27001
+#define AXIS_DRAW_COLORVALUES_Y_1 903,27071
+#define AXIS_DRAW_COLORVALUES_Y_2 904,27139
+#define AXIS_POLAR_R_GRID 906,27210
+#define AXIS_POLAR_T_GRID 907,27251
+CONSOLE_T  *ty_C;ty_C915,27433
+SCREEN_T ty_screen;916,27451
+PICTURE_T ty_Pic_shadow;917,27471
+U_INT_8_T ty_scale_x,918,27496
+U_INT_8_T ty_scale_x, ty_scale_y;918,27496
+S_INT_8_T  ty_SDL_initialized;920,27531

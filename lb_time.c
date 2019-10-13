@@ -1,11 +1,11 @@
 #include <time.h>
 #include "lb_time.h"
 
-void lb_ti_delay_ms(U_INT_32_T delay_ms)
+void lb_ti_delay_ms(U_INT32_T delay_ms)
 {
   clock_t stamp, delta;
 
-  delta=(U_INT_32_T)(CLOCKS_PER_SEC/1000)*delay_ms;
+  delta=(U_INT32_T)(CLOCKS_PER_SEC/1000)*delay_ms;
   stamp=clock();
   while ( (clock()-stamp)<delta )
     {
@@ -14,10 +14,10 @@ void lb_ti_delay_ms(U_INT_32_T delay_ms)
 }
 
 
-void lb_ti_delay_us(U_INT_32_T delay_us)
+void lb_ti_delay_us(U_INT32_T delay_us)
 {
   clock_t stamp, delta;
-  delta=(U_INT_32_T)(CLOCKS_PER_SEC/1000000)*delay_us;
+  delta=(U_INT32_T)(CLOCKS_PER_SEC/1000000)*delay_us;
   stamp=clock();
   while ( (clock()-stamp)<delta )
     {

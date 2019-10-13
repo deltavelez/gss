@@ -10,7 +10,7 @@
 
 void lb_al_add_vector_c(VECTOR_C_T *A, VECTOR_C_T *B, VECTOR_C_T *C)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_c(A))
     {
@@ -36,7 +36,7 @@ void lb_al_add_vector_c(VECTOR_C_T *A, VECTOR_C_T *B, VECTOR_C_T *C)
 
 void lb_al_add_array_r_r(VECTOR_R_T *A, VECTOR_R_T *B, VECTOR_R_T *C)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_r(A))
     {
@@ -66,7 +66,7 @@ void lb_al_add_array_r_r(VECTOR_R_T *A, VECTOR_R_T *B, VECTOR_R_T *C)
     (*C).array[i]=(*A).array[i]+(*B).array[i];
 }
 
-S_INT_8_T lb_al_assert_dimensions_matrix_p2d(MATRIX_POINT_2D_T *S)
+S_INT8_T lb_al_assert_dimensions_matrix_p2d(MATRIX_POINT_2D_T *S)
 {
   if ( ((*S).rows <= 0) || ((*S).rows > MATRIX_MAX_ROWS) ||
        ((*S).cols <= 0) || ((*S).cols > MATRIX_MAX_COLS) )
@@ -74,7 +74,7 @@ S_INT_8_T lb_al_assert_dimensions_matrix_p2d(MATRIX_POINT_2D_T *S)
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_matrix_p3d(MATRIX_POINT_3D_T *S)
+S_INT8_T lb_al_assert_dimensions_matrix_p3d(MATRIX_POINT_3D_T *S)
 {
   if ( ((*S).rows <= 0) || ((*S).rows > MATRIX_MAX_ROWS) ||
        ((*S).cols <= 0) || ((*S).cols > MATRIX_MAX_COLS) )
@@ -82,9 +82,9 @@ S_INT_8_T lb_al_assert_dimensions_matrix_p3d(MATRIX_POINT_3D_T *S)
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_array_r(ARRAY_R_T *M)
+S_INT8_T lb_al_assert_dimensions_array_r(ARRAY_R_T *M)
 {
-  S_INT_16_T  i;
+  S_INT16_T  i;
 
   if ( ((*M).n<1) || ((*M).n>ARRAY_MAX_DIM) ) 
     return FALSE;
@@ -96,7 +96,7 @@ S_INT_8_T lb_al_assert_dimensions_array_r(ARRAY_R_T *M)
   return TRUE;
 }
 
-S_INT_8_T lb_al_assert_dimensions_matrix_r(MATRIX_R_T *M)
+S_INT8_T lb_al_assert_dimensions_matrix_r(MATRIX_R_T *M)
 {
   if ( ((*M).rows <= 0) || ((*M).rows > MATRIX_MAX_ROWS) ||
        ((*M).cols <= 0) || ((*M).cols > MATRIX_MAX_COLS) )
@@ -104,7 +104,7 @@ S_INT_8_T lb_al_assert_dimensions_matrix_r(MATRIX_R_T *M)
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_matrix_si8(MATRIX_S_INT_8_T *M)
+S_INT8_T lb_al_assert_dimensions_matrix_si8(MATRIX_S_INT8_T *M)
 {
   if ( ((*M).rows <= 0) || ((*M).rows > MATRIX_MAX_ROWS) ||
        ((*M).cols <= 0) || ((*M).cols > MATRIX_MAX_COLS) )
@@ -112,37 +112,37 @@ S_INT_8_T lb_al_assert_dimensions_matrix_si8(MATRIX_S_INT_8_T *M)
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_vector_c(VECTOR_C_T *V)
+S_INT8_T lb_al_assert_dimensions_vector_c(VECTOR_C_T *V)
 {
   if ( ((*V).items < 0) || ((*V).items > VECTOR_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_vector_r(VECTOR_R_T *V)
+S_INT8_T lb_al_assert_dimensions_vector_r(VECTOR_R_T *V)
 {
   if ( ((*V).items < 0) || ((*V).items > VECTOR_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_vector_si8(VECTOR_S_INT_8_T *V)
+S_INT8_T lb_al_assert_dimensions_vector_si8(VECTOR_S_INT8_T *V)
 {
   if ( ((*V).items < 0) || ((*V).items > VECTOR_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-S_INT_8_T lb_al_assert_dimensions_vector_si16(VECTOR_S_INT_16_T *V)
+S_INT8_T lb_al_assert_dimensions_vector_si16(VECTOR_S_INT16_T *V)
 {
   if ( ((*V).items < 0) || ((*V).items > VECTOR_MAX_ITEMS) )
     return 0;
   return 1;
 }
 
-void lb_al_copy_matrix_r_col_to_vector_r(MATRIX_R_T *M, VECTOR_R_T *V, U_INT_16_T j)
+void lb_al_copy_matrix_r_col_to_vector_r(MATRIX_R_T *M, VECTOR_R_T *V, U_INT16_T j)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -172,9 +172,9 @@ void lb_al_copy_matrix_r_col_to_vector_r(MATRIX_R_T *M, VECTOR_R_T *V, U_INT_16_
     (*V).array[i]=(*M).array[i][j];
 }
 
-void lb_al_copy_matrix_r_row_to_vector_r(MATRIX_R_T *M, VECTOR_R_T *V, U_INT_16_T i)
+void lb_al_copy_matrix_r_row_to_vector_r(MATRIX_R_T *M, VECTOR_R_T *V, U_INT16_T i)
 {
-  U_INT_16_T j;
+  U_INT16_T j;
   
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -206,7 +206,7 @@ void lb_al_copy_matrix_r_row_to_vector_r(MATRIX_R_T *M, VECTOR_R_T *V, U_INT_16_
 
 void lb_al_copy_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2)
 { 
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
 
   if (!lb_al_assert_dimensions_matrix_r(M1))
     {
@@ -233,7 +233,7 @@ void lb_al_copy_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2)
 
 void lb_al_copy_matrix33_r(FLOAT_T M1[3][3], FLOAT_T M2[3][3])
 { 
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
 
   for (i=0;i<3;i++)
     for (j=0;j<3;j++)
@@ -241,9 +241,9 @@ void lb_al_copy_matrix33_r(FLOAT_T M1[3][3], FLOAT_T M2[3][3])
 }
 
 
-void lb_al_copy_minor_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2, U_INT_16_T io, U_INT_16_T jo)
+void lb_al_copy_minor_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2, U_INT16_T io, U_INT16_T jo)
 {
-  U_INT_16_T i, j, i_minor, j_minor;
+  U_INT16_T i, j, i_minor, j_minor;
 
   /* We assert the size */
   if (!lb_al_assert_dimensions_matrix_r(M1))
@@ -288,7 +288,7 @@ void lb_al_copy_minor_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2, U_INT_16_T io, U_
 
 void lb_al_copy_vector_c(VECTOR_C_T *V1, VECTOR_C_T *V2)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_c(V1))
     {
@@ -314,7 +314,7 @@ void lb_al_copy_vector_c(VECTOR_C_T *V1, VECTOR_C_T *V2)
 
 void lb_al_copy_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_r(V1))
     {
@@ -340,7 +340,7 @@ void lb_al_copy_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 
 void lb_al_create_array_r(ARRAY_R_T *M)
 {
-  U_INT_16_T j[5];
+  U_INT16_T j[5];
 
   if (!lb_al_assert_dimensions_array_r(M))
     {
@@ -509,7 +509,7 @@ void lb_al_create_array_r(ARRAY_R_T *M)
 
 void  lb_al_create_matrix_p2d(MATRIX_POINT_2D_T *S)
 {
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
 
   if (!lb_al_assert_dimensions_matrix_p2d(S))
     {
@@ -546,7 +546,7 @@ void  lb_al_create_matrix_p2d(MATRIX_POINT_2D_T *S)
 
 void  lb_al_create_matrix_p3d(MATRIX_POINT_3D_T *S)
 {
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
 
   if (!lb_al_assert_dimensions_matrix_p3d(S))
     {
@@ -582,7 +582,7 @@ void  lb_al_create_matrix_p3d(MATRIX_POINT_3D_T *S)
 
 void lb_al_create_matrix_r(MATRIX_R_T *M)
 {
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
 
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -613,9 +613,9 @@ void lb_al_create_matrix_r(MATRIX_R_T *M)
       (*M).array[i][j]=0.0;
 } 
 
-void  lb_al_create_matrix_si8(MATRIX_S_INT_8_T *M)
+void  lb_al_create_matrix_si8(MATRIX_S_INT8_T *M)
 {
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
 
   if (!lb_al_assert_dimensions_matrix_si8(M))
     {
@@ -623,7 +623,7 @@ void  lb_al_create_matrix_si8(MATRIX_S_INT_8_T *M)
       exit(EXIT_FAILURE);
     }
   
-  (*M).array=malloc((*M).rows*sizeof(S_INT_8_T*));
+  (*M).array=malloc((*M).rows*sizeof(S_INT8_T*));
 
   if ((*M).array==NULL)
     {
@@ -632,7 +632,7 @@ void  lb_al_create_matrix_si8(MATRIX_S_INT_8_T *M)
     }
   for (i=0;i<(*M).rows;i++)
     { 
-      (*M).array[i]=malloc((*M).cols*sizeof(S_INT_8_T));
+      (*M).array[i]=malloc((*M).cols*sizeof(S_INT8_T));
       if ((*M).array[i]== NULL)
 	{
 	  printf("Error: lb_al_create_matrix_si8() --> out of memory (2)\r\n");
@@ -647,7 +647,7 @@ void  lb_al_create_matrix_si8(MATRIX_S_INT_8_T *M)
 
 void lb_al_create_vector_c(VECTOR_C_T *V)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_c(V))
     {
@@ -672,7 +672,7 @@ void lb_al_create_vector_c(VECTOR_C_T *V)
 
 void lb_al_create_vector_r(VECTOR_R_T *V)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   if (!lb_al_assert_dimensions_vector_r(V))
     {
       printf("Error: lb_al_create_vector_r() --> invalid dimension [%d]\r\n",(*V).items);
@@ -694,9 +694,9 @@ void lb_al_create_vector_r(VECTOR_R_T *V)
     }
 }
 
-void lb_al_create_vector_si8(VECTOR_S_INT_8_T *V)
+void lb_al_create_vector_si8(VECTOR_S_INT8_T *V)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_si8(V))
     {
@@ -704,7 +704,7 @@ void lb_al_create_vector_si8(VECTOR_S_INT_8_T *V)
       exit(EXIT_FAILURE);
     }
   
-  (*V).array=malloc((*V).items*sizeof(S_INT_8_T));
+  (*V).array=malloc((*V).items*sizeof(S_INT8_T));
 
   if ((*V).array==NULL)
     {
@@ -717,9 +717,9 @@ void lb_al_create_vector_si8(VECTOR_S_INT_8_T *V)
 }
 
 
-void lb_al_create_vector_si16(VECTOR_S_INT_16_T *V)
+void lb_al_create_vector_si16(VECTOR_S_INT16_T *V)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_si16(V))
     {
@@ -727,7 +727,7 @@ void lb_al_create_vector_si16(VECTOR_S_INT_16_T *V)
       exit(EXIT_FAILURE);
     }
   
-  (*V).array=malloc((*V).items*sizeof(S_INT_16_T));
+  (*V).array=malloc((*V).items*sizeof(S_INT16_T));
   if ((*V).array==NULL)
     {
       printf("Error: lb_al_create_vector_si16() --> out of memory\r\n");
@@ -777,16 +777,16 @@ void lb_al_cross_product_vector3_r(FLOAT_T V1[3], FLOAT_T V2[3], FLOAT_T V3[3])
   V3[2]=V1[0]*V2[1]-V1[1]*V2[0];
 }
 
-void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT_16_T pos)
+void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT16_T pos)
 {
   lb_al_delete_n_items_vector_r(V, pos, 1);
 }
 
 #ifdef NADA
-void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT_16_T pos)
+void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT16_T pos)
 {
   VECTOR_R_T V_temp;
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
   
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -828,10 +828,10 @@ void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT_16_T pos)
 #ifdef NADA
 /* This is a different implementation in which a fill copy if the vector is made.
    It is slower but may be useful later */
-void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT_16_T pos)
+void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT16_T pos)
 {
   VECTOR_R_T V_copy;
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
   
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -885,10 +885,10 @@ void lb_al_delete_item_vector_r(VECTOR_R_T *V, U_INT_16_T pos)
 #endif
 
 
-void lb_al_delete_n_items_vector_r(VECTOR_R_T *V, U_INT_16_T pos, U_INT_16_T n)
+void lb_al_delete_n_items_vector_r(VECTOR_R_T *V, U_INT16_T pos, U_INT16_T n)
 {
   VECTOR_R_T V_temp;
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
   
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -932,7 +932,7 @@ void lb_al_delete_n_items_vector_r(VECTOR_R_T *V, U_INT_16_T pos, U_INT_16_T n)
 
 FLOAT_T lb_al_determinant_matrix_r(MATRIX_R_T *M)
 {
-  U_INT_16_T j, n;
+  U_INT16_T j, n;
   FLOAT_T det = 0.0;
   MATRIX_R_T SUB;
 
@@ -975,7 +975,7 @@ FLOAT_T lb_al_determinant_matrix_r(MATRIX_R_T *M)
 FLOAT_T lb_al_determinant_matrix_r_gauss(MATRIX_R_T *M)
 {
   MATRIX_R_T NEW_M;
-  S_INT_16_T i, j, k, n;
+  S_INT16_T i, j, k, n;
   FLOAT_T factor, temp, det;
   
   /* We assert the size */
@@ -1067,7 +1067,7 @@ FLOAT_T   lb_al_determinant_matrix33_r(FLOAT_T M[3][3])
 
 FLOAT_T lb_al_dot_product_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   FLOAT_T temp_f;
 
   if (!lb_al_assert_dimensions_vector_r(V1))
@@ -1097,7 +1097,7 @@ FLOAT_T lb_al_dot_product_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 
 void lb_al_fill_identity_matrix_r(MATRIX_R_T *M)
 {
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
   /* We assert the size */
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -1256,7 +1256,7 @@ void lb_al_fill_rotation_matrix33_Z(FLOAT_T R[3][3], FLOAT_T angle_z)
 
 void lb_al_fill_zeros_matrix_r(MATRIX_R_T *M)
 {
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
   /* We assert the size */
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -1269,10 +1269,10 @@ void lb_al_fill_zeros_matrix_r(MATRIX_R_T *M)
       (*M).array[i][j]=0.0;
 }
 
-void lb_al_insert_item_vector_r(VECTOR_R_T *V, FLOAT_T x, U_INT_16_T pos)
+void lb_al_insert_item_vector_r(VECTOR_R_T *V, FLOAT_T x, U_INT16_T pos)
 {
   VECTOR_R_T V2, temp_V;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -1322,33 +1322,33 @@ void lb_al_inter_matrix(MATRIX_R_T *M, FLOAT_T ir, FLOAT_T jr, FLOAT_T *Q)
       exit(EXIT_FAILURE);
     }
     
-  if ( ((S_INT_16_T)ir<0) || ((S_INT_16_T)ir>((*M).rows-1)) ||
-       ((S_INT_16_T)jr<0) || ((S_INT_16_T)jr>((*M).cols-1)) )
+  if ( ((S_INT16_T)ir<0) || ((S_INT16_T)ir>((*M).rows-1)) ||
+       ((S_INT16_T)jr<0) || ((S_INT16_T)jr>((*M).cols-1)) )
     {
       printf("Error: lb_al_interpolate_from_matrix() --> index out of boundaries i[%d,%d]\r\n",
-	     (S_INT_16_T)ir,(S_INT_16_T)jr);
+	     (S_INT16_T)ir,(S_INT16_T)jr);
       exit(EXIT_FAILURE);
     } 
   
   /* If jr is exactly at the corner of the matrix, we return the last item */ 
   if(lb_re_equal(ir,(*M).rows-1) && lb_re_equal(jr,(*M).cols-1))
-    *Q=(*M).array[(U_INT_16_T)ir][(U_INT_16_T)jr];
+    *Q=(*M).array[(U_INT16_T)ir][(U_INT16_T)jr];
   else
     if(lb_re_equal(jr,(*M).cols-1))
-      lb_re_inter_linear((U_INT_16_T)ir,   (*M).array[(U_INT_16_T)ir][(*M).cols-1],
-			 (U_INT_16_T)ir+1, (*M).array[(U_INT_16_T)ir+1][(*M).cols-1],
+      lb_re_inter_linear((U_INT16_T)ir,   (*M).array[(U_INT16_T)ir][(*M).cols-1],
+			 (U_INT16_T)ir+1, (*M).array[(U_INT16_T)ir+1][(*M).cols-1],
 			 ir, Q, &error);
     else
       if(lb_re_equal(ir,(*M).rows-1))
-	lb_re_inter_linear((U_INT_16_T)jr,   (*M).array[(*M).rows-1][(U_INT_16_T)jr],
-			   (U_INT_16_T)jr+1, (*M).array[(*M).rows-1][(U_INT_16_T)jr+1],
+	lb_re_inter_linear((U_INT16_T)jr,   (*M).array[(*M).rows-1][(U_INT16_T)jr],
+			   (U_INT16_T)jr+1, (*M).array[(*M).rows-1][(U_INT16_T)jr+1],
 			   jr, Q, &error);
       else
-	lb_re_inter_bilinear((U_INT_16_T)ir, (U_INT_16_T)jr, (U_INT_16_T)ir+1, (U_INT_16_T)jr+1,
-			     (*M).array[(U_INT_16_T)ir][(U_INT_16_T)jr],
-			     (*M).array[(U_INT_16_T)ir][(U_INT_16_T)jr+1],
-			     (*M).array[(U_INT_16_T)ir+1][(U_INT_16_T)jr],
-			     (*M).array[(U_INT_16_T)ir+1][(U_INT_16_T)jr+1],
+	lb_re_inter_bilinear((U_INT16_T)ir, (U_INT16_T)jr, (U_INT16_T)ir+1, (U_INT16_T)jr+1,
+			     (*M).array[(U_INT16_T)ir][(U_INT16_T)jr],
+			     (*M).array[(U_INT16_T)ir][(U_INT16_T)jr+1],
+			     (*M).array[(U_INT16_T)ir+1][(U_INT16_T)jr],
+			     (*M).array[(U_INT16_T)ir+1][(U_INT16_T)jr+1],
 			     ir, jr, Q, &error);
 }
 
@@ -1361,7 +1361,7 @@ void      lb_al_load_CSV_file(MATRIX_R_T *M, const char filename)
 /* This function multiplies two matrices.  Parameter C cannot be A nor B */
 void lb_al_multiply_matrix_r(MATRIX_R_T *A, MATRIX_R_T *B, MATRIX_R_T *C)
 {
-  U_INT_16_T i,j,k;
+  U_INT16_T i,j,k;
 
   /* We assert sizes */
   if (!lb_al_assert_dimensions_matrix_r(A))
@@ -1405,7 +1405,7 @@ void lb_al_multiply_matrix_r(MATRIX_R_T *A, MATRIX_R_T *B, MATRIX_R_T *C)
 
 void lb_al_multiply_matrix_r_copy(MATRIX_R_T *A, MATRIX_R_T *B, MATRIX_R_T *C)
 {
-  U_INT_16_T i,j,k;
+  U_INT16_T i,j,k;
   MATRIX_R_T temp;
 
   /* We assert sizes */
@@ -1453,7 +1453,7 @@ void lb_al_multiply_matrix_r_copy(MATRIX_R_T *A, MATRIX_R_T *B, MATRIX_R_T *C)
 
 void lb_al_multiply_matrix_r_vector_r(MATRIX_R_T *A, VECTOR_R_T *B, VECTOR_R_T *C)
 {
-  U_INT_16_T i,k;
+  U_INT16_T i,k;
 
   /* We assert sizes */
   if (((*A).rows != (*C).items) ||
@@ -1474,7 +1474,7 @@ void lb_al_multiply_matrix_r_vector_r(MATRIX_R_T *A, VECTOR_R_T *B, VECTOR_R_T *
 /* This function multiplies two 3x3 matrices.  Parameter C cannot be A nor B */
 void lb_al_multiply_matrix33_r(FLOAT_T A[3][3], FLOAT_T B[3][3], FLOAT_T C[3][3])
 {
-  U_INT_16_T i,j,k;
+  U_INT16_T i,j,k;
 
   for (i=0;i<3;i++)
     for (j=0;j<3;j++)
@@ -1491,7 +1491,7 @@ void lb_al_multiply_matrix33_r(FLOAT_T A[3][3], FLOAT_T B[3][3], FLOAT_T C[3][3]
 
 void lb_al_multiply_matrix33_r_copy(FLOAT_T A[3][3], FLOAT_T B[3][3], FLOAT_T C[3][3])
 {
-  U_INT_16_T i,j,k;
+  U_INT16_T i,j,k;
   FLOAT_T TEMP[3][3];
   
   for (i=0;i<3;i++)
@@ -1507,7 +1507,7 @@ void lb_al_multiply_matrix33_r_copy(FLOAT_T A[3][3], FLOAT_T B[3][3], FLOAT_T C[
 
 void lb_al_multiply_matrix33_r_vector_r(FLOAT_T A[3][3], FLOAT_T B[3], FLOAT_T C[3])
 {
-  U_INT_16_T i,k;
+  U_INT16_T i,k;
 
   for (i=0;i<3;i++)
     {
@@ -1519,7 +1519,7 @@ void lb_al_multiply_matrix33_r_vector_r(FLOAT_T A[3][3], FLOAT_T B[3], FLOAT_T C
 
 void lb_al_multiply_vector_c_real(VECTOR_C_T *V, FLOAT_T k)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_c(V))
     {
@@ -1536,7 +1536,7 @@ void lb_al_multiply_vector_c_real(VECTOR_C_T *V, FLOAT_T k)
 
 void lb_al_multiply_vector_c_real_copy(VECTOR_C_T *V1, FLOAT_T k, VECTOR_C_T *V2)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_c(V1) || !lb_al_assert_dimensions_vector_c(V2))
     {
@@ -1562,7 +1562,7 @@ void lb_al_multiply_vector_c_real_copy(VECTOR_C_T *V1, FLOAT_T k, VECTOR_C_T *V2
 
 void lb_al_multiply_vector_r_real(VECTOR_R_T *V, FLOAT_T k)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -1576,7 +1576,7 @@ void lb_al_multiply_vector_r_real(VECTOR_R_T *V, FLOAT_T k)
 
 void lb_al_multiply_vector_r_real_copy(VECTOR_R_T *V1, FLOAT_T k, VECTOR_R_T *V2)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_r(V1))
     {
@@ -1609,7 +1609,7 @@ void lb_al_multiply_vector_r_real_copy(VECTOR_R_T *V1, FLOAT_T k, VECTOR_R_T *V2
 FLOAT_T lb_al_norm_matrix_r(MATRIX_R_T *M, ERR_T *error)
 {
   FLOAT_T sum;
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
  
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -1627,7 +1627,7 @@ FLOAT_T lb_al_norm_matrix_r(MATRIX_R_T *M, ERR_T *error)
 FLOAT_T lb_al_norm_vector_r(VECTOR_R_T *V, ERR_T *error)
 {
   FLOAT_T sum;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -1645,7 +1645,7 @@ FLOAT_T lb_al_norm_vector_r(VECTOR_R_T *V, ERR_T *error)
 void lb_al_normalize_matrix_r(MATRIX_R_T *M, MATRIX_R_T *Mnorm, ERR_T *error)
 {
   FLOAT_T norm;
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
  
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -1676,7 +1676,7 @@ void lb_al_normalize_matrix_r(MATRIX_R_T *M, MATRIX_R_T *Mnorm, ERR_T *error)
 void lb_al_normalize_vector_r(VECTOR_R_T *V, VECTOR_R_T *Vnorm, ERR_T *error)
 {
   FLOAT_T norm;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -1715,10 +1715,10 @@ void lb_al_normalize_vector_r(VECTOR_R_T *V, VECTOR_R_T *Vnorm, ERR_T *error)
 #define UC_CROSS "\u253c"
 
 
-void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT_8_T len, S_INT_8_T dec)
+void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT8_T len, S_INT8_T dec)
 {
-  U_INT_16_T x, j[ARRAY_MAX_DIM], digsize[ARRAY_MAX_DIM];
-  S_INT_8_T  title_size, n;
+  U_INT16_T x, j[ARRAY_MAX_DIM], digsize[ARRAY_MAX_DIM];
+  S_INT8_T  title_size, n;
   char s0[10], s1[10], s2[10], s3[10], sval[10];
 
   for (x=0;x<ARRAY_MAX_DIM;x++)
@@ -2213,7 +2213,7 @@ void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT_8_T len, S_INT_8_
 
   void lb_al_print_matrix_r(MATRIX_R_T *M, char *text, const char *format)
 { 
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
   char s[40];
 
   strcpy(s,text);
@@ -2240,7 +2240,7 @@ void lb_al_print_array_r(ARRAY_R_T *M, const char *text, S_INT_8_T len, S_INT_8_
 
 void lb_al_print_matrix33_r(FLOAT_T M[3][3], char *text, const char *format)
 { 
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
   char s[40];
 
   strcpy(s,text);
@@ -2261,7 +2261,7 @@ void lb_al_print_matrix33_r(FLOAT_T M[3][3], char *text, const char *format)
 
 void lb_al_print_vector_c(VECTOR_C_T *V, char *text, const char *format)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
   char s[40];
 
   strcpy(s,text);
@@ -2287,7 +2287,7 @@ void lb_al_print_vector_c(VECTOR_C_T *V, char *text, const char *format)
 
 void lb_al_print_vector_r(VECTOR_R_T *V, char *text, const char *format)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
   char s[40];
 
   strcpy(s,text);
@@ -2313,9 +2313,9 @@ void lb_al_print_vector_r(VECTOR_R_T *V, char *text, const char *format)
   //lb_ft_printf(ty_C,"%s[%02i]=%06.2f  ",text,i,(*V).array[i]);
 }
 
-void lb_al_print_vector_si8(VECTOR_S_INT_8_T *V, char *text)
+void lb_al_print_vector_si8(VECTOR_S_INT8_T *V, char *text)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
   char s[40];
 
   strcpy(s,text);
@@ -2339,9 +2339,9 @@ void lb_al_print_vector_si8(VECTOR_S_INT_8_T *V, char *text)
   lb_ft_printf(ty_C,"\r\n");
 }
 
-void lb_al_print_vector_si16(VECTOR_S_INT_16_T *V, char *text)
+void lb_al_print_vector_si16(VECTOR_S_INT16_T *V, char *text)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
   char s[40];
 
   strcpy(s,text);
@@ -2367,7 +2367,7 @@ void lb_al_print_vector_si16(VECTOR_S_INT_16_T *V, char *text)
 
 void lb_al_release_array_r(ARRAY_R_T *M)
 {
-  S_INT_16_T j[5];
+  S_INT16_T j[5];
 
   if (!lb_al_assert_dimensions_array_r(M))
     {
@@ -2433,7 +2433,7 @@ void lb_al_release_array_r(ARRAY_R_T *M)
 
 void  lb_al_release_matrix_p2d(MATRIX_POINT_2D_T *S)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   
   for(i=0; i<(*S).rows; i++)
     free((*S).array[i]);
@@ -2442,7 +2442,7 @@ void  lb_al_release_matrix_p2d(MATRIX_POINT_2D_T *S)
 
 void  lb_al_release_matrix_p3d(MATRIX_POINT_3D_T *S)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   
   for(i=0; i<(*S).rows; i++)
     free((*S).array[i]);
@@ -2451,16 +2451,16 @@ void  lb_al_release_matrix_p3d(MATRIX_POINT_3D_T *S)
 
 void lb_al_release_matrix_r(MATRIX_R_T *M)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   
   for(i=0; i<(*M).rows; i++)
     free((*M).array[i]);
   free((*M).array);
 }
 
-void lb_al_release_matrix_si8(MATRIX_S_INT_8_T *M)
+void lb_al_release_matrix_si8(MATRIX_S_INT8_T *M)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   
   for(i=0; i<(*M).rows; i++)
     free((*M).array[i]);
@@ -2480,19 +2480,19 @@ void lb_al_release_vector_r(VECTOR_R_T *V)
   (*V).array=NULL;
 }
 
-void lb_al_release_vector_si8(VECTOR_S_INT_8_T *V)
+void lb_al_release_vector_si8(VECTOR_S_INT8_T *V)
 {
   free((*V).array);
 }
 
-void lb_al_release_vector_si16(VECTOR_S_INT_16_T *V)
+void lb_al_release_vector_si16(VECTOR_S_INT16_T *V)
 {
   free((*V).array);
 }
 
-void lb_al_resize_vector_r(VECTOR_R_T *V, U_INT_16_T new_size)
+void lb_al_resize_vector_r(VECTOR_R_T *V, U_INT16_T new_size)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -2533,9 +2533,9 @@ void lb_al_resize_vector_r(VECTOR_R_T *V, U_INT_16_T new_size)
     }
 }
 
-void lb_al_resize_vector_si16(VECTOR_S_INT_16_T *V, U_INT_16_T new_size)
+void lb_al_resize_vector_si16(VECTOR_S_INT16_T *V, U_INT16_T new_size)
 {
-  U_INT_16_T i;
+  U_INT16_T i;
   
   if (!lb_al_assert_dimensions_vector_si16(V))
     {
@@ -2545,7 +2545,7 @@ void lb_al_resize_vector_si16(VECTOR_S_INT_16_T *V, U_INT_16_T new_size)
    
   if ((*V).items != new_size)
     {
-      (*V).array=(S_INT_16_T *)realloc((*V).array,new_size*sizeof(S_INT_16_T));
+      (*V).array=(S_INT16_T *)realloc((*V).array,new_size*sizeof(S_INT16_T));
       
       if ( ((*V).array==NULL) && (new_size!=0) )
 	{
@@ -2564,7 +2564,7 @@ void lb_al_resize_vector_si16(VECTOR_S_INT_16_T *V, U_INT_16_T new_size)
 
 void lb_al_reverse_order_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 {
-  U_INT_16_T  i;
+  U_INT16_T  i;
   
   if (!lb_al_assert_dimensions_vector_r(V1))
     {
@@ -2592,7 +2592,7 @@ void lb_al_reverse_order_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 void lb_al_solve_linear_system_r(MATRIX_R_T *M, VECTOR_R_T *X, VECTOR_R_T *S)
 {
   MATRIX_R_T temp;
-  U_INT_16_T j, ip, jp, n;
+  U_INT16_T j, ip, jp, n;
   FLOAT_T det;
 
   if (!lb_al_assert_dimensions_matrix_r(M))
@@ -2646,8 +2646,8 @@ void lb_al_solve_linear_system_r(MATRIX_R_T *M, VECTOR_R_T *X, VECTOR_R_T *S)
 
 void lb_al_sort_bubble_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 {
-  U_INT_16_T i;
-  S_INT_8_T flag_swaps;
+  U_INT16_T i;
+  S_INT8_T flag_swaps;
   FLOAT_T temp_f;
   
   if (!lb_al_assert_dimensions_vector_r(V1))
@@ -2685,10 +2685,10 @@ void lb_al_sort_bubble_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 
 /* Unregistered version of the bubble sorting algorithm.  
    n=number of cells in array */
-void lb_al_sort_bubble_vector_r_unreg(FLOAT_T *V, U_INT_16_T n)
+void lb_al_sort_bubble_vector_r_unreg(FLOAT_T *V, U_INT16_T n)
 {
-  U_INT_16_T i;
-  S_INT_8_T flag_swaps;
+  U_INT16_T i;
+  S_INT8_T flag_swaps;
   FLOAT_T temp_f;
   
   do {
@@ -2704,9 +2704,9 @@ void lb_al_sort_bubble_vector_r_unreg(FLOAT_T *V, U_INT_16_T n)
   } while (flag_swaps); 
 }
 
-void _lb_al_sort_quicksort_vector_r(VECTOR_R_T *V, U_INT_16_T a, U_INT_16_T b)
+void _lb_al_sort_quicksort_vector_r(VECTOR_R_T *V, U_INT16_T a, U_INT16_T b)
 {
-  U_INT_16_T left, right;
+  U_INT16_T left, right;
   FLOAT_T pivot_f, temp_f;
  
   if (!lb_al_assert_dimensions_vector_r(V))
@@ -2769,7 +2769,7 @@ void lb_al_sort_quicksort_vector_r(VECTOR_R_T *V1, VECTOR_R_T *V2)
 
 void lb_al_substract_vector_c(VECTOR_C_T *A, VECTOR_C_T *B, VECTOR_C_T *C)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_c(A))
     {
@@ -2802,7 +2802,7 @@ void lb_al_substract_vector_c(VECTOR_C_T *A, VECTOR_C_T *B, VECTOR_C_T *C)
 
 void lb_al_substract_vector_r(VECTOR_R_T *A, VECTOR_R_T *B, VECTOR_R_T *C)
 { 
-  U_INT_16_T i;
+  U_INT16_T i;
 
   if (!lb_al_assert_dimensions_vector_r(A))
     {
@@ -2837,7 +2837,7 @@ void lb_al_substract_vector_r(VECTOR_R_T *A, VECTOR_R_T *B, VECTOR_R_T *C)
 FLOAT_T lb_al_sum_abs_matrix_r(MATRIX_R_T *M)
 {
   FLOAT_T sum;
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
  
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -2856,7 +2856,7 @@ FLOAT_T lb_al_sum_abs_matrix_r(MATRIX_R_T *M)
 FLOAT_T lb_al_sum_abs_vector_c(VECTOR_C_T *V, ERR_T *error)
 {
   FLOAT_T sum;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_c(V))
     {
@@ -2873,7 +2873,7 @@ FLOAT_T lb_al_sum_abs_vector_c(VECTOR_C_T *V, ERR_T *error)
 FLOAT_T lb_al_sum_abs_vector_r(VECTOR_R_T *V)
 {
   FLOAT_T sum;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -2892,7 +2892,7 @@ FLOAT_T lb_al_sum_abs_vector_r(VECTOR_R_T *V)
    COMPLEX_T lb_al_sum_matrix_c(MATRIX_C_T *M)
    {
    COMPLEX_T sum;
-   U_INT_16_T i,j;
+   U_INT16_T i,j;
  
    if (!lb_al_assert_dimensions_matrix_c(M))
    {
@@ -2911,7 +2911,7 @@ FLOAT_T lb_al_sum_abs_vector_r(VECTOR_R_T *V)
 FLOAT_T lb_al_sum_matrix_r(MATRIX_R_T *M)
 {
   FLOAT_T sum;
-  U_INT_16_T i,j;
+  U_INT16_T i,j;
  
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -2929,7 +2929,7 @@ FLOAT_T lb_al_sum_matrix_r(MATRIX_R_T *M)
 COMPLEX_T lb_al_sum_vector_c(VECTOR_C_T *V)
 {
   COMPLEX_T sum;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_c(V))
     {
@@ -2947,7 +2947,7 @@ COMPLEX_T lb_al_sum_vector_c(VECTOR_C_T *V)
 FLOAT_T lb_al_sum_vector_r(VECTOR_R_T *V)
 {
   FLOAT_T sum;
-  U_INT_16_T i;
+  U_INT16_T i;
  
   if (!lb_al_assert_dimensions_vector_r(V))
     {
@@ -2984,7 +2984,7 @@ void lb_al_swap_vector_r(VECTOR_R_T *A, VECTOR_R_T *B)
 
 void lb_al_transpose_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2)
 {
-  U_INT_16_T i, j;
+  U_INT16_T i, j;
 
   /* We assert the size */
   if (!lb_al_assert_dimensions_matrix_r(M1))

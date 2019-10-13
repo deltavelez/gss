@@ -6,10 +6,10 @@
 #include "lb_types.h"
 #include "lb_integer.h"
 
-void lb_sieve_erathostenes(VECTOR_S_INT_16_T *P, S_INT_16_T n)
+void lb_sieve_erathostenes(VECTOR_S_INT16_T *P, S_INT16_T n)
 {
-  U_INT_16_T i,j;
-  VECTOR_S_INT_8_T flags;
+  U_INT16_T i,j;
+  VECTOR_S_INT8_T flags;
 
   if (n<2)
     flags.items=0;
@@ -58,10 +58,10 @@ void lb_sieve_erathostenes(VECTOR_S_INT_16_T *P, S_INT_16_T n)
 }
 
 /* Classic algorithm by Erathostenes which uses an array with only odd numbers */
-void lb_sieve_erathostenes_2(VECTOR_S_INT_16_T *P, S_INT_16_T n)
+void lb_sieve_erathostenes_2(VECTOR_S_INT16_T *P, S_INT16_T n)
 {
-  U_INT_16_T i,j;
-  VECTOR_S_INT_8_T flags;
+  U_INT16_T i,j;
+  VECTOR_S_INT8_T flags;
 
   flags.items=ceil((FLOAT_T)(n-2)/2)+1;
   lb_al_create_vector_si8(&flags);
@@ -112,9 +112,9 @@ void lb_sieve_erathostenes_2(VECTOR_S_INT_16_T *P, S_INT_16_T n)
   lb_al_release_vector_si8(&flags);
 }
 
-S_INT_8_T lb_in_pos_in_sorted_vector(VECTOR_S_INT_16_T *P, S_INT_16_T n)
+S_INT8_T lb_in_pos_in_sorted_vector(VECTOR_S_INT16_T *P, S_INT16_T n)
 {
-  U_INT_16_T a, b, c;
+  U_INT16_T a, b, c;
   if ((*P).items==0)
     return -1; /* not found */
   a=0;
@@ -144,33 +144,33 @@ S_INT_8_T lb_in_pos_in_sorted_vector(VECTOR_S_INT_16_T *P, S_INT_16_T n)
 
 
 
-U_INT_16_T lb_in_invert_bits(U_INT_16_T x, U_INT_16_T n_bits)
+U_INT16_T lb_in_invert_bits(U_INT16_T x, U_INT16_T n_bits)
 {
-  U_INT_8_T bit;
-  U_INT_16_T inverted=0;
+  U_INT8_T bit;
+  U_INT16_T inverted=0;
   for (bit=0;bit<=n_bits;bit++)
     inverted|= ((x>>bit) & 0x01)<<((n_bits-1-bit));
   inverted = inverted & ((0x01<<n_bits) -1);
   return inverted;
 }
 
-S_INT_8_T lb_in_is_even(S_INT_16_T x)
+S_INT8_T lb_in_is_even(S_INT16_T x)
 {
   if (x%2==0)
     return TRUE;
   return FALSE;
 }
 
-S_INT_8_T lb_in_is_odd(S_INT_16_T x)
+S_INT8_T lb_in_is_odd(S_INT16_T x)
 {
   if (x%2==0)
     return FALSE;
   return TRUE;
 }
 
-S_INT_8_T  lb_in_is_perfectsquare(S_INT_32_T n)
+S_INT8_T  lb_in_is_perfectsquare(S_INT32_T n)
 {
-  S_INT_32_T x;
+  S_INT32_T x;
   x=lb_in_isqrt(n);
   if ( (x*x) == n )
     return TRUE;
@@ -178,9 +178,9 @@ S_INT_8_T  lb_in_is_perfectsquare(S_INT_32_T n)
 }
 
 
-S_INT_8_T lb_in_is_power_of_two(U_INT_32_T x)
+S_INT8_T lb_in_is_power_of_two(U_INT32_T x)
 {
-  U_INT_8_T bit_size=0;
+  U_INT8_T bit_size=0;
   while (((x % 2) == 0) && (x > 1)) /* While x is even and > 1 */
     {
       x /= 2;
@@ -190,9 +190,9 @@ S_INT_8_T lb_in_is_power_of_two(U_INT_32_T x)
   return 0;
 }
 
-S_INT_8_T lb_in_is_prime(S_INT_32_T n)
+S_INT8_T lb_in_is_prime(S_INT32_T n)
 {
-  S_INT_32_T i, w;
+  S_INT32_T i, w;
   if (n<2)
     return FALSE;
 
@@ -218,9 +218,9 @@ S_INT_8_T lb_in_is_prime(S_INT_32_T n)
   return TRUE;
 }
 
-S_INT_32_T  lb_in_isqrt(S_INT_32_T n)
+S_INT32_T  lb_in_isqrt(S_INT32_T n)
 {
-  S_INT_32_T start, end, mid, ans;
+  S_INT32_T start, end, mid, ans;
   if (n<0)
     {
       printf("Error: lb_in_isqrt() --> negative argument [%li]\r\n",n);
@@ -253,20 +253,20 @@ S_INT_32_T  lb_in_isqrt(S_INT_32_T n)
 }
 
 
-S_INT_16_T lb_in_littleS16_to_bigS16(S_INT_16_T x)
+S_INT16_T lb_in_littleS16_to_bigS16(S_INT16_T x)
 {
   return ((x & 0x00FF)<<8) | ((x & 0xFF00)>>8);
 }
 
-S_INT_16_T lb_in_max(S_INT_16_T x, S_INT_16_T y)
+S_INT16_T lb_in_max(S_INT16_T x, S_INT16_T y)
 {
   if (x>=y) return x;
   return y;
 }
 
-S_INT_16_T lb_in_max_n(S_INT_16_T n, ...)
+S_INT16_T lb_in_max_n(S_INT16_T n, ...)
 {
-  /* oxo: this function requires further work.  Warnings are generated: va_args(argsS_INT_16_T) */
+  /* oxo: this function requires further work.  Warnings are generated: va_args(argsS_INT16_T) */
   va_list args;
   int i, max, temp;
 
@@ -290,15 +290,15 @@ S_INT_16_T lb_in_max_n(S_INT_16_T n, ...)
 }
 
   
-S_INT_16_T lb_in_min(S_INT_16_T x, S_INT_16_T y)
+S_INT16_T lb_in_min(S_INT16_T x, S_INT16_T y)
 {
   if (x<=y) return x;
   return y;
 }
 
-S_INT_16_T lb_in_pow(S_INT_16_T k, S_INT_16_T n)
+S_INT16_T lb_in_pow(S_INT16_T k, S_INT16_T n)
 {
-  S_INT_16_T temp, i;
+  S_INT16_T temp, i;
   if (n==0) 
     return 1;
   temp=k;
@@ -307,15 +307,15 @@ S_INT_16_T lb_in_pow(S_INT_16_T k, S_INT_16_T n)
   return temp;
 }
 
-S_INT_16_T lb_in_round_div_up(S_INT_32_T a, S_INT_32_T b)
+S_INT16_T lb_in_round_div_up(S_INT32_T a, S_INT32_T b)
 {
   if(b==0) return 0;
   return (a + (b-1))/b;
 }
 
-S_INT_16_T lb_in_simpson2d_coef(S_INT_16_T i, S_INT_16_T j, S_INT_16_T m, S_INT_16_T n)
+S_INT16_T lb_in_simpson2d_coef(S_INT16_T i, S_INT16_T j, S_INT16_T m, S_INT16_T n)
 {
-  S_INT_16_T i_exp, j_exp;
+  S_INT16_T i_exp, j_exp;
   if ((i==0) || (i==m-1)) 
     i_exp=0;
   else

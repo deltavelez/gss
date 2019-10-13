@@ -84,7 +84,7 @@ FLOAT_T diego_y(FLOAT_T t, ERR_T *error)
 }
 
 
-S_INT_16_T lb_gis_height(FLOAT_T lon, FLOAT_T lat)
+S_INT16_T lb_gis_height(FLOAT_T lon, FLOAT_T lat)
 {
   FILE *fp;
   char filename[16];
@@ -96,26 +96,26 @@ S_INT_16_T lb_gis_height(FLOAT_T lon, FLOAT_T lat)
   if (lat>=0.0)
     {
       strcat(filename,"N");
-      sprintf(str, "%02d", (S_INT_16_T)lat);
+      sprintf(str, "%02d", (S_INT16_T)lat);
       pos_lat=round(1201.0*lb_re_frac(lat));
     }
   else
     {
       strcat(filename,"S");
-      sprintf(str, "%02d", (S_INT_16_T)ceil(-lat));
+      sprintf(str, "%02d", (S_INT16_T)ceil(-lat));
       pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
     }
   strcat(filename,str);
   if (lon>=0.0)
     {
       strcat(filename,"E");
-      sprintf(str, "%03d", (S_INT_16_T)lon);
+      sprintf(str, "%03d", (S_INT16_T)lon);
       pos_lon=round(1201*lb_re_frac(lon));
     }
   else
     {
       strcat(filename,"W");
-      sprintf(str, "%03d", (S_INT_16_T)ceil(-lon));
+      sprintf(str, "%03d", (S_INT16_T)ceil(-lon));
       pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
     }
   strcat(filename,str);
@@ -195,9 +195,9 @@ int main(int argc, char *argv[])
   M.dim[2]=3;
   M.dim[3]=2;
   M.dim[4]=2;
-  U_INT_16_T i,j,k,l;
+  U_INT16_T i,j,k,l;
   long cummulative;
-  S_INT_8_T flag;
+  S_INT8_T flag;
   struct sysinfo info_1, info_2, info_3;
 
   lb_al_create_array_r(&M);
@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
 #define MAX_ROWS_V 4
 #define MAX_N 10
 
-  S_INT_16_T n_row, w_row, w_col, s_col, flag_insert, n_back, n_back_adj, j, n_vis_rows;
+  S_INT16_T n_row, w_row, w_col, s_col, flag_insert, n_back, n_back_adj, j, n_vis_rows;
   char c;
   char V[MAX_ROWS][MAX_COLS];
   
@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
 	printf("n_row=%d, n_back=%d\r\n",n_row,n_back);
 	for (i=0;i<=n_vis_rows;i++)
 	  {
-	    S_INT_16_T temp_cursor, temp_row;
+	    S_INT16_T temp_cursor, temp_row;
 	    for (j=0;j<MAX_COLS;j++)
 	      {
 		temp_cursor=(w_row-n_back+MAX_ROWS)%MAX_ROWS;
@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
   //#define DEMO_SWAP_VECTOR
 #ifdef DEMO_SWAP_VECTOR
   VECTOR_R_T A, B;
-  U_INT_16_T i;
+  U_INT16_T i;
   A.items=10; 
   B.items=20;
 
@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
   //#define DEMO_INSERT_VECTOR
 #ifdef DEMO_INSERT_VECTOR
   VECTOR_R_T V;
-  U_INT_16_T k;
+  U_INT16_T k;
   V.items=0;
  
   for (k=11;k<=22;k++)
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
   // #define DEMO_DELETE_ITEM_VECTOR
 #ifdef DEMO_DELETE_ITEM_VECTOR
   VECTOR_R_T V;
-  U_INT_16_T i, k;
+  U_INT16_T i, k;
      
   for(k=0;k<1;k++)
     {
@@ -545,7 +545,7 @@ int main(int argc, char *argv[])
   //#define DEMO_INTERPOLATE
 #ifdef DEMO_INTERPOLATE
   MATRIX_R_T A;
-  S_INT_16_T i,j;
+  S_INT16_T i,j;
   FLOAT_T Q;
       
   A.rows=4; /* vertical */
@@ -714,7 +714,7 @@ int main(int argc, char *argv[])
   //#define DEMO_PIXEL
 #ifdef DEMO_PIXEL
   SDL_Event event;
-  S_INT_16_T x, y, z, width, height;
+  S_INT16_T x, y, z, width, height;
   clock_t begin, end;
   FLOAT_T time_total=0;
   int frames_count=0;
@@ -792,7 +792,7 @@ int main(int argc, char *argv[])
   //#define DEMO_LINE1
 #ifdef DEMO_LINE1
   SDL_Event event;
-  S_INT_16_T x, y, z, width, height;
+  S_INT16_T x, y, z, width, height;
   clock_t begin, end;
   PIXEL_T color;
   
@@ -855,7 +855,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_LINE1_FLOAT
 #ifdef DEMO_LINE1_FLOAT
-  S_INT_16_T i, j,k;
+  S_INT16_T i, j,k;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
@@ -927,7 +927,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   FLOAT_T angle;
   PICTURE_T Pic;
-  U_INT_8_T pix_x=32, pix_y=32;
+  U_INT8_T pix_x=32, pix_y=32;
   
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   Pic.w= ty_screen.w/pix_x;
@@ -964,8 +964,8 @@ int main(int argc, char *argv[])
   //#define DEMO_LINE_ANTIALIASING3
 #ifdef DEMO_LINE_ANTIALIASING3
   SDL_Event event;
-  S_INT_32_T i;
-  S_INT_16_T x1, y1, x2, y2;
+  S_INT32_T i;
+  S_INT16_T x1, y1, x2, y2;
   PIXEL_T color;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
@@ -1275,7 +1275,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_TRIANGLE
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  S_INT_16_T i;
+  S_INT16_T i;
   POINT_2D_INT_T A, B, C, D, X;
   clock_t begin, end;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
@@ -1399,7 +1399,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_INSIDE_POLYGON_INT
   SDL_Event event;
   int pix_x=12, pix_y=12;
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
   LINE_2D_INT_T Poly_int;
   POINT_2D_INT_T P;
 
@@ -1448,7 +1448,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_INSIDE_POLYGON_FLOAT
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
   LINE_2D_FLOAT_T Poly_f;
   POINT_2D_FLOAT_T P;
   VIEWPORT_2D_T win;
@@ -1541,7 +1541,7 @@ int main(int argc, char *argv[])
   //#define DUFF_PORTER
 #ifdef DUFF_PORTER
   PICTURE_T pic1;
-  S_INT_16_T i,j, alpha;
+  S_INT16_T i,j, alpha;
   LINE_2D_INT_T myPol;
   int k=40;
 
@@ -1605,7 +1605,7 @@ int main(int argc, char *argv[])
 #ifdef ROTATE_ALGORITHM
   /* This helps ilustrating  an older algorithm used to rotate bitmaps */
   PICTURE_T Pic;
-  S_INT_16_T k;
+  S_INT16_T k;
   LINE_2D_FLOAT_T P1, P2, P3;
   VIEWPORT_2D_T win;
   FLOAT_T angle;
@@ -1674,7 +1674,7 @@ int main(int argc, char *argv[])
   //#define DEMO_ROTATE_BITMAP
 #ifdef  DEMO_ROTATE_BITMAP
   PICTURE_T pic_src, pic_dst;
-  S_INT_16_T width, height;
+  S_INT16_T width, height;
   FLOAT_T angle;
   //pending: strange line on top
   
@@ -1705,7 +1705,7 @@ int main(int argc, char *argv[])
   //#define DEMO_ROTATE_BITMAP_SAMPLING
 #ifdef  DEMO_ROTATE_BITMAP_SAMPLING
   PICTURE_T pic_src, pic_dst;
-  S_INT_16_T width, height;
+  S_INT16_T width, height;
   FLOAT_T angle;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -1731,7 +1731,7 @@ int main(int argc, char *argv[])
   //#define DEMO_BMP_TO_MATRIX
 #ifdef DEMO_BMP_TO_MATRIX
   MATRIX_R_T R, G, B;
-  S_INT_16_T i,j;
+  S_INT16_T i,j;
   PIXEL_T color;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -1972,7 +1972,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_PLOT_IMPLICIT
   MATRIX_R_T A;
   VIEWPORT_2D_T vp;
-  S_INT_16_T i,j;
+  S_INT16_T i,j;
   FLOAT_T xr, yr, zr;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -2012,7 +2012,7 @@ int main(int argc, char *argv[])
   //#define DEMO_PLOT2D_REVERSE
 #ifdef DEMO_PLOT2D_REVERSE
   FLOAT_T t, t0, t1;
-  S_INT_16_T i;
+  S_INT16_T i;
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
@@ -2058,7 +2058,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   int pix_x=1, pix_y=8;
   FLOAT_T t, t0, t1;
-  S_INT_16_T i;
+  S_INT16_T i;
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
@@ -2119,7 +2119,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   int pix_x=3, pix_y=3;
   PICTURE_T pic1, pic2;
-  S_INT_16_T i,j;
+  S_INT16_T i,j;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
@@ -2478,7 +2478,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-#define GPIO
+  //#define GPIO
 #ifdef GPIO
 
 #define PIN_CS_0   17
@@ -2495,8 +2495,8 @@ int main(int argc, char *argv[])
   
   clock_t time_begin, time_end;
   char text[20];
-  S_INT_8_T relay_status=0;
-  S_INT_16_T shock_counter=1;
+  S_INT8_T relay_status=0;
+  S_INT16_T shock_counter=1;
   FLOAT_T accel, accel_max;
   FILE *fp;
 
@@ -2511,8 +2511,8 @@ int main(int argc, char *argv[])
   union Record temp0, press0, temp1, press1;
 
   SPI_PORT_T my_port;
-  S_INT_32_T time_stroke=4000;
-  U_INT_16_T value;
+  S_INT32_T time_stroke=4000;
+  U_INT16_T value;
 
   printf("CLOCKS_PER_SEC=%u\r\n",CLOCKS_PER_SEC); 
   printf("Size(clock_T)=%d\r\n",sizeof(clock_t));
@@ -2628,7 +2628,7 @@ int main(int argc, char *argv[])
 	  else
 	    sprintf(text,"DO");
 
-	  U_INT_32_T stamp;
+	  U_INT32_T stamp;
 	  stamp=clock();
 	  
 	  printf("n=%d  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f  ts=%u\r\n",
@@ -2757,7 +2757,7 @@ int main(int argc, char *argv[])
   FLOAT_T Pos_xp, Pos_yp;
   
   FLOAT_T RPM, t, dt, t_max, w,  xp, yp, xp2, yp2;
-  S_INT_32_T i;
+  S_INT32_T i;
   VIEWPORT_2D_T win_v, win_a, win_sim;
   SDL_Event event;
 
@@ -2890,7 +2890,7 @@ int main(int argc, char *argv[])
 
         
       max_angle=-M_PI;
-      S_INT_8_T flag_first=TRUE;
+      S_INT8_T flag_first=TRUE;
       for (i=0;i<N_DISK; i++)
 	{
 	  xr = disk_distance + R.array[i]*cos(T.array[i] + w*t);
@@ -3110,8 +3110,8 @@ int main(int argc, char *argv[])
   FLOAT_T dt;
   VIEWPORT_2D_T win;
   FLOAT_T xp, yp;
-  S_INT_32_T step_counter=0;
-  S_INT_8_T flag_paused=FALSE;
+  S_INT32_T step_counter=0;
+  S_INT8_T flag_paused=FALSE;
 
   lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
  
@@ -3269,7 +3269,7 @@ int main(int argc, char *argv[])
 	  
 	      if (i==1) 
 		{
-		  if ( (step_counter==0) || (U_INT_32_T)((t+dt)/(365*24*3600))>(U_INT_32_T)(t/(365*24*3600)) )
+		  if ( (step_counter==0) || (U_INT32_T)((t+dt)/(365*24*3600))>(U_INT32_T)(t/(365*24*3600)) )
 		    {
 		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
 		      lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
@@ -3393,7 +3393,7 @@ int main(int argc, char *argv[])
   VIEWPORT_3D_T vp3d;
   //FLOAT_T u_a, u_b, v_a, v_b;
   FLOAT_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
-  S_INT_8_T flag_exit;
+  S_INT8_T flag_exit;
     
   //MATRIX_POINT_3D_T S;
   MATRIX_R_T Z;
@@ -3541,7 +3541,7 @@ int main(int argc, char *argv[])
       lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
       lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
 
-      S_INT_8_T flag_process_keys=TRUE;
+      S_INT8_T flag_process_keys=TRUE;
       while (!lb_co_kbhit()) ;
       while (flag_process_keys)
 	{
@@ -3868,7 +3868,7 @@ int main(int argc, char *argv[])
   FLOAT_T lon, lat;
   FILE *fp;
   int i_lat, i_lon, parsing_lon;
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
   char c, str_lat[128], str_lon[128];
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -3938,7 +3938,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_GIS_HEIGHT
 #ifdef DEMO_GIS_HEIGHT
-  S_INT_16_T i, j, height, height_max;
+  S_INT16_T i, j, height, height_max;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
   lb_fb_clear(ty_fb_main, 0,0,0,255);
@@ -4004,7 +4004,7 @@ int main(int argc, char *argv[])
   FONT_T my_font;
   char text[40];
   FLOAT_T x;
-  S_INT_16_T i;
+  S_INT16_T i;
   FLOAT_T mu, sigma2;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -4061,8 +4061,8 @@ int main(int argc, char *argv[])
 #ifdef DEMO_PRIMES
   VIEWPORT_2D_T win;
   FONT_T my_font;
-  VECTOR_S_INT_16_T P;
-  S_INT_32_T k,j;
+  VECTOR_S_INT16_T P;
+  S_INT32_T k,j;
   FLOAT_T t, x, y, xp, yp;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -4171,7 +4171,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_GENERAL_RUNGE_KUTTA
   VECTOR_R_T C, B, K;
   MATRIX_R_T A;
-  S_INT_16_T i, j;
+  S_INT16_T i, j;
   FLOAT_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
   VIEWPORT_2D_T win;
 
@@ -4262,10 +4262,10 @@ int main(int argc, char *argv[])
   //#define DEMO_TIME_TEST
 #ifdef DEMO_TIME_TEST
   unsigned long i, max;
-  S_INT_16_T j;
+  S_INT16_T j;
   clock_t begin, end;
 
-  max=1000000000;
+  max=1000000;
 
   begin=clock();
   for (i=0;i<max;i++)
@@ -4290,7 +4290,7 @@ int main(int argc, char *argv[])
 
   /* BER vs Noise using a Montecarlo simulation */
   
-  //#define DEMO_ZERO_CROSSING
+#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
     VECTOR_R_T Signal, Noise;
     SDL_Event event;
@@ -4298,24 +4298,24 @@ int main(int argc, char *argv[])
     /* User-defined simulation parameters */
     const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
     const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-    S_INT_32_T n_experiments=10000; /* Maximum number of experiments. Not declared as a const to allow a possible
+    S_INT32_T n_experiments=1000; /* Maximum number of experiments. Not declared as a const to allow a possible
 					 upgrade to variable-step size */
-    const S_INT_32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
+    const S_INT32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
     FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
     FLOAT_T f_max_noise=6.0e3;  /* Maximum noise frequency */
     FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
     FLOAT_T N_exp_min;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
    
     /* Simulation variables */
-    S_INT_32_T experiment;       /* Keeps track of the current experiment */
-    S_INT_32_T errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02;     /* Keeps track of the number of errors detected during a series of experiments */
+    S_INT32_T experiment;       /* Keeps track of the current experiment */
+    S_INT32_T errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02;     /* Keeps track of the number of errors detected during a series of experiments */
     FLOAT_T N_experiment;        /* Current value of the noise energy during a series of experiments */
     FLOAT_T N_total;             /* Total energy of a frequency vector  */
-    S_INT_8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
+    S_INT8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
 				    a) The last series of experiments with the minimum noise level was completed.
 				    b) The maximum time allowed for running the simulation has been exceeded. 
 				    c) The user interrupted the simulation. */
-    S_INT_8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
+    S_INT8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
 				   visual idea of the amount of noise and its effects. 
 				   The waveform will be only ploted in a subset of the experiments. */
 
@@ -4326,7 +4326,7 @@ int main(int argc, char *argv[])
 
     VIEWPORT_2D_T win_wave, win_BER;
     FLOAT_T xp, yp;                        /* Graphic variables */
-    S_INT_16_T i, k;                       /* General-use counters */
+    S_INT16_T i, k;                       /* General-use counters */
  
     FONT_T my_font;
     char text[80];
@@ -4342,7 +4342,7 @@ int main(int argc, char *argv[])
     FLOAT_T energy_signal(VECTOR_R_T *V)
     {
       FLOAT_T temp;
-      U_INT_16_T j;
+      U_INT16_T j;
 
       temp=0.0;
       for(j=0;j<(*V).items;j++)
@@ -4350,11 +4350,11 @@ int main(int argc, char *argv[])
       return 0.5*temp;
     } 
 
-    S_INT_8_T parse_vector(VECTOR_R_T *buffer, FLOAT_T threshold_h, FLOAT_T threshold_l)
+    S_INT8_T parse_vector(VECTOR_R_T *buffer, FLOAT_T threshold_h, FLOAT_T threshold_l)
     {
-      U_INT_16_T time_stamp[4];
+      U_INT16_T time_stamp[4];
    
-      U_INT_16_T i, crossings_counter=0;
+      U_INT16_T i, crossings_counter=0;
       FLOAT_T delta_0, delta_1, margin;
 
       delta_0=(*buffer).items*freq_1/(1.5*freq_0+1.5*freq_1);
@@ -4427,7 +4427,7 @@ int main(int argc, char *argv[])
     /* We determine the number of frequency coefficients which are required, given the bandwidth */
 
     T_base=1.0/(2.0*freq_0)+1.0/(2.0*freq_1);
-    Noise.items=(S_INT_16_T)ceil(f_max_noise*T_base);
+    Noise.items=(S_INT16_T)ceil(f_max_noise*T_base);
   
     /* We make sure the size of the signal in the time domain is at least twice as large as the vector 
        holding the noise frequencies, due to the Shannon-Nyquist sampling theorem. */
@@ -4575,7 +4575,7 @@ int main(int argc, char *argv[])
     //#define DEMO_KEYBOARD
 #ifdef DEMO_KEYBOARD
     unsigned char c;
-    S_INT_8_T flag;
+    S_INT8_T flag;
 
     flag=FALSE;
     lb_co_set_echo(0); 
@@ -4779,7 +4779,7 @@ int main(int argc, char *argv[])
     //#define DEMO_WAV_WRITE
 #ifdef DEMO_WAV_WRITE
     VECTOR_R_T V;
-    U_INT_16_T i;
+    U_INT16_T i;
     FLOAT_T f1,f2;
   
     V.items=SAMPLES;
@@ -4851,7 +4851,7 @@ int main(int argc, char *argv[])
     //#define DEMO_WAV
 #ifdef DEMO_WAV
     VECTOR_R_T V;
-    U_INT_16_T i;
+    U_INT16_T i;
     V.items=VECTOR_MAX_ITEMS;
     lb_al_create_vector_r(&V);
 

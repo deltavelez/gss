@@ -75,7 +75,7 @@ FLOAT_T lb_ge_arclength_ellipse_angle_q1(FLOAT_T a, FLOAT_T b, FLOAT_T t, FLOAT_
 FLOAT_T lb_ge_arclength_ellipse_angle(FLOAT_T a, FLOAT_T b, FLOAT_T t)
 {
   FLOAT_T R, length;
-  S_INT_16_T n_q;
+  S_INT16_T n_q;
 
   R=lb_ge_arclength_ellipse(a,b);
     
