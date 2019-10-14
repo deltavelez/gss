@@ -1277,7 +1277,7 @@ void lb_al_insert_item_vector_r(VECTOR_R_T *V, REAL_T x, UINT16_T pos)
   if (!lb_al_assert_dimensions_vector_r(V))
     {
       if((*V).items==0)
-	lb_ft_printf(ty_C,"Warning: lb_al_insert_item_vector_r(): vector_r has 0 elements\n");
+	printf("Warning: lb_al_insert_item_vector_r(): vector_r has 0 elements\r\n");
       else
 	{
 	  printf("Error: lb_al_insert_item_vector_r() --> invalid dimension V[%d]\r\n",(*V).items);
@@ -2221,7 +2221,7 @@ void lb_al_print_array_r(ARRAY_R_T *M, const char *text, SINT8_T len, SINT8_T de
   strcat(s,format);
   strcat(s," ");
 
-  lb_ft_printf(ty_C,"-----------\r\n");
+  printf("-----------\r\n");
 
   if (!lb_al_assert_dimensions_matrix_r(M))
     {
@@ -2232,9 +2232,9 @@ void lb_al_print_array_r(ARRAY_R_T *M, const char *text, SINT8_T len, SINT8_T de
   for (i=0;i<(*M).rows;i++)
     {
       for (j=0;j<(*M).cols;j++)
-	lb_ft_printf(ty_C,s,i,j,(*M).array[i][j]);
-      // lb_ft_printf(ty_C,"%s[%02i,%02i]=%06.2f  ",text,i,j,(*M).array[i][j]);
-      lb_ft_printf(ty_C,"\r\n");
+	printf(s,i,j,(*M).array[i][j]);
+      // lb_ft_printf("%s[%02i,%02i]=%06.2f  ",text,i,j,(*M).array[i][j]);
+      printf("\r\n");
     }
 }
 
@@ -2248,14 +2248,14 @@ void lb_al_print_matrix33_r(REAL_T M[3][3], char *text, const char *format)
   strcat(s,format);
   strcat(s," ");
 
-  lb_ft_printf(ty_C,"-----------\r\n");
+  printf("-----------\r\n");
 
   for (i=0;i<3;i++)
     {
       for (j=0;j<3;j++)
-	lb_ft_printf(ty_C,s,i,j,M[i][j]);
-      // lb_ft_printf(ty_C,"%s[%02i,%02i]=%06.2f  ",text,i,j,(*M).array[i][j]);
-      lb_ft_printf(ty_C,"\r\n");
+	printf(s,i,j,M[i][j]);
+      // printf("%s[%02i,%02i]=%06.2f  ",text,i,j,(*M).array[i][j]);
+      printf("\r\n");
     }
 }
 
@@ -2268,7 +2268,7 @@ void lb_al_print_vector_c(VECTOR_C_T *V, char *text, const char *format)
   strcat(s,"[%02i]=");
   strcat(s,format);
   
-  lb_ft_printf(ty_C,"-----------\r\n");
+  printf("-----------\r\n");
   
   if (!lb_al_assert_dimensions_vector_c(V))
     {
@@ -2278,10 +2278,10 @@ void lb_al_print_vector_c(VECTOR_C_T *V, char *text, const char *format)
   
   for (i=0;i<(*V).items;i++)
     {
-      lb_ft_printf(ty_C,s,i,(*V).array[i].r);
-      lb_ft_printf(ty_C," , ");
-      lb_ft_printf(ty_C,format,(*V).array[i].i);
-      lb_ft_printf(ty_C,"\r\n");
+      printf(s,i,(*V).array[i].r);
+      printf(" , ");
+      printf(format,(*V).array[i].i);
+      printf("\r\n");
     }
 }
 
@@ -2294,12 +2294,12 @@ void lb_al_print_vector_r(VECTOR_R_T *V, char *text, const char *format)
   strcat(s,"[%02i]=");
   strcat(s,format);
   
-  lb_ft_printf(ty_C,"-----------\r\n");
+  printf("-----------\r\n");
 
   if (!lb_al_assert_dimensions_vector_r(V))
     {
       if((*V).items==0)
-	lb_ft_printf(ty_C,"Warning: lb_al_print_vector_r(): %s has 0 elements",text);
+	printf("Warning: lb_al_print_vector_r(): %s has 0 elements",text);
       else
 	{
 	  printf("Error: lb_al_print_vector_r() --> invalid dimension V[%d]\r\n",(*V).items);
@@ -2308,7 +2308,7 @@ void lb_al_print_vector_r(VECTOR_R_T *V, char *text, const char *format)
     }
   
   for (i=0;i<V->items;i++)
-    lb_ft_printf(ty_C,s,i,V->array[i]);
+    printf(s,i,V->array[i]);
 
   //lb_ft_printf(ty_C,"%s[%02i]=%06.2f  ",text,i,(*V).array[i]);
 }
@@ -2321,12 +2321,12 @@ void lb_al_print_vector_si8(VECTOR_SINT8_T *V, char *text)
   strcpy(s,text);
   strcat(s,"[%02i]=%i\r\n");
  
-  lb_ft_printf(ty_C,"-----------\r\n");
+  printf("-----------\r\n");
 
   if (!lb_al_assert_dimensions_vector_si8(V))
     {
       if((*V).items==0)
-	lb_ft_printf(ty_C,"Warning: lb_al_print_vector_i(): %s has 0 elements",text);
+	printf("Warning: lb_al_print_vector_i(): %s has 0 elements",text);
       else
 	{
 	  printf("Error: lb_al_print_vector_si8() --> invalid dimension V[%d]\r\n",(*V).items);
@@ -2334,9 +2334,9 @@ void lb_al_print_vector_si8(VECTOR_SINT8_T *V, char *text)
 	}			  
     }
   for (i=0;i<V->items;i++)
-    lb_ft_printf(ty_C,s,i,V->array[i]);
+    printf(s,i,V->array[i]);
 
-  lb_ft_printf(ty_C,"\r\n");
+  printf("\r\n");
 }
 
 void lb_al_print_vector_si16(VECTOR_SINT16_T *V, char *text)
@@ -2347,12 +2347,12 @@ void lb_al_print_vector_si16(VECTOR_SINT16_T *V, char *text)
   strcpy(s,text);
   strcat(s,"[%02i]=%i\r\n");
  
-  lb_ft_printf(ty_C,"-----------\r\n");
+  printf("-----------\r\n");
 
   if (!lb_al_assert_dimensions_vector_si16(V))
     {
       if((*V).items==0)
-	lb_ft_printf(ty_C,"Warning: lb_al_print_vector_i(): %s has 0 elements",text);
+	printf("Warning: lb_al_print_vector_i(): %s has 0 elements",text);
       else
 	{
 	  printf("Error: lb_al_print_vector_si16() --> invalid dimension V[%d]\r\n",(*V).items);
@@ -2360,9 +2360,9 @@ void lb_al_print_vector_si16(VECTOR_SINT16_T *V, char *text)
 	}
     }
   for (i=0;i<V->items;i++)
-    lb_ft_printf(ty_C,s,i,V->array[i]);
+    printf(s,i,V->array[i]);
 
-  lb_ft_printf(ty_C,"\r\n");
+  printf("\r\n");
 }
 
 void lb_al_release_array_r(ARRAY_R_T *M)

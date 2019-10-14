@@ -204,11 +204,11 @@ unsigned char lb_co_getch_pc(void)
 		      if ( (bu[2]==0x32) && (bu[3]==0x33) && (bu[4]==0x7E) ) return PCKEY_F11;
 		      if ( (bu[2]==0x32) && (bu[3]==0x34) && (bu[4]==0x7E) ) return PCKEY_F12;
 		    }
-		  lb_ft_printf(ty_C,"An error occurred (4) [0x%02x-0x%02x-0x%02x-0x%02x]\r\n",
+		 printf("An error occurred (4) [0x%02x-0x%02x-0x%02x-0x%02x]\r\n",
 			       bu[0],bu[1],bu[2],bu[3]);
 		}
 	      else
-		lb_ft_printf(ty_C,"An error occurred (3) [0x%02x-0x%02x-0x%02x]\r\n",bu[0],bu[1],bu[2]);
+		printf("An error occurred (3) [0x%02x-0x%02x-0x%02x]\r\n",bu[0],bu[1],bu[2]);
 	    }
 	  else
 	    printf("An error occurred (2) [0x%02x-0x%02x]\r\n",bu[0],bu[1]);

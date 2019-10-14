@@ -324,15 +324,6 @@ void lb_ft_draw_char(PICTURE_T *Pic, FONT_T *font, SINT16_T xc, SINT16_T yc, cha
     }
 }
 
-void lb_ft_set_active_console(CONSOLE_T *C)
-{
-  if (C==NULL)
-    {
-      lb_ft_printf(ty_C,"Error: lb_ft_set_active_console() --> Console hasn't been initialized\r\n");
-      exit(EXIT_FAILURE);
-    }
-  ty_C=C;
-}
 
 void lb_ft_console_gotox(CONSOLE_T *C, SINT16_T x)
 {

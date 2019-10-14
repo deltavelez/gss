@@ -29,9 +29,12 @@ git rm filename
 Renames file:
 git mv old_filename new_filename
 
-git config -- global user.name 
 git config --global user.name "Diego Velez"
 git config --global user.email "delta@velez.ca"
+git remote add origin https://github.com/deltavelez/gss.git
+
+#Update a local copy from the repository:
+git pull https://github.com/deltavelez/gss.git master
 
 Shows differences:
 git diff
@@ -46,8 +49,6 @@ git remote remove origin
 Check a remote:
 git remote -v
 
-Update a local copy from the repository:
-git pull htts://github.com/deltavelez/gss.git master
 
 Github certificate error:  Try either
 export GIT_SSL_NO_VERIFY
@@ -66,4 +67,6 @@ Deleted branch pixelargs (was 9cfdcda).
 Creating a local branch of a specific commit:
  git branch pixelargs 9cfdcda4f263be8e197bc1e75821552a72782701
 
+Emacs: creating a simple TAGS file, useful, for example, to change a string across multiple files:
+execute command: etags *c *.h
 

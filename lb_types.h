@@ -15,7 +15,7 @@
 #define TRUE 1
 #define FALSE 0
 
-/*******************************************E***********/
+/******************************************************/
 /* Basic data types */
 /******************************************************/
 
@@ -636,16 +636,6 @@ typedef struct
     UINT8_T a:N_BITS_A;
   } PIXEL_T;
 
-#define RENDEROPTIONS_DEFAULT        0b00000000
-#define RENDEROPTIONS_LINE           0b00000010
-#define RENDEROPTIONS_GRAPHICS_ONLY  0b00000100
-
-typedef struct 
-  {
-    UINT8_T r;
-    UINT8_T g;
-    UINT8_T b;
-  } RGB_T;
 
 typedef struct
 {
@@ -736,11 +726,7 @@ typedef struct
 /* Global Variables */
 /******************************************************/
 
-CONSOLE_T  *ty_C;
 SCREEN_T ty_screen;
-PICTURE_T ty_Pic_shadow;
-UINT8_T ty_scale_x, ty_scale_y;
-
 SINT8_T  ty_SDL_initialized;
 
 #endif /* LB_TYPES_H */

@@ -24,7 +24,6 @@
 */
 
 /* Global Variables.  They're declared "extern" in lb_x11.c */
-extern CONSOLE_T *ty_C;
 extern SCREEN_T ty_screen;
 
 SDL_Renderer *renderer;
@@ -269,7 +268,7 @@ void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, REAL_T angle, P
 
 	j_rot = (SINT16_T)x_rot;
 	i_rot = (SINT16_T)y_rot;
-	//lb_ft_printf(ty_C, "angle=%f, x_lowest=%d, y_lowest=%d, j_rot=%d/%d, i_rot=%d/%d\r\n",
+	//printf("angle=%f, x_lowest=%d, y_lowest=%d, j_rot=%d/%d, i_rot=%d/%d\r\n",
 	//       angle, x_lowest, y_lowest,j_rot,(*pic_dst).w,i_rot,(*pic_dst).h);
 	
 	if (lb_re_frac(x_rot)>=0.5)
@@ -417,7 +416,7 @@ void lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, REAL_T angle, P
 	  }
 	else
 	  {
-	    //lb_ft_printf(ty_C, "denom=%f\r\n",M2.array[i][j]);
+	    //printf("denom=%f\r\n",M2.array[i][j]);
 	    (*pic_dst).pic[i][j].r=round(default_color.r);
 	    (*pic_dst).pic[i][j].g=round(default_color.g);
 	    (*pic_dst).pic[i][j].b=round(default_color.b);
@@ -536,7 +535,7 @@ void lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, REAL_T
   for(i=0;i<(*pic_dst).h;i++)
     for(j=0;j<(*pic_dst).w;j++)
       {
-	//lb_ft_printf(ty_C, "max_rgb= %f %f %f\r\n",max_r, max_g, max_b);
+	//printf("max_rgb= %f %f %f\r\n",max_r, max_g, max_b);
 	if (M_r.array[i][j]>max_r)
 	  max_r=M_r.array[i][j];
 	if (M_g.array[i][j]>max_g)
@@ -577,7 +576,7 @@ void lb_gr_BMPfile_getsize(const char *filename, SINT16_T *width, SINT16_T *heig
   fd = fopen(filename, "rb");
   if (fd == NULL)
     {
-      lb_ft_printf(ty_C, "Error: lb_gr_BMPfile_getsize() --> fopen failed\n");
+      printf("Error: lb_gr_BMPfile_getsize() --> fopen failed\n");
       return; 
     }
 
@@ -1090,7 +1089,8 @@ void lb_gr_reset_zbuffer(MATRIX_R_T *Z)
  
   if (!lb_al_assert_dimensions_matrix_r(Z))
     {
-      lb_ft_printf(ty_C, "Error: lb_gr_reset_zbuffer() --> invalid dimension\r\n");
+      printf("Error: lb_gr_reset_zbuffer() --> invalid dimension\r\n");
+      exit(EXIT_FAILURE);
     }
   for (i=0;i<(*Z).rows;i++)
     for (j=0;j<(*Z).cols;j++)
@@ -1191,7 +1191,7 @@ void       lb_gr_plot_zbuffer_line_1(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_T 
       delta=_y1-_y0;
     }
   m_hz=(_hz1-_hz0)/delta;
-  lb_ft_printf(ty_C, "delta=%f\r\n",delta);
+  printf("delta=%f\r\n",delta);
   for (k=0;k<delta;k++)
     {
       if (flag_octant_1)
@@ -1266,7 +1266,7 @@ void       lb_gr_plot_zbuffer_triangle(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_
   lb_al_cross_product_vector3_r(VAB,VAC,Vperp);
   if (lb_re_equal(Vperp[0]*Vperp[0] + Vperp[1]*Vperp[1] + Vperp[2]*Vperp[2],0.0))
     {
-      lb_ft_printf(ty_C, "Warning: lb_gr_plot_zbuffer_triangle() --> 3d collinear points\r\n");
+      printf("Warning: lb_gr_plot_zbuffer_triangle() --> 3d collinear points\r\n");
       return;
     }
   
@@ -1392,7 +1392,7 @@ void       lb_gr_plot_zbuffer_triangle(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_
 	  /***************************/
 	  do 
 	    {
-	      //lb_ft_printf(ty_C, "E.y=%d\r\n",E.y); 
+	      //printf("E.y=%d\r\n",E.y); 
 	      ac_e2 = ac_err;
 
 	      if (ac_e2 >-ac_dx)
@@ -1405,7 +1405,7 @@ void       lb_gr_plot_zbuffer_triangle(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_
 		{
 		  ac_err += ac_dx;
 		  E.y += ac_sy;
-		  //lb_ft_printf(ty_C, "1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
+		  //printf("1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
 		  if (S.x!=E.x)
 		    lb_gr_plot_zbuffer_pixel(Pic, Z, E.x, E.y,
 					     PA_x, PA_y, PB_x, PB_y, PC_x, PC_y,
@@ -1461,7 +1461,7 @@ void       lb_gr_plot_zbuffer_triangle(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_
 	  /***************************/
 	  do 
 	    {
-	      //lb_ft_printf(ty_C, "E.y=%d\r\n",E.y); 
+	      //printf("E.y=%d\r\n",E.y); 
 	      ac_e2 = ac_err;
 
 	      if (ac_e2 >-ac_dx)
@@ -1474,7 +1474,7 @@ void       lb_gr_plot_zbuffer_triangle(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_
 		{
 		  ac_err += ac_dx;
 		  E.y += ac_sy;
-		  //lb_ft_printf(ty_C, "1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
+		  //printf("1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
 		  if (S.x!=E.x)
 		    lb_gr_plot_zbuffer_pixel(Pic, Z, E.x, E.y,
 					     PA_x, PA_y, PB_x, PB_y, PC_x, PC_y,
@@ -1541,7 +1541,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
       M[1][0]=PB_y-PA_y;   M[1][1]=yp-PA_y;
       det_dividend=lb_al_determinant_matrix22_r(M);
       pp1=det_dividend/det_divisor;
-      //lb_ft_printf(ty_C, "pp0 = %f,  pp1=%f\r\n", pp0, pp1);
+      //printf("pp0 = %f,  pp1=%f\r\n", pp0, pp1);
 
       //if (pp0<0.0) pp0=0.0;
       //if (pp0>1.0) pp0=1.0;
@@ -1567,7 +1567,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
     }
   else  /* All 3 points are part of the same line */
     {
-      lb_ft_printf(ty_C, "Collinear projected triangle.  det_divisor=%f, equal=%d\r\n",det_divisor*1e6,lb_re_equal(det_divisor,0.0)); 
+      printf("Collinear projected triangle.  det_divisor=%f, equal=%d\r\n",det_divisor*1e6,lb_re_equal(det_divisor,0.0)); 
       /* We first determine if the line is in the first or second octant */
       REAL_T max_delta_x, max_delta_y, temp, hz_AB, hz_AC, hz_BC;
 
@@ -1596,7 +1596,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 	    }
 	  else
 	    hz_AB = PA_hz; 
-	  lb_ft_printf(ty_C, "hz_AB=%f\r\n",hz_AB);
+	  printf("hz_AB=%f\r\n",hz_AB);
 	   
 	  /* See if xp lies in between A and C and interpolate height */ 	  
 	  if (!lb_re_equal(PC_x,PA_x))
@@ -1607,7 +1607,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 	    }
 	  else
 	    hz_AC = PA_hz; 
-	  lb_ft_printf(ty_C, "hz_AC=%f\r\n",hz_AC);
+	  printf("hz_AC=%f\r\n",hz_AC);
 	   
 	  /* See if xp lies in between B and C and interpolate height */ 	  
 	  if (!lb_re_equal(PC_x,PB_x))
@@ -1618,7 +1618,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 	    }
 	  else
 	    hz_BC = PB_hz;
-	  lb_ft_printf(ty_C, "hz_BC=%f\r\n",hz_BC);
+	  printf("hz_BC=%f\r\n",hz_BC);
 	   
 	}
       else   /* Second octant */
@@ -1631,7 +1631,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 	    }
 	  else
 	    hz_AB = PA_hz; 
-	  lb_ft_printf(ty_C, "hz_AB=%f\r\n",hz_AB);
+	  printf("hz_AB=%f\r\n",hz_AB);
 
 	  /* See if xp lies in between A and C and interpolate height */ 	  
 	  if (!lb_re_equal(PC_y,PA_y))
@@ -1642,7 +1642,7 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 	    }
 	  else
 	    hz_AC = PA_hz; 
-	  lb_ft_printf(ty_C, "hz_AC=%f\r\n",hz_AC);
+	  printf("hz_AC=%f\r\n",hz_AC);
 
 	  /* See if xp lies in between B and C and interpolate height */ 	  
 	  if (!lb_re_equal(PC_y,PB_y))
@@ -1660,9 +1660,9 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 	hz=hz_AC;
       if (hz_BC>hz)
 	hz=hz_BC;
-      lb_ft_printf(ty_C, "hz_BC=%f\r\n",hz_BC);
+      printf("hz_BC=%f\r\n",hz_BC);
 
-      lb_ft_printf(ty_C, "hz=%f\r\n",hz);
+      printf("hz=%f\r\n",hz);
       if (hz>(*Z).array[(SINT16_T)yp][(SINT16_T)xp])
 	{
 	  (*Z).array[(SINT16_T)yp][(SINT16_T)xp]=hz;
@@ -2286,21 +2286,21 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
   // length=lb_ge_arclength_ellipse(a,b);
 
   Pol.items=4*(n_q1-1)+1;
-  //lb_ft_printf(ty_C, "Pol items = %d\r\n",Pol.items);
+  //printf("Pol items = %d\r\n",Pol.items);
   lb_gr_create_line2d_f(&Pol);
   
   for(k=0;k<n_q1;k++)
     {
       //tetha=lb_ge_angle_from_length_ellipse_q1(a,b,(REAL_T)k*length/(n_q1-1),length);
       tetha=M_PI_2*k/(n_q1-1);
-      //lb_ft_printf(ty_C, "tetha=%f\r\n",tetha);
+      //printf("tetha=%f\r\n",tetha);
       xr=a*cos(tetha);
       yr=b*sin(tetha);
       cos_val=cos(angle);
       sin_val=sin(angle);
 
       /* Q1 */
-      //lb_ft_printf(ty_C, "Q1 k=%d\r\n",k);
+      //printf("Q1 k=%d\r\n",k);
       xrr=xr*cos_val-yr*sin_val;
       yrr=xr*sin_val+yr*cos_val;
       Pol.array[k].x=xc+xrr;
@@ -2309,7 +2309,7 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
       /* Q2 */
       if (k!=n_q1-1)
 	{
-	  //lb_ft_printf(ty_C, "Q2 k=%d\r\n",2*(n_q1-1)-k);
+	  //printf("Q2 k=%d\r\n",2*(n_q1-1)-k);
 	  xrr=-xr*cos_val-yr*sin_val;
 	  yrr=-xr*sin_val+yr*cos_val;
 	  Pol.array[2*(n_q1-1)-k].x=xc+xrr;
@@ -2319,7 +2319,7 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
       /* Q3 */
       if (k!=0)
 	{
-	  //lb_ft_printf(ty_C, "Q3 k=%d\r\n",2*(n_q1-1)+k);
+	  //printf("Q3 k=%d\r\n",2*(n_q1-1)+k);
 	  xrr=-xr*cos_val+yr*sin_val;
 	  yrr=-xr*sin_val-yr*cos_val;
 	  Pol.array[2*(n_q1-1)+k].x=xc+xrr;
@@ -2328,7 +2328,7 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
       /* Q4 */
       if ((k!=n_q1-1))
 	{
-	  //lb_ft_printf(ty_C, "Q4 k=%d\r\n",4*(n_q1-1)-k);
+	  //printf("Q4 k=%d\r\n",4*(n_q1-1)-k);
 	  xrr=xr*cos_val+yr*sin_val;
 	  yrr=xr*sin_val-yr*cos_val;
 	  Pol.array[4*(n_q1-1)-k].x=xc+xrr;
@@ -2462,7 +2462,7 @@ void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16
     {
       xr=lb_re_sqrt(b*b-yp*yp,&error)*(REAL_T)a/b;
       yr=lb_re_sqrt(a*a-xr*xr,&error)*(REAL_T)b/a;
-      lb_ft_printf(ty_C, "xp=%02.2f, xr=%02.2f\r\n",xp, xr);
+      printf("xp=%02.2f, xr=%02.2f\r\n",xp, xr);
       //lb_re_rotate(lb_re_sqrt(b*b-yp*yp,&error)*(REAL_T)a/b,
       //	   lb_re_sqrt(a*a-xp*xp,&error)*(REAL_T)b/a, angle,
       //	   &xrot, &yrot);
@@ -3463,7 +3463,7 @@ void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, S
 	{
 	  /* Middle */
       	  lb_gr_draw_pixel(Pic, x_real, y_real, temp_color, copymode);
-	  //lb_ft_printf(ty_C, "x_real=%f, y_real=%f, temp_float=%f \r\n",x_real,y_real,temp_float);
+	  //printf("x_real=%f, y_real=%f, temp_float=%f \r\n",x_real,y_real,temp_float);
 
 	  temp_color.a=round(MAX_A*(1-lb_re_frac(y_real)));
 	  lb_gr_draw_pixel(Pic, x_real, y_real-1, temp_color, copymode);
@@ -3548,7 +3548,7 @@ void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REA
 	{
 	  /* Middle */
       	  lb_gr_draw_pixel(Pic, x_real, y_real, temp_color, copymode);
-	  //lb_ft_printf(ty_C, "x_real=%f, y_real=%f, temp_float=%f \r\n",x_real,y_real,temp_float);
+	  //printf("x_real=%f, y_real=%f, temp_float=%f \r\n",x_real,y_real,temp_float);
 
 	  temp_color.a=round(MAX_A*(1-lb_re_frac(y_real)));
 	  lb_gr_draw_pixel(Pic, x_real, y_real-1, temp_color, copymode);
@@ -3974,7 +3974,7 @@ void _lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, SINT16_T x, SINT16_T y, 
   if (n_xy_den!=0)
     {
       n_f=(REAL_T)n_xy_num/(REAL_T)n_xy_den;
-      //lb_ft_printf(ty_C, "n_xy= %f / %f =%f\r\n",(REAL_T)n_xy_num,(REAL_T)n_xy_den,(REAL_T)n_xy_num/n_xy_den);
+      //printf("n_xy= %f / %f =%f\r\n",(REAL_T)n_xy_num,(REAL_T)n_xy_den,(REAL_T)n_xy_num/n_xy_den);
       
       temp_r = round(n_f*src_r + (1.0-n_f)*dst_r);
       temp_g = round(n_f*src_g + (1.0-n_f)*dst_g);
@@ -4407,7 +4407,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, SINT16_T x, SINT16_T y, PIXEL_T pixel, COP
 	  if (n_xy_den!=0)
 	    {
 	      n_f=(REAL_T)n_xy_num/(REAL_T)n_xy_den;
-	      //lb_ft_printf(ty_C, "n_xy= %f / %f =%f\r\n",(REAL_T)n_xy_num,(REAL_T)n_xy_den,(REAL_T)n_xy_num/n_xy_den);
+	      //printf("n_xy= %f / %f =%f\r\n",(REAL_T)n_xy_num,(REAL_T)n_xy_den,(REAL_T)n_xy_num/n_xy_den);
       
 	      temp_r = round(n_f*pixel.r + (1.0-n_f)*(*Pic).pic[y][x].r);
 	      temp_g = round(n_f*pixel.g + (1.0-n_f)*(*Pic).pic[y][x].g);
@@ -4417,7 +4417,7 @@ void lb_gr_draw_pixel(PICTURE_T *Pic, SINT16_T x, SINT16_T y, PIXEL_T pixel, COP
 	      if((temp_r<0) || (temp_g<0) || (temp_b<0) || (temp_k<0)||
 		 (temp_r>MAX_R) || (temp_g>MAX_G) || (temp_b>MAX_B) || (temp_k>MAX_A))
 		{
-		  //lb_ft_printf(ty_C, "Error: lb_gr_draw_pixel()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%d, tg=%d, tb=%d, tk=%d\r\n",
+		  //printf("Error: lb_gr_draw_pixel()--> src=(%d,%d,%d,%d) dst=(%d,%d,%d,%d), tr=%d, tg=%d, tb=%d, tk=%d\r\n",
 		  //		     src.r,src.g,src.b,src.a,    dst.r,dst.g,dst.b,dst.a, temp_r, temp_g, temp_b, temp_k);
 		  //lb_fb_exit(1);
 		}
@@ -4597,9 +4597,9 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
     bc_err=-bc_dy/2;
 
   
-  //lb_ft_printf(ty_C, "A = (POINT_2D_SINT16_T){%d,%d};\r\n",A.x,A.y); 
-  //lb_ft_printf(ty_C, "B = (POINT_2D_SINT16_T){%d,%d};\r\n",B.x,B.y); 
-  //lb_ft_printf(ty_C, "C = (POINT_2D_SINT16_T){%d,%d};\r\n",C.x,C.y); 
+  //printf("A = (POINT_2D_SINT16_T){%d,%d};\r\n",A.x,A.y); 
+  //printf("B = (POINT_2D_SINT16_T){%d,%d};\r\n",B.x,B.y); 
+  //printf("C = (POINT_2D_SINT16_T){%d,%d};\r\n",C.x,C.y); 
   
   S=A;
   E=A;
@@ -4623,7 +4623,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 	  /***************************/
 	  do 
 	    {
-	      //lb_ft_printf(ty_C, "E.y=%d\r\n",E.y); 
+	      //printf("E.y=%d\r\n",E.y); 
 	      ac_e2 = ac_err;
 
 	      if (ac_e2 >-ac_dx)
@@ -4636,7 +4636,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 		{
 		  ac_err += ac_dx;
 		  E.y += ac_sy;
-		  //lb_ft_printf(ty_C, "1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
+		  //printf("1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
 		  if (S.x!=E.x)
 		    lb_gr_draw_pixel(Pic, E.x, E.y, color, copymode);
 		  //lb_gr_delay(500);
@@ -4684,7 +4684,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 	  /***************************/
 	  do 
 	    {
-	      //lb_ft_printf(ty_C, "E.y=%d\r\n",E.y); 
+	      //printf("E.y=%d\r\n",E.y); 
 	      ac_e2 = ac_err;
 
 	      if (ac_e2 >-ac_dx)
@@ -4697,7 +4697,7 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 		{
 		  ac_err += ac_dx;
 		  E.y += ac_sy;
-		  //lb_ft_printf(ty_C, "1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
+		  //printf("1) S.x=%d S.y=%d E.x=%d E.y=%d, delta=%d\r\n", S.x, S.y, E.x, E.y,S.x-E.x);
 		  if (S.x!=E.x)
 		    lb_gr_draw_pixel(Pic, E.x, E.y, color, copymode);
 		  //lb_gr_delay(500);
@@ -4733,296 +4733,6 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 }
 
 
-#ifdef NADA
-
-void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P2, PIXEL_T color, COPYMODE_T copymode)
-{
-  // http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-  POINT_2D_SINT16_T A, B, C, P_temp;
-  SINT16_T i, x_start, x_end, line_y, temp;
-  
-  A=P0;
-  B=P1;
-  C=P2;
-  
-  if (B.y>C.y)
-    {
-      /* swap B and C */
-      P_temp=B;
-      B=C;
-      C=P_temp;
-    }
-
-  if (A.y>B.y)
-    {
-      /* swap A and B */
-      P_temp=A;
-      A=B;
-      B=P_temp;
-    }
-
-  if (B.y>C.y)
-    {
-      /* swap B and C */
-      P_temp=B;
-      B=C;
-      C=P_temp;
-    }
-
-  lb_ft_printf(ty_C, "A = ( %d , %d )\r\n",A.x,A.y); 
-  lb_ft_printf(ty_C, "B = ( %d , %d )\r\n",B.x,B.y); 
-  lb_ft_printf(ty_C, "C = ( %d , %d )\r\n",C.x,C.y); 
-  
-  line_y=A.y;
-  
-  while (line_y<=B.y)
-    {
-      if (A.y!=B.y)
-	x_start = B.x+(line_y-B.y)*(A.x-B.x)/(A.y-B.y);
-      else
-	{
-	  x_start=A.x;
-	  x_end=B.x;
-	}
-      if (A.y!=C.y)
-	x_end   = C.x+(line_y-C.y)*(A.x-C.x)/(A.y-C.y);
-      else
-	{
-	  if(A.x<=B.x)
-	    x_start=A.x;
-	  else
-	    x_start=B.x;
-	  if(C.x<x_start)
-	    x_start=C.x;
-
-	  if(A.x>=B.x)
-	    x_end=A.x;
-	  else
-	    x_end=B.x;
-	  if(C.x>x_end)
-	    x_end=C.x;
-	}
-      lb_ft_printf(ty_C, "1) x_start= %d,  x_end=%d\r\n",x_start,x_end); 
-      
-      if (x_start>x_end)
-	{
-	  temp=x_end;
-	  x_end=x_start;
-	  x_start=temp;
-	}
-      	    
-      for(i=x_start;i<=x_end;i++)
-	lb_gr_draw_pixel(Pic, i, line_y, color, copymode);
-      line_y++;
-    }
-  while (line_y <= C.y)
-    {
-      x_start = C.x+(line_y-C.y)*(B.x-C.x)/(B.y-C.y);
-      x_end   = C.x+(line_y-C.y)*(A.x-C.x)/(A.y-C.y);
-     
-      lb_ft_printf(ty_C, "2) x_start= %d,  x_end=%d\r\n",x_start,x_end); 
-   
-      if (x_start>x_end)
-	{
-	  temp=x_end;
-	  x_end=x_start;
-	  x_start=temp;
-	}
-      for(i=x_start;i<=x_end;i++)
-	lb_gr_draw_pixel(Pic, i, line_y, color, copymode);
-
-      line_y++;
-    }
-}
-
-void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P2, PIXEL_T color, COPYMODE_T copymode)
-{
-  // http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-  POINT_2D_REAL_T A, B, C, P_temp;
-  REAL_T i, x_start, x_end, line_y, temp;
-  
-  A=P0;
-  B=P1;
-  C=P2;
-  
-  if (B.y>C.y)
-    {
-      /* swap B and C */
-      P_temp=B;
-      B=C;
-      C=P_temp;
-    }
-
-  if (A.y>B.y)
-    {
-      /* swap A and B */
-      P_temp=A;
-      A=B;
-      B=P_temp;
-    }
-
-  if (B.y>C.y)
-    {
-      /* swap B and C */
-      P_temp=B;
-      B=C;
-      C=P_temp;
-    }
-
-  lb_ft_printf(ty_C, "A = ( %f , %f )\r\n",A.x,A.y); 
-  lb_ft_printf(ty_C, "B = ( %f , %f )\r\n",B.x,B.y); 
-  lb_ft_printf(ty_C, "C = ( %f , %f )\r\n",C.x,C.y); 
-  
-  line_y=A.y;
-  
-  while (line_y<=B.y)
-    {
-      x_start = B.x+0.5+(line_y-0.5-B.y)*(A.x-B.x)/(A.y-B.y);
-      x_end   = C.x+0.5+(line_y-0.5-C.y)*(A.x-C.x)/(A.y-C.y);
-
-      if
-	lb_ft_printf(ty_C, "1) x_start= %f,  x_end=%f\r\n",x_start,x_end); 
-      
-      //lb_gr_draw_pixel(Pic,x_start, line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_RED),  COPYMODE_BLEND);
-      // lb_gr_draw_pixel(Pic,x_end,   line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-      if (x_start>x_end)
-	{
-	  temp=x_end;
-	  x_end=x_start;
-	  x_start=temp;
-	}
-	    
-      for(i=round(x_start);i<round(x_end);i++)
-	lb_gr_draw_pixel(Pic,round(i), round(line_y),lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE),  COPYMODE_BLEND);
-      line_y++;
-      // lb_gr_delay(10);
-    }
-  while (line_y <= C.y)
-    {
-      x_start = C.x+0.5+(line_y-0.5-C.y)*(B.x-C.x)/(B.y-C.y);
-      x_end   = C.x+0.5+(line_y-0.5-C.y)*(A.x-C.x)/(A.y-C.y);
-     
-      lb_ft_printf(ty_C, "2) x_start= %f,  x_end=%f\r\n",x_start,x_end); 
-   
-      if (x_start>x_end)
-	{
-	  temp=x_end;
-	  x_end=x_start;
-	  x_start=temp;
-	}
-      for(i=round(x_start);i<round(x_end);i++)
-	lb_gr_draw_pixel(Pic, round(i), round(line_y),lb_gr_12RGB(COLOR_SOLID | COLOR_GREEN),  COPYMODE_BLEND);
-
-      //lb_gr_draw_pixel(Pic,x_start, line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_RED),  COPYMODE_BLEND);
-      //lb_gr_draw_pixel(Pic,x_end,   line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-      line_y++;
-      // lb_gr_delay(10);
-    }
-  //lb_gr_draw_line1_f(NULL, A.x, A.y, B.x, B.y, lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-  //lb_gr_draw_line1_f(NULL, B.x, B.y, C.x, C.y, lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-  //lb_gr_draw_line1_f(NULL, C.x, C.y, A.x, A.y, lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-  lb_gr_draw_pixel(NULL, A.x, A.y, lb_gr_12RGB(COLOR_YELLOW), copymode);
-  lb_gr_draw_pixel(NULL, B.x, B.y, lb_gr_12RGB(COLOR_YELLOW), copymode);
-  lb_gr_draw_pixel(NULL, C.x, C.y, lb_gr_12RGB(COLOR_YELLOW), copymode);
-
-
-}
-void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P2, PIXEL_T color, COPYMODE_T copymode)
-{
-  // http://www-users.mat.uni.torun.pl/~wrona/3d_tutor/tri_fillers.html
-  POINT_2D_REAL_T A, B, C, P_temp;
-  REAL_T i, x_start, x_end, line_y, temp;
-  
-  A=P0;
-  B=P1;
-  C=P2;
-  
-  if (B.y>C.y)
-    {
-      /* swap B and C */
-      P_temp=B;
-      B=C;
-      C=P_temp;
-    }
-
-  if (A.y>B.y)
-    {
-      /* swap A and B */
-      P_temp=A;
-      A=B;
-      B=P_temp;
-    }
-
-  if (B.y>C.y)
-    {
-      /* swap B and C */
-      P_temp=B;
-      B=C;
-      C=P_temp;
-    }
-
-  lb_ft_printf(ty_C, "A = ( %f , %f )\r\n",A.x,A.y); 
-  lb_ft_printf(ty_C, "B = ( %f , %f )\r\n",B.x,B.y); 
-  lb_ft_printf(ty_C, "C = ( %f , %f )\r\n",C.x,C.y); 
-  
-  line_y=A.y;
-  
-  while (line_y<=B.y)
-    {
-      x_start = B.x+(line_y-B.y)*(A.x-B.x)/(A.y-B.y);
-      x_end   = C.x+(line_y-C.y)*(A.x-C.x)/(A.y-C.y);
-
-      
-      lb_ft_printf(ty_C, "1) x_start= %f,  x_end=%f\r\n",x_start,x_end); 
-      
-      //lb_gr_draw_pixel(Pic,x_start, line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_RED),  COPYMODE_BLEND);
-      // lb_gr_draw_pixel(Pic,x_end,   line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-      if (x_start>x_end)
-	{
-	  temp=x_end;
-	  x_end=x_start;
-	  x_start=temp;
-	}
-	    
-      for(i=round(x_start);i<=round(x_end);i++)
-	lb_gr_draw_pixel(Pic,i, round(line_y),lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_WHITE),  COPYMODE_BLEND);
-      line_y++;
-      //lb_gr_delay(10);
-    }
-  while (line_y <= C.y)
-    {
-      x_start = C.x+(line_y-C.y)*(B.x-C.x)/(B.y-C.y);
-      x_end   = C.x+(line_y-C.y)*(A.x-C.x)/(A.y-C.y);
-     
-      lb_ft_printf(ty_C, "2) x_start= %f,  x_end=%f\r\n",x_start,x_end); 
-   
-      if (x_start>x_end)
-	{
-	  temp=x_end;
-	  x_end=x_start;
-	  x_start=temp;
-	}
-      for(i=round(x_start);i<=round(x_end);i++)
-	lb_gr_draw_pixel(Pic,i, round(line_y),lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_GRAY),  COPYMODE_BLEND);
-
-      //lb_gr_draw_pixel(Pic,x_start, line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_RED),  COPYMODE_BLEND);
-      //lb_gr_draw_pixel(Pic,x_end,   line_y,lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_BLUE), COPYMODE_BLEND);
-      line_y++;
-      //lb_gr_delay(10);
-    }  
- 
-
-  //lb_gr_draw_line1_f(NULL, A.x, A.y, B.x, B.y, lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
-  //lb_gr_draw_line1_f(NULL, B.x, B.y, C.x, C.y, lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
-  //lb_gr_draw_line1_f(NULL, C.x, C.y, A.x, A.y, lb_gr_12RGB(COLOR_SEMI_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
-  lb_gr_draw_pixel(NULL, A.x, A.y, lb_gr_12RGB(COLOR_YELLOW), copymode);
-  lb_gr_draw_pixel(NULL, B.x, B.y, lb_gr_12RGB(COLOR_YELLOW), copymode);
-  lb_gr_draw_pixel(NULL, C.x, C.y, lb_gr_12RGB(COLOR_YELLOW), copymode);
-}
-#endif
-
-
-
 void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode)  
 {
   SINT16_T i, j, image_top, image_bottom, pixel_x, pixel_y, nodes, swap, nodeX[20];
@@ -5030,7 +4740,7 @@ void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T colo
   /* make sure the polygon is a closed shape */
   if ( ((*L).array[0].x != (*L).array[(*L).items-1].x) || ((*L).array[0].y != (*L).array[(*L).items-1].y))
     {
-      lb_ft_printf(ty_C, "invalid shape (not closed) --> lb_gr_draw_polygon_fill\r\n");
+      printf("Warning: lb_gr_draw_polygon_fill_i() --> Invalid shape (not closed)\r\n");
       return;
     }
   
