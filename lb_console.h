@@ -38,11 +38,11 @@
 void lb_co_cls(void);
 void lb_co_cls_from_cursor(void);
 
-void lb_co_color(S_INT16_T color);
+void lb_co_color(SINT16_T color);
 void lb_co_color_bg(PIXEL_T color);
 void lb_co_color_fg(PIXEL_T color);
-void lb_co_color_bg_216(S_INT16_T r, S_INT16_T g, S_INT16_T b);
-void lb_co_color_fg_216(S_INT16_T r, S_INT16_T g, S_INT16_T b);
+void lb_co_color_bg_216(SINT16_T r, SINT16_T g, SINT16_T b);
+void lb_co_color_fg_216(SINT16_T r, SINT16_T g, SINT16_T b);
 void lb_co_color_bg_RGB(PIXEL_T color);
 void lb_co_color_fg_RGB(PIXEL_T color);
 
@@ -50,21 +50,21 @@ void lb_co_cursor_clearfrom(void);
 void lb_co_cursor_clearline(void);
 void lb_co_cursor_clearto(void);
 void lb_co_cursor_hide(void);
-void lb_co_cursor_shift(S_INT16_T x, S_INT16_T y);
+void lb_co_cursor_shift(SINT16_T x, SINT16_T y);
 void lb_co_cursor_show(void);
  
 unsigned char lb_co_getch(void);
 unsigned char lb_co_getch_pc(void);
-void lb_co_gotox(S_INT16_T x);
-void lb_co_gotoxy(S_INT16_T x,S_INT16_T y);
-S_INT8_T lb_co_kbhit();
-void lb_co_printf_block(char *str, S_INT16_T a, S_INT16_T b);
-void lb_co_printf_firstn(char *str, S_INT16_T n);
-void lb_co_printf_lastn(char *str, S_INT16_T n);
+void lb_co_gotox(SINT16_T x);
+void lb_co_gotoxy(SINT16_T x,SINT16_T y);
+SINT8_T lb_co_kbhit();
+void lb_co_printf_block(char *str, SINT16_T a, SINT16_T b);
+void lb_co_printf_firstn(char *str, SINT16_T n);
+void lb_co_printf_lastn(char *str, SINT16_T n);
 void lb_co_reset(void);
 void lb_co_reset_attributes(void);
 void lb_co_reset_colors(void);
-void lb_co_set_echo(S_INT8_T state); 
+void lb_co_set_echo(SINT8_T state); 
 void lb_co_str_to_upper(char *str);
 
 

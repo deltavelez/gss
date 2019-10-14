@@ -21,7 +21,7 @@ void lb_co_cls_from_cursor(void)
   printf("\x1b[%dJ",0);
 }
 
-void lb_co_color(S_INT16_T color)
+void lb_co_color(SINT16_T color)
 {
   printf("\x1b[%dm",color);
 }
@@ -38,7 +38,7 @@ void lb_co_color_fg(PIXEL_T color)
   printf("\x1b[38;5;%dm",16+36*(color.r*5/MAX_R)+6*(color.g*5/MAX_G)+color.b*5/MAX_B);
 }
 
-void lb_co_color_bg_216(S_INT16_T r, S_INT16_T g, S_INT16_T b)
+void lb_co_color_bg_216(SINT16_T r, SINT16_T g, SINT16_T b)
 {
   if ((r>5) || (g>5) || (b>5))
     {
@@ -48,7 +48,7 @@ void lb_co_color_bg_216(S_INT16_T r, S_INT16_T g, S_INT16_T b)
   printf("\x1b[48;5;%dm",16+36*r+6*g+b);
 }
 
-void lb_co_color_fg_216(S_INT16_T r, S_INT16_T g, S_INT16_T b)
+void lb_co_color_fg_216(SINT16_T r, SINT16_T g, SINT16_T b)
 {
   if ((r>5) || (g>5) || (b>5))
     {
@@ -96,7 +96,7 @@ void lb_co_cursor_hide(void)
     printf("\x1b[?25l");
 }
 
-void lb_co_cursor_shift(S_INT16_T x, S_INT16_T y)
+void lb_co_cursor_shift(SINT16_T x, SINT16_T y)
 {
   if (y<0) printf("\x1b[%dA",-y);
   else
@@ -124,7 +124,7 @@ unsigned char lb_co_getch( )
   return ch;
 }
 
-void lb_co_set_echo(S_INT8_T state) 
+void lb_co_set_echo(SINT8_T state) 
 { 
   struct termios tsettings;
 
@@ -217,18 +217,18 @@ unsigned char lb_co_getch_pc(void)
   return ASCII_NUL;
 }
 
-void lb_co_gotox(S_INT16_T x)
+void lb_co_gotox(SINT16_T x)
 {
   printf("\x1b[%dG",x);
 }
 
-void lb_co_gotoxy(S_INT16_T x, S_INT16_T y)
+void lb_co_gotoxy(SINT16_T x, SINT16_T y)
 {
   printf("\x1b[%d;%df",y,x);
   //  printf("\x1b[%d;%dH",x,y);  /* Equivalent */
 }
 
-S_INT8_T lb_co_kbhit()
+SINT8_T lb_co_kbhit()
 {
   // Use termios to turn off line buffering
   struct termios term;
@@ -245,9 +245,9 @@ S_INT8_T lb_co_kbhit()
 
 
 /* Prints part of a string */
-void lb_co_printf_block(char *str, S_INT16_T a, S_INT16_T b)
+void lb_co_printf_block(char *str, SINT16_T a, SINT16_T b)
 {
-  S_INT16_T i;
+  SINT16_T i;
   if ( (a<=b) && (b<strlen(str)) )
     {
       i=a;
@@ -260,9 +260,9 @@ void lb_co_printf_block(char *str, S_INT16_T a, S_INT16_T b)
 }
 
 /* Prints the first n-characters of a string */
-void lb_co_printf_firstn(char *str, S_INT16_T n)
+void lb_co_printf_firstn(char *str, SINT16_T n)
 {
-  S_INT16_T i=0;
+  SINT16_T i=0;
   while ( (i<n) && (str[i]!='\0') )
     {
       printf("%c",str[i]);
@@ -270,9 +270,9 @@ void lb_co_printf_firstn(char *str, S_INT16_T n)
     }
 }
 
-void lb_co_printf_lastn(char *str, S_INT16_T n)
+void lb_co_printf_lastn(char *str, SINT16_T n)
 {
-  S_INT16_T i;
+  SINT16_T i;
   if (n<strlen(str))
     {
       i=strlen(str)-n;
@@ -302,7 +302,7 @@ void lb_co_reset_colors(void)
 
 void lb_co_str_to_upper(char *str)
 {
-  S_INT16_T i;
+  SINT16_T i;
   i=0;
   while (str[i]!='\0')
     {

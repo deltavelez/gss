@@ -102,9 +102,9 @@ ERRORS_T errors[MAX_ERRORS] = { { e_none,                   "No errors"         
 
 };
 
-void lb_pa_pop(FN_RECORD_T *fnrec, STACK_ELEMENT_T *item, S_INT16_T *s, ARGS_T *args)
+void lb_pa_pop(FN_RECORD_T *fnrec, STACK_ELEMENT_T *item, SINT16_T *s, ARGS_T *args)
 {
-  S_INT16_T n, total_subitems, sum_last=0;
+  SINT16_T n, total_subitems, sum_last=0;
 
 
   (*fnrec).out[(*fnrec).oq]=*item;
@@ -207,7 +207,7 @@ void lb_pa_pop(FN_RECORD_T *fnrec, STACK_ELEMENT_T *item, S_INT16_T *s, ARGS_T *
   (*s)--;
 }
 
-void lb_pa_inc_out(char *debug_msg,  S_INT16_T *var)
+void lb_pa_inc_out(char *debug_msg,  SINT16_T *var)
 {
   if ((*var+1)>= MAX_STACK_SIZE)
     {
@@ -217,9 +217,9 @@ void lb_pa_inc_out(char *debug_msg,  S_INT16_T *var)
   (*var)++;
 }
 
-S_INT16_T lb_pa_startpos(FN_RECORD_T *fnrec, S_INT16_T i, S_INT16_T argument)
+SINT16_T lb_pa_startpos(FN_RECORD_T *fnrec, SINT16_T i, SINT16_T argument)
 {
-  S_INT16_T n, sum_args;
+  SINT16_T n, sum_args;
 
   if ((*fnrec).out[i].type!=st_function)
     {
@@ -238,30 +238,30 @@ S_INT16_T lb_pa_startpos(FN_RECORD_T *fnrec, S_INT16_T i, S_INT16_T argument)
   return i-sum_args;
 }
 
-FLOAT_T lb_pa_eval_real(FN_RECORD_T *fnrec, FLOAT_T *values, ERR_T *error)
+REAL_T lb_pa_eval_real(FN_RECORD_T *fnrec, REAL_T *values, MATHERROR_T *error)
 {
-  FLOAT_T F[MAX_STACK_SIZE];
-  S_INT16_T i, k, n, temp_pos;
-  FLOAT_T temp_float;
+  REAL_T F[MAX_STACK_SIZE];
+  SINT16_T i, k, n, temp_pos;
+  REAL_T temp_float;
 
   /* Special constants */
-  FLOAT_T max_float;
-  //FLOAT_T min_float;
+  REAL_T max_float;
+  //REAL_T min_float;
 
   FN_RECORD_T fnrec1;                  
 
-  if (sizeof(FLOAT_T)==4)
+  if (sizeof(REAL_T)==4)
     {
       max_float=FLT_MAX;
       //  min_float=FLT_MIN;
     } else
-    if (sizeof(FLOAT_T)==8)
+    if (sizeof(REAL_T)==8)
       {
 	max_float=DBL_MAX;
 	//  min_float=DBL_MIN;
       } else
       {
-  	printf("Error: lb_pa_eval(): invalid floating data type: [size = %zd]\r\n",sizeof(FLOAT_T));
+  	printf("Error: lb_pa_eval(): invalid floating data type: [size = %zd]\r\n",sizeof(REAL_T));
   	exit(1);
       }
     //printf("Max_float = %.12e\r\n",max_float); 
@@ -605,33 +605,33 @@ FLOAT_T lb_pa_eval_real(FN_RECORD_T *fnrec, FLOAT_T *values, ERR_T *error)
     }
 }
 
-COMPLEX_T lb_pa_eval_complex(FN_RECORD_T *fnrec, COMPLEX_T *values, ERR_T *error)
+COMPLEX_T lb_pa_eval_complex(FN_RECORD_T *fnrec, COMPLEX_T *values, MATHERROR_T *error)
 {
   COMPLEX_T F[MAX_STACK_SIZE];
-  S_INT16_T i, k, n, temp_pos;
+  SINT16_T i, k, n, temp_pos;
   COMPLEX_T temp_z;
  
   /* Special constants */
-  FLOAT_T max_float;
-  //FLOAT_T min_float;
+  REAL_T max_float;
+  //REAL_T min_float;
 
   FN_RECORD_T fnrec1;                  
 
   if(*error!=e_none)
     return ZERO_C;
 
-  if (sizeof(FLOAT_T)==4)
+  if (sizeof(REAL_T)==4)
     {
       max_float=FLT_MAX;
       //min_float=FLT_MIN;
     } else
-    if (sizeof(FLOAT_T)==8)
+    if (sizeof(REAL_T)==8)
       {
 	max_float=DBL_MAX;
 	//min_float=DBL_MIN;
       } else
       {
-	printf("Error: lb_pa_eval(): invalid floating data type: [size = %zd]\r\n",sizeof(FLOAT_T));
+	printf("Error: lb_pa_eval(): invalid floating data type: [size = %zd]\r\n",sizeof(REAL_T));
 	exit(1);
       }
   
@@ -1110,8 +1110,8 @@ COMPLEX_T lb_pa_eval_complex(FN_RECORD_T *fnrec, COMPLEX_T *values, ERR_T *error
 void lb_pa_shunting_yard(FN_RECORD_T *fnrec)
 {
   STACK_ELEMENT_T stack[MAX_STACK_SIZE];
-  S_INT16_T st, i, oq_size;
-  S_INT8_T f_cond1, f_cond2, f_cond3;
+  SINT16_T st, i, oq_size;
+  SINT8_T f_cond1, f_cond2, f_cond3;
   ARGS_T args;
   
   if ( (*fnrec).oq<=0 )
@@ -1287,14 +1287,14 @@ void lb_pa_shunting_yard(FN_RECORD_T *fnrec)
     }
 }
 
-void lb_pa_parse(char *fnstr, FN_RECORD_T *fnrec, char *vars, S_INT16_T *n_vars)
+void lb_pa_parse(char *fnstr, FN_RECORD_T *fnrec, char *vars, SINT16_T *n_vars)
 {
   char vars_list[MAX_NUMBER_VARIABLES][MAX_VARIABLE_SIZE+1];
   char token[MAX_FORMULA_SIZE+1];
-  S_INT16_T i, k, length_fn, length_token, length_number;
-  S_INT8_T decimal_flag, match_flag=FALSE, match_flag2=FALSE;
-  S_INT8_T f_is_first, f_prev_is_lpar, f_prev_is_separator, f_prev_is_plus_or_minus, temp_operator;
-  FLOAT_T temp_float;
+  SINT16_T i, k, length_fn, length_token, length_number;
+  SINT8_T decimal_flag, match_flag=FALSE, match_flag2=FALSE;
+  SINT8_T f_is_first, f_prev_is_lpar, f_prev_is_separator, f_prev_is_plus_or_minus, temp_operator;
+  REAL_T temp_float;
  
   lb_pa_parse_vars(vars, vars_list, n_vars);
 
@@ -1524,14 +1524,14 @@ void lb_pa_parse(char *fnstr, FN_RECORD_T *fnrec, char *vars, S_INT16_T *n_vars)
     }
 }
 
-void lb_pa_parse_vars(char *vars, char vars_list[MAX_NUMBER_VARIABLES][MAX_VARIABLE_SIZE+1], S_INT16_T *n_vars)
+void lb_pa_parse_vars(char *vars, char vars_list[MAX_NUMBER_VARIABLES][MAX_VARIABLE_SIZE+1], SINT16_T *n_vars)
 /* This function parses the variables in a null-terminated strings
    Rules:  1. Variables must start with a letter 
            2. Variables can be followed by letters or numbers
            3. Other characters are considered invalid 
            4. Variables are not case sensitive */
 {
-  S_INT16_T i, j, k, length_string;
+  SINT16_T i, j, k, length_string;
   char token[MAX_VARIABLE_SIZE+1];
 
   /* Parsing the variables */
@@ -1620,7 +1620,7 @@ void lb_pa_parse_vars(char *vars, char vars_list[MAX_NUMBER_VARIABLES][MAX_VARIA
 
 void lb_pa_print_item(STACK_ELEMENT_T item)
 {
-  S_INT16_T n;
+  SINT16_T n;
   switch(item.type)
     {
     case st_constant: 
@@ -1657,11 +1657,11 @@ void lb_pa_print_item(STACK_ELEMENT_T item)
     }
 }
 
-void lb_pa_print_output(FN_RECORD_T *fnrec, S_INT16_T color)
+void lb_pa_print_output(FN_RECORD_T *fnrec, SINT16_T color)
 {
   lb_co_color(color);
   lb_co_cls_from_cursor();
-  S_INT16_T i;
+  SINT16_T i;
   if ((*fnrec).oq==0)
     printf("Output queue is empty\r\n");
   for (i=0;i<(*fnrec).oq;i++)
@@ -1673,9 +1673,9 @@ void lb_pa_print_output(FN_RECORD_T *fnrec, S_INT16_T color)
   lb_co_cls_from_cursor();
  }
 
-void lb_pa_print_stack(STACK_ELEMENT_T *stack, S_INT16_T st)
+void lb_pa_print_stack(STACK_ELEMENT_T *stack, SINT16_T st)
 {
-  S_INT16_T i;
+  SINT16_T i;
   if (st==0)
     printf("Stack is empty\r\n");
   for (i=0;i<st;i++)
@@ -1685,11 +1685,11 @@ void lb_pa_print_stack(STACK_ELEMENT_T *stack, S_INT16_T st)
     }
 }
 
-FLOAT_T lb_pa_formula(char *fnstr, char *vars, FLOAT_T f1, FLOAT_T f2, FLOAT_T f3, ERR_T *error)
+REAL_T lb_pa_formula(char *fnstr, char *vars, REAL_T f1, REAL_T f2, REAL_T f3, MATHERROR_T *error)
 {
   FN_RECORD_T fnrec;
-  FLOAT_T vector[3];
-  S_INT16_T n_vars;
+  REAL_T vector[3];
+  SINT16_T n_vars;
  
   vector[0]=f1;
   vector[1]=f2;
@@ -1716,11 +1716,11 @@ FLOAT_T lb_pa_formula(char *fnstr, char *vars, FLOAT_T f1, FLOAT_T f2, FLOAT_T f
   return lb_pa_eval_real(&fnrec, vector, error);
 }
 
-COMPLEX_T lb_pa_formula_complex(char *fnstr, char *vars, COMPLEX_T f1, COMPLEX_T f2, COMPLEX_T f3, ERR_T *error)
+COMPLEX_T lb_pa_formula_complex(char *fnstr, char *vars, COMPLEX_T f1, COMPLEX_T f2, COMPLEX_T f3, MATHERROR_T *error)
 {
   FN_RECORD_T fnrec;
   COMPLEX_T vector[3];
-  S_INT16_T n_vars;
+  SINT16_T n_vars;
  
   vector[0]=f1;
   vector[1]=f2;

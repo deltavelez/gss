@@ -21,8 +21,8 @@ void lb_au_callback_copy(void *userdata, Uint8 *stream, int len)
 
 void lb_au_callback_DTMF(void *userdata, Uint8 *stream, int len) 
 {
-  U_INT16_T i;
-  S_INT16_T sample_left, sample_right;
+  UINT16_T i;
+  SINT16_T sample_left, sample_right;
   //printf("len=%d\r\n",len);
   //printf("tetha=%f\r\n",tetha);
     
@@ -64,7 +64,7 @@ void lb_au_callback_DTMF(void *userdata, Uint8 *stream, int len)
     }
 }
 
-void lb_au_freq_DTMF(char digit, FLOAT_T *f1, FLOAT_T *f2)
+void lb_au_freq_DTMF(char digit, REAL_T *f1, REAL_T *f2)
 {
   if ((digit=='1') || (digit=='2') || (digit=='3') || (digit=='a'))
     *f1=697.0;
@@ -92,9 +92,9 @@ void lb_au_freq_DTMF(char digit, FLOAT_T *f1, FLOAT_T *f2)
   return;
 }  
 
-S_INT8_T lb_au_SDL_audio_init_DTMF(void)
+SINT8_T lb_au_SDL_audio_init_DTMF(void)
 {
-  U_INT16_T i;
+  UINT16_T i;
 
   /* We first check the SDL audio has been initialized */
   if (SDL_Init(SDL_INIT_AUDIO) < 0)
@@ -106,8 +106,8 @@ S_INT8_T lb_au_SDL_audio_init_DTMF(void)
   /* We load the sinewave lookup tables */
   for (i=0;i<AUDIO_SAMPLES;i++)
     {
-      _lb_au_sin_table8[i]=(U_INT8_T)(127.0*sin((FLOAT_T)(i+0.5)*0.5*M_PI/AUDIO_SAMPLES));
-      _lb_au_sin_table16[i]=(S_INT16_T)(0.5+32766.0*sin((FLOAT_T)(i+0.5)*0.5*M_PI/AUDIO_SAMPLES));
+      _lb_au_sin_table8[i]=(UINT8_T)(127.0*sin((REAL_T)(i+0.5)*0.5*M_PI/AUDIO_SAMPLES));
+      _lb_au_sin_table16[i]=(SINT16_T)(0.5+32766.0*sin((REAL_T)(i+0.5)*0.5*M_PI/AUDIO_SAMPLES));
       //  printf("sin[%i]=%d\r\n",i,_lb_au_sin_table16[i]);
     }
   
@@ -192,7 +192,7 @@ void lb_au_wave_load_to_vector_r(const char *filename, VECTOR_R_T *V)
 {
   WAVE_HEADER_T h;
   FILE *file;
-  U_INT16_T i, i_max;
+  UINT16_T i, i_max;
   short sample16;
 
   file=fopen(filename,"rb");
@@ -204,7 +204,7 @@ void lb_au_wave_load_to_vector_r(const char *filename, VECTOR_R_T *V)
   for(i=0;i<i_max;i++)
     {
       fread(&sample16,sizeof(sample16),1,file);
-      (*V).array[i]=(FLOAT_T)sample16/32767.0;
+      (*V).array[i]=(REAL_T)sample16/32767.0;
       //printf("sample[%d]=%d\r\n",i,sample16);
   
     }
@@ -212,11 +212,11 @@ void lb_au_wave_load_to_vector_r(const char *filename, VECTOR_R_T *V)
   fclose(file);
 }
 
-void lb_au_wave_write_from_vector_r(const char *filename, VECTOR_R_T *V, U_INT16_T bit_rate, U_INT8_T bits_per_sample)
+void lb_au_wave_write_from_vector_r(const char *filename, VECTOR_R_T *V, UINT16_T bit_rate, UINT8_T bits_per_sample)
 {
   WAVE_HEADER_T h;
   FILE *file;
-  U_INT16_T i;
+  UINT16_T i;
   //short sample16;
   
   if (!((bit_rate==11025) || (bit_rate==22050) || (bit_rate==44100)))
@@ -285,11 +285,11 @@ void lb_au_wave_write_from_vector_r(const char *filename, VECTOR_R_T *V, U_INT16
   fclose(file);
 }
 
-void lb_au_wave_write_or_append_from_vector_r(const char *filename, VECTOR_R_T *V, U_INT16_T bit_rate, U_INT8_T bits_per_sample)
+void lb_au_wave_write_or_append_from_vector_r(const char *filename, VECTOR_R_T *V, UINT16_T bit_rate, UINT8_T bits_per_sample)
 {
   WAVE_HEADER_T h;
   FILE *file;
-  U_INT16_T i;
+  UINT16_T i;
   //short sample16;
   
   if (!((bit_rate==8000) || (bit_rate==11025) || (bit_rate==22050) || (bit_rate==44100)))
@@ -413,7 +413,7 @@ void lb_au_wave_parse_header(WAVE_HEADER_T h)
   printf("data_length=%d\r\n",     h.data_length);
 }
 
-U_INT8_T lb_au_sin_from_table_8_bit(U_INT16_T i)
+UINT8_T lb_au_sin_from_table_8_bit(UINT16_T i)
 {
   if (i>=4*AUDIO_SAMPLES)
     {
@@ -438,7 +438,7 @@ U_INT8_T lb_au_sin_from_table_8_bit(U_INT16_T i)
   return 0;
 }
 
-S_INT16_T lb_au_sin_from_table_16_bit(U_INT16_T  i)
+SINT16_T lb_au_sin_from_table_16_bit(UINT16_T  i)
 {
   if (i>=4*AUDIO_SAMPLES)
     {

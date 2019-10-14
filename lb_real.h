@@ -5,68 +5,68 @@
 
 /* Basic operations */
 
-FLOAT_T lb_re_divide(FLOAT_T x, FLOAT_T y, ERR_T *error);
-FLOAT_T lb_re_pow(FLOAT_T x, FLOAT_T y,  ERR_T *error);
-FLOAT_T lb_re_sqr(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_sqrt(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_xroot(FLOAT_T x, FLOAT_T y, ERR_T *error);
+REAL_T lb_re_divide(REAL_T x, REAL_T y, MATHERROR_T *error);
+REAL_T lb_re_pow(REAL_T x, REAL_T y,  MATHERROR_T *error);
+REAL_T lb_re_sqr(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_sqrt(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_xroot(REAL_T x, REAL_T y, MATHERROR_T *error);
 
 /* Euler */
 
-FLOAT_T lb_re_exp(FLOAT_T x,ERR_T *error);
-FLOAT_T lb_re_ln(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_log(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_log2(FLOAT_T x, ERR_T *error);
+REAL_T lb_re_exp(REAL_T x,MATHERROR_T *error);
+REAL_T lb_re_ln(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_log(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_log2(REAL_T x, MATHERROR_T *error);
 
 /* Trigonometric - circular */
 
-FLOAT_T lb_re_tan(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_asin(FLOAT_T x,ERR_T *error);
-FLOAT_T lb_re_acos(FLOAT_T x,ERR_T *error);
-FLOAT_T lb_re_atan2(FLOAT_T y, FLOAT_T x);
+REAL_T lb_re_tan(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_asin(REAL_T x,MATHERROR_T *error);
+REAL_T lb_re_acos(REAL_T x,MATHERROR_T *error);
+REAL_T lb_re_atan2(REAL_T y, REAL_T x);
 
 /* Trigonometric - hyperbolic*/
 
-FLOAT_T lb_re_sinh(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_cosh(FLOAT_T x, ERR_T *error);
-FLOAT_T lb_re_acosh(FLOAT_T x,ERR_T *error);
-FLOAT_T lb_re_atanh(FLOAT_T x,ERR_T *error);
+REAL_T lb_re_sinh(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_cosh(REAL_T x, MATHERROR_T *error);
+REAL_T lb_re_acosh(REAL_T x,MATHERROR_T *error);
+REAL_T lb_re_atanh(REAL_T x,MATHERROR_T *error);
 
 /* Comparison */
 
-S_INT8_T lb_re_equal(FLOAT_T a, FLOAT_T b);
-S_INT8_T lb_re_is_int(FLOAT_T x);
-S_INT8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b);
-S_INT8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b);
-FLOAT_T lb_re_max(FLOAT_T x, FLOAT_T y);
-FLOAT_T lb_re_min(FLOAT_T x, FLOAT_T y);
+SINT8_T lb_re_equal(REAL_T a, REAL_T b);
+SINT8_T lb_re_is_int(REAL_T x);
+SINT8_T lb_re_larger_or_equal(REAL_T a, REAL_T b);
+SINT8_T lb_re_smaller_or_equal(REAL_T a, REAL_T b);
+REAL_T lb_re_max(REAL_T x, REAL_T y);
+REAL_T lb_re_min(REAL_T x, REAL_T y);
 
 /* Singular functions */
-FLOAT_T lb_re_frac(FLOAT_T x);
-S_INT8_T lb_re_ispos(FLOAT_T x);
-FLOAT_T lb_re_ramp(FLOAT_T x);
+REAL_T lb_re_frac(REAL_T x);
+SINT8_T lb_re_ispos(REAL_T x);
+REAL_T lb_re_ramp(REAL_T x);
 
-S_INT8_T lb_re_sign(FLOAT_T x);
-FLOAT_T lb_re_pulse(FLOAT_T a, FLOAT_T b, FLOAT_T x);
-FLOAT_T lb_re_pulse_triangle(FLOAT_T a, FLOAT_T b, FLOAT_T x);
-FLOAT_T lb_re_step(FLOAT_T x);
-FLOAT_T lb_re_step_practical(FLOAT_T t, FLOAT_T x);
+SINT8_T lb_re_sign(REAL_T x);
+REAL_T lb_re_pulse(REAL_T a, REAL_T b, REAL_T x);
+REAL_T lb_re_pulse_triangle(REAL_T a, REAL_T b, REAL_T x);
+REAL_T lb_re_step(REAL_T x);
+REAL_T lb_re_step_practical(REAL_T t, REAL_T x);
 
 /* Other functions */
-S_INT16_T lb_re_ndigits(FLOAT_T x);
-FLOAT_T lb_re_factorial(FLOAT_T n,ERR_T *error);
-FLOAT_T lb_re_normed_exponent(FLOAT_T x);
-FLOAT_T lb_re_normed_significand(FLOAT_T x);
-FLOAT_T lb_re_test_interval_closed(FLOAT_T a, FLOAT_T b, FLOAT_T x);
-FLOAT_T lb_re_test_interval_open(FLOAT_T a, FLOAT_T b, FLOAT_T x);
+SINT16_T lb_re_ndigits(REAL_T x);
+REAL_T lb_re_factorial(REAL_T n,MATHERROR_T *error);
+REAL_T lb_re_normed_exponent(REAL_T x);
+REAL_T lb_re_normed_significand(REAL_T x);
+REAL_T lb_re_test_interval_closed(REAL_T a, REAL_T b, REAL_T x);
+REAL_T lb_re_test_interval_open(REAL_T a, REAL_T b, REAL_T x);
 
 
 
 /* Financial */
 
-FLOAT_T lb_re_APR_to_monthly(FLOAT_T apr, ERR_T *error);
-FLOAT_T lb_re_monthly_to_APR(FLOAT_T monthly, ERR_T *error);
-FLOAT_T lb_re_monthly_to_effective(FLOAT_T monthly, ERR_T *error);
+REAL_T lb_re_APR_to_monthly(REAL_T apr, MATHERROR_T *error);
+REAL_T lb_re_monthly_to_APR(REAL_T monthly, MATHERROR_T *error);
+REAL_T lb_re_monthly_to_effective(REAL_T monthly, MATHERROR_T *error);
 
 /* Interpolation */
 /*
@@ -76,14 +76,14 @@ FLOAT_T lb_re_monthly_to_effective(FLOAT_T monthly, ERR_T *error);
      |_____________________________x 
 */
 
-void lb_re_inter_linear(FLOAT_T x0, FLOAT_T Q0, FLOAT_T x1, FLOAT_T Q1,
-			FLOAT_T x, FLOAT_T *Q, ERR_T *error);
+void lb_re_inter_linear(REAL_T x0, REAL_T Q0, REAL_T x1, REAL_T Q1,
+			REAL_T x, REAL_T *Q, MATHERROR_T *error);
 
-void lb_re_inter_bilinear(FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1,
-			  FLOAT_T Q00, FLOAT_T Q01, FLOAT_T Q10, FLOAT_T Q11,
-			  FLOAT_T x, FLOAT_T y, FLOAT_T *Q, ERR_T *error);
+void lb_re_inter_bilinear(REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1,
+			  REAL_T Q00, REAL_T Q01, REAL_T Q10, REAL_T Q11,
+			  REAL_T x, REAL_T y, REAL_T *Q, MATHERROR_T *error);
 
 /* Rotation */
-void lb_re_rotate(FLOAT_T x, FLOAT_T y, FLOAT_T angle, FLOAT_T *xr, FLOAT_T *yr);
+void lb_re_rotate(REAL_T x, REAL_T y, REAL_T angle, REAL_T *xr, REAL_T *yr);
 
 #endif /* LB_REAL_H */

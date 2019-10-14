@@ -15,23 +15,25 @@
 #define TRUE 1
 #define FALSE 0
 
-/******************************************************/
+/*******************************************E***********/
 /* Basic data types */
 /******************************************************/
 
-#define FLOAT_T double
-#define U_INT8_T unsigned char
-#define U_INT16_T unsigned short
-#define U_INT32_T unsigned int
-#define S_INT8_T char
-#define S_INT16_T short
-#define S_INT32_T long
+#define REAL_T double
+#define SINT8_T char
+#define UINT8_T unsigned char
+#define SINT16_T short
+#define UINT16_T unsigned short
+#define SINT32_T long
+#define UINT32_T unsigned int
+#define SINT64_T long long
+#define UINT64_T unsigned long long
 
 /******************************************************/
 /* Math data types */
 /******************************************************/
 
-typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small, e_arg_inf_loop, e_arg_non_real, e_arg_not_var } ERR_T;
+typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_smaller_one, e_arg_larger_one, e_arg_negative, e_arg_non_int, e_arg_non_even, e_arg_non_odd, e_arg_less_two, e_arg_too_big, e_arg_too_small, e_arg_inf_loop, e_arg_non_real, e_arg_not_var } MATHERROR_T;
 
 /******************************************************/
 /* Complex variable data types */
@@ -39,7 +41,7 @@ typedef enum { e_none=0, e_div_zero, e_too_big, e_complex, e_undefined, e_arg_sm
 
 typedef struct 
 {
-  FLOAT_T r, i;
+  REAL_T r, i;
 } COMPLEX_T;
 
 #define ZERO_C (COMPLEX_T){0.0, 0.0}
@@ -50,8 +52,8 @@ typedef struct
 #define ARRAY_MAX_DIM      5
 #define ARRAY_MAX_N        65535
 
-#define MATRIX_MAX_ROWS  1000
-#define MATRIX_MAX_COLS  1000
+#define MATRIX_MAX_ROWS  65535
+#define MATRIX_MAX_COLS  65535
 #define VECTOR_MAX_ITEMS 65535
 
 /******************************************************/
@@ -60,63 +62,63 @@ typedef struct
 
 typedef struct
 {
-  S_INT8_T *array;
-  U_INT16_T items;
-} VECTOR_S_INT8_T;
+  SINT8_T *array;
+  UINT16_T items;
+} VECTOR_SINT8_T;
 
 typedef struct
 {
-  S_INT16_T *array;
-  U_INT16_T items;
-} VECTOR_S_INT16_T;
+  SINT16_T *array;
+  UINT16_T items;
+} VECTOR_SINT16_T;
 
 typedef struct
 {
-  FLOAT_T *array;
-  U_INT16_T items;
+  REAL_T *array;
+  UINT16_T items;
 } VECTOR_R_T;
 
 typedef struct
 {
   COMPLEX_T *array;
-  U_INT16_T items;
+  UINT16_T items;
 } VECTOR_C_T;
 
 typedef struct
 {
-  S_INT8_T **array;
-  U_INT16_T rows;
-  U_INT16_T cols;
-} MATRIX_S_INT8_T;
+  SINT8_T **array;
+  UINT16_T rows;
+  UINT16_T cols;
+} MATRIX_SINT8_T;
 
 typedef struct
 {
-  FLOAT_T **array;
-  U_INT16_T rows;
-  U_INT16_T cols;
+  REAL_T **array;
+  UINT16_T rows;
+  UINT16_T cols;
 } MATRIX_R_T;
 
 typedef struct
 {
   COMPLEX_T **array;
-  U_INT16_T rows;
-  U_INT16_T cols;
+  UINT16_T rows;
+  UINT16_T cols;
 } MATRIX_C_T;
 
 typedef struct
 {
-  S_INT8_T n;
-  U_INT16_T dim[5];
-  FLOAT_T *a1;
-  FLOAT_T **a2;
-  FLOAT_T ***a3;
-  FLOAT_T ****a4;
-  FLOAT_T *****a5;
+  SINT8_T n;
+  UINT16_T dim[5];
+  REAL_T *a1;
+  REAL_T **a2;
+  REAL_T ***a3;
+  REAL_T ****a4;
+  REAL_T *****a5;
 } ARRAY_R_T;
 
 
-typedef FLOAT_T(*FUNCTION_X_Y)(FLOAT_T, FLOAT_T, ERR_T*);
-typedef FLOAT_T(*FUNCTION_X)(FLOAT_T, ERR_T*);
+typedef REAL_T(*FUNCTION_X_Y)(REAL_T, REAL_T, MATHERROR_T*);
+typedef REAL_T(*FUNCTION_X)(REAL_T, MATHERROR_T*);
 
 /******************************************************/
 /* Computer Graphics constants */
@@ -124,10 +126,10 @@ typedef FLOAT_T(*FUNCTION_X)(FLOAT_T, ERR_T*);
 #define PICTURE_MAX_HEIGHT 1080
 #define PICTURE_MAX_WIDTH 1920
 
-#define N_BITS_R 8            /* Number of bits for red channel in all operations */
-#define N_BITS_G 8            /* Number of bits for green channel in all operations */
-#define N_BITS_B 8            /* Number of bits for blue channel in all operations */
-#define N_BITS_A 8            /* Number of bits for k-channel in all operations */
+#define N_BITS_R 8            /* Number of bits for red channel for PICTURE_T */
+#define N_BITS_G 8            /* Number of bits for green channel for PICTURE_T */
+#define N_BITS_B 8            /* Number of bits for blue channel for PICTURE_T */
+#define N_BITS_A 8            /* Number of bits for k-channel for PICTURE_T */
 
 
 #if N_BITS_R == 1
@@ -473,6 +475,276 @@ typedef FLOAT_T(*FUNCTION_X)(FLOAT_T, ERR_T*);
 #define COLOR_ALICEBLUE	            0xFFE
 #define COLOR_PAPAYAWHIP	    0xDEF
 
+
+/******************************************************/
+/* Computer Graphics data types */
+/******************************************************/
+#define LINE_MAX_ITEMS 65535
+
+
+typedef enum { COPYMODE_FRAMEBUFFER=0,
+	       COPYMODE_COPY,
+	       COPYMODE_AND,
+	       COPYMODE_OR,
+	       COPYMODE_XOR,
+	       COPYMODE_NOT_SRC,
+	       COPYMODE_NOT_DST,
+	       COPYMODE_ADD,
+	       COPYMODE_SRC_MINUS_DST,
+	       COPYMODE_DST_MINUS_SRC,
+	       COPYMODE_AVG,
+	       COPYMODE_BLEND,
+	       COPYMODE_MULTIPLY,
+	       COPYMODE_SRC_DIV_DST,
+	       COPYMODE_DST_DIV_SRC,
+	       COPYMODE_PORTERDUFF_CLEAR_DST,
+	       COPYMODE_PORTERDUFF_COPY_SRC,
+	       COPYMODE_PORTERDUFF_LEAVES_DST,
+	       COPYMODE_PORTERDUFF_SRC_OVER_DST,
+	       COPYMODE_PORTERDUFF_DST_OVER_SRC,
+	       COPYMODE_PORTERDUFF_SRC_IN_DST,
+	       COPYMODE_PORTERDUFF_DST_IN_SRC,
+	       COPYMODE_PORTERDUFF_SRC_OUT_DST,
+	       COPYMODE_PORTERDUFF_DST_OUT_SRC,
+	       COPYMODE_PORTERDUFF_SRC_ATOP_DST,
+	       COPYMODE_PORTERDUFF_DST_ATOP_SRC,
+	       COPYMODE_PORTERDUFF_XOR } COPYMODE_T; 
+
+
+#define RENDERMODE_T UINT32_T
+
+/* This section deals with the attributes passed through the "copymode" parameter. They're listed from lower to higher order. 
+   For example: value = (value >> THAT_VALUE_SHIFT ) && THAT_VALUE_MASK */
+#define RENDERMODE_PIXELBG_R_MASK    0b00000000000000000000000000001111
+#define RENDERMODE_PIXELBG_G_MASK    0b00000000000000000000000011110000
+#define RENDERMODE_PIXELBG_B_MASK    0b00000000000000000000111100000000
+#define RENDERMODE_PIXELMODE_MASK    0b00000000000000001111000000000000
+#define RENDERMODE_SCALE_X_MASK      0b00000000001111110000000000000000
+#define RENDERMODE_SCALE_Y_MASK      0b00001111110000000000000000000000
+
+#define RENDERMODE_PIXELMODE_0       0b00000000000000000000000000000000
+#define RENDERMODE_PIXELMODE_1       0b00000000000000000001000000000000
+#define RENDERMODE_PIXELMODE_2       0b00000000000000000010000000000000
+#define RENDERMODE_PIXELMODE_3       0b00000000000000000011000000000000
+
+#define RENDERMODE_PIXELMODE_SHIFT      12 
+#define RENDERMODE_PIXELBG_R_SHIFT       0
+#define RENDERMODE_PIXELBG_G_SHIFT       4
+#define RENDERMODE_PIXELBG_B_SHIFT       8
+#define RENDERMODE_SCALE_X_SHIFT         16
+#define RENDERMODE_SCALE_Y_SHIFT         22
+
+/* These macros help the user setting an arbitrary "pixel size" */
+#define RENDERMODE_SCALE_X(X) (((X-1)<<RENDERMODE_SCALE_X_SHIFT) & RENDERMODE_SCALE_X_MASK)
+#define RENDERMODE_SCALE_Y(X) (((X-1)<<RENDERMODE_SCALE_Y_SHIFT) & RENDERMODE_SCALE_Y_MASK)
+#define RENDERMODE_BGCOLOR(X) (X & (RENDERMODE_PIXELBG_R_MASK | RENDERMODE_PIXELBG_G_MASK | RENDERMODE_PIXELBG_B_MASK) )
+
+
+typedef enum
+  { 
+    LINEMODE_DOTS_SOLID, 
+    LINEMODE_DOTS_FILTERED,
+    LINEMODE_SOLID, /* Draws solid pixels */
+    LINEMODE_FILTERED   /* Uses anti-aliasing */
+  } LINEMODE_T;
+   
+
+typedef struct
+{
+  SINT16_T x;
+  SINT16_T y;
+  SINT8_T flag;
+} POINT_2D_SINT16_T;
+
+typedef struct
+{
+  REAL_T x;
+  REAL_T y;
+  SINT8_T flag;
+} POINT_2D_REAL_T;
+
+typedef struct
+{
+  REAL_T x;
+  REAL_T y;
+  REAL_T z;
+  SINT8_T flag;
+} POINT_3D_REAL_T;
+
+typedef struct
+{
+  POINT_2D_SINT16_T *array;
+  UINT16_T items;
+} LINE_2D_SINT16_T;
+
+typedef struct
+{
+  POINT_2D_REAL_T *array;
+  UINT16_T items;
+} LINE_2D_REAL_T;
+
+typedef struct
+{
+  POINT_3D_REAL_T *array;
+  UINT16_T items;
+} LINE_3D_REAL_T;
+
+typedef struct
+{
+  POINT_2D_REAL_T **array;
+  UINT16_T rows;
+  UINT16_T cols;
+} MATRIX_POINT_2D_REAL_T;
+
+typedef struct
+{
+  POINT_3D_REAL_T **array;
+  UINT16_T rows;
+  UINT16_T cols;
+} MATRIX_POINT_3D_REAL_T;
+
+typedef struct 
+  {
+    SINT16_T xp_min;
+    SINT16_T yp_min;
+    SINT16_T xp_max;
+    SINT16_T yp_max;
+    REAL_T xr_min;
+    REAL_T xr_max;
+    REAL_T yr_min;
+    REAL_T yr_max;
+  } VIEWPORT_2D_T;
+
+typedef struct 
+  {
+    SINT16_T xp_min;
+    SINT16_T yp_min;
+    SINT16_T xp_max;
+    SINT16_T yp_max;
+    
+    REAL_T scale;    /* Zoom */
+    REAL_T cam_d;    /* Stereoscopic */
+    REAL_T cam_h;    /* Depth */
+    POINT_3D_REAL_T cam;   /* Camera's location */
+} VIEWPORT_3D_T;
+
+typedef struct 
+  {
+    UINT8_T r:N_BITS_R;
+    UINT8_T g:N_BITS_G;
+    UINT8_T b:N_BITS_B;
+    UINT8_T a:N_BITS_A;
+  } PIXEL_T;
+
+#define RENDEROPTIONS_DEFAULT        0b00000000
+#define RENDEROPTIONS_LINE           0b00000010
+#define RENDEROPTIONS_GRAPHICS_ONLY  0b00000100
+
+typedef struct 
+  {
+    UINT8_T r;
+    UINT8_T g;
+    UINT8_T b;
+  } RGB_T;
+
+typedef struct
+{
+  PIXEL_T **pic;
+  UINT16_T w;
+  UINT16_T h;
+} PICTURE_T;
+
+typedef struct
+{
+  char *dat;
+  UINT16_T w;
+  UINT16_T h;
+} SCREEN_T;
+
+/******************************************************/
+/* Fonts data types */
+/******************************************************/
+
+typedef struct
+{
+  UINT8_T cols;
+  UINT8_T rows;
+  UINT8_T range_a;
+  UINT8_T range_b;
+  unsigned char* data;
+  UINT8_T scale_x;
+  UINT8_T scale_y;
+  UINT8_T gap_x;
+  UINT8_T gap_y;
+  UINT8_T max_x;
+  SINT16_T angle;
+  UINT8_T flag_fg;
+  UINT8_T flag_bg;
+  PIXEL_T color_fg;
+  PIXEL_T color_bg;
+} FONT_T;
+
+typedef struct
+{
+  char c;
+  PIXEL_T color_fg;
+  PIXEL_T color_bg;
+} CONSOLE_CHAR_T;
+
+typedef struct
+{
+  /* 2D circular buffer */
+  CONSOLE_CHAR_T **screen; /* 2D circular buffer for visualization, scrollable */
+  SINT16_T MAX_ROWS;     /* Maximum (total) number of rows stored in memory */  
+  SINT16_T MAX_ROWS_V;   /* Visible number of rows*/
+  SINT16_T MAX_COLS;
+  /*  SINT16_T n_row;       Number of "rows" which have been received*/
+  SINT16_T a_row;        /* Index of the oldest row that was written */
+  SINT16_T b_row;        /* Index of the row of the next cell to be written */
+  SINT16_T w_col;        /* Index of the column of the next cell to be written */
+  SINT16_T s_row;        /* Index of the row of the next cell to be "seen" (cursor) */
+  SINT16_T s_col;        /* Index of the column of the next cell to be "seen" (cursor) */
+  SINT16_T n_back;       /* Number of rows "backwards" counted from the next cell to be written */
+  SINT16_T n_back_adj;   /* Adjusted number of rows "backwards", to add hysteresis */
+  PIXEL_T    color_fg;     /* Current foreground color */
+  PIXEL_T    color_bg;     /* Current background color */
+} CONSOLE_T;
+
+
+#define AXIS_DRAW_X               0b0000000000000001
+#define AXIS_DRAW_X_ARROWS        0b0000000000000010
+#define AXIS_DRAW_X_GRID          0b0000000000000100
+#define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
+#define AXIS_DRAW_X_LABEL         0b0000000000010000
+#define AXIS_DRAW_Y               0b0000000000100000
+#define AXIS_DRAW_Y_ARROWS        0b0000000001000000
+#define AXIS_DRAW_Y_GRID          0b0000000010000000
+#define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
+#define AXIS_DRAW_Z_GRID          0b0000001000000000
+
+#define AXIS_DRAW_COLORVALUES_X_1 0b0000010000000000 /* Degradé */
+#define AXIS_DRAW_COLORVALUES_X_2 0b0000100000000000 /* Color code */
+#define AXIS_DRAW_COLORVALUES_Y_1 0b0001000000000000 /* Degradé */
+#define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 /* Color code */
+
+#define AXIS_POLAR_R_GRID     0b00000001
+#define AXIS_POLAR_T_GRID     0b00000010
+
+
+
+/******************************************************/
+/* Global Variables */
+/******************************************************/
+
+CONSOLE_T  *ty_C;
+SCREEN_T ty_screen;
+PICTURE_T ty_Pic_shadow;
+UINT8_T ty_scale_x, ty_scale_y;
+
+SINT8_T  ty_SDL_initialized;
+
+#endif /* LB_TYPES_H */
+
 /******************************************************/
 /* ASCII table */
 /******************************************************/
@@ -650,274 +922,3 @@ typedef FLOAT_T(*FUNCTION_X)(FLOAT_T, ERR_T*);
 #define PCKEY_NUM_LOCK     0x1F      /* Warning: cannot be read through console */
 #define PCKEY_DEL          ASCII_DEL /* 0x7F Reserved for compatibility with Delete */
 #define PCKEY_END          0x80
-
-
-/******************************************************/
-/* Computer Graphics data types */
-/******************************************************/
-#define LINE_MAX_ITEMS 32768
-
-
-typedef enum { COPYMODE_FRAMEBUFFER=0,
-	       COPYMODE_COPY,
-	       COPYMODE_AND,
-	       COPYMODE_OR,
-	       COPYMODE_XOR,
-	       COPYMODE_NOT_SRC,
-	       COPYMODE_NOT_DST,
-	       COPYMODE_ADD,
-	       COPYMODE_SRC_MINUS_DST,
-	       COPYMODE_DST_MINUS_SRC,
-	       COPYMODE_AVG,
-	       COPYMODE_BLEND,
-	       COPYMODE_MULTIPLY,
-	       COPYMODE_SRC_DIV_DST,
-	       COPYMODE_DST_DIV_SRC,
-	       COPYMODE_PORTERDUFF_CLEAR_DST,
-	       COPYMODE_PORTERDUFF_COPY_SRC,
-	       COPYMODE_PORTERDUFF_LEAVES_DST,
-	       COPYMODE_PORTERDUFF_SRC_OVER_DST,
-	       COPYMODE_PORTERDUFF_DST_OVER_SRC,
-	       COPYMODE_PORTERDUFF_SRC_IN_DST,
-	       COPYMODE_PORTERDUFF_DST_IN_SRC,
-	       COPYMODE_PORTERDUFF_SRC_OUT_DST,
-	       COPYMODE_PORTERDUFF_DST_OUT_SRC,
-	       COPYMODE_PORTERDUFF_SRC_ATOP_DST,
-	       COPYMODE_PORTERDUFF_DST_ATOP_SRC,
-	       COPYMODE_PORTERDUFF_XOR } COPYMODE_T; 
-
-
-#define RENDERMODE_T U_INT32_T
-
-/* This section deals with the attributes passed through the "copymode" parameter. They're listed from lower to higher order. 
-   For example: value = (value >> THAT_VALUE_SHIFT ) && THAT_VALUE_MASK */
-#define RENDERMODE_PIXELBG_R_MASK    0b00000000000000000000000000001111
-#define RENDERMODE_PIXELBG_G_MASK    0b00000000000000000000000011110000
-#define RENDERMODE_PIXELBG_B_MASK    0b00000000000000000000111100000000
-#define RENDERMODE_PIXELMODE_MASK    0b00000000000000001111000000000000
-#define RENDERMODE_SCALE_X_MASK      0b00000000001111110000000000000000
-#define RENDERMODE_SCALE_Y_MASK      0b00001111110000000000000000000000
-
-#define RENDERMODE_PIXELMODE_0       0b00000000000000000000000000000000
-#define RENDERMODE_PIXELMODE_1       0b00000000000000000001000000000000
-#define RENDERMODE_PIXELMODE_2       0b00000000000000000010000000000000
-#define RENDERMODE_PIXELMODE_3       0b00000000000000000011000000000000
-
-#define RENDERMODE_PIXELMODE_SHIFT      12 
-#define RENDERMODE_PIXELBG_R_SHIFT       0
-#define RENDERMODE_PIXELBG_G_SHIFT       4
-#define RENDERMODE_PIXELBG_B_SHIFT       8
-#define RENDERMODE_SCALE_X_SHIFT         16
-#define RENDERMODE_SCALE_Y_SHIFT         22
-
-/* These macros help the user setting an arbitrary "pixel size" */
-#define RENDERMODE_SCALE_X(X) (((X-1)<<RENDERMODE_SCALE_X_SHIFT) & RENDERMODE_SCALE_X_MASK)
-#define RENDERMODE_SCALE_Y(X) (((X-1)<<RENDERMODE_SCALE_Y_SHIFT) & RENDERMODE_SCALE_Y_MASK)
-#define RENDERMODE_BGCOLOR(X) (X & (RENDERMODE_PIXELBG_R_MASK | RENDERMODE_PIXELBG_G_MASK | RENDERMODE_PIXELBG_B_MASK) )
-
-
-typedef enum
-  { 
-    LINEMODE_DOTS_SOLID, 
-    LINEMODE_DOTS_FILTERED,
-    LINEMODE_SOLID, /* Draws solid pixels */
-    LINEMODE_FILTERED   /* Uses anti-aliasing */
-  } LINEMODE_T;
-   
-
-typedef struct
-{
-  S_INT16_T x;
-  S_INT16_T y;
-  S_INT8_T flag;
-} POINT_2D_INT_T;
-
-typedef struct
-{
-  FLOAT_T x;
-  FLOAT_T y;
-  S_INT8_T flag;
-} POINT_2D_FLOAT_T;
-
-typedef struct
-{
-  FLOAT_T x;
-  FLOAT_T y;
-  FLOAT_T z;
-  S_INT8_T flag;
-} POINT_3D_FLOAT_T;
-
-typedef struct
-{
-  POINT_2D_INT_T *array;
-  S_INT16_T items;
-} LINE_2D_INT_T;
-
-typedef struct
-{
-  POINT_2D_FLOAT_T *array;
-  S_INT16_T items;
-} LINE_2D_FLOAT_T;
-
-typedef struct
-{
-  POINT_3D_FLOAT_T *array;
-  S_INT16_T items;
-} LINE_3D_FLOAT_T;
-
-typedef struct
-{
-  POINT_2D_FLOAT_T **array;
-  S_INT16_T rows;
-  S_INT16_T cols;
-} MATRIX_POINT_2D_T;
-
-typedef struct
-{
-  POINT_3D_FLOAT_T **array;
-  S_INT16_T rows;
-  S_INT16_T cols;
-} MATRIX_POINT_3D_T;
-
-typedef struct 
-  {
-    S_INT16_T xp_min;
-    S_INT16_T yp_min;
-    S_INT16_T xp_max;
-    S_INT16_T yp_max;
-    FLOAT_T xr_min;
-    FLOAT_T xr_max;
-    FLOAT_T yr_min;
-    FLOAT_T yr_max;
-  } VIEWPORT_2D_T;
-
-typedef struct 
-  {
-    S_INT16_T xp_min;
-    S_INT16_T yp_min;
-    S_INT16_T xp_max;
-    S_INT16_T yp_max;
-    
-    FLOAT_T scale;    /* Zoom */
-    FLOAT_T cam_d;    /* Stereoscopic */
-    FLOAT_T cam_h;    /* Depth */
-    POINT_3D_FLOAT_T cam;   /* Camera's location */
-} VIEWPORT_3D_T;
-
-typedef struct 
-  {
-    U_INT8_T r:N_BITS_R;
-    U_INT8_T g:N_BITS_G;
-    U_INT8_T b:N_BITS_B;
-    U_INT8_T a:N_BITS_A;
-  } PIXEL_T;
-
-#define RENDEROPTIONS_DEFAULT        0b00000000
-#define RENDEROPTIONS_LINE           0b00000010
-#define RENDEROPTIONS_GRAPHICS_ONLY  0b00000100
-
-typedef struct 
-  {
-    U_INT8_T r;
-    U_INT8_T g;
-    U_INT8_T b;
-  } RGB_T;
-
-typedef struct
-{
-  PIXEL_T **pic;
-  U_INT16_T w;
-  U_INT16_T h;
-} PICTURE_T;
-
-typedef struct
-{
-  char *dat;
-  U_INT16_T w;
-  U_INT16_T h;
-} SCREEN_T;
-
-/******************************************************/
-/* Fonts data types */
-/******************************************************/
-
-typedef struct
-{
-  U_INT8_T cols;
-  U_INT8_T rows;
-  U_INT8_T range_a;
-  U_INT8_T range_b;
-  unsigned char* data;
-  U_INT8_T scale_x;
-  U_INT8_T scale_y;
-  U_INT8_T gap_x;
-  U_INT8_T gap_y;
-  U_INT8_T max_x;
-  S_INT16_T angle;
-  U_INT8_T flag_fg;
-  U_INT8_T flag_bg;
-  PIXEL_T color_fg;
-  PIXEL_T color_bg;
-} FONT_T;
-
-typedef struct
-{
-  char c;
-  PIXEL_T color_fg;
-  PIXEL_T color_bg;
-} CONSOLE_CHAR_T;
-
-typedef struct
-{
-  /* 2D circular buffer */
-  CONSOLE_CHAR_T **screen; /* 2D circular buffer for visualization, scrollable */
-  S_INT16_T MAX_ROWS;     /* Maximum (total) number of rows stored in memory */  
-  S_INT16_T MAX_ROWS_V;   /* Visible number of rows*/
-  S_INT16_T MAX_COLS;
-  /*  S_INT16_T n_row;       Number of "rows" which have been received*/
-  S_INT16_T a_row;        /* Index of the oldest row that was written */
-  S_INT16_T b_row;        /* Index of the row of the next cell to be written */
-  S_INT16_T w_col;        /* Index of the column of the next cell to be written */
-  S_INT16_T s_row;        /* Index of the row of the next cell to be "seen" (cursor) */
-  S_INT16_T s_col;        /* Index of the column of the next cell to be "seen" (cursor) */
-  S_INT16_T n_back;       /* Number of rows "backwards" counted from the next cell to be written */
-  S_INT16_T n_back_adj;   /* Adjusted number of rows "backwards", to add hysteresis */
-  PIXEL_T    color_fg;     /* Current foreground color */
-  PIXEL_T    color_bg;     /* Current background color */
-} CONSOLE_T;
-
-
-#define AXIS_DRAW_X               0b0000000000000001
-#define AXIS_DRAW_X_ARROWS        0b0000000000000010
-#define AXIS_DRAW_X_GRID          0b0000000000000100
-#define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
-#define AXIS_DRAW_X_LABEL         0b0000000000010000
-#define AXIS_DRAW_Y               0b0000000000100000
-#define AXIS_DRAW_Y_ARROWS        0b0000000001000000
-#define AXIS_DRAW_Y_GRID          0b0000000010000000
-#define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
-#define AXIS_DRAW_Z_GRID          0b0000001000000000
-
-#define AXIS_DRAW_COLORVALUES_X_1 0b0000010000000000 /* Degradé */
-#define AXIS_DRAW_COLORVALUES_X_2 0b0000100000000000 /* Color code */
-#define AXIS_DRAW_COLORVALUES_Y_1 0b0001000000000000 /* Degradé */
-#define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 /* Color code */
-
-#define AXIS_POLAR_R_GRID     0b00000001
-#define AXIS_POLAR_T_GRID     0b00000010
-
-
-
-/******************************************************/
-/* Global Variables */
-/******************************************************/
-
-CONSOLE_T  *ty_C;
-SCREEN_T ty_screen;
-PICTURE_T ty_Pic_shadow;
-U_INT8_T ty_scale_x, ty_scale_y;
-
-S_INT8_T  ty_SDL_initialized;
-
-#endif /* LB_TYPES_H */
-

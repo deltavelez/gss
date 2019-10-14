@@ -31,23 +31,23 @@ Uint8 *lb_au_audio_pos;
 SDL_AudioSpec want, have;
 SDL_AudioDeviceID dev;
 
-U_INT8_T _lb_au_sin_table8[AUDIO_SAMPLES];
-S_INT16_T _lb_au_sin_table16[AUDIO_SAMPLES];
-FLOAT_T _lb_au_ph0, _lb_au_ph1, _lb_au_f0, _lb_au_f1;
+UINT8_T _lb_au_sin_table8[AUDIO_SAMPLES];
+SINT16_T _lb_au_sin_table16[AUDIO_SAMPLES];
+REAL_T _lb_au_ph0, _lb_au_ph1, _lb_au_f0, _lb_au_f1;
 
 
 void lb_au_callback_copy(void *userdata, Uint8 *stream, int len); 
 void lb_au_callback_DTMF(void *userdata, Uint8 *stream, int len); 
-void lb_au_freq_DTMF(char digit, FLOAT_T *f1, FLOAT_T *f2);
-S_INT8_T lb_au_SDL_audio_init_DTMF(void);
+void lb_au_freq_DTMF(char digit, REAL_T *f1, REAL_T *f2);
+SINT8_T lb_au_SDL_audio_init_DTMF(void);
 void lb_au_SDL_audio_start(void);
 void lb_au_SDL_audio_stop(void);
 void lb_au_SDL_audio_close_DTMF(void);
 void lb_au_wave_load_to_vector_r(const char *filename, VECTOR_R_T *V);
-void lb_au_wave_write_from_vector_r(const char *filename, VECTOR_R_T *V, U_INT16_T bit_rate, U_INT8_T bits_per_sample);
-void lb_au_wave_write_or_append_from_vector_r(const char *filename, VECTOR_R_T *V, U_INT16_T bit_rate, U_INT8_T bits_per_sample);
+void lb_au_wave_write_from_vector_r(const char *filename, VECTOR_R_T *V, UINT16_T bit_rate, UINT8_T bits_per_sample);
+void lb_au_wave_write_or_append_from_vector_r(const char *filename, VECTOR_R_T *V, UINT16_T bit_rate, UINT8_T bits_per_sample);
 void lb_au_wave_parse_header(WAVE_HEADER_T h);
-U_INT8_T lb_au_sin_from_table_8_bit(U_INT16_T i);
-S_INT16_T lb_au_sin_from_table_16_bit(U_INT16_T  i);
+UINT8_T lb_au_sin_from_table_8_bit(UINT16_T i);
+SINT16_T lb_au_sin_from_table_16_bit(UINT16_T  i);
 
 #endif /* LB_AUDIO_H */

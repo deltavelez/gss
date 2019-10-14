@@ -67,24 +67,24 @@ void *floatsum(void *x_max_par)
 }
 
 
-FLOAT_T diego_sin(FLOAT_T x, FLOAT_T y, ERR_T *error)
+REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
 {
   return -0.1*x;
 }
 
-FLOAT_T diego_x(FLOAT_T t, ERR_T *error)
+REAL_T diego_x(REAL_T t, MATHERROR_T *error)
 {
   return 0.75*sin(5*t)*cos(t);
 }
 
-FLOAT_T diego_y(FLOAT_T t, ERR_T *error)
+REAL_T diego_y(REAL_T t, MATHERROR_T *error)
 {
   return 0.75*sin(5*t)*sin(t);
   
 }
 
 
-S_INT16_T lb_gis_height(FLOAT_T lon, FLOAT_T lat)
+SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
 {
   FILE *fp;
   char filename[16];
@@ -96,26 +96,26 @@ S_INT16_T lb_gis_height(FLOAT_T lon, FLOAT_T lat)
   if (lat>=0.0)
     {
       strcat(filename,"N");
-      sprintf(str, "%02d", (S_INT16_T)lat);
+      sprintf(str, "%02d", (SINT16_T)lat);
       pos_lat=round(1201.0*lb_re_frac(lat));
     }
   else
     {
       strcat(filename,"S");
-      sprintf(str, "%02d", (S_INT16_T)ceil(-lat));
+      sprintf(str, "%02d", (SINT16_T)ceil(-lat));
       pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
     }
   strcat(filename,str);
   if (lon>=0.0)
     {
       strcat(filename,"E");
-      sprintf(str, "%03d", (S_INT16_T)lon);
+      sprintf(str, "%03d", (SINT16_T)lon);
       pos_lon=round(1201*lb_re_frac(lon));
     }
   else
     {
       strcat(filename,"W");
-      sprintf(str, "%03d", (S_INT16_T)ceil(-lon));
+      sprintf(str, "%03d", (SINT16_T)ceil(-lon));
       pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
     }
   strcat(filename,str);
@@ -195,9 +195,9 @@ int main(int argc, char *argv[])
   M.dim[2]=3;
   M.dim[3]=2;
   M.dim[4]=2;
-  U_INT16_T i,j,k,l;
+  UINT16_T i,j,k,l;
   long cummulative;
-  S_INT8_T flag;
+  SINT8_T flag;
   struct sysinfo info_1, info_2, info_3;
 
   lb_al_create_array_r(&M);
@@ -206,25 +206,25 @@ int main(int argc, char *argv[])
     {
     case 1:
       for (j=0;j<M.dim[0];j++)
-	M.a1[j]=((FLOAT_T)rand()/RAND_MAX-0.5)*pow(10,10*(FLOAT_T)rand()/RAND_MAX);
+	M.a1[j]=((REAL_T)rand()/RAND_MAX-0.5)*pow(10,10*(REAL_T)rand()/RAND_MAX);
       break;
     case 2:
       for (i=0;i<M.dim[1];i++)
 	for (j=0;j<M.dim[0];j++)
-	  M.a2[i][j]=((FLOAT_T)rand()/RAND_MAX-0.5)*pow(10,10*(FLOAT_T)rand()/RAND_MAX);
+	  M.a2[i][j]=((REAL_T)rand()/RAND_MAX-0.5)*pow(10,10*(REAL_T)rand()/RAND_MAX);
       break;
     case 3:
       for (k=0;k<M.dim[2];k++)
 	for (i=0;i<M.dim[1];i++)
 	  for (j=0;j<M.dim[0];j++)
-	    M.a3[k][i][j]=((FLOAT_T)rand()/RAND_MAX-0.5)*pow(10,10*(FLOAT_T)rand()/RAND_MAX);
+	    M.a3[k][i][j]=((REAL_T)rand()/RAND_MAX-0.5)*pow(10,10*(REAL_T)rand()/RAND_MAX);
       break;
     case 4:
       for (l=0;l<M.dim[3];l++)
 	for (k=0;k<M.dim[2];k++)
 	  for (i=0;i<M.dim[1];i++)
 	    for (j=0;j<M.dim[0];j++)
-	      M.a4[l][k][i][j]=((FLOAT_T)rand()/RAND_MAX-0.5)*pow(10,10*(FLOAT_T)rand()/RAND_MAX);
+	      M.a4[l][k][i][j]=((REAL_T)rand()/RAND_MAX-0.5)*pow(10,10*(REAL_T)rand()/RAND_MAX);
       break;
     }
   lb_al_print_array_r(&M, "",12,2 );
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 
   if (0) for (l=0;l<1000000;l++)
 	   {
-	     //printf("size=%d\r\n",sizeof(FLOAT_T));
+	     //printf("size=%d\r\n",sizeof(REAL_T));
 
 	     //flag=!(l % 1000);
 	     flag=TRUE;
@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
 #define MAX_ROWS_V 4
 #define MAX_N 10
 
-  S_INT16_T n_row, w_row, w_col, s_col, flag_insert, n_back, n_back_adj, j, n_vis_rows;
+  SINT16_T n_row, w_row, w_col, s_col, flag_insert, n_back, n_back_adj, j, n_vis_rows;
   char c;
   char V[MAX_ROWS][MAX_COLS];
   
@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
 	printf("n_row=%d, n_back=%d\r\n",n_row,n_back);
 	for (i=0;i<=n_vis_rows;i++)
 	  {
-	    S_INT16_T temp_cursor, temp_row;
+	    SINT16_T temp_cursor, temp_row;
 	    for (j=0;j<MAX_COLS;j++)
 	      {
 		temp_cursor=(w_row-n_back+MAX_ROWS)%MAX_ROWS;
@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
   //#define DEMO_SWAP_VECTOR
 #ifdef DEMO_SWAP_VECTOR
   VECTOR_R_T A, B;
-  U_INT16_T i;
+  UINT16_T i;
   A.items=10; 
   B.items=20;
 
@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
   //#define DEMO_INSERT_VECTOR
 #ifdef DEMO_INSERT_VECTOR
   VECTOR_R_T V;
-  U_INT16_T k;
+  UINT16_T k;
   V.items=0;
  
   for (k=11;k<=22;k++)
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
   // #define DEMO_DELETE_ITEM_VECTOR
 #ifdef DEMO_DELETE_ITEM_VECTOR
   VECTOR_R_T V;
-  U_INT16_T i, k;
+  UINT16_T i, k;
      
   for(k=0;k<1;k++)
     {
@@ -545,8 +545,8 @@ int main(int argc, char *argv[])
   //#define DEMO_INTERPOLATE
 #ifdef DEMO_INTERPOLATE
   MATRIX_R_T A;
-  S_INT16_T i,j;
-  FLOAT_T Q;
+  SINT16_T i,j;
+  REAL_T Q;
       
   A.rows=4; /* vertical */
   A.cols=6; /* horizontal */
@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
   //#define DEMO_DETERMINANT
 #ifdef DEMO_DETERMINANT
   MATRIX_R_T A;
-  FLOAT_T det;
+  REAL_T det;
   A.rows=5;
   A.cols=5;
   lb_al_create_matrix_r(&A);
@@ -594,7 +594,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_MATRIX_33
 #ifdef  DEMO_MATRIX_33
-  FLOAT_T M[3][3],  G[3][3], x;
+  REAL_T M[3][3],  G[3][3], x;
   
   M[0][0]=1;  M[0][1]= -2;  M[0][2]=3;
   M[1][0]=10; M[1][1]=0.5;  M[1][2]=7;
@@ -614,7 +614,7 @@ int main(int argc, char *argv[])
 
   // #define DEMO_MATRIX_22
 #ifdef  DEMO_MATRIX_22
-  FLOAT_T M1[2][2], x;
+  REAL_T M1[2][2], x;
   
   M1[0][0] = 3.14;  M1[0][1] = 4;
   M1[1][0] = -6;    M1[1][1] = 0.2;
@@ -714,9 +714,9 @@ int main(int argc, char *argv[])
   //#define DEMO_PIXEL
 #ifdef DEMO_PIXEL
   SDL_Event event;
-  S_INT16_T x, y, z, width, height;
+  SINT16_T x, y, z, width, height;
   clock_t begin, end;
-  FLOAT_T time_total=0;
+  REAL_T time_total=0;
   int frames_count=0;
   PIXEL_T color;
   
@@ -773,7 +773,7 @@ int main(int argc, char *argv[])
 		 }
 	     lb_gr_refresh();
 	     end=clock();
-	     time_total+=(FLOAT_T)end-(FLOAT_T)begin;
+	     time_total+=(REAL_T)end-(REAL_T)begin;
 	     frames_count++;
 	     printf("FPS = %f\n",(double)CLOCKS_PER_SEC*frames_count/time_total);
 	     int i=0;
@@ -792,7 +792,7 @@ int main(int argc, char *argv[])
   //#define DEMO_LINE1
 #ifdef DEMO_LINE1
   SDL_Event event;
-  S_INT16_T x, y, z, width, height;
+  SINT16_T x, y, z, width, height;
   clock_t begin, end;
   PIXEL_T color;
   
@@ -855,7 +855,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_LINE1_FLOAT
 #ifdef DEMO_LINE1_FLOAT
-  S_INT16_T i, j,k;
+  SINT16_T i, j,k;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
@@ -882,13 +882,13 @@ int main(int argc, char *argv[])
   //for (k=0; k<100000000; k++)
   // test_f1(0,0,0);
   //end=clock();
-  //printf("Ellapsed time = %f\r\n",(FLOAT_T)(end-begin)/CLOCKS_PER_SEC);
+  //printf("Ellapsed time = %f\r\n",(REAL_T)(end-begin)/CLOCKS_PER_SEC);
 
   //begin=clock();
   //for (k=0; k<100000000; k++)
   // test_f2(0,0,0);
   //end=clock();
-  //printf("Ellapsed time = %f\r\n",(FLOAT_T)(end-begin)/CLOCKS_PER_SEC);
+  //printf("Ellapsed time = %f\r\n",(REAL_T)(end-begin)/CLOCKS_PER_SEC);
 
   lb_gr_SDL_init("Bienvenidos", SDL_INIT_VIDEO, 1200, 800, 100, 0, 5);
 
@@ -925,9 +925,9 @@ int main(int argc, char *argv[])
   //#define DEMO_LINE_ANTIALIASING2
 #ifdef DEMO_LINE_ANTIALIASING2
   SDL_Event event;
-  FLOAT_T angle;
+  REAL_T angle;
   PICTURE_T Pic;
-  U_INT8_T pix_x=32, pix_y=32;
+  UINT8_T pix_x=32, pix_y=32;
   
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   Pic.w= ty_screen.w/pix_x;
@@ -964,8 +964,8 @@ int main(int argc, char *argv[])
   //#define DEMO_LINE_ANTIALIASING3
 #ifdef DEMO_LINE_ANTIALIASING3
   SDL_Event event;
-  S_INT32_T i;
-  S_INT16_T x1, y1, x2, y2;
+  SINT32_T i;
+  SINT16_T x1, y1, x2, y2;
   PIXEL_T color;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
@@ -1227,7 +1227,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_ELLIPSE
 #ifdef DEMO_ELLIPSE
-  FLOAT_T angle;
+  REAL_T angle;
 
   SDL_Event event;
   int pix_x=10, pix_y=10;
@@ -1275,8 +1275,8 @@ int main(int argc, char *argv[])
 #ifdef DEMO_TRIANGLE
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  S_INT16_T i;
-  POINT_2D_INT_T A, B, C, D, X;
+  SINT16_T i;
+  POINT_2D_SINT16_T A, B, C, D, X;
   clock_t begin, end;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
@@ -1315,7 +1315,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_POLYGON
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  LINE_2D_INT_T myPol;
+  LINE_2D_SINT16_T myPol;
   int i;
   float phase;
 
@@ -1358,7 +1358,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_POLYGON_FLOAT
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  LINE_2D_FLOAT_T myPol;
+  LINE_2D_REAL_T myPol;
   int i;
   float phase;
 
@@ -1399,9 +1399,9 @@ int main(int argc, char *argv[])
 #ifdef DEMO_INSIDE_POLYGON_INT
   SDL_Event event;
   int pix_x=12, pix_y=12;
-  S_INT16_T i, j;
-  LINE_2D_INT_T Poly_int;
-  POINT_2D_INT_T P;
+  SINT16_T i, j;
+  LINE_2D_SINT16_T Poly_int;
+  POINT_2D_SINT16_T P;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
@@ -1448,9 +1448,9 @@ int main(int argc, char *argv[])
 #ifdef DEMO_INSIDE_POLYGON_FLOAT
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  S_INT16_T i, j;
-  LINE_2D_FLOAT_T Poly_f;
-  POINT_2D_FLOAT_T P;
+  SINT16_T i, j;
+  LINE_2D_REAL_T Poly_f;
+  POINT_2D_REAL_T P;
   VIEWPORT_2D_T win;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
@@ -1504,7 +1504,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_POLYGON_FILL
   SDL_Event event;
   int pix_x=1, pix_y=1;
-  LINE_2D_INT_T myPol;
+  LINE_2D_SINT16_T myPol;
   int k=40;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
@@ -1541,8 +1541,8 @@ int main(int argc, char *argv[])
   //#define DUFF_PORTER
 #ifdef DUFF_PORTER
   PICTURE_T pic1;
-  S_INT16_T i,j, alpha;
-  LINE_2D_INT_T myPol;
+  SINT16_T i,j, alpha;
+  LINE_2D_SINT16_T myPol;
   int k=40;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -1605,10 +1605,10 @@ int main(int argc, char *argv[])
 #ifdef ROTATE_ALGORITHM
   /* This helps ilustrating  an older algorithm used to rotate bitmaps */
   PICTURE_T Pic;
-  S_INT16_T k;
-  LINE_2D_FLOAT_T P1, P2, P3;
+  SINT16_T k;
+  LINE_2D_REAL_T P1, P2, P3;
   VIEWPORT_2D_T win;
-  FLOAT_T angle;
+  REAL_T angle;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
  
@@ -1674,8 +1674,8 @@ int main(int argc, char *argv[])
   //#define DEMO_ROTATE_BITMAP
 #ifdef  DEMO_ROTATE_BITMAP
   PICTURE_T pic_src, pic_dst;
-  S_INT16_T width, height;
-  FLOAT_T angle;
+  SINT16_T width, height;
+  REAL_T angle;
   //pending: strange line on top
   
   lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -1705,8 +1705,8 @@ int main(int argc, char *argv[])
   //#define DEMO_ROTATE_BITMAP_SAMPLING
 #ifdef  DEMO_ROTATE_BITMAP_SAMPLING
   PICTURE_T pic_src, pic_dst;
-  S_INT16_T width, height;
-  FLOAT_T angle;
+  SINT16_T width, height;
+  REAL_T angle;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
@@ -1731,7 +1731,7 @@ int main(int argc, char *argv[])
   //#define DEMO_BMP_TO_MATRIX
 #ifdef DEMO_BMP_TO_MATRIX
   MATRIX_R_T R, G, B;
-  S_INT16_T i,j;
+  SINT16_T i,j;
   PIXEL_T color;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -1786,7 +1786,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_PROJECT_2D
 #ifdef DEMO_PROJECT_2D
-  FLOAT_T xr, yr, xp, yp;
+  REAL_T xr, yr, xp, yp;
   VIEWPORT_2D_T win;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -1812,7 +1812,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_GAMMA
 #ifdef DEMO_GAMMA
-  FLOAT_T xr, yr, xr_min, yr_min, xr_max, yr_max;
+  REAL_T xr, yr, xr_min, yr_min, xr_max, yr_max;
   VIEWPORT_2D_T win;
 
   SDL_Event event;
@@ -1947,7 +1947,7 @@ int main(int argc, char *argv[])
   vec.items=50;
   lb_al_create_vector_c(&vec);
       
-  LINE_2D_INT_T vec_i;
+  LINE_2D_SINT16_T vec_i;
   vec_i.items=50;
   lb_gr_create_line2d_i(&vec_i);
 
@@ -1972,8 +1972,8 @@ int main(int argc, char *argv[])
 #ifdef DEMO_PLOT_IMPLICIT
   MATRIX_R_T A;
   VIEWPORT_2D_T vp;
-  S_INT16_T i,j;
-  FLOAT_T xr, yr, zr;
+  SINT16_T i,j;
+  REAL_T xr, yr, zr;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
 
@@ -2011,8 +2011,8 @@ int main(int argc, char *argv[])
 
   //#define DEMO_PLOT2D_REVERSE
 #ifdef DEMO_PLOT2D_REVERSE
-  FLOAT_T t, t0, t1;
-  S_INT16_T i;
+  REAL_T t, t0, t1;
+  SINT16_T i;
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
@@ -2042,7 +2042,7 @@ int main(int argc, char *argv[])
       printf("hello %d\r\n",i);
       Lx.array[i]=cos(3*t)*cos(t);  /* an example: petal flower */
       Ly.array[i]=cos(3*t)*sin(t);
-      t+=(t1-t0)/(FLOAT_T)Lx.items;
+      t+=(t1-t0)/(REAL_T)Lx.items;
     }
   lb_gr_plot2d_line_reverse(NULL, vp, &Lx, &Ly, 8, lb_gr_12RGB(0xffaa), COPYMODE_BLEND);
    
@@ -2057,8 +2057,8 @@ int main(int argc, char *argv[])
 #ifdef DEMO_PLOT2D_REVERSE_SLOW
   SDL_Event event;
   int pix_x=1, pix_y=8;
-  FLOAT_T t, t0, t1;
-  S_INT16_T i;
+  REAL_T t, t0, t1;
+  SINT16_T i;
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
@@ -2092,7 +2092,7 @@ int main(int argc, char *argv[])
     {
       Lx.array[i]=cos(3*t)*cos(t); 
       Ly.array[i]=cos(3*t)*sin(t);
-      t+=(t1-t0)/(FLOAT_T)Lx.items;
+      t+=(t1-t0)/(REAL_T)Lx.items;
     }
 
   lb_gr_plot2d_line_reverse_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
@@ -2119,7 +2119,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   int pix_x=3, pix_y=3;
   PICTURE_T pic1, pic2;
-  S_INT16_T i,j;
+  SINT16_T i,j;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
@@ -2351,7 +2351,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
   int xp, yp, iterations;
-  FLOAT_T xr, yr;
+  REAL_T xr, yr;
   COMPLEX_T z, p;
   VIEWPORT_2D_T win;
 
@@ -2400,7 +2400,7 @@ int main(int argc, char *argv[])
   //  #define EULER_2ND_ORDER
 #ifdef EULER_2ND_ORDER
 
-  FLOAT_T t, x0, x1, t_max, delta, x0_copy, x1_copy;
+  REAL_T t, x0, x1, t_max, delta, x0_copy, x1_copy;
   delta=0.05;
   t_max=10;
   x0 = 10; /* position */
@@ -2431,20 +2431,20 @@ int main(int argc, char *argv[])
   //#define RK4_2ND_ORDER
 #ifdef RK4_2ND_ORDER
 
-  FLOAT_T t, x0, x1, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
+  REAL_T t, x0, x1, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
   h=0.001;
   t_max=45;
   x0 = 10; /* position */
   x1 = 10;  /* speed */
 
 
-  FLOAT_T f_x0_div_dt(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
+  REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
   {
     return _x1;
   }
 
   
-  FLOAT_T f_x1_div_dt(FLOAT_T t, FLOAT_T _x0, FLOAT_T _x1)
+  REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
   {
     return -1.0;
   }
@@ -2495,9 +2495,9 @@ int main(int argc, char *argv[])
   
   clock_t time_begin, time_end;
   char text[20];
-  S_INT8_T relay_status=0;
-  S_INT16_T shock_counter=1;
-  FLOAT_T accel, accel_max;
+  SINT8_T relay_status=0;
+  SINT16_T shock_counter=1;
+  REAL_T accel, accel_max;
   FILE *fp;
 
   union Record
@@ -2511,8 +2511,8 @@ int main(int argc, char *argv[])
   union Record temp0, press0, temp1, press1;
 
   SPI_PORT_T my_port;
-  S_INT32_T time_stroke=4000;
-  U_INT16_T value;
+  SINT32_T time_stroke=4000;
+  UINT16_T value;
 
   printf("CLOCKS_PER_SEC=%u\r\n",CLOCKS_PER_SEC); 
   printf("Size(clock_T)=%d\r\n",sizeof(clock_t));
@@ -2559,7 +2559,7 @@ int main(int argc, char *argv[])
 	  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
 
 	  time_begin = clock();
-	  time_end = time_begin + ceil(((FLOAT_T)time_stroke*CLOCKS_PER_SEC)/1000.0);
+	  time_end = time_begin + ceil(((REAL_T)time_stroke*CLOCKS_PER_SEC)/1000.0);
 	  relay_status = !relay_status;
 	  lb_gp_gpio_wr(PIN_RELAY,   relay_status);
 
@@ -2628,7 +2628,7 @@ int main(int argc, char *argv[])
 	  else
 	    sprintf(text,"DO");
 
-	  U_INT32_T stamp;
+	  UINT32_T stamp;
 	  stamp=clock();
 	  
 	  printf("n=%d  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f  ts=%u\r\n",
@@ -2743,21 +2743,21 @@ int main(int argc, char *argv[])
 #ifdef DEMO_SHAKER
 #define N_DISK 4000
   /* Graphical variables */
-  FLOAT_T bar_radius=0.05;
-  FLOAT_T bar_length=1.5;
-  FLOAT_T disk_distance=0.7;
-  FLOAT_T disk_max_radius=0.0;
-  FLOAT_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
+  REAL_T bar_radius=0.05;
+  REAL_T bar_length=1.5;
+  REAL_T disk_distance=0.7;
+  REAL_T disk_max_radius=0.0;
+  REAL_T ellipse_a, ellipse_b, tetha1, tetha2, xt_r_1, yt_r_1, xt_p_1, yt_p_1, xt_p_2, yt_p_2, xp_1, yp_1, xp_2, yp_2, max_angle;
 
   /* General use variables */
-  FLOAT_T xr, yr;
+  REAL_T xr, yr;
   
   /* Dynamics variables */
-  FLOAT_T Pos_x, Pos_y, Pos_x_prev, Pos_y_prev, Vel_x, Vel_y, Vel_x_prev, Vel_y_prev, Acc_x, Acc_y;
-  FLOAT_T Pos_xp, Pos_yp;
+  REAL_T Pos_x, Pos_y, Pos_x_prev, Pos_y_prev, Vel_x, Vel_y, Vel_x_prev, Vel_y_prev, Acc_x, Acc_y;
+  REAL_T Pos_xp, Pos_yp;
   
-  FLOAT_T RPM, t, dt, t_max, w,  xp, yp, xp2, yp2;
-  S_INT32_T i;
+  REAL_T RPM, t, dt, t_max, w,  xp, yp, xp2, yp2;
+  SINT32_T i;
   VIEWPORT_2D_T win_v, win_a, win_sim;
   SDL_Event event;
 
@@ -2890,7 +2890,7 @@ int main(int argc, char *argv[])
 
         
       max_angle=-M_PI;
-      S_INT8_T flag_first=TRUE;
+      SINT8_T flag_first=TRUE;
       for (i=0;i<N_DISK; i++)
 	{
 	  xr = disk_distance + R.array[i]*cos(T.array[i] + w*t);
@@ -3031,14 +3031,14 @@ int main(int argc, char *argv[])
     
   typedef struct
   {
-    FLOAT_T x;
-    FLOAT_T y;
-    FLOAT_T z;
+    REAL_T x;
+    REAL_T y;
+    REAL_T z;
   } VECTOR_3D_T;
 
   typedef struct
   {
-    FLOAT_T m;
+    REAL_T m;
     VECTOR_3D_T p;
     VECTOR_3D_T v;
     VECTOR_3D_T v_temp;
@@ -3052,7 +3052,7 @@ int main(int argc, char *argv[])
   VECTOR_3D_T calc_acceleration(const ASTRO_T M[], int i)
   {
     VECTOR_3D_T accel;
-    FLOAT_T denom;
+    REAL_T denom;
     int j;
   
     accel.x=0;
@@ -3076,7 +3076,7 @@ int main(int argc, char *argv[])
   }
 
  
-  VECTOR_3D_T future_acc(ASTRO_T M[], int i, FLOAT_T delta_t, FLOAT_T delta_v_x,FLOAT_T delta_v_y, FLOAT_T delta_v_z)
+  VECTOR_3D_T future_acc(ASTRO_T M[], int i, REAL_T delta_t, REAL_T delta_v_x,REAL_T delta_v_y, REAL_T delta_v_z)
   {
     VECTOR_3D_T tmp_pos, tmp_vel, acceleration;
   
@@ -3106,12 +3106,12 @@ int main(int argc, char *argv[])
   SDL_Event event;
   FONT_T my_font;
   char text[40];
-  FLOAT_T t;
-  FLOAT_T dt;
+  REAL_T t;
+  REAL_T dt;
   VIEWPORT_2D_T win;
-  FLOAT_T xp, yp;
-  S_INT32_T step_counter=0;
-  S_INT8_T flag_paused=FALSE;
+  REAL_T xp, yp;
+  SINT32_T step_counter=0;
+  SINT8_T flag_paused=FALSE;
 
   lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
  
@@ -3269,7 +3269,7 @@ int main(int argc, char *argv[])
 	  
 	      if (i==1) 
 		{
-		  if ( (step_counter==0) || (U_INT32_T)((t+dt)/(365*24*3600))>(U_INT32_T)(t/(365*24*3600)) )
+		  if ( (step_counter==0) || (UINT32_T)((t+dt)/(365*24*3600))>(UINT32_T)(t/(365*24*3600)) )
 		    {
 		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
 		      lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
@@ -3342,7 +3342,7 @@ int main(int argc, char *argv[])
   //#define DEMO_VIDEO
 #ifdef DEMO_VIDEO
   int xp, yp, iterations, k;
-  FLOAT_T xr, yr, z_zoom;
+  REAL_T xr, yr, z_zoom;
   char filename[12];
   COMPLEX_T z, p;
   VIEWPORT_2D_T win;
@@ -3391,11 +3391,11 @@ int main(int argc, char *argv[])
   CONSOLE_T Con;
   
   VIEWPORT_3D_T vp3d;
-  //FLOAT_T u_a, u_b, v_a, v_b;
-  FLOAT_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
-  S_INT8_T flag_exit;
+  //REAL_T u_a, u_b, v_a, v_b;
+  REAL_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3];
+  SINT8_T flag_exit;
     
-  //MATRIX_POINT_3D_T S;
+  //MATRIX_POINT_3D_REAL_T S;
   MATRIX_R_T Z;
   char c;
   FONT_T font_console;
@@ -3497,26 +3497,26 @@ int main(int argc, char *argv[])
       //lb_gr_plot3d_surface(NULL, vp3d, Rot, &S,
       //		     1.0, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_SOLID);
 
-      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){2,2,2},
+      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){0,0,0}, (POINT_3D_REAL_T){2,2,2},
 				lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
-      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){0,1,0},
+      lb_gr_plot_zbuffer_line_1(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){1,0,0}, (POINT_3D_REAL_T){0,1,0},
 				lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,1}, (POINT_3D_FLOAT_T){0,3,1},
-				  (POINT_3D_FLOAT_T){3,0,1}, lb_gr_12RGB(COLOR_SOLID | COLOR_FORESTGREEN), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){0,0,1}, (POINT_3D_REAL_T){0,3,1},
+				  (POINT_3D_REAL_T){3,0,1}, lb_gr_12RGB(COLOR_SOLID | COLOR_FORESTGREEN), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){1,0,0}, (POINT_3D_FLOAT_T){1,2,0},
-				  (POINT_3D_FLOAT_T){1,0,2}, lb_gr_12RGB(COLOR_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){1,0,0}, (POINT_3D_REAL_T){1,2,0},
+				  (POINT_3D_REAL_T){1,0,2}, lb_gr_12RGB(COLOR_SOLID | COLOR_YELLOW), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){0,5,0},
-				  (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){0,0,0}, (POINT_3D_REAL_T){0,5,0},
+				  (POINT_3D_REAL_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){5,5,0}, (POINT_3D_FLOAT_T){0,5,0},
-				  (POINT_3D_FLOAT_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){5,5,0}, (POINT_3D_REAL_T){0,5,0},
+				  (POINT_3D_REAL_T){5,0,0}, lb_gr_12RGB(COLOR_SOLID | 0xa00), COPYMODE_BLEND);
 
-      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_FLOAT_T){0,0,0}, (POINT_3D_FLOAT_T){1,1,1},
-				  (POINT_3D_FLOAT_T){2,2,2}, lb_gr_12RGB(COLOR_SOLID | 0xF00), COPYMODE_BLEND);
+      lb_gr_plot_zbuffer_triangle(&Pic, vp3d, Rot, &Z, (POINT_3D_REAL_T){0,0,0}, (POINT_3D_REAL_T){1,1,1},
+				  (POINT_3D_REAL_T){2,2,2}, lb_gr_12RGB(COLOR_SOLID | 0xF00), COPYMODE_BLEND);
 
 	
       vp3d.cam_d=0;
@@ -3541,7 +3541,7 @@ int main(int argc, char *argv[])
       lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
       lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
 
-      S_INT8_T flag_process_keys=TRUE;
+      SINT8_T flag_process_keys=TRUE;
       while (!lb_co_kbhit()) ;
       while (flag_process_keys)
 	{
@@ -3631,7 +3631,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_NEW_FONT
   FONT_T my_font;
   char text[40];
-  FLOAT_T x;
+  REAL_T x;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
 
@@ -3674,8 +3674,8 @@ int main(int argc, char *argv[])
 
   //#define DEMO_FINANCIAL
 #ifdef DEMO_FINANCIAL
-  ERR_T e_code;
-  FLOAT_T apr, monthly;
+  MATHERROR_T e_code;
+  REAL_T apr, monthly;
   apr=6.75;
   monthly=lb_re_APR_to_monthly(apr, &e_code);
   printf("APR = %.4f %% half yearly, not in advanced corresponds to %.4f %% monthly\r\n",
@@ -3693,8 +3693,8 @@ int main(int argc, char *argv[])
 
   //#define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
-  ERR_T e_code;
-  FLOAT_T x,y,z,result;
+  MATHERROR_T e_code;
+  REAL_T x,y,z,result;
   char variables[]="x,y,i"; 
   x=1;
   y=M_PI*60/180;
@@ -3779,7 +3779,7 @@ int main(int argc, char *argv[])
   
   //#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
-  ERR_T e_code;
+  MATHERROR_T e_code;
   COMPLEX_T var1,var2,imag,result;
   var1.r=0;
   var1.i=0;
@@ -3865,10 +3865,10 @@ int main(int argc, char *argv[])
 
   //#define DEMO_GIS
 #ifdef DEMO_GIS
-  FLOAT_T lon, lat;
+  REAL_T lon, lat;
   FILE *fp;
   int i_lat, i_lon, parsing_lon;
-  S_INT16_T i, j;
+  SINT16_T i, j;
   char c, str_lat[128], str_lon[128];
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -3938,7 +3938,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_GIS_HEIGHT
 #ifdef DEMO_GIS_HEIGHT
-  S_INT16_T i, j, height, height_max;
+  SINT16_T i, j, height, height_max;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
   lb_fb_clear(ty_fb_main, 0,0,0,255);
@@ -3948,7 +3948,7 @@ int main(int argc, char *argv[])
   for (i=0;i<ty_height;i++)
     for (j=0;j<ty_width;j++)
       {
-	height=lb_gis_height(-73+(FLOAT_T)j/ty_width, 8.0+(FLOAT_T)i/ty_height);
+	height=lb_gis_height(-73+(REAL_T)j/ty_width, 8.0+(REAL_T)i/ty_height);
 
 	if (height>height_max)
 	  height_max=height;
@@ -3957,7 +3957,7 @@ int main(int argc, char *argv[])
 
 	PIXEL_T pix;
 	pix.r=0;
-	pix.g=round(MAX_R*(FLOAT_T)height/3619.0);
+	pix.g=round(MAX_R*(REAL_T)height/3619.0);
 	pix.b=0;
 	pix.k=MAX_K;
 	  
@@ -4003,9 +4003,9 @@ int main(int argc, char *argv[])
   VECTOR_R_T Data, Bins;
   FONT_T my_font;
   char text[40];
-  FLOAT_T x;
-  S_INT16_T i;
-  FLOAT_T mu, sigma2;
+  REAL_T x;
+  SINT16_T i;
+  REAL_T mu, sigma2;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
@@ -4061,9 +4061,9 @@ int main(int argc, char *argv[])
 #ifdef DEMO_PRIMES
   VIEWPORT_2D_T win;
   FONT_T my_font;
-  VECTOR_S_INT16_T P;
-  S_INT32_T k,j;
-  FLOAT_T t, x, y, xp, yp;
+  VECTOR_SINT16_T P;
+  SINT32_T k,j;
+  REAL_T t, x, y, xp, yp;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
 
@@ -4132,9 +4132,9 @@ int main(int argc, char *argv[])
 
   //#define DEMO_RK4
 #ifdef DEMO_RK4
-  FLOAT_T t_n, y_rk4, y_euler, xp, yp;
+  REAL_T t_n, y_rk4, y_euler, xp, yp;
   VIEWPORT_2D_T win;
-  ERR_T error;
+  MATHERROR_T error;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
   lb_fb_clear(ty_fb_main, 0,0,0,255);
@@ -4171,8 +4171,8 @@ int main(int argc, char *argv[])
 #ifdef DEMO_GENERAL_RUNGE_KUTTA
   VECTOR_R_T C, B, K;
   MATRIX_R_T A;
-  S_INT16_T i, j;
-  FLOAT_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
+  SINT16_T i, j;
+  REAL_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
   VIEWPORT_2D_T win;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -4262,7 +4262,7 @@ int main(int argc, char *argv[])
   //#define DEMO_TIME_TEST
 #ifdef DEMO_TIME_TEST
   unsigned long i, max;
-  S_INT16_T j;
+  SINT16_T j;
   clock_t begin, end;
 
   max=1000000;
@@ -4296,42 +4296,42 @@ int main(int argc, char *argv[])
     SDL_Event event;
   
     /* User-defined simulation parameters */
-    const FLOAT_T freq_0=2000;        /* Frequency associated to one of the symbols */
-    const FLOAT_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
-    S_INT32_T n_experiments=1000; /* Maximum number of experiments. Not declared as a const to allow a possible
+    const REAL_T freq_0=2000;        /* Frequency associated to one of the symbols */
+    const REAL_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
+    SINT32_T n_experiments=1000; /* Maximum number of experiments. Not declared as a const to allow a possible
 					 upgrade to variable-step size */
-    const S_INT32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
-    FLOAT_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
-    FLOAT_T f_max_noise=6.0e3;  /* Maximum noise frequency */
-    FLOAT_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
-    FLOAT_T N_exp_min;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
+    const SINT32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
+    REAL_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
+    REAL_T f_max_noise=6.0e3;  /* Maximum noise frequency */
+    REAL_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
+    REAL_T N_exp_min;         /* Minimum (final) amound of noise to be reached during a series of experiments */;
    
     /* Simulation variables */
-    S_INT32_T experiment;       /* Keeps track of the current experiment */
-    S_INT32_T errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02;     /* Keeps track of the number of errors detected during a series of experiments */
-    FLOAT_T N_experiment;        /* Current value of the noise energy during a series of experiments */
-    FLOAT_T N_total;             /* Total energy of a frequency vector  */
-    S_INT8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
+    SINT32_T experiment;       /* Keeps track of the current experiment */
+    SINT32_T errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02;     /* Keeps track of the number of errors detected during a series of experiments */
+    REAL_T N_experiment;        /* Current value of the noise energy during a series of experiments */
+    REAL_T N_total;             /* Total energy of a frequency vector  */
+    SINT8_T flag_running=TRUE; /* This variable will be true until it reaches any of the following conditions:
 				    a) The last series of experiments with the minimum noise level was completed.
 				    b) The maximum time allowed for running the simulation has been exceeded. 
 				    c) The user interrupted the simulation. */
-    S_INT8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
+    SINT8_T flag_draw_wave;   /* There isn't really any use to plot the waveform, except to give the user a rough
 				   visual idea of the amount of noise and its effects. 
 				   The waveform will be only ploted in a subset of the experiments. */
 
-    FLOAT_T t_min=-0.25/freq_0;             /* Initial time for parsing the waveform */
-    FLOAT_T t_max=0.5/freq_0+0.75/freq_1 ;  /* Final time for parsing the waveform */
-    FLOAT_T t;
-    FLOAT_T T_base;
+    REAL_T t_min=-0.25/freq_0;             /* Initial time for parsing the waveform */
+    REAL_T t_max=0.5/freq_0+0.75/freq_1 ;  /* Final time for parsing the waveform */
+    REAL_T t;
+    REAL_T T_base;
 
     VIEWPORT_2D_T win_wave, win_BER;
-    FLOAT_T xp, yp;                        /* Graphic variables */
-    S_INT16_T i, k;                       /* General-use counters */
+    REAL_T xp, yp;                        /* Graphic variables */
+    SINT16_T i, k;                       /* General-use counters */
  
     FONT_T my_font;
     char text[80];
 
-    FLOAT_T wave(FLOAT_T t, FLOAT_T f0, FLOAT_T f1) 
+    REAL_T wave(REAL_T t, REAL_T f0, REAL_T f1) 
     {
       if (t<1.0/(2.0*f0)) 
 	return sin(2*M_PI*f0*t);
@@ -4339,10 +4339,10 @@ int main(int argc, char *argv[])
 	return sin(2*M_PI*f1*(t-1.0/(2.0*f0)+1.0/(2.0*f1)));
     }
 
-    FLOAT_T energy_signal(VECTOR_R_T *V)
+    REAL_T energy_signal(VECTOR_R_T *V)
     {
-      FLOAT_T temp;
-      U_INT16_T j;
+      REAL_T temp;
+      UINT16_T j;
 
       temp=0.0;
       for(j=0;j<(*V).items;j++)
@@ -4350,12 +4350,12 @@ int main(int argc, char *argv[])
       return 0.5*temp;
     } 
 
-    S_INT8_T parse_vector(VECTOR_R_T *buffer, FLOAT_T threshold_h, FLOAT_T threshold_l)
+    SINT8_T parse_vector(VECTOR_R_T *buffer, REAL_T threshold_h, REAL_T threshold_l)
     {
-      U_INT16_T time_stamp[4];
+      UINT16_T time_stamp[4];
    
-      U_INT16_T i, crossings_counter=0;
-      FLOAT_T delta_0, delta_1, margin;
+      UINT16_T i, crossings_counter=0;
+      REAL_T delta_0, delta_1, margin;
 
       delta_0=(*buffer).items*freq_1/(1.5*freq_0+1.5*freq_1);
       delta_1=(*buffer).items*freq_0/(1.5*freq_0+1.5*freq_1);
@@ -4385,7 +4385,15 @@ int main(int argc, char *argv[])
       return 1; /* Failure: one of the bits was incorrectly decoded */
     }
 
-  
+    printf("Size of SINT64_T is =%d\r\n",(SINT8_T)sizeof(SINT64_T));
+    printf("Size of UINT64_T is =%d\r\n",(SINT8_T)sizeof(UINT64_T));
+    SINT64_T numero;
+    numero=0xffffffffffffffff;
+    printf("T is =%lld\r\n",numero);
+    numero=0xffffffffffffffff;
+    numero++;
+    printf("T is =%lld\r\n",numero);
+
     lb_gr_SDL_init("BER vs Noise using a Montecarlo simulation", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
 
     win_wave.xp_min=20;
@@ -4427,7 +4435,7 @@ int main(int argc, char *argv[])
     /* We determine the number of frequency coefficients which are required, given the bandwidth */
 
     T_base=1.0/(2.0*freq_0)+1.0/(2.0*freq_1);
-    Noise.items=(S_INT16_T)ceil(f_max_noise*T_base);
+    Noise.items=(SINT16_T)ceil(f_max_noise*T_base);
   
     /* We make sure the size of the signal in the time domain is at least twice as large as the vector 
        holding the noise frequencies, due to the Shannon-Nyquist sampling theorem. */
@@ -4460,7 +4468,7 @@ int main(int argc, char *argv[])
 	      Noise.array[k]=lb_st_marsaglia_polar(noise_variance);
 
 	    N_total=energy_signal(&Noise);
-	    FLOAT_T scale_factor;
+	    REAL_T scale_factor;
 	    scale_factor=sqrt(N_experiment/N_total);
 
 	    for (k=0; k<Noise.items; k++)
@@ -4474,7 +4482,7 @@ int main(int argc, char *argv[])
 	      {
 		t=t_min+k*(t_max-t_min)/Signal.items;
 		  
-		FLOAT_T temp;
+		REAL_T temp;
 		temp=0;
 
 		for (i=0;i<Noise.items;i++)
@@ -4509,25 +4517,25 @@ int main(int argc, char *argv[])
 	printf("N_experiment=%f\tN_total=%f\tE(0,0)=%d, E(0.025, -0.025)=%d, E(0.05, -0.05)=%d\r\n",
 	       N_experiment,N_total, errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02);
 
-	FLOAT_T temp_00, temp_01, temp_02, temp;
+	REAL_T temp_00, temp_01, temp_02, temp;
 	if (N_experiment>0)
 	  {
 	    lb_gr_project_2d_x(win_BER, -10*log10(N_experiment), &xp);
 
-	    temp_00=(FLOAT_T)errors_count_threshold_00/n_experiments;
+	    temp_00=(REAL_T)errors_count_threshold_00/n_experiments;
 	    if (temp_00>0)
 	      {
 		lb_gr_project_2d_y_log(win_BER, temp_00, &yp);
 		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 	      }
 
-	    temp_01=(FLOAT_T)errors_count_threshold_01/n_experiments;
+	    temp_01=(REAL_T)errors_count_threshold_01/n_experiments;
 	    if (temp_01>0)
 	      {
 		lb_gr_project_2d_y_log(win_BER, temp_01, &yp);
 		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
 	      }
-	    temp_02=(FLOAT_T)errors_count_threshold_02/n_experiments;
+	    temp_02=(REAL_T)errors_count_threshold_02/n_experiments;
 
 	    if (temp_02>0)
 	      {
@@ -4535,8 +4543,8 @@ int main(int argc, char *argv[])
 		lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY);
 	      }
 	    
-	    ERR_T error;
-	    temp = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(FLOAT_T)1.0/N_experiment, &error));
+	    MATHERROR_T error;
+	    temp = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(REAL_T)1.0/N_experiment, &error));
 	    if (temp>0)
 	      {
 		lb_gr_project_2d_y_log(win_BER, temp, &yp);
@@ -4575,7 +4583,7 @@ int main(int argc, char *argv[])
     //#define DEMO_KEYBOARD
 #ifdef DEMO_KEYBOARD
     unsigned char c;
-    S_INT8_T flag;
+    SINT8_T flag;
 
     flag=FALSE;
     lb_co_set_echo(0); 
@@ -4779,8 +4787,8 @@ int main(int argc, char *argv[])
     //#define DEMO_WAV_WRITE
 #ifdef DEMO_WAV_WRITE
     VECTOR_R_T V;
-    U_INT16_T i;
-    FLOAT_T f1,f2;
+    UINT16_T i;
+    REAL_T f1,f2;
   
     V.items=SAMPLES;
     lb_al_create_vector_r(&V);
@@ -4851,7 +4859,7 @@ int main(int argc, char *argv[])
     //#define DEMO_WAV
 #ifdef DEMO_WAV
     VECTOR_R_T V;
-    U_INT16_T i;
+    UINT16_T i;
     V.items=VECTOR_MAX_ITEMS;
     lb_al_create_vector_r(&V);
 

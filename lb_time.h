@@ -5,7 +5,7 @@
 
 #include "lb_types.h"
 
-void lb_ti_delay_ms(U_INT32_T delay);
-void lb_ti_delay_us(U_INT32_T delay);
+void lb_ti_delay_ms(UINT32_T delay);
+void lb_ti_delay_us(UINT32_T delay);
 
 #endif

@@ -55,14 +55,14 @@ typedef struct
 
 void       lb_gp_gpio_close();
 int        lb_gp_gpio_open();
-U_INT8_T  lb_gp_gpio_rd(U_INT8_T pin_number);
-U_INT32_T lb_gp_gpio_rd_all(void);
-void       lb_gp_gpio_setup_pin(U_INT8_T pin_number, U_INT8_T mode);
-U_INT8_T  lb_gp_gpio_SPI_rw(SPI_PORT_T *port, U_INT8_T byte_out);
-U_INT16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, U_INT16_T int16_out, U_INT8_T n_bits);
-void       lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, U_INT8_T *buffer_out, U_INT8_T *buffer_in, U_INT8_T n_bytes);
-void       lb_gp_gpio_wr(U_INT8_T pin_number, U_INT8_T value);
-void       lb_gp_print_u32_as_binary(U_INT32_T value, U_INT8_T n_bits);
+UINT8_T  lb_gp_gpio_rd(UINT8_T pin_number);
+UINT32_T lb_gp_gpio_rd_all(void);
+void       lb_gp_gpio_setup_pin(UINT8_T pin_number, UINT8_T mode);
+UINT8_T  lb_gp_gpio_SPI_rw(SPI_PORT_T *port, UINT8_T byte_out);
+UINT16_T lb_gp_gpio_SPI_rw_nbits(SPI_PORT_T *port, UINT16_T int16_out, UINT8_T n_bits);
+void       lb_gp_gpio_SPI_rw_buffer(SPI_PORT_T *port, UINT8_T *buffer_out, UINT8_T *buffer_in, UINT8_T n_bytes);
+void       lb_gp_gpio_wr(UINT8_T pin_number, UINT8_T value);
+void       lb_gp_print_u32_as_binary(UINT32_T value, UINT8_T n_bits);
 
 
 #endif /* LB_GPIO_H */

@@ -7,18 +7,18 @@
 
 #define REL_ERROR 1e-12
 
-FLOAT_T lb_st_erf(FLOAT_T x)
+REAL_T lb_st_erf(REAL_T x)
 //erf(x) = 2/sqrt(pi)*integral(exp(-t^2),t,0,x)
 //         = 2/sqrt(pi)*[x - x^3/3 + x^5/5*2! - x^7/7*3! + ...]
 //         = 1-erfc(x)
 {
-  FLOAT_T two_sqrtpi=2/sqrt(M_PI);
+  REAL_T two_sqrtpi=2/sqrt(M_PI);
   //static const double two_sqrtpi=  1.128379167095512574;        // 2/sqrt(pi)
   if (fabs(x) > 2.2) {
     return 1.0 - erfc(x);        //use continued fraction when fabs(x) > 2.2
   }
   
-  FLOAT_T sum=x, term=x, xsqr=x*x;
+  REAL_T sum=x, term=x, xsqr=x*x;
   int j=1;
   do {
     term*= xsqr/j;
@@ -31,14 +31,14 @@ FLOAT_T lb_st_erf(FLOAT_T x)
   return two_sqrtpi*sum;
 }
 
-FLOAT_T lb_st_erfc(FLOAT_T x)
+REAL_T lb_st_erfc(REAL_T x)
 /* 
    erfc(x) = 2/sqrt(pi)*integral(exp(-t^2),t,x,inf)
            = exp(-x^2)/sqrt(pi) * [1/x+ (1/2)/x+ (2/2)/x+ (3/2)/x+ (4/2)/x+ [...]
            = 1-erf(x)
 	   expression inside [] is a continued fraction so '+' means add to denominator only */
 {
-  FLOAT_T one_sqrtpi = 1/sqrt(M_PI); 
+  REAL_T one_sqrtpi = 1/sqrt(M_PI); 
   //  static const double one_sqrtpi =  0.564189583547756287;        // 1/sqrt(pi)
   if (fabs(x) < 2.2) {
     return 1.0 - erf(x);        //use series when fabs(x) < 2.2
@@ -46,10 +46,10 @@ FLOAT_T lb_st_erfc(FLOAT_T x)
   if (signbit(x)) {               //continued fraction only valid for x>0
     return 2.0 - erfc(-x);
   }
-  FLOAT_T a=1, b=x;                //last two convergent numerators
-  FLOAT_T c=x, d=x*x+0.5;          //last two convergent denominators
-  FLOAT_T q1,q2;                   //last two convergents (a/c and b/d)
-  FLOAT_T n= 1.0, t;
+  REAL_T a=1, b=x;                //last two convergent numerators
+  REAL_T c=x, d=x*x+0.5;          //last two convergent denominators
+  REAL_T q1,q2;                   //last two convergents (a/c and b/d)
+  REAL_T n= 1.0, t;
   do {
     t= a*n+b*x;
     a= b;
@@ -64,57 +64,57 @@ FLOAT_T lb_st_erfc(FLOAT_T x)
   return one_sqrtpi*exp(-x*x)*q2;
 }
 
-FLOAT_T lb_st_frand(void)
+REAL_T lb_st_frand(void)
 {
-  return (FLOAT_T)rand()/RAND_MAX;
+  return (REAL_T)rand()/RAND_MAX;
 } 
 
-FLOAT_T lb_st_marsaglia_polar(FLOAT_T variance)
+REAL_T lb_st_marsaglia_polar(REAL_T variance)
 {
-  FLOAT_T r1, r2;
+  REAL_T r1, r2;
   lb_st_marsaglia_polar2(variance, &r1, &r2);
   return r1;
 }
 
-void lb_st_marsaglia_polar2(FLOAT_T variance, FLOAT_T *r1, FLOAT_T *r2)
+void lb_st_marsaglia_polar2(REAL_T variance, REAL_T *r1, REAL_T *r2)
 {
-  FLOAT_T x, y, s;
+  REAL_T x, y, s;
   do {
-    x= 2.0*rand()/(FLOAT_T)RAND_MAX -1.0;
-    y= 2.0*rand()/(FLOAT_T)RAND_MAX -1.0;
+    x= 2.0*rand()/(REAL_T)RAND_MAX -1.0;
+    y= 2.0*rand()/(REAL_T)RAND_MAX -1.0;
     s = x*x + y*y;
   } while ((s>=1) || (s==0));
   *r1=variance*x*sqrt(-2.0*log(s)/s);
   *r2=variance*y*sqrt(-2.0*log(s)/s);
 }
 
-FLOAT_T lb_st_gauss_area(FLOAT_T x)
+REAL_T lb_st_gauss_area(REAL_T x)
 {
   // constants
-  FLOAT_T a1 =  0.254829592;
-  FLOAT_T a2 = -0.284496736;
-  FLOAT_T a3 =  1.421413741;
-  FLOAT_T a4 = -1.453152027;
-  FLOAT_T a5 =  1.061405429;
-  FLOAT_T p  =  0.3275911;
+  REAL_T a1 =  0.254829592;
+  REAL_T a2 = -0.284496736;
+  REAL_T a3 =  1.421413741;
+  REAL_T a4 = -1.453152027;
+  REAL_T a5 =  1.061405429;
+  REAL_T p  =  0.3275911;
   
   // Save the sign of x
-  S_INT8_T  sign = 1;
+  SINT8_T  sign = 1;
   if (x < 0)
     sign = -1;
   x = fabs(x)/sqrt(2.0);
   
   // A&S formula 7.1.26
-  FLOAT_T t = 1.0/(1.0 + p*x);
-  FLOAT_T y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*exp(-x*x);
+  REAL_T t = 1.0/(1.0 + p*x);
+  REAL_T y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*exp(-x*x);
   
   return 0.5*(1.0 + sign*y);
 }
 
-FLOAT_T lb_st_average(VECTOR_R_T *Data)
+REAL_T lb_st_average(VECTOR_R_T *Data)
 {
- U_INT16_T i;
- FLOAT_T sum;
+ UINT16_T i;
+ REAL_T sum;
  if (!lb_al_assert_dimensions_vector_r(Data))
    {
      printf("Error: lb_st_average() --> invalid dimension --> Invalid dimension [V]\r\n");
@@ -127,10 +127,10 @@ FLOAT_T lb_st_average(VECTOR_R_T *Data)
  return sum/(*Data).items;
 }
 
-FLOAT_T lb_st_stddev2(VECTOR_R_T *Data, FLOAT_T mu)
+REAL_T lb_st_stddev2(VECTOR_R_T *Data, REAL_T mu)
 {
- U_INT16_T i;
- FLOAT_T sum, temp;
+ UINT16_T i;
+ REAL_T sum, temp;
  if (!lb_al_assert_dimensions_vector_r(Data))
    {
      printf("Error: lb_st_stddev() --> invalid dimension --> Invalid dimension [V]\r\n");
@@ -147,11 +147,11 @@ FLOAT_T lb_st_stddev2(VECTOR_R_T *Data, FLOAT_T mu)
 
 
 
-void lb_st_histogram(VECTOR_R_T *Data, VECTOR_R_T *Bins, FLOAT_T a, FLOAT_T b, FLOAT_T *mu, FLOAT_T *sigma2 )
+void lb_st_histogram(VECTOR_R_T *Data, VECTOR_R_T *Bins, REAL_T a, REAL_T b, REAL_T *mu, REAL_T *sigma2 )
 {
-  FLOAT_T sum, temp;
-  U_INT16_T i;
-  S_INT16_T index;
+  REAL_T sum, temp;
+  UINT16_T i;
+  SINT16_T index;
   
   if (!lb_al_assert_dimensions_vector_r(Data))
     {

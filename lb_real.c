@@ -25,10 +25,10 @@ M_SQRT1_2  The reciprocal of the square root of two (also the square root of 1/2
 /* Basic operations */
 /******************************************************************************************/
 
-FLOAT_T lb_re_divide(FLOAT_T x, FLOAT_T y, ERR_T *error)
+REAL_T lb_re_divide(REAL_T x, REAL_T y, MATHERROR_T *error)
 {
  int raised;
- FLOAT_T result;
+ REAL_T result;
 
  feclearexcept(FE_ALL_EXCEPT);
  result=x/y;
@@ -50,10 +50,10 @@ FLOAT_T lb_re_divide(FLOAT_T x, FLOAT_T y, ERR_T *error)
  return result;
 }
 
-FLOAT_T lb_re_pow(FLOAT_T x, FLOAT_T y,  ERR_T *error)
+REAL_T lb_re_pow(REAL_T x, REAL_T y,  MATHERROR_T *error)
 {
  int raised;
- FLOAT_T result;
+ REAL_T result;
 
  feclearexcept(FE_ALL_EXCEPT);
  result=pow(x,y);
@@ -75,13 +75,13 @@ FLOAT_T lb_re_pow(FLOAT_T x, FLOAT_T y,  ERR_T *error)
  return result;
 }
 
-FLOAT_T lb_re_sqr(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_sqr(REAL_T x, MATHERROR_T *error)
 {
-    FLOAT_T max_argument;
-    if (sizeof(FLOAT_T)==4)
+    REAL_T max_argument;
+    if (sizeof(REAL_T)==4)
       max_argument=1.8446743524e19;
     else
-      if (sizeof(FLOAT_T)==8)
+      if (sizeof(REAL_T)==8)
 	max_argument=1.8446743524e19;
     
     if (x<max_argument)
@@ -93,7 +93,7 @@ FLOAT_T lb_re_sqr(FLOAT_T x, ERR_T *error)
     }
 }
 
-FLOAT_T lb_re_sqrt(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_sqrt(REAL_T x, MATHERROR_T *error)
 {
   if (x<0)
     {
@@ -103,7 +103,7 @@ FLOAT_T lb_re_sqrt(FLOAT_T x, ERR_T *error)
   return sqrt(x);
 }
 
-FLOAT_T lb_re_xroot(FLOAT_T x, FLOAT_T y, ERR_T *error)
+REAL_T lb_re_xroot(REAL_T x, REAL_T y, MATHERROR_T *error)
 {
   if (lb_re_equal(x,0.0))
     {
@@ -117,17 +117,17 @@ FLOAT_T lb_re_xroot(FLOAT_T x, FLOAT_T y, ERR_T *error)
 /* Euler */
 /******************************************************************************************/
 
-FLOAT_T lb_re_exp(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_exp(REAL_T x, MATHERROR_T *error)
 {
-  FLOAT_T max_argument;
-  if (sizeof(FLOAT_T)==4)
+  REAL_T max_argument;
+  if (sizeof(REAL_T)==4)
     max_argument=88.722839;
   else
-    if (sizeof(FLOAT_T)==8)
+    if (sizeof(REAL_T)==8)
       max_argument=709.782712;
       else
 	{
-	  printf("Error: lb_re_exp(): invalid data type: sizeof(FLOAT_T)=%zd\r\n",sizeof(FLOAT_T));
+	  printf("Error: lb_re_exp(): invalid data type: sizeof(REAL_T)=%zd\r\n",sizeof(REAL_T));
 	  exit(1);
 	}
   if (x<max_argument)
@@ -139,10 +139,10 @@ FLOAT_T lb_re_exp(FLOAT_T x, ERR_T *error)
     }
 }
 
-FLOAT_T lb_re_ln(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_ln(REAL_T x, MATHERROR_T *error)
 {
  int raised;
- FLOAT_T result;
+ REAL_T result;
 
  feclearexcept(FE_ALL_EXCEPT);
  result=log(x);
@@ -164,10 +164,10 @@ FLOAT_T lb_re_ln(FLOAT_T x, ERR_T *error)
  return result;
 }
 
-FLOAT_T lb_re_log(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_log(REAL_T x, MATHERROR_T *error)
 {
  int raised;
- FLOAT_T result;
+ REAL_T result;
 
  feclearexcept(FE_ALL_EXCEPT);
  result=log10(x);
@@ -189,10 +189,10 @@ FLOAT_T lb_re_log(FLOAT_T x, ERR_T *error)
  return result;
 }
 
-FLOAT_T lb_re_log2(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_log2(REAL_T x, MATHERROR_T *error)
 {
  int raised;
- FLOAT_T result;
+ REAL_T result;
 
  feclearexcept(FE_ALL_EXCEPT);
  result=log2(x);
@@ -218,10 +218,10 @@ FLOAT_T lb_re_log2(FLOAT_T x, ERR_T *error)
 /* Trigonometric - circular */
 /******************************************************************************************/
 
-FLOAT_T lb_re_tan(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_tan(REAL_T x, MATHERROR_T *error)
 {
  int raised;
- FLOAT_T result;
+ REAL_T result;
 
  feclearexcept(FE_ALL_EXCEPT);
  result=tan(x);
@@ -243,7 +243,7 @@ FLOAT_T lb_re_tan(FLOAT_T x, ERR_T *error)
  return result;
 }
 
-FLOAT_T lb_re_asin(FLOAT_T x,ERR_T *error)
+REAL_T lb_re_asin(REAL_T x,MATHERROR_T *error)
 {
   if (fabs(x)>1)
     {
@@ -253,7 +253,7 @@ FLOAT_T lb_re_asin(FLOAT_T x,ERR_T *error)
   return asin(x);
 }
 
-FLOAT_T lb_re_acos(FLOAT_T x,ERR_T *error)
+REAL_T lb_re_acos(REAL_T x,MATHERROR_T *error)
 {
   if (fabs(x)>1)
     {
@@ -267,47 +267,47 @@ FLOAT_T lb_re_acos(FLOAT_T x,ERR_T *error)
 /* Trigonometric - hyperbolic */
 /******************************************************************************************/
 
-FLOAT_T lb_re_sinh(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_sinh(REAL_T x, MATHERROR_T *error)
 {
-  if (sizeof(FLOAT_T)==4)
+  if (sizeof(REAL_T)==4)
     if (x<88.722839)    
       return sinh(x);
     else ;
   else
-    if (sizeof(FLOAT_T)==8)
+    if (sizeof(REAL_T)==8)
       if (x<709.782712)
 	return sinh(x);
       else ;
     else
       {
-	printf("Error: lb_re_sinh(): invalid data type: sizeof(FLOAT_T)=%zd\r\n",sizeof(FLOAT_T));
+	printf("Error: lb_re_sinh(): invalid data type: sizeof(REAL_T)=%zd\r\n",sizeof(REAL_T));
 	exit(1);
       }
   *error=e_too_big;
   return 0;
 }
 
-FLOAT_T lb_re_cosh(FLOAT_T x, ERR_T *error)
+REAL_T lb_re_cosh(REAL_T x, MATHERROR_T *error)
 {
-  if (sizeof(FLOAT_T)==4)
+  if (sizeof(REAL_T)==4)
     if (x<88.722839)    
       return cosh(x);
     else ;
   else
-    if (sizeof(FLOAT_T)==8)
+    if (sizeof(REAL_T)==8)
       if (x<709.782712)
 	return cosh(x);
       else ;
     else
       {
-	printf("Error: lb_re_cosh(): invalid data type: sizeof(FLOAT_T)=%zd\r\n",sizeof(FLOAT_T));
+	printf("Error: lb_re_cosh(): invalid data type: sizeof(REAL_T)=%zd\r\n",sizeof(REAL_T));
 	exit(1);
       }
   *error=e_too_big;
   return 0;
 }
 
-FLOAT_T lb_re_acosh(FLOAT_T x,ERR_T *error)
+REAL_T lb_re_acosh(REAL_T x,MATHERROR_T *error)
 {
   if (x<1)
     {
@@ -317,7 +317,7 @@ FLOAT_T lb_re_acosh(FLOAT_T x,ERR_T *error)
   return acosh(x);
 }
 
-FLOAT_T lb_re_atanh(FLOAT_T x,ERR_T *error)
+REAL_T lb_re_atanh(REAL_T x,MATHERROR_T *error)
 {
   if (fabs(x)>1)
     {
@@ -327,7 +327,7 @@ FLOAT_T lb_re_atanh(FLOAT_T x,ERR_T *error)
   return atanh(x);
 }
 
-FLOAT_T lb_re_atan2(FLOAT_T y, FLOAT_T x)
+REAL_T lb_re_atan2(REAL_T y, REAL_T x)
 {
   if (x==0) x=0;  // 0 has several representations.  
                   // atan2(1,-0.0)=3.1416 [OK]  atan2(1.0,-0.0)=-3.1416 [WRONG]
@@ -339,17 +339,17 @@ FLOAT_T lb_re_atan2(FLOAT_T y, FLOAT_T x)
 /* Comparison */
 /******************************************************************************************/
 
-S_INT8_T lb_re_equal(FLOAT_T a, FLOAT_T b)
+SINT8_T lb_re_equal(REAL_T a, REAL_T b)
 {
-  FLOAT_T max_diff, largest, diff;
-  if (sizeof(FLOAT_T)==4)
+  REAL_T max_diff, largest, diff;
+  if (sizeof(REAL_T)==4)
     max_diff = 10.0*FLT_EPSILON;
   else
-    if (sizeof(FLOAT_T)==8)
+    if (sizeof(REAL_T)==8)
       max_diff = 10.0*DBL_EPSILON;
     else
       {
-	printf("Error: lb_re_equal(): invalid floating data type: [size = %zd]\r\n",sizeof(FLOAT_T));
+	printf("Error: lb_re_equal(): invalid floating data type: [size = %zd]\r\n",sizeof(REAL_T));
 	exit(1);
       }
   //printf("Epsilon = %1.9e\r\n",max_diff);
@@ -366,14 +366,14 @@ S_INT8_T lb_re_equal(FLOAT_T a, FLOAT_T b)
   return FALSE;
 }
 
-S_INT8_T lb_re_is_int(FLOAT_T x)
+SINT8_T lb_re_is_int(REAL_T x)
 {
-  if (lb_re_equal(x-(S_INT16_T)x,0))
+  if (lb_re_equal(x-(SINT16_T)x,0))
     return 1;
   return 0;
 }
 
-S_INT8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b)
+SINT8_T lb_re_larger_or_equal(REAL_T a, REAL_T b)
 {
   if (a>b)
     return TRUE;
@@ -384,7 +384,7 @@ S_INT8_T lb_re_larger_or_equal(FLOAT_T a, FLOAT_T b)
   return FALSE;
 }
 
-S_INT8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b)
+SINT8_T lb_re_smaller_or_equal(REAL_T a, REAL_T b)
 {
   if (a<b)
     return TRUE;
@@ -395,13 +395,13 @@ S_INT8_T lb_re_smaller_or_equal(FLOAT_T a, FLOAT_T b)
   return FALSE;
 }
 
-FLOAT_T lb_re_max(FLOAT_T x, FLOAT_T y)
+REAL_T lb_re_max(REAL_T x, REAL_T y)
 {
   if (x>=y) return x;
   return y;
 }
 
-FLOAT_T lb_re_min(FLOAT_T x, FLOAT_T y)
+REAL_T lb_re_min(REAL_T x, REAL_T y)
 {
   if (x<=y) return x;
   return y;
@@ -411,38 +411,38 @@ FLOAT_T lb_re_min(FLOAT_T x, FLOAT_T y)
 /* Singular functions */
 /******************************************************************************************/
 
-FLOAT_T lb_re_frac(FLOAT_T x)
+REAL_T lb_re_frac(REAL_T x)
 {
   return fmod(x,1.0);
 }
 
-S_INT8_T lb_re_ispos(FLOAT_T x)
+SINT8_T lb_re_ispos(REAL_T x)
 {
   if (x>=0) return 1.0;
   return 0.0;
 }
 
-FLOAT_T lb_re_ramp(FLOAT_T x)
+REAL_T lb_re_ramp(REAL_T x)
 {
   if(x>=0) return x;
   return 0.0;
 }
 
-S_INT8_T lb_re_sign(FLOAT_T x)
+SINT8_T lb_re_sign(REAL_T x)
 {
   if (x>=0) return 1.0;
   if (x<0) return -1.0;
   return 0.0;
 }
 
-FLOAT_T lb_re_pulse(FLOAT_T a, FLOAT_T b, FLOAT_T x)
+REAL_T lb_re_pulse(REAL_T a, REAL_T b, REAL_T x)
 {
   if ((x==a) || (x==b)) return 0.5;
   if ((x<a)  || (x>b)) return 0.0;
   return 1;
 }
 
-FLOAT_T lb_re_pulse_triangle(FLOAT_T a, FLOAT_T b, FLOAT_T x)
+REAL_T lb_re_pulse_triangle(REAL_T a, REAL_T b, REAL_T x)
 {
   if (a==b)
     { 
@@ -454,14 +454,14 @@ FLOAT_T lb_re_pulse_triangle(FLOAT_T a, FLOAT_T b, FLOAT_T x)
   return 2*(b-x)/(b-a);
 }
 
-FLOAT_T lb_re_step(FLOAT_T x)
+REAL_T lb_re_step(REAL_T x)
 {
   if(x==0) return 0.5;
   if (x>0) return 1.0;
   return 0.0; /* if x<0 return 0.0 */
 }
 
-FLOAT_T lb_re_step_practical(FLOAT_T t, FLOAT_T x)
+REAL_T lb_re_step_practical(REAL_T t, REAL_T x)
 {
   if (x<=0) return 0.0;
   if (x>=t) return 1.0;
@@ -473,7 +473,7 @@ FLOAT_T lb_re_step_practical(FLOAT_T t, FLOAT_T x)
 /******************************************************************************************/
 
 /* Returns the minimum number of digits required to represent a number */
-S_INT16_T lb_re_ndigits(FLOAT_T x)
+SINT16_T lb_re_ndigits(REAL_T x)
 {
   if (x>0)
     return log10(x)+1.0;
@@ -481,29 +481,29 @@ S_INT16_T lb_re_ndigits(FLOAT_T x)
 }
 
 
-FLOAT_T lb_re_factorial(FLOAT_T n,ERR_T *error)
+REAL_T lb_re_factorial(REAL_T n,MATHERROR_T *error)
 {
-  FLOAT_T temp_f;
-  S_INT16_T n_int;
+  REAL_T temp_f;
+  SINT16_T n_int;
 
   if (n<0)
     *error=e_arg_negative;
   else
-    if (!lb_re_equal(n,(S_INT16_T)n))
+    if (!lb_re_equal(n,(SINT16_T)n))
       *error=e_arg_non_int;
     else
-      if (sizeof(FLOAT_T)==4)
+      if (sizeof(REAL_T)==4)
 	if (n>34) 
 	  *error=e_too_big;
 	else ;
       else
-	if (sizeof(FLOAT_T)==8)
+	if (sizeof(REAL_T)==8)
 	  if (n>170)
 	    *error=e_too_big;
 	  else; 
 	else
 	  {
-	    printf("Error: lb_re_factorial(): invalid data type: sizeof(FLOAT_T)=%zd\r\n",sizeof(FLOAT_T));
+	    printf("Error: lb_re_factorial(): invalid data type: sizeof(REAL_T)=%zd\r\n",sizeof(REAL_T));
 	    exit(1);
 	  }
   if ((*error) != e_none)
@@ -521,14 +521,14 @@ FLOAT_T lb_re_factorial(FLOAT_T n,ERR_T *error)
 
 /* Returns the normed significand, that is, a number between 0 and 0.9999 x 10^n */
 
-FLOAT_T lb_re_normed_exponent(FLOAT_T x)
+REAL_T lb_re_normed_exponent(REAL_T x)
 {
   if (x>0)
-    return (S_INT16_T)floor(log10(fabs(x)));
+    return (SINT16_T)floor(log10(fabs(x)));
   return 0;
 }
 
-FLOAT_T lb_re_normed_significand(FLOAT_T x)
+REAL_T lb_re_normed_significand(REAL_T x)
 {
   if (x>0)
     return x/pow(10.0,floor(log10(x)));
@@ -538,7 +538,7 @@ FLOAT_T lb_re_normed_significand(FLOAT_T x)
 }
 
 /* Returns 1 if x is in the closed interval, otherwise returns 0 */
-FLOAT_T lb_re_test_interval_closed(FLOAT_T a, FLOAT_T b, FLOAT_T x)
+REAL_T lb_re_test_interval_closed(REAL_T a, REAL_T b, REAL_T x)
 {
   if  ( ((a<=x) && (x<=b)) || ((b<=x) && (x<=a)) )
     return 1;
@@ -546,7 +546,7 @@ FLOAT_T lb_re_test_interval_closed(FLOAT_T a, FLOAT_T b, FLOAT_T x)
 }
 
 /* Returns 1 if x is in the open interval, otherwise returns 0 */
-FLOAT_T lb_re_test_interval_open(FLOAT_T a, FLOAT_T b, FLOAT_T x)
+REAL_T lb_re_test_interval_open(REAL_T a, REAL_T b, REAL_T x)
 {
   if  ( ((a<x) && (x<b)) || ((b<x) && (x<a)) )
     return 1;
@@ -558,19 +558,19 @@ FLOAT_T lb_re_test_interval_open(FLOAT_T a, FLOAT_T b, FLOAT_T x)
 /* Financial */
 /******************************************************************************************/
 
-FLOAT_T lb_re_APR_to_monthly(FLOAT_T apr, ERR_T *error)
+REAL_T lb_re_APR_to_monthly(REAL_T apr, MATHERROR_T *error)
 {
   /* Converts a half-yearly, not in advanced rate to a simple monthly rate */
   return 100.0*lb_re_xroot(6,1+apr/200,error)-100.0;
 }
 
-FLOAT_T lb_re_monthly_to_APR(FLOAT_T monthly, ERR_T *error)
+REAL_T lb_re_monthly_to_APR(REAL_T monthly, MATHERROR_T *error)
 {
   /* Converts a simple monthly rate to an APR half-yearly, not in advanced rate */  
   return 200*lb_re_pow(1.0+monthly/100,6,error)-200.0;
 }
 
-FLOAT_T lb_re_monthly_to_effective(FLOAT_T monthly, ERR_T *error)
+REAL_T lb_re_monthly_to_effective(REAL_T monthly, MATHERROR_T *error)
 {
   /* Converts a simple montly rate to an effective yearly rate */
   return 100*lb_re_pow(1.0+monthly/100.0,12,error)-100.0;
@@ -580,8 +580,8 @@ FLOAT_T lb_re_monthly_to_effective(FLOAT_T monthly, ERR_T *error)
 /* Interpolation */
 /******************************************************************************************/
 
-void lb_re_inter_linear(FLOAT_T x0, FLOAT_T Q0, FLOAT_T x1, FLOAT_T Q1,
-			FLOAT_T x, FLOAT_T *Q, ERR_T *error)
+void lb_re_inter_linear(REAL_T x0, REAL_T Q0, REAL_T x1, REAL_T Q1,
+			REAL_T x, REAL_T *Q, MATHERROR_T *error)
 {
   if(lb_re_equal(x1,x0))
     {
@@ -592,11 +592,11 @@ void lb_re_inter_linear(FLOAT_T x0, FLOAT_T Q0, FLOAT_T x1, FLOAT_T Q1,
     *Q=Q0+(Q1-Q0)*(x-x0)/(x1-x0);
 }
 
-void lb_re_inter_bilinear(FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1,
-			  FLOAT_T Q00, FLOAT_T Q01, FLOAT_T Q10, FLOAT_T Q11,
-			  FLOAT_T x, FLOAT_T y, FLOAT_T *Q, ERR_T *error)
+void lb_re_inter_bilinear(REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1,
+			  REAL_T Q00, REAL_T Q01, REAL_T Q10, REAL_T Q11,
+			  REAL_T x, REAL_T y, REAL_T *Q, MATHERROR_T *error)
 {
-  FLOAT_T denom, temp;
+  REAL_T denom, temp;
   denom=(x1-x0)*(y1-y0);
   if(lb_re_equal(denom,0.0))
     {
@@ -615,9 +615,9 @@ void lb_re_inter_bilinear(FLOAT_T x0, FLOAT_T y0, FLOAT_T x1, FLOAT_T y1,
 /* Rotation */
 /******************************************************************************************/
 
-void lb_re_rotate(FLOAT_T x, FLOAT_T y, FLOAT_T angle, FLOAT_T *xr, FLOAT_T *yr)
+void lb_re_rotate(REAL_T x, REAL_T y, REAL_T angle, REAL_T *xr, REAL_T *yr)
 {
-  FLOAT_T cos_val, sin_val;
+  REAL_T cos_val, sin_val;
   cos_val=cos(angle);
   sin_val=sin(angle);
   *xr=x*cos_val - y*sin_val;

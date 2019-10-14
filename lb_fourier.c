@@ -8,11 +8,11 @@
 #include "lb_real.h"
 #include "lb_integer.h"
 
-void lb_fo_FFT_C_recursive(VECTOR_C_T *T,VECTOR_C_T *F, S_INT8_T sign)
+void lb_fo_FFT_C_recursive(VECTOR_C_T *T,VECTOR_C_T *F, SINT8_T sign)
 {
-  U_INT16_T i,size;
+  UINT16_T i,size;
   VECTOR_C_T T_even, T_odd, F_even, F_odd, W;
-  FLOAT_T temp_f;
+  REAL_T temp_f;
 
   /* We assert the size */
   if(!lb_al_assert_dimensions_vector_c(T))
@@ -116,10 +116,10 @@ void lb_fo_FFT_C_recursive(VECTOR_C_T *T,VECTOR_C_T *F, S_INT8_T sign)
   return;
 }
 
-void lb_fo_calculate_W(VECTOR_C_T *W, S_INT8_T sign)
+void lb_fo_calculate_W(VECTOR_C_T *W, SINT8_T sign)
 {
-  U_INT16_T k;
-  FLOAT_T arg;
+  UINT16_T k;
+  REAL_T arg;
    if(!lb_al_assert_dimensions_vector_c(W))
     {
       printf("Error:  lb_fo_calculate_W() --> invalid dimension\r\n");
@@ -143,11 +143,11 @@ void lb_fo_calculate_W(VECTOR_C_T *W, S_INT8_T sign)
     }
 }
 
-void lb_fo_DFT_C(VECTOR_C_T *T, VECTOR_C_T *F, S_INT8_T sign, ERR_T *error) 
+void lb_fo_DFT_C(VECTOR_C_T *T, VECTOR_C_T *F, SINT8_T sign, MATHERROR_T *error) 
 {
-  U_INT16_T k, n, size;
+  UINT16_T k, n, size;
   COMPLEX_T a;
-  FLOAT_T temp_f;
+  REAL_T temp_f;
 
   /* We assert the size */
   if(!lb_al_assert_dimensions_vector_c(T))
@@ -177,7 +177,7 @@ void lb_fo_DFT_C(VECTOR_C_T *T, VECTOR_C_T *F, S_INT8_T sign, ERR_T *error)
       exit(1);
     }
   
-    temp_f=1/(FLOAT_T)size;
+    temp_f=1/(REAL_T)size;
    for (k=0;k<size;k++)
     {
       (*F).array[k].r=0.0;
@@ -195,7 +195,7 @@ void lb_fo_DFT_C(VECTOR_C_T *T, VECTOR_C_T *F, S_INT8_T sign, ERR_T *error)
 
 void lb_fo_DFT_R(VECTOR_R_T *T, VECTOR_C_T *F) 
 {
-  U_INT16_T k, n, size;
+  UINT16_T k, n, size;
  
   /* We assert the size */
   if(!lb_al_assert_dimensions_vector_r(T))
@@ -236,11 +236,11 @@ void lb_fo_DFT_R(VECTOR_R_T *T, VECTOR_C_T *F)
      }
 }
 
-void lb_fo_FFT_C(VECTOR_C_T *T, VECTOR_C_T *F, VECTOR_C_T *W, S_INT8_T sign) 
+void lb_fo_FFT_C(VECTOR_C_T *T, VECTOR_C_T *F, VECTOR_C_T *W, SINT8_T sign) 
 {
-  U_INT8_T stage, bit_size;
-  U_INT16_T k, l, size, addr_1, addr_2, two_pow_stage, two_pow_stage_plus_one, w_index_factor;
-  FLOAT_T temp_f;
+  UINT8_T stage, bit_size;
+  UINT16_T k, l, size, addr_1, addr_2, two_pow_stage, two_pow_stage_plus_one, w_index_factor;
+  REAL_T temp_f;
   COMPLEX_T temp1, temp2, W_temp;
 
 #ifdef DEBUGGING_FFT
@@ -334,7 +334,7 @@ void lb_fo_FFT_C(VECTOR_C_T *T, VECTOR_C_T *F, VECTOR_C_T *W, S_INT8_T sign)
     } /* stage*/
   if (sign==1)
     {
-      temp_f=1/(FLOAT_T)size;
+      temp_f=1/(REAL_T)size;
       for (l=0;l<size;l++)
 	{
 	  (*F).array[l].r=(*F).array[l].r*temp_f;
@@ -345,8 +345,8 @@ void lb_fo_FFT_C(VECTOR_C_T *T, VECTOR_C_T *F, VECTOR_C_T *W, S_INT8_T sign)
     
 void lb_fo_FFT_R(VECTOR_R_T *T, VECTOR_C_T *F, VECTOR_C_T *W) 
 {
-  U_INT8_T stage, bit_size;
-  U_INT16_T k, l, size, addr_1, addr_2, addr_3, two_pow_stage, two_pow_stage_plus_one, w_index_factor;
+  UINT8_T stage, bit_size;
+  UINT16_T k, l, size, addr_1, addr_2, addr_3, two_pow_stage, two_pow_stage_plus_one, w_index_factor;
   COMPLEX_T temp1, temp2, W_temp;
 
   /* We assert the size */
@@ -428,9 +428,9 @@ void lb_fo_FFT_R(VECTOR_R_T *T, VECTOR_C_T *F, VECTOR_C_T *W)
 
 void lb_fo_IFFT_R(VECTOR_C_T *T, VECTOR_C_T *F, VECTOR_C_T *W) 
 {
-  U_INT8_T stage, bit_size;
-  U_INT16_T k, l, size, addr_1, addr_2, two_pow_stage, two_pow_stage_plus_one, w_index_factor;
-  FLOAT_T temp_f;
+  UINT8_T stage, bit_size;
+  UINT16_T k, l, size, addr_1, addr_2, two_pow_stage, two_pow_stage_plus_one, w_index_factor;
+  REAL_T temp_f;
   COMPLEX_T temp1, temp2, W_temp;
 
   /* We assert the size */
@@ -520,7 +520,7 @@ void lb_fo_IFFT_R(VECTOR_C_T *T, VECTOR_C_T *F, VECTOR_C_T *W)
 	    }
 	}
     } /* stage*/
-  temp_f=1/(FLOAT_T)size;
+  temp_f=1/(REAL_T)size;
   for (l=0;l<size;l++)
     (*F).array[l].r=(*F).array[l].r*temp_f;
 }

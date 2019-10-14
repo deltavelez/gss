@@ -56,7 +56,7 @@ COMPLEX_T lb_cp_multiply(COMPLEX_T a, COMPLEX_T b)
   return temp;
 }
 
-COMPLEX_T lb_cp_multiply_real(COMPLEX_T c, FLOAT_T r)
+COMPLEX_T lb_cp_multiply_real(COMPLEX_T c, REAL_T r)
 {
   COMPLEX_T temp;
   temp.r = r*c.r;
@@ -64,7 +64,7 @@ COMPLEX_T lb_cp_multiply_real(COMPLEX_T c, FLOAT_T r)
   return temp;
 }
 
-COMPLEX_T lb_cp_divide_real(COMPLEX_T c, FLOAT_T r, ERR_T *error)
+COMPLEX_T lb_cp_divide_real(COMPLEX_T c, REAL_T r, MATHERROR_T *error)
 {
   COMPLEX_T temp;
   if (lb_re_equal(r,0.0))
@@ -81,10 +81,10 @@ COMPLEX_T lb_cp_divide_real(COMPLEX_T c, FLOAT_T r, ERR_T *error)
   return temp;
 }
 
-COMPLEX_T lb_cp_divide(COMPLEX_T a, COMPLEX_T b, ERR_T *error)
+COMPLEX_T lb_cp_divide(COMPLEX_T a, COMPLEX_T b, MATHERROR_T *error)
 {
   COMPLEX_T temp;
-  FLOAT_T denom;
+  REAL_T denom;
   denom=lb_re_sqr(b.r,error)+lb_re_sqr(b.i, error);
   temp.r=lb_re_divide(a.r*b.r+a.i*b.i,denom, error);
   temp.i=lb_re_divide(a.i*b.r-a.r*b.i,denom, error);
@@ -101,7 +101,7 @@ COMPLEX_T lb_cp_conjugate(COMPLEX_T a)
 
 /* Power */
 
-COMPLEX_T lb_cp_sqr(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_sqr(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp;
   temp.r=lb_re_sqr(z.r,error)-lb_re_sqr(z.i,error);
@@ -109,20 +109,20 @@ COMPLEX_T lb_cp_sqr(COMPLEX_T z, ERR_T *error)
   return temp;
 }
 
-COMPLEX_T lb_cp_sqrt(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_sqrt(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp;
-  FLOAT_T h;
+  REAL_T h;
   h=lb_re_sqrt(z.r*z.r + z.i*z.i,error);
   temp.r=M_SQRT1_2*lb_re_sqrt(h+z.r,error);
   temp.i=M_SQRT1_2*lb_re_sign(z.i)*lb_re_sqrt(h-z.r,error);
   return temp;
 }
 
-COMPLEX_T lb_cp_power(COMPLEX_T z1, COMPLEX_T z2, ERR_T *error)
+COMPLEX_T lb_cp_power(COMPLEX_T z1, COMPLEX_T z2, MATHERROR_T *error)
 {
  COMPLEX_T temp;
- FLOAT_T mag_z1_sqr, mag_z1, angle_z1, t1, t2; 
+ REAL_T mag_z1_sqr, mag_z1, angle_z1, t1, t2; 
  
  if (lb_re_equal(z1.r,0) && lb_re_equal(z1.i,0))
    if (lb_re_equal(z2.r,0) && lb_re_equal(z2.i,0))
@@ -152,7 +152,7 @@ COMPLEX_T lb_cp_power(COMPLEX_T z1, COMPLEX_T z2, ERR_T *error)
 
 /* Euler */
 
-COMPLEX_T lb_cp_exp(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_exp(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp;
   temp.r = lb_re_exp(z.r,error)*cos(z.i);
@@ -160,10 +160,10 @@ COMPLEX_T lb_cp_exp(COMPLEX_T z, ERR_T *error)
   return temp;
 }
 
-COMPLEX_T lb_cp_ln(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_ln(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
-  FLOAT_T temp;
+  REAL_T temp;
   temp=lb_re_sqr(z.r,error)+lb_re_sqr(z.i,error);
   if (!lb_re_equal(temp,0))
     {
@@ -179,21 +179,21 @@ COMPLEX_T lb_cp_ln(COMPLEX_T z, ERR_T *error)
   return s;
 }
 
-COMPLEX_T lb_cp_log(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_log(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp_z;
   temp_z=lb_cp_divide_real(lb_cp_ln(z,error),M_LN10,error);
   return temp_z;
 }
 
-COMPLEX_T lb_cp_log2(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_log2(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp_z;
   temp_z=lb_cp_divide_real(lb_cp_ln(z,error),M_LN2,error);
   return temp_z;
 }
 
-COMPLEX_T lb_cp_logb(COMPLEX_T b, COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_logb(COMPLEX_T b, COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp_z;
   printf("b.r=%f , b.i=%f \r\n",b.r,b.i);
@@ -208,7 +208,7 @@ COMPLEX_T lb_cp_logb(COMPLEX_T b, COMPLEX_T z, ERR_T *error)
 /* Trigonometric - circular*/
 /******************************************************************************************/
 
-COMPLEX_T lb_cp_sin(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_sin(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
   s.r=sin(z.r)*lb_re_cosh(z.i,error);
@@ -216,7 +216,7 @@ COMPLEX_T lb_cp_sin(COMPLEX_T z, ERR_T *error)
   return s;
 }
 
-COMPLEX_T lb_cp_cos(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_cos(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
   s.r=  cos(z.r)*lb_re_cosh(z.i,error);
@@ -224,20 +224,20 @@ COMPLEX_T lb_cp_cos(COMPLEX_T z, ERR_T *error)
   return s;
 } 
 
-COMPLEX_T lb_cp_tan(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_tan(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
-  FLOAT_T denom;
+  REAL_T denom;
   denom=cos(2*z.r)+lb_re_cosh(2*z.i,error);
   s.r=sin(2*z.r)/denom;
   s.i=lb_re_sinh(2*z.i,error)/denom;
   return s;
 }
 
-COMPLEX_T lb_cp_asin(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_asin(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
-  FLOAT_T alpha, betha;
+  REAL_T alpha, betha;
   alpha=0.5*(sqrt(lb_re_sqr(z.r+1,error)+lb_re_sqr(z.i,error))+sqrt(lb_re_sqr(z.r-1,error)+lb_re_sqr(z.i,error)));
   betha=0.5*(sqrt(lb_re_sqr(z.r+1,error)+lb_re_sqr(z.i,error))-sqrt(lb_re_sqr(z.r-1,error)+lb_re_sqr(z.i,error)));
   s.r=asin(betha);
@@ -245,10 +245,10 @@ COMPLEX_T lb_cp_asin(COMPLEX_T z, ERR_T *error)
   return s;
 }
 
-COMPLEX_T lb_cp_acos(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_acos(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
-  FLOAT_T alpha, betha;
+  REAL_T alpha, betha;
   alpha=0.5*(sqrt(lb_re_sqr(z.r+1,error)+lb_re_sqr(z.i,error))+sqrt(lb_re_sqr(z.r-1,error)+lb_re_sqr(z.i,error)));
   betha=0.5*(sqrt(lb_re_sqr(z.r+1,error)+lb_re_sqr(z.i,error))-sqrt(lb_re_sqr(z.r-1,error)+lb_re_sqr(z.i,error)));
   s.r=acos(betha);
@@ -256,10 +256,10 @@ COMPLEX_T lb_cp_acos(COMPLEX_T z, ERR_T *error)
   return s;
 }
 
-COMPLEX_T lb_cp_atan(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_atan(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
-  FLOAT_T denom;
+  REAL_T denom;
   denom=1-lb_re_sqr(z.r,error)-lb_re_sqr(z.i,error);
   if (!lb_re_equal(denom,0))
     {
@@ -279,7 +279,7 @@ COMPLEX_T lb_cp_atan(COMPLEX_T z, ERR_T *error)
 /* Trigonometric - hyperbolic */
 /******************************************************************************************/
 
-COMPLEX_T lb_cp_sinh(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_sinh(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
   s.r=lb_re_sinh(z.r,error)*cos(z.i);
@@ -287,7 +287,7 @@ COMPLEX_T lb_cp_sinh(COMPLEX_T z, ERR_T *error)
   return s;
 }
 
-COMPLEX_T lb_cp_cosh(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_cosh(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
   s.r=lb_re_cosh(z.r,error)*cos(z.i);
@@ -295,17 +295,17 @@ COMPLEX_T lb_cp_cosh(COMPLEX_T z, ERR_T *error)
   return s;
 }
 
-COMPLEX_T lb_cp_tanh(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_tanh(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T s;
-  FLOAT_T denom;
+  REAL_T denom;
   denom=lb_re_cosh(2*z.r,error)+cos(2*z.i);
   s.r=lb_re_sinh(2*z.r,error)/denom;
   s.i=sin(2*z.i)/denom;
   return s;
 }
 
-COMPLEX_T lb_cp_asinh(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_asinh(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp_z, one;
   one.r=1.0;
@@ -319,7 +319,7 @@ COMPLEX_T lb_cp_asinh(COMPLEX_T z, ERR_T *error)
   return temp_z;
 }
 
-COMPLEX_T lb_cp_acosh(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_acosh(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp_z, one;
   one.r=1.0;
@@ -333,7 +333,7 @@ COMPLEX_T lb_cp_acosh(COMPLEX_T z, ERR_T *error)
   return temp_z;
 }
 
-COMPLEX_T lb_cp_atanh(COMPLEX_T z, ERR_T *error)
+COMPLEX_T lb_cp_atanh(COMPLEX_T z, MATHERROR_T *error)
 {
   COMPLEX_T temp_z, num, denom, one;
   one.r=1.0;
@@ -355,12 +355,12 @@ COMPLEX_T lb_cp_atanh(COMPLEX_T z, ERR_T *error)
 /* Conversion or data assembly */
 /******************************************************************************************/
  
-FLOAT_T lb_cp_abs(COMPLEX_T z)
+REAL_T lb_cp_abs(COMPLEX_T z)
 {
   return sqrt(z.r*z.r+z.i*z.i);
 }
 
-FLOAT_T lb_cp_arg(COMPLEX_T z)
+REAL_T lb_cp_arg(COMPLEX_T z)
 {
   if (z.r==0)
     z.r=0;
@@ -369,7 +369,7 @@ FLOAT_T lb_cp_arg(COMPLEX_T z)
   return atan2(z.i,z.r);
 }
 
-COMPLEX_T lb_cp_complex(FLOAT_T r, FLOAT_T i)
+COMPLEX_T lb_cp_complex(REAL_T r, REAL_T i)
 {
   COMPLEX_T temp;
   temp.r = r;
@@ -377,17 +377,17 @@ COMPLEX_T lb_cp_complex(FLOAT_T r, FLOAT_T i)
   return temp;
 }
 
-FLOAT_T lb_cp_re(COMPLEX_T z)
+REAL_T lb_cp_re(COMPLEX_T z)
 {
   return z.r;
 }
 
-FLOAT_T lb_cp_im(COMPLEX_T z)
+REAL_T lb_cp_im(COMPLEX_T z)
 {
   return z.i;
 }
 
-COMPLEX_T lb_cp_polar_to_rect(FLOAT_T mag, FLOAT_T angle)
+COMPLEX_T lb_cp_polar_to_rect(REAL_T mag, REAL_T angle)
 {
   COMPLEX_T temp;
   temp.r=mag*cos(angle);
@@ -395,7 +395,7 @@ COMPLEX_T lb_cp_polar_to_rect(FLOAT_T mag, FLOAT_T angle)
   return temp;
 }
 
-COMPLEX_T lb_cp_rect_to_polar(FLOAT_T x, FLOAT_T y)
+COMPLEX_T lb_cp_rect_to_polar(REAL_T x, REAL_T y)
 {
   COMPLEX_T z, temp;
   z.r=x;
@@ -409,7 +409,7 @@ COMPLEX_T lb_cp_rect_to_polar(FLOAT_T x, FLOAT_T y)
 /* Other */
 /******************************************************************************************/
 
-S_INT8_T lb_cp_equal(COMPLEX_T z1, COMPLEX_T z2)
+SINT8_T lb_cp_equal(COMPLEX_T z1, COMPLEX_T z2)
 {
   if (lb_re_equal(z1.r,z2.r) && lb_re_equal(z1.i,z2.i))
     return 1.0;
