@@ -1001,7 +1001,7 @@ void lb_gr_create_line2d_i(LINE_2D_SINT16_T *L)
     }
 }
 
-void lb_gr_create_line2d_f(LINE_2D_REAL_T *L)
+void lb_gr_create_line2d_r(LINE_2D_REAL_T *L)
 {
   SINT16_T j;
 
@@ -2126,7 +2126,7 @@ void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T
       }
 }
 
-void lb_gr_draw_circle_filled_antialiasing_f(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color, COPYMODE_T copymode) 
 {
   REAL_T x = radius;
   REAL_T y = 0;
@@ -2287,7 +2287,7 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
 
   Pol.items=4*(n_q1-1)+1;
   //printf("Pol items = %d\r\n",Pol.items);
-  lb_gr_create_line2d_f(&Pol);
+  lb_gr_create_line2d_r(&Pol);
   
   for(k=0;k<n_q1;k++)
     {
@@ -2343,7 +2343,6 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
 
 
 
-#ifdef NADA
 void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, REAL_T angle, PIXEL_T color, COPYMODE_T copymode)
 {
   SINT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
@@ -2433,104 +2432,6 @@ void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16
     }
 }
 
-void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, REAL_T angle, PIXEL_T color, COPYMODE_T copymode)
-{
-  SINT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
-  REAL_T xr, yr, xrot, yrot;
-  MATHERROR_T error;
-  
-  if ((a==0) || (b==0))
-    {
-      printf("Error: lb_gr_draw_ellipse_rotated() --> an axis is zero\r\n");
-      exit(EXIT_FAILURE);
-    }
-  
-  two_a_square=2*a*a;
-  two_b_square=2*b*b;
- 
-  xp=a;
-  yp=0;
-
-  x_change=b*b*(1-2*a);
-  y_change=a*a;
-  ellipse_error=0;
-  stop_x=two_b_square*a;
-  stop_y=0;
-
-  
-  while (stop_x>=stop_y)
-    {
-      xr=lb_re_sqrt(b*b-yp*yp,&error)*(REAL_T)a/b;
-      yr=lb_re_sqrt(a*a-xr*xr,&error)*(REAL_T)b/a;
-      printf("xp=%02.2f, xr=%02.2f\r\n",xp, xr);
-      //lb_re_rotate(lb_re_sqrt(b*b-yp*yp,&error)*(REAL_T)a/b,
-      //	   lb_re_sqrt(a*a-xp*xp,&error)*(REAL_T)b/a, angle,
-      //	   &xrot, &yrot);
-      lb_re_rotate(xr, -yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-
-      lb_re_rotate(-xr, -yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-
-      lb_re_rotate(-xr, yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-
-      lb_re_rotate(xr, yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-      yp++;
-      stop_y+=two_a_square;
-      ellipse_error+=y_change;
-      y_change+=two_a_square;
-      if ((2*ellipse_error + x_change)>0)
-	{
-	  xp--;
-	  stop_x-=two_b_square;
-	  ellipse_error+=x_change;
-	  x_change+=two_b_square;
-	}
-    }
-
-  xp=0;
-  yp=b;
-
-  x_change=b*b;
-  y_change=a*a*(1-2*b);
-  ellipse_error=0;
-  stop_x=0;
-  stop_y=two_a_square*b;
- 
-  while (stop_x<=stop_y)
-    {
-      xr=lb_re_sqrt(b*b-yp*yp,&error)*(REAL_T)a/b;
-      yr=lb_re_sqrt(a*a-xr*xr,&error)*(REAL_T)b/a;
-
-      lb_re_rotate(xr, -yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-
-      lb_re_rotate(-xr, -yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-
-      lb_re_rotate(-xr, yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-
-      lb_re_rotate(xr, yr, -angle, &xrot, &yrot);
-      lb_gr_draw_pixel(Pic, xc + round(xrot), yc + round(yrot), color, copymode);
-      xp++;
-      stop_x+=two_b_square;
-      ellipse_error+=x_change;
-      x_change+=two_b_square;
-      if ((2*ellipse_error + y_change)>0)
-	{
-	  yp--;
-	  stop_y-=two_a_square;
-	  ellipse_error+=y_change;
-	  y_change+=two_a_square;
-	}
-    }
-}
-
-
-#endif
 
 void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color, COPYMODE_T copymode)
 {

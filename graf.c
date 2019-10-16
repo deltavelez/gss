@@ -1154,11 +1154,11 @@ int main(int argc, char *argv[])
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
       
-  lb_gr_draw_circle_filled_antialiasing_f(NULL, ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
+  lb_gr_draw_circle_filled_antialiasing_r(NULL, ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
 					  lb_gr_12RGB(COLOR_RED | COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_filled_antialiasing_f(NULL, 2*ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
+  lb_gr_draw_circle_filled_antialiasing_r(NULL, 2*ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
 					  lb_gr_12RGB(COLOR_LIME  | COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_filled_antialiasing_f(NULL, ty_screen.w/(2*pix_x), 2*ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
+  lb_gr_draw_circle_filled_antialiasing_r(NULL, ty_screen.w/(2*pix_x), 2*ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
 					  lb_gr_12RGB(COLOR_BLUE  | COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
   lb_gr_refresh();
   while (1)
@@ -1225,37 +1225,39 @@ int main(int argc, char *argv[])
       }
 #endif
 
-  //#define DEMO_ELLIPSE
+#define DEMO_ELLIPSE
 #ifdef DEMO_ELLIPSE
   REAL_T angle;
 
   SDL_Event event;
-  int pix_x=10, pix_y=10;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
   /* Example 1: */
-  lb_gr_draw_ellipse(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x, ty_screen.h*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
-		     COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  //lb_gr_draw_ellipse(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x, ty_screen.h*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
+  //		     COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
 	
   /* Example 2: */
-  lb_gr_draw_ellipse_antialiasing2(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x,ty_screen.h*0.22/pix_y, lb_gr_12RGB(COLOR_WHITE),
-				   COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  //lb_gr_draw_ellipse_antialiasing2(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x,ty_screen.h*0.22/pix_y, lb_gr_12RGB(COLOR_WHITE),
+  //				   COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
 
   /* Example 3: */
-  lb_gr_draw_ellipse_antialiasing3(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x,ty_screen.w*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
-				   COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y)); 
+  //lb_gr_draw_ellipse_antialiasing3(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x,ty_screen.w*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
+  //				   COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y)); 
 	
   angle=0.0;
   lb_gr_refresh();
-  if (0) for (angle=0;angle<=M_PI/2;angle+=1*M_PI/180)
+  if (1) for (angle=0;angle<=M_PI/2;angle+=1*M_PI/180)
 	   {
 	     lb_gr_clear_picture(NULL,lb_gr_12RGB(0x0000));
 	     // lb_gr_draw_rectangle(NULL,0,0,ty_width,ty_height,lb_gr_12RGB(0xF000),COPYMODE_COPY);
-	     lb_gr_draw_ellipse_rotated_antialiasing(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_x, angle, 8, 100,
-						     lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
-	     lb_gr_delay(100);
+	     //	     lb_gr_draw_ellipse_rotated_antialiasing(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_x, angle, 8, 100,
+	     //						     lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
+	     lb_gr_draw_ellipse_rotated(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.w*0.45,ty_screen.w*0.10, angle, 
+	     						     lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+	     
 	     lb_gr_refresh();
+	     lb_ti_delay_ms(1000);
 	   }
 
   while (1)
@@ -1368,7 +1370,7 @@ int main(int argc, char *argv[])
  
   /* Polygon creation and testing */ 
   myPol.items=10;
-  lb_gr_create_line2d_f(&myPol);
+  lb_gr_create_line2d_r(&myPol);
   printf("\a\r\n");
   for (phase=0; phase<6.2832; phase+=0.01) 
     {
@@ -1467,7 +1469,7 @@ int main(int argc, char *argv[])
 
   /* Polygon creation and testing */
   Poly_f.items=6;
-  lb_gr_create_line2d_f(&Poly_f);
+  lb_gr_create_line2d_r(&Poly_f);
   for (i=0;i<Poly_f.items-1;i++)
     {
       Poly_f.array[i].x=cos(2*M_PI*i/(Poly_f.items-1));
@@ -1630,11 +1632,11 @@ int main(int argc, char *argv[])
 
   /* Polygon creation and testing */
   P1.items=5;
-  lb_gr_create_line2d_f(&P1);
+  lb_gr_create_line2d_r(&P1);
   P2.items=5;
-  lb_gr_create_line2d_f(&P2);
+  lb_gr_create_line2d_r(&P2);
   P3.items=5;
-  lb_gr_create_line2d_f(&P3);
+  lb_gr_create_line2d_r(&P3);
   P1.array[0].x=0.0;  P1.array[0].y=0.0;
   P1.array[1].x=1.0;  P1.array[1].y=0.0;
   P1.array[2].x=1.0;  P1.array[2].y=1.0;
@@ -4290,7 +4292,7 @@ int main(int argc, char *argv[])
 
   /* BER vs Noise using a Montecarlo simulation */
   
-#define DEMO_ZERO_CROSSING
+  //#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
     VECTOR_R_T Signal, Noise;
     SDL_Event event;

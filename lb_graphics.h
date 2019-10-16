@@ -7,7 +7,6 @@
 
 
 void lb_gr_SDL_init(const char *title, Uint32 flags, SINT16_T width, SINT16_T height,  UINT8_T r, UINT8_T g, UINT8_T b);
-void lb_gr_resize(SINT16_T width, SINT16_T height);
 
 void lb_gr_SDL_close();
 void lb_gr_refresh();
@@ -48,8 +47,8 @@ SINT16_T lb_gr_check_left_i(POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D
 SINT16_T lb_gr_check_left_f(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P);
 
 void       lb_gr_create_line2d_i(LINE_2D_SINT16_T *L);
-void       lb_gr_create_line2d_f(LINE_2D_REAL_T *L);
-void       lb_gr_create_line3d_f(LINE_3D_REAL_T *L);
+void       lb_gr_create_line2d_r(LINE_2D_REAL_T *L);
+//void       lb_gr_create_line3d_r(LINE_3D_REAL_T *L);
 void       lb_gr_create_picture(PICTURE_T *Pic, PIXEL_T default_color );
 void       lb_gr_create_zbuffer(PICTURE_T *Pic, MATRIX_R_T *Z);
 void       lb_gr_reset_zbuffer(MATRIX_R_T *Z);
@@ -69,8 +68,6 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 				    PIXEL_T color, COPYMODE_T copymode);
 
 
-void       lb_gr_delay(SINT32_T delay);
-
 void       lb_gr_draw_arrow(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1, REAL_T w, REAL_T arrow_size, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 
 void       lb_gr_draw_circle(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color, COPYMODE_T copymode); 
@@ -86,7 +83,7 @@ void       lb_gr_draw_circle_arc(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT1
 				 PIXEL_T color, COPYMODE_T mode); 
 void       lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color,
 						 COPYMODE_T copymode);
-void       lb_gr_draw_circle_filled_antialiasing_f(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color, COPYMODE_T copymode); 
+void       lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color, COPYMODE_T copymode); 
 
 void       lb_gr_draw_circle_filled(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color,
 					 COPYMODE_T mode);

@@ -1,3 +1,33 @@
+Comparar las funciones lb_gr_draw_circle_antialiasing() y lb_gr_draw_circle_antialiasing_f()
+--
+
+To explore is jpeglib.h could be loaded including its source code instead.
+
+--
+
+To functions
+lb_cp_print_c(), add a tolerance parameter, instead of using a default one
+-----
+To all print functions, to add sprint version in order to print to a buffer
+
+lb_re_equal()
+lb_re_larger_or_equal()
+lb_re_smaller_or_equal()
+
+
+
+-------------------------------
+To add a tolerance parameter to
+lb_cp_equal()
+-------------------------------
+To integrate both matrix multiplication 
+-------------------------------
+implement functions to load and save CSV into vectors or matrices
+lb_al_load_CSV_FILE
+lb_al_save_CSV_FILE
+-------------------------------
+
+
 #define DEMO_CIRCLE_FILLED_FAST
 ==> has a minor glitch at angles = 45 +k*90
 
