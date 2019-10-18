@@ -74,7 +74,7 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, SINT16_T width, SINT16_T he
   
   /* The renderer is created as "Software" since it is actually faster both in the Raspberry Pi as well as in a Desktop */
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-  //SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+  //SDL_SetRenderDradwColor(renderer, r, g, b, 255);
   //SDL_RenderClear(renderer);
   //SDL_RenderPresent(renderer);
 
@@ -4633,14 +4633,14 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 }
 
 
-void lb_gr_draw_polygon_rill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode)  
 {
   SINT16_T i, j, image_top, image_bottom, pixel_x, pixel_y, nodes, swap, nodeX[20];
   
   /* make sure the polygon is a closed shape */
   if ( ((*L).array[0].x != (*L).array[(*L).items-1].x) || ((*L).array[0].y != (*L).array[(*L).items-1].y))
     {
-      printf("Warning: lb_gr_draw_polygon_rill_i() --> Invalid shape (not closed)\r\n");
+      printf("Warning: lb_gr_draw_polygon_fill_i() --> Invalid shape (not closed)\r\n");
       return;
     }
   
@@ -4789,7 +4789,7 @@ void lb_gr_draw_rectangle(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1,
 }
 
 void lb_gr_draw_rectangle_bar(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, SINT16_T w,
-			      PIXEL_T color_line, PIXEL_T color_background,  COPYMODE_T copymode)
+			      PIXEL_T color_line, PIXEL_T color_inside,  COPYMODE_T copymode)
 {
   SINT16_T x_l, x_h, y_l, y_h, i, j;
 
@@ -4818,7 +4818,7 @@ void lb_gr_draw_rectangle_bar(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T
   lb_gr_draw_rectangle_line(Pic, x0, y0, x1, y1, w, color_line, copymode);
   for (i=y_l+w;i<=(y_h-w);i++)
     for (j=x_l+w;j<=(x_h-w);j++)
-      lb_gr_draw_pixel(Pic, j, i, color_background, copymode);
+      lb_gr_draw_pixel(Pic, j, i, color_inside, copymode);
 }
 
 
@@ -5053,7 +5053,7 @@ void lb_gr_draw_rectangle_fill(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_
 #endif
  
 
-SINT16_T lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P)
+SINT8_T lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P)
 {
   SINT16_T k, wn; /* the  winding number counter */
 
@@ -5083,7 +5083,7 @@ SINT16_T lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P)
   return wn;
 }
 
-SINT16_T lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P)
+SINT8_T lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P)
 {
   SINT16_T k, wn; /* the  winding number counter */
 
@@ -5705,9 +5705,11 @@ SINT8_T lb_gr_return_octant(SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1)
 	return 6;
 }
 
-void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, REAL_T w_axis, PIXEL_T color_axis,
-			      REAL_T w_grid, REAL_T arrow_size, PIXEL_T color_grid_x, REAL_T delta_grid_x, PIXEL_T color_grid_y,
-			      REAL_T delta_grid_y, UINT16_T options, COPYMODE_T copymode, LINEMODE_T linemode)
+void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
+			      PIXEL_T color_axis, REAL_T w_axis, REAL_T arrow_size,
+			      PIXEL_T color_grid_x, REAL_T delta_grid_x, 
+			      PIXEL_T color_grid_y, REAL_T delta_grid_y, REAL_T w_grid,
+			      UINT16_T options, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   REAL_T xr, yr, xr_min, xr_max, yr_min, yr_max, xp0, yp0;
   SINT8_T flag, sign_re_x, sign_re_y;
@@ -5931,10 +5933,10 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, 
 	    {
 	      /* The arrow indicates positive numbers */
 	      if(sign_re_y==1)
-		lb_gr_draw_arrow(Pic, xp0, vp2d.yp_max, xp0, vp2d.yp_min, w_axis, arrow_size,
+		lb_gr_draw_arrow(Pic, xp0, vp2d.yp_min, xp0, vp2d.yp_max, w_axis, arrow_size,
 				 color_axis, copymode, linemode);
 	      else
-		lb_gr_draw_arrow(Pic, xp0, vp2d.yp_min, xp0, vp2d.yp_max, w_axis, arrow_size,
+		lb_gr_draw_arrow(Pic, xp0, vp2d.yp_max, xp0, vp2d.yp_min, w_axis, arrow_size,
 				color_axis, copymode, linemode);
 	    }
 	  else

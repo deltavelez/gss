@@ -1539,8 +1539,8 @@ int main(int argc, char *argv[])
   myPol.array[3].x=96+k; myPol.array[3].y=80+k;
   myPol.array[4].x=10+k; myPol.array[4].y=10+k;
       
-  lb_gr_draw_polygon_rill_i(NULL,&myPol,lb_gr_12RGB(0xFF00),COPYMODE_BLEND);
-  lb_gr_draw_polygon_rill_i(NULL,&myPol,lb_gr_12RGB(0xF0F0),COPYMODE_BLEND);
+  lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xFF00),COPYMODE_BLEND);
+  lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xF0F0),COPYMODE_BLEND);
   lb_gr_draw_polygon_i(NULL,&myPol, 4,lb_gr_12RGB(0xF00F),COPYMODE_BLEND,LINEMODE_FILTERED);
   lb_gr_refresh();
 
@@ -1603,10 +1603,10 @@ int main(int argc, char *argv[])
   alpha=MAX_K;
   lb_gr_BMPfile_load_to_pic("sdl24bit.bmp",&pic1,alpha);
   printf("1. alpha=%d\r\n",alpha);
-  lb_gr_draw_polygon_rill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
+  lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
   lb_gr_render_picture(&pic1, 0, 0, 4, 4, RENDEROPTIONS_DEFAULT);
   lb_gr_delay(5000);
-  lb_gr_draw_polygon_rill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
+  lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
   lb_gr_render_picture(&pic1, 0, 0, 4, 4, RENDEROPTIONS_DEFAULT);
   lb_gr_delay(5000);
      
@@ -2250,12 +2250,13 @@ int main(int argc, char *argv[])
       }
 #endif
 
-  //#define DEMO_ADXIS_2D
+  //#define DEMO_AXIS_2D
 #ifdef DEMO_AXIS_2D
   VIEWPORT_2D_T win;
+  SDL_Event event;
   FONT_T my_font;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200,800, 0xff, 0xff, 0xff);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2270,23 +2271,147 @@ int main(int argc, char *argv[])
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
   win.xp_min=20;
-  win.xp_max=ty_width-20;
-  win.yp_min=20;
-  win.yp_max=ty_height-20;
-    
-  win.xr_min= 1e-2;
-  win.xr_max=  1e2;
-  win.yr_min=  1e5;
-  win.yr_max=  1E1; 
+  win.xp_max=ty_screen.w-20;
+  win.yp_min=ty_screen.h-20;
+  win.yp_max=20;
 
-  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-  lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 1,
-		     lb_gr_12RGB(COLOR_GREEN),10, lb_gr_12RGB(COLOR_YELLOW), 10, 
-		     AXIS_DRAW_X_GRID_LOG | AXIS_DRAW_Y_GRID_LOG,
-		     COPYMODE_COPY, LINEMODE_SOLID);
-  lb_gr_delay(30000);
-  lb_fb_exit(1); 
+
+  win.xr_min= -5;
+  win.xr_max=  10;
+  win.yr_min=  -1;
+  win.yr_max=  4; 
+
+  //  win.xr_min= 1e-2;
+  //win.xr_max=  1e2;
+  //win.yr_min=  1e5;
+  //win.yr_max=  1E1; 
+
+  /* #define AXIS_DRAW_X               0b0000000000000001
+     #define AXIS_DRAW_X_ARROWS        0b0000000000000010
+     #define AXIS_DRAW_X_GRID          0b0000000000000100
+     #define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
+     #define AXIS_DRAW_X_LABEL         0b0000000000010000
+     #define AXIS_DRAW_Y               0b0000000000100000
+     #define AXIS_DRAW_Y_ARROWS        0b0000000001000000
+     #define AXIS_DRAW_Y_GRID          0b0000000010000000
+     #define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
+     #define AXIS_DRAW_Z_GRID          0b0000001000000000
+
+     #define AXIS_DRAW_COLORVALUES_X_1 0b0000010000000000 Degradé
+     #define AXIS_DRAW_COLORVALUES_X_2 0b0000100000000000 Color code 
+     #define AXIS_DRAW_COLORVALUES_Y_1 0b0001000000000000 Degradé 
+     #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
+
+     lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
+    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+
+
+  lg_gr_draw_axis_2d(NULL, win, &my_font,
+    lb_gr_12RGB(COLOR_BLUE), 5, 15,
+    lb_gr_12RGB(COLOR_GREEN), 1,
+    lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
+    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
+    0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+    COPYMODE_BLEND, LINEMODE_FILTERED);
+  
+  lb_gr_refresh();
+  lb_gr_BMPfile_save("axis_2d.bmp", NULL);
+
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+#endif
+
+
+  //#define DEMO_AXIS_2D_LOG
+#ifdef DEMO_AXIS_2D_LOG
+  VIEWPORT_2D_T win;
+  SDL_Event event;
+  FONT_T my_font;
+
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200,800, 0xff, 0xff, 0xff);
+
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+  my_font.scale_x=1;
+  my_font.scale_y=1;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=FALSE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
+  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+
+  win.xp_min=20;
+  win.xp_max=ty_screen.w-20;
+  win.yp_min=ty_screen.h-20;
+  win.yp_max=20;
+
+
+  win.xr_min= -5;
+  win.xr_max=  10;
+  win.yr_min=  -1;
+  win.yr_max=  4; 
+
+  //  win.xr_min= 1e-2;
+  //win.xr_max=  1e2;
+  //win.yr_min=  1e5;
+  //win.yr_max=  1E1; 
+
+  /* #define AXIS_DRAW_X               0b0000000000000001
+     #define AXIS_DRAW_X_ARROWS        0b0000000000000010
+     #define AXIS_DRAW_X_GRID          0b0000000000000100
+     #define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
+     #define AXIS_DRAW_X_LABEL         0b0000000000010000
+     #define AXIS_DRAW_Y               0b0000000000100000
+     #define AXIS_DRAW_Y_ARROWS        0b0000000001000000
+     #define AXIS_DRAW_Y_GRID          0b0000000010000000
+     #define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
+     #define AXIS_DRAW_Z_GRID          0b0000001000000000
+
+     #define AXIS_DRAW_COLORVALUES_X_1 0b0000010000000000 Degradé
+     #define AXIS_DRAW_COLORVALUES_X_2 0b0000100000000000 Color code 
+     #define AXIS_DRAW_COLORVALUES_Y_1 0b0001000000000000 Degradé 
+     #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
+
+     lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
+    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+
+
+  lg_gr_draw_axis_2d(NULL, win, &my_font,
+    lb_gr_12RGB(COLOR_BLUE), 5, 15,
+    lb_gr_12RGB(COLOR_GREEN), 1,
+    lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
+    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
+    0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+    COPYMODE_BLEND, LINEMODE_FILTERED);
+  
+  lb_gr_refresh();
+  lb_gr_BMPfile_save("axis_2d.bmp", NULL);
+
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+
 #endif
 
   //#define DEMO_PLOT_CONTINUOUS
@@ -3419,7 +3544,7 @@ int main(int argc, char *argv[])
   lb_fb_exit(1);
 #endif
 
-#define DEMO_PLOT3D
+  //#define DEMO_PLOT3D
 #ifdef DEMO_PLOT3D
   SDL_Event event;
   PICTURE_T Pic;
@@ -4028,7 +4153,6 @@ int main(int argc, char *argv[])
   VECTOR_R_T Data, Bins;
   FONT_T my_font;
   char text[40];
-  REAL_T x;
   SINT16_T i;
   REAL_T mu, sigma2;
 
@@ -4038,27 +4162,60 @@ int main(int argc, char *argv[])
   win.xp_max=ty_screen.w;
   win.yp_min=0;
   win.yp_max=ty_screen.h;
-  win.xr_min=-40;
-  win.xr_max=400;
+  win.xr_min=-80;
+  win.xr_max=80;
   win.yr_min=-30; 
-  win.yr_max=3000;
+  win.yr_max=300;
   
   /* Data generation */
-  Data.items=30000;
+  Data.items=6000;
   lb_al_create_vector_r(&Data);
   for(i=0;i<Data.items;i++)
-    Data.array[i]=lb_st_marsaglia_polar(30);
-      
-  Bins.items=40;
+    {
+      Data.array[i]=lb_st_marsaglia_polar(30);
+      //printf("Data[%d]=%f\r\n",i,Data.array[i]);
+      //lb_ti_delay_ms(2);
+    }
+  Bins.items=50;
   lb_al_create_vector_r(&Bins);
-  lb_st_histogram(&Data,&Bins,-100,100,&mu, &sigma2);
+  lb_st_histogram(&Data,&Bins, win.xr_min, win.xr_max,&mu, &sigma2);
   lb_al_print_vector_r(&Bins, "Bin", "%04.2f\r\n");
 
   printf("mu=%f,  sigma2=%f\r\n",mu,sigma2);
   lb_gr_draw_histogram(NULL, win, &Bins, 
 		       lb_gr_12RGB(COLOR_DIMGRAY), lb_gr_12RGB(COLOR_WHITE),
-		       lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_BLUE));
-           
+		       lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_LIGHTBLUE));
+
+  LINE_2D_REAL_T L;
+  L.items=Bins.items;
+
+  lb_gr_create_line2d_r(&L);
+
+  REAL_T area_bins=0, area_normal=0, xr, yr;
+  for (i=0;i<Bins.items;i++)
+    {
+      xr = win.xr_min+(REAL_T)i*(win.xr_max-win.xr_min)/Bins.items;
+      yr = exp(-(xr-mu)*(xr-mu)/(2*sigma2))/sqrt(2*M_PI*sigma2);
+      area_normal +=yr*(win.xr_max-win.xr_min)/Bins.items;
+      area_bins += Bins.array[i]*(win.xr_max-win.xr_min)/Bins.items;
+    }
+    printf("Area_normal = %f\r\n",area_normal);
+    printf("Area_bins/area_normal = %f\r\n",area_bins/area_normal);
+    printf("Area_bins = %f\r\n",area_bins);
+ 
+      
+  for (i=0;i<Bins.items;i++)
+    {
+      xr = win.xr_min+i*(win.xr_max-win.xr_min)/Bins.items;
+      yr = (area_bins/area_normal)*exp(-(xr-mu)*(xr-mu)/(2*sigma2))/sqrt(2*M_PI*sigma2);
+      L.array[i].x=xr;
+      L.array[i].y=yr;
+    }
+
+  lb_gr_plot2d_line(NULL, win, &L, 4, lb_gr_12RGB(0xF00a), COPYMODE_BLEND, LINEMODE_FILTERED);
+
+ 
+	 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
   my_font.scale_x=2;

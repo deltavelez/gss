@@ -108,10 +108,11 @@ void       lb_gr_implicit_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, MATRIX_R_T *M, 
 			     COPYMODE_T copymode, LINEMODE_T linemode);
 
 
-void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font, REAL_T w_axis, PIXEL_T color_axis,
-			      REAL_T w_grid, REAL_T arrow_size, PIXEL_T color_grid_x, REAL_T delta_grid_x, PIXEL_T color_grid_y,
-			      REAL_T delta_grid_y, UINT16_T options, COPYMODE_T copymode, LINEMODE_T linemode);
-
+void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
+			      PIXEL_T color_axis, REAL_T w_axis, REAL_T arrow_size,
+			      PIXEL_T color_grid_x, REAL_T delta_grid_x, 
+			      PIXEL_T color_grid_y, REAL_T delta_grid_y, REAL_T w_grid,
+			      UINT16_T options, COPYMODE_T copymode, LINEMODE_T linemode);
 
 void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
 				    REAL_T r0, REAL_T r1, REAL_T delta_r, PIXEL_T color_r, 
@@ -164,14 +165,14 @@ void       lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, REAL_T w, P
 				  LINEMODE_T linemode);
 void       lb_gr_draw_polygon_r(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode,
 				LINEMODE_T linemode);
-void       lb_gr_draw_polygon_rill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode);
+void       lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode);
 void       lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode);
 
 void       lb_gr_draw_rectangle(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1,  PIXEL_T color,
 				COPYMODE_T copymode);
 
 void       lb_gr_draw_rectangle_bar(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, SINT16_T w,
-				    PIXEL_T color_line, PIXEL_T color_background,  COPYMODE_T copymode);
+				    PIXEL_T color_line, PIXEL_T color_inside,  COPYMODE_T copymode);
 
 void       lb_gr_draw_rectangle_line(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, SINT16_T w,
 				     PIXEL_T color, COPYMODE_T copymode);
@@ -181,8 +182,8 @@ void       lb_gr_draw_rectangle_solid(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, 
 void        lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P2,
 				PIXEL_T color, COPYMODE_T copymode);
 
-SINT16_T lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P);
-SINT16_T lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P);
+SINT8_T lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P);
+SINT8_T lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P);
 SINT8_T  lb_gr_matrix_gs_to_pic(MATRIX_R_T *A, PICTURE_T *Pic);
 
 void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
