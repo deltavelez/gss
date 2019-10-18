@@ -1,3 +1,19 @@
+To  review the functions to proyect in logarithmic scale and better deal with error conditions such as zero or negative arguments
+
+---------
+
+
+To explore changes to
+
+lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly,
+
+to use a line2d_r instead of real vectors, to deal with discontinuities
+
+---------
+Create function that can render a picture onto another picture and not just to the framebuffer.
+
+--
+
 Comparar las funciones lb_gr_draw_circle_antialiasing() y lb_gr_draw_circle_antialiasing_f()
 --
 

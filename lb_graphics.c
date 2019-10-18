@@ -1007,14 +1007,14 @@ void lb_gr_create_line2d_r(LINE_2D_REAL_T *L)
 
   if (!lb_gr_assert_dimensions_line2d_f(L))
     {
-      printf("Error: lb_gr_create_line_f() --> invalid dimension\r\n");
+      printf("Error: lb_gr_create_line2d_r() --> invalid dimension\r\n");
       exit(EXIT_FAILURE);
     }
   
   (*L).array=malloc((*L).items*sizeof(POINT_2D_REAL_T));
   if ((*L).array==NULL)
     {
-      printf("Error: lb_gr_create_line_f() --> Out of memory\r\n");
+      printf("Error: lb_gr_create_line2d_r() --> Out of memory\r\n");
       exit(EXIT_FAILURE);
     }
   
@@ -2335,7 +2335,7 @@ void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T y
 	  Pol.array[4*(n_q1-1)-k].y=yc-yrr;
 	}
     }
-  lb_gr_draw_polygon_f(Pic, &Pol, w, color, copymode, linemode);
+  lb_gr_draw_polygon_r(Pic, &Pol, w, color, copymode, linemode);
   lb_gr_release_line2d_f(&Pol);
 }
 
@@ -2347,7 +2347,6 @@ void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16
 {
   SINT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   REAL_T xrot, yrot;
-  MATHERROR_T error;
   
   if ((a==0) || (b==0))
     {
@@ -2871,7 +2870,7 @@ void lb_gr_draw_line1(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SIN
 }
 #endif
 
-void lb_gr_draw_line1_f(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_line1_r(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1, PIXEL_T color, COPYMODE_T copymode)
 {
   REAL_T _x0, _x1, _y0, _y1, xr, yr, dx, dy;
 
@@ -3228,7 +3227,7 @@ void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, S
 }
 
 
-void lb_gr_draw_line_antialiasing2_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1, PIXEL_T color, COPYMODE_T copymode)  
 {
   REAL_T x0, y0, x1, y1, y_real, x_real, m, distance;
   SINT16_T i, i_max, sign;
@@ -4370,7 +4369,7 @@ void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, REAL_T w, PIXEL_T
     }
 }
 
-void lb_gr_draw_polygon_f(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
+void lb_gr_draw_polygon_r(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   SINT16_T k;
 
@@ -4634,14 +4633,14 @@ void lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_S
 }
 
 
-void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_polygon_rill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode)  
 {
   SINT16_T i, j, image_top, image_bottom, pixel_x, pixel_y, nodes, swap, nodeX[20];
   
   /* make sure the polygon is a closed shape */
   if ( ((*L).array[0].x != (*L).array[(*L).items-1].x) || ((*L).array[0].y != (*L).array[(*L).items-1].y))
     {
-      printf("Warning: lb_gr_draw_polygon_fill_i() --> Invalid shape (not closed)\r\n");
+      printf("Warning: lb_gr_draw_polygon_rill_i() --> Invalid shape (not closed)\r\n");
       return;
     }
   
@@ -5240,14 +5239,14 @@ void lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_REAL_T *L, RE
     }
 }
 
-void lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_plot2d_curve_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
 {
   /* This function draws an anti-aliased plot of a set of P(xi,yi) by efficiently checking the shortest distance from
      only the neighbor pixels to P(xi,yi) to each P(xi,y).  The function offers very good results at the expense of
      speed compared with other functions which just plot lines or anti-alised lines between points.
      This implementation has some academic merit as it also ilustrates the concept of using a reverse transformation
      from pixel coordinates to real coordinates.
-     A simpler implementation, with no efficiency improvements is: lb_gr_plot2d_line_reverse_slow */ 
+     A simpler implementation, with no efficiency improvements is: lb_gr_plot2d_curve_neighbor_slow */ 
 
   REAL_T xr, yr, distance, temp, w2;
   SINT16_T i_min, i, j, i_max, j_min, j_max, k, xi, yi;
@@ -5282,7 +5281,7 @@ void lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *L
 
   if ((*Lx).items != (*Ly).items)
     {
-      printf("Error: lb_gr_plot2d_line_reverse --> vectors with different dimensions [%d] != [%d]\r\n",
+      printf("Error: lb_gr_plot2d_curve_neighbor --> vectors with different dimensions [%d] != [%d]\r\n",
 	     (*Lx).items,(*Ly).items);
       exit(EXIT_FAILURE);
     }	
@@ -5349,7 +5348,7 @@ void lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *L
   lb_al_release_matrix_si8(&Mflags);
 }
   
-void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_plot2d_curve_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
 {
   REAL_T xr, yr, distance, temp, w2;
   SINT16_T i, xi, yi, width, height;
@@ -5373,7 +5372,7 @@ void lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R
 
   if ((*Lx).items != (*Ly).items)
     {
-      printf("Error: lb_gr_plot2d_line_reverse_slow --> vectors with different dimensions [%d] != [%d]\r\n",
+      printf("Error: lb_gr_plot2d_curve_neighbor_slow --> vectors with different dimensions [%d] != [%d]\r\n",
 	     (*Lx).items,(*Ly).items);
       exit(EXIT_FAILURE);
     }	
@@ -6084,7 +6083,7 @@ void       lg_gr_draw_axis_2d_polar(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *
       yr=r_max*sin(t);
       lb_gr_project_2d(vp2d, xr, yr, &xp1, &yp1);
 
-      lb_gr_draw_line1_f(Pic, round(xp0), round(yp0), round(xp1), round(yp1), color_r, COPYMODE_COPY);
+      lb_gr_draw_line1_r(Pic, round(xp0), round(yp0), round(xp1), round(yp1), color_r, COPYMODE_COPY);
       t+=delta_t;
     }
 }
@@ -6429,6 +6428,102 @@ void lb_gr_render_picture(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, COPYMODE_T c
       }
 }
 
+
+#ifdef NADA
+void lb_gr_render_picture_picture(PICTURE_T *Pic_dst,  PICTURE_T *Pic_src, SINT16_T xc, SINT16_T yc, COPYMODE_T copymode, RENDERMODE_T rendermode)
+{
+  SINT16_T x, y;
+  if (!lb_gr_assert_dimensions_picture(Pic_src))
+    {
+      printf("Error: lb_gr_render_picture_picture() --> invalid dimension (source)\r\n"); 
+      exit(EXIT_FAILURE);
+    }
+
+  if (!lb_gr_assert_dimensions_picture(Pic_src))
+    {
+      printf("Error: lb_gr_render_picture_picture() --> invalid dimension (destiny)\r\n"); 
+      exit(EXIT_FAILURE);
+    }
+
+  //oxo
+
+  UINT8_T scale_x, scale_y;
+  scale_x = 1 + ((rendermode & RENDERMODE_SCALE_X_MASK) >> RENDERMODE_SCALE_X_SHIFT );
+  scale_y = 1 + ((rendermode & RENDERMODE_SCALE_Y_MASK) >> RENDERMODE_SCALE_Y_SHIFT );
+
+  //  printf("rendermode=0x%x, scale_x=%d, scale_y=%d\r\n",rendermode,scale_x, scale_y);
+  if ((scale_x==1) && (scale_y==1))
+    for (y=0;y<(*Pic).h;y++)
+      for (x=0;x<(*Pic).w;x++)
+	lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, xc+x, yc+y, (*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+  else
+    switch (rendermode & RENDERMODE_PIXELMODE_MASK)
+      {
+      case RENDERMODE_PIXELMODE_0: /* solid rectangle */
+	for (y=0;y<(*Pic).h;y++)
+	  for (x=0;x<(*Pic).w;x++)
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+	    lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x, yc + y*scale_y, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+					(*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+#else
+	lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x, yc + y*scale_y, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+				    FACTOR_N_TO_8_R*(*Pic).pic[y][x].r, FACTOR_N_TO_8_G*(*Pic).pic[y][x].g, FACTOR_N_TO_8_B*(*Pic).pic[y][x].b, FACTOR_N_TO_8_A*(*Pic).pic[y][x].a, copymode);
+#endif
+	break;
+      
+      case RENDERMODE_PIXELMODE_1:
+	{
+	  UINT8_T border_r, border_g, border_b;
+	  border_r = ((rendermode & RENDERMODE_PIXELBG_R_MASK) >> RENDERMODE_PIXELBG_R_SHIFT)*255/15;
+	  border_g = ((rendermode & RENDERMODE_PIXELBG_G_MASK) >> RENDERMODE_PIXELBG_G_SHIFT)*255/15;
+	  border_b = ((rendermode & RENDERMODE_PIXELBG_B_MASK) >> RENDERMODE_PIXELBG_B_SHIFT)*255/15;
+
+	  for (y=0;y<(*Pic).h;y++)
+	    for (x=0;x<(*Pic).w;x++)
+	      {
+		lb_gr_fb_line_h_copymode(&ty_screen, yc +  y   *scale_y, xc + x*scale_x,   xc + (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_h_copymode(&ty_screen, yc + (y+1)*scale_y, xc + x*scale_x,   xc + (x+1)*scale_x,   border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc +  x   *scale_x, yc + y*scale_y+1, yc + (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc + (x+1)*scale_x, yc + y*scale_y+1, yc + (y+1)*scale_y-1, border_r, border_g, border_b, 255, copymode);
+		
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+					    (*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+#else
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-1, yc + (y+1)*scale_y-1,
+					    FACTOR_N_TO_8_R*(*Pic).pic[y][x].r, FACTOR_N_TO_8_G*(*Pic).pic[y][x].g, FACTOR_N_TO_8_B*(*Pic).pic[y][x].b, FACTOR_N_TO_8_A*(*Pic).pic[y][x].a, copymode);
+#endif
+	      }
+	}
+	break;
+      case RENDERMODE_PIXELMODE_2:
+	  {
+	    UINT8_T border_r, border_g, border_b;
+	    border_r = ((rendermode & RENDERMODE_PIXELBG_R_MASK) >> RENDERMODE_PIXELBG_R_SHIFT)*255/15;
+	    border_g = ((rendermode & RENDERMODE_PIXELBG_G_MASK) >> RENDERMODE_PIXELBG_G_SHIFT)*255/15;
+	    border_b = ((rendermode & RENDERMODE_PIXELBG_B_MASK) >> RENDERMODE_PIXELBG_B_SHIFT)*255/15;
+
+	    for (y=0;y<(*Pic).h;y++)
+	      for (x=0;x<(*Pic).w;x++)
+	      {
+		lb_gr_fb_line_h_copymode(&ty_screen, yc +     y*scale_y,   xc + x*scale_x,   xc + (x+1)*scale_x-1, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_h_copymode(&ty_screen, yc + (y+1)*scale_y-1, xc + x*scale_x,   xc + (x+1)*scale_x-1, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc +   x  *scale_x,   yc + y*scale_y+1, yc + (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode);
+		lb_gr_fb_line_v_copymode(&ty_screen, xc + (x+1)*scale_x-1, yc + y*scale_y+1, yc + (y+1)*scale_y-2, border_r, border_g, border_b, 255, copymode);
+	  
+#if ( (N_BITS_R==8) && (N_BITS_G==8) && (N_BITS_B==8) && (N_BITS_A==8) )
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-2, yc + (y+1)*scale_y-2,
+					    (*Pic).pic[y][x].r, (*Pic).pic[y][x].g, (*Pic).pic[y][x].b, (*Pic).pic[y][x].a, copymode);
+#else
+		lb_gr_fb_rectangle_copymode(&ty_screen, xc + x*scale_x+1, yc + y*scale_y+1, xc + (x+1)*scale_x-2, yc + (y+1)*scale_y-2,
+					    FACTOR_N_TO_8_R*(*Pic).pic[y][x].r, FACTOR_N_TO_8_G*(*Pic).pic[y][x].g, FACTOR_N_TO_8_B*(*Pic).pic[y][x].b, FACTOR_N_TO_8_A*(*Pic).pic[y][x].a, copymode);
+#endif
+	      }
+	  }
+      }
+}
+
+#endif
 
     
 void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,

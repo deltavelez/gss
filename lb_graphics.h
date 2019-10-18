@@ -124,7 +124,7 @@ void       lg_gr_draw_axis_3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_T Rot[3][
 			      PIXEL_T color_axis,
 			      REAL_T xr_min, REAL_T xr_max, REAL_T delta_grid_x,
 			      REAL_T yr_min, REAL_T yr_max, REAL_T delta_grid_y,
-			      REAL_T zr_min, REAL_T zr_max, REAL_T delta_grid_z,
+	      	      REAL_T zr_min, REAL_T zr_max, REAL_T delta_grid_z,
 			      REAL_T w_grid,
 			      PIXEL_T color_grid,
 			      UINT16_T options,
@@ -140,7 +140,7 @@ void       lb_gr_draw_line(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL
 void       lb_gr_draw_line1(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, PIXEL_T color,
 			    COPYMODE_T copymode);
 
-void       lb_gr_draw_line1_f(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1, PIXEL_T color, COPYMODE_T copymode);
+void       lb_gr_draw_line1_r(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1, PIXEL_T color, COPYMODE_T copymode);
 
 void       lb_gr_draw_line2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1, PIXEL_T color,
 			    COPYMODE_T copymode);
@@ -151,7 +151,7 @@ void       lb_gr_draw_line_antialiasing(PICTURE_T *Pic, REAL_T _xr0, REAL_T _yr0
 void       lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1,
 					 PIXEL_T color, COPYMODE_T copymode);
 
-void       lb_gr_draw_line_antialiasing2_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1,
+void       lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1,
 					 PIXEL_T color, COPYMODE_T copymode);
 
 void       lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1,
@@ -162,9 +162,9 @@ void       lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y
 void       lb_gr_draw_pixel(PICTURE_T *Pic, SINT16_T x, SINT16_T y, PIXEL_T pixel, COPYMODE_T copymode);
 void       lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode,
 				  LINEMODE_T linemode);
-void       lb_gr_draw_polygon_f(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode,
+void       lb_gr_draw_polygon_r(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode,
 				LINEMODE_T linemode);
-void       lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode);
+void       lb_gr_draw_polygon_rill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode);
 void       lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode);
 
 void       lb_gr_draw_rectangle(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1,  PIXEL_T color,
@@ -196,9 +196,9 @@ void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr
 			PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 void       lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_REAL_T *L, REAL_T w,
 			     PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
-void       lb_gr_plot2d_line_reverse(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
+void       lb_gr_plot2d_curve_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
 				     PIXEL_T color, COPYMODE_T copymode);
-void       lb_gr_plot2d_line_reverse_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
+void       lb_gr_plot2d_curve_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
 					  PIXEL_T color, COPYMODE_T copymode);
 void       lb_gr_plot3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  REAL_T Rot[3][3], POINT_3D_REAL_T Pr, REAL_T w,
 			PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);

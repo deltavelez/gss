@@ -857,8 +857,8 @@ int main(int argc, char *argv[])
 #ifdef DEMO_LINE1_FLOAT
   SINT16_T i, j,k;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
+  lb_fb_open("/dev/fb0","/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_clear_picture(NULL , lb_gr_12RGB(0x333 | COLOR_SOLID));
   for(i=0;i<1000;i++)
     lb_gr_draw_line1(NULL, ty_width/2, ty_height/2, rand() % ty_width , rand() % ty_height,
 		     lb_gr_12RGB(rand() % 0xFFF |0xF000),COPYMODE_COPY);
@@ -867,60 +867,47 @@ int main(int argc, char *argv[])
 #endif
 
 
-
-
-
   //#define DEMO_LINE_ANTIALIASING
 #ifdef DEMO_LINE_ANTIALIASING
   SDL_Event event;
-  long k;
-  clock_t begin, end;
-  PIXEL_T a, b;
-  int x, y, z, SIZE_X=60, SIZE_Y=60;
-
-  //  begin=clock();
-  //for (k=0; k<100000000; k++)
-  // test_f1(0,0,0);
-  //end=clock();
-  //printf("Ellapsed time = %f\r\n",(REAL_T)(end-begin)/CLOCKS_PER_SEC);
-
-  //begin=clock();
-  //for (k=0; k<100000000; k++)
-  // test_f2(0,0,0);
-  //end=clock();
-  //printf("Ellapsed time = %f\r\n",(REAL_T)(end-begin)/CLOCKS_PER_SEC);
-
-  lb_gr_SDL_init("Bienvenidos", SDL_INIT_VIDEO, 1200, 800, 100, 0, 5);
-
-  for (y=0; y<ty_screen.h; y++)
-    for (x=0; x<ty_screen.w; x++)
-      lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, 255*x/ty_screen.w, 255*x/ty_screen.w, 255*x/ty_screen.w, 255, COPYMODE_COPY);
+  REAL_T angle;
+  PICTURE_T Pic;
+  UINT8_T pix_x=32, pix_y=32;
   
-  //lb_gr_fb_setpixel_ARGB_copymode(&ty_screen, x, y, 100, 100, 100, 0, COPYMODE_COPY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  Pic.w= ty_screen.w/pix_x;
+  Pic.h= ty_screen.h/pix_y;
 
-  //lb_gr_fb_rectangle_copymode(&ty_screen, 100, 100, 200, 200, 255, 255, 255, 255, COPYMODE_BLEND);
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
 
-  lb_gr_refresh();
+  angle=0.0;
+  //  while (angle<2*M_PI)
+  {
+    angle = 32.0*M_PI/180;
+    printf("angle=%f\r\n",angle*180.0/M_PI);
+    lb_gr_draw_rectangle(&Pic,0,0,Pic.w,Pic.h,lb_gr_12RGB(0xFFFF),COPYMODE_COPY);
+    lb_gr_draw_line_antialiasing(&Pic, 0.5*Pic.w, 0.5*Pic.h,
+				 0.5*Pic.w  + 0.5*Pic.h*cos(angle),
+				 0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
+				 7, lb_gr_12RGB(0xF090), COPYMODE_BLEND );
+    lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+    lb_gr_refresh();
 
-  if (1) for (y=0; y<ty_screen.h/SIZE_Y; y++)
-	   {
-	     for (x=0; x<ty_screen.w/SIZE_X; x++)
-	       lb_gr_draw_pixel(NULL, x,y, lb_gr_12RGB(0x500f),
-				COPYMODE_BGCOLOR(0x0FFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_COPY | COPYMODE_SCALE_X(SIZE_X) |  COPYMODE_SCALE_Y(SIZE_Y));
-	     lb_gr_refresh();
-	     lb_gr_delay(1000);
-	     while (SDL_PollEvent(&event))
-	       {
-		 if (event.type == SDL_QUIT)
-		   {
-		     SDL_Quit();
-		     return EXIT_SUCCESS;
-		   }
-	       }
-	   }
-  lb_gr_delay(5000);
+    angle+=M_PI/180;
+    lb_ti_delay_ms(10000);
+
+    lb_gr_BMPfile_save("line.bmp", &Pic);
+ 
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+  }
 #endif
-
 
   //#define DEMO_LINE_ANTIALIASING2
 #ifdef DEMO_LINE_ANTIALIASING2
@@ -936,31 +923,35 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
 
   angle=0.0;
-  while (angle<2*M_PI)
-    {
-      printf("angle=%f\r\n",angle*180.0/M_PI);
-      lb_gr_draw_rectangle(&Pic,0,0,Pic.w,Pic.h,lb_gr_12RGB(0xF060),COPYMODE_COPY);
-      lb_gr_draw_line_antialiasing(&Pic, 0.5*Pic.w, 0.5*Pic.h,
-				   0.5*Pic.w  + 0.3*Pic.h*cos(angle),
-				   0.5*Pic.h  - 0.3*Pic.h*sin(angle), 
-				   5, lb_gr_12RGB(0xFfFFF), COPYMODE_BLEND );
-      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY |  COPYMODE_BGCOLOR(0x0FFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-      lb_gr_refresh();
+  //  while (angle<2*M_PI)
+  {
+    angle = 32.0*M_PI/180;
+    printf("angle=%f\r\n",angle*180.0/M_PI);
+    lb_gr_draw_rectangle(&Pic,0,0,Pic.w,Pic.h,lb_gr_12RGB(0xFFFF),COPYMODE_COPY);
+    lb_gr_draw_line_antialiasing3(&Pic, 0.5*Pic.w, 0.5*Pic.h,
+				 0.5*Pic.w  + 0.5*Pic.h*cos(angle),
+				 0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
+				 lb_gr_12RGB(0xF900), COPYMODE_BLEND );
+    lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+    lb_gr_refresh();
 
-      angle+=M_PI/180;
-      lb_gr_delay(100);
+    angle+=M_PI/180;
+    lb_ti_delay_ms(10000);
 
-      while (SDL_PollEvent(&event))
-	{
-	  if (event.type == SDL_QUIT)
-	    {
-	      SDL_Quit();
-	      return EXIT_SUCCESS;
-	    }
-	}
-    }
+    lb_gr_BMPfile_save("line.bmp", &Pic);
+ 
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+  }
 #endif
 
+  
   //#define DEMO_LINE_ANTIALIASING3
 #ifdef DEMO_LINE_ANTIALIASING3
   SDL_Event event;
@@ -1056,9 +1047,12 @@ int main(int argc, char *argv[])
   SDL_Event event;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
 
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
+  lb_gr_clear_picture(NULL, lb_gr_12RGB(0xFFFF | COLOR_SOLID));
   lb_gr_draw_circle_antialiasing_simple(NULL, ty_screen.w/2, ty_screen.h/2, 0.35*ty_screen.h,20,
 					lb_gr_12RGB(0x1F00), COPYMODE_BLEND);
+
+  lb_gr_BMPfile_save("circle.bmp", NULL);
+
   lb_gr_refresh();
 
   while (1)
@@ -1075,17 +1069,28 @@ int main(int argc, char *argv[])
   //#define DEMO_CIRCLE_ANTIALIASING23
 #ifdef DEMO_CIRCLE_ANTIALIASING23
   SDL_Event event;
-  int pix_x=20, pix_y=20;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
-  //      lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0xff, 0xff, 0xff, 0xff, 0);
-  lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0, 0, 0, 0xff, 0);
 
-      
-  //lb_gr_draw_circle_antialiasing2(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xF00f),
-  //				      COPYMODE_BLEND | COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFFa0),
-				  COPYMODE_BLEND | COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  PICTURE_T Pic;
+  UINT8_T pix_x=20, pix_y=20;
+  
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  Pic.w= ty_screen.w/pix_x;
+  Pic.h= ty_screen.h/pix_y;
+
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(0xFFFF) );
+
+     
+  lb_gr_draw_circle_antialiasing3(&Pic, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFF00),  COPYMODE_BLEND);
+
+  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
+  
+  
   lb_gr_refresh();
+
+  lb_ti_delay_ms(1000);
+  
+  lb_gr_BMPfile_save("circle2.bmp", NULL);
+
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -1175,20 +1180,20 @@ int main(int argc, char *argv[])
   //#define DEMO_CIRCLE_FILLED_ANTIALIASING
 #ifdef DEMO_CIRCLE_FILLED_ANTIALIASING
   SDL_Event event;
-  int pix_x=10, pix_y=10;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
 
-  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/(pix_x*3), ty_screen.h/(pix_y*3), ty_screen.h/(pix_x*4),
-					lb_gr_12RGB(0xF00F),COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_filled_antialiasing(NULL, 2*ty_screen.w/(pix_x*3), ty_screen.h/(pix_y*3), ty_screen.h/(pix_y*4),
-					lb_gr_12RGB(0xf0F0), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/(pix_x*2), 2*ty_screen.h/(pix_y*3), ty_screen.h/(pix_y*4),
-					lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/(pix_x*2), 2*ty_screen.h/(pix_y*3), ty_screen.h/(pix_y*4),
-					lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/3, ty_screen.h/3, ty_screen.h/4,
+					lb_gr_12RGB(0xF00F), COPYMODE_BLEND);
+  lb_gr_draw_circle_filled_antialiasing(NULL, 2*ty_screen.w/3, ty_screen.h/3, ty_screen.h/4,
+					lb_gr_12RGB(0xf0F0), COPYMODE_BLEND);
+  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4,
+					lb_gr_12RGB(0xfF00), COPYMODE_BLEND);
+  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4,
+					lb_gr_12RGB(0xfF00), COPYMODE_BLEND);
   lb_gr_refresh();
+  lb_gr_BMPfile_save("filled_circles.bmp", NULL);
 
   while (1)
     while (SDL_PollEvent(&event))
@@ -1212,6 +1217,7 @@ int main(int argc, char *argv[])
   lb_gr_draw_circle_arc(NULL, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.h/(pix_y*2)-1,
 			0, M_PI/3,lb_gr_12RGB(0xFfff), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
   lb_gr_refresh();
+  
 
   while (1)
     while (SDL_PollEvent(&event))
@@ -1225,14 +1231,21 @@ int main(int argc, char *argv[])
       }
 #endif
 
-#define DEMO_ELLIPSE
+  //#define DEMO_ELLIPSE
 #ifdef DEMO_ELLIPSE
   REAL_T angle;
-
   SDL_Event event;
+  PICTURE_T Pic;
+  SINT16_T pix_x=20, pix_y=20;
+  
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
+  Pic.w= ty_screen.w/pix_x;
+  Pic.h= ty_screen.h/pix_y;
+
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
+  
+  
   /* Example 1: */
   //lb_gr_draw_ellipse(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x, ty_screen.h*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
   //		     COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
@@ -1247,14 +1260,18 @@ int main(int argc, char *argv[])
 	
   angle=0.0;
   lb_gr_refresh();
-  if (1) for (angle=0;angle<=M_PI/2;angle+=1*M_PI/180)
+  //  if (1) for (angle=0;angle<=M_PI/2;angle+=1*M_PI/180)
+  angle = 30.0*M_PI/180.0;
 	   {
-	     lb_gr_clear_picture(NULL,lb_gr_12RGB(0x0000));
+	     lb_gr_clear_picture(&Pic, lb_gr_12RGB(COLOR_WHITE));
 	     // lb_gr_draw_rectangle(NULL,0,0,ty_width,ty_height,lb_gr_12RGB(0xF000),COPYMODE_COPY);
 	     //	     lb_gr_draw_ellipse_rotated_antialiasing(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_x, angle, 8, 100,
 	     //						     lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
-	     lb_gr_draw_ellipse_rotated(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.w*0.45,ty_screen.w*0.10, angle, 
-	     						     lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+	     lb_gr_draw_ellipse_rotated(&Pic, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_y, angle, 
+	     						     lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+	     
+	     lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+	     lb_gr_BMPfile_save("rotated_ellipse.bmp", NULL);
 	     
 	     lb_gr_refresh();
 	     lb_ti_delay_ms(1000);
@@ -1522,8 +1539,8 @@ int main(int argc, char *argv[])
   myPol.array[3].x=96+k; myPol.array[3].y=80+k;
   myPol.array[4].x=10+k; myPol.array[4].y=10+k;
       
-  lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xFF00),COPYMODE_BLEND);
-  lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xF0F0),COPYMODE_BLEND);
+  lb_gr_draw_polygon_rill_i(NULL,&myPol,lb_gr_12RGB(0xFF00),COPYMODE_BLEND);
+  lb_gr_draw_polygon_rill_i(NULL,&myPol,lb_gr_12RGB(0xF0F0),COPYMODE_BLEND);
   lb_gr_draw_polygon_i(NULL,&myPol, 4,lb_gr_12RGB(0xF00F),COPYMODE_BLEND,LINEMODE_FILTERED);
   lb_gr_refresh();
 
@@ -1586,10 +1603,10 @@ int main(int argc, char *argv[])
   alpha=MAX_K;
   lb_gr_BMPfile_load_to_pic("sdl24bit.bmp",&pic1,alpha);
   printf("1. alpha=%d\r\n",alpha);
-  lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
+  lb_gr_draw_polygon_rill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
   lb_gr_render_picture(&pic1, 0, 0, 4, 4, RENDEROPTIONS_DEFAULT);
   lb_gr_delay(5000);
-  lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
+  lb_gr_draw_polygon_rill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
   lb_gr_render_picture(&pic1, 0, 0, 4, 4, RENDEROPTIONS_DEFAULT);
   lb_gr_delay(5000);
      
@@ -1977,17 +1994,17 @@ int main(int argc, char *argv[])
   SINT16_T i,j;
   REAL_T xr, yr, zr;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1024, 1024, 0, 0, 0);
 
-  A.rows=20; /* vertical */
-  A.cols=20; /* horizontal */
+  A.rows=100; /* vertical */
+  A.cols=100; /* horizontal */
   lb_al_create_matrix_r(&A);
 
   /* Viewport definition */
   vp.xp_min = 0;
-  vp.xp_max = ty_width;
+  vp.xp_max = ty_screen.w;
   vp.yp_min = 0;
-  vp.yp_max = ty_height;
+  vp.yp_max = ty_screen.h;
 
   vp.xr_min = -5;
   vp.xr_max =  5;
@@ -1999,41 +2016,45 @@ int main(int argc, char *argv[])
       {
 	xr = vp.xr_min + j*(vp.xr_max-vp.xr_min)/(A.cols-1);
 	yr = vp.yr_min + i*(vp.yr_max-vp.yr_min)/(A.rows-1);
-	zr=4-xr*xr-yr*yr;
+	zr=sin(xr*xr+yr*yr);
 	A.array[i][j]=zr;
       }
   //lb_al_print_matrix_r(&A,"A",FLOAT_FORMAT_MATRIX);
       
   lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_WHITE));
-  lb_gr_implicit_2d(NULL, vp, &A, 1, lb_gr_12RGB(COLOR_RED),COPYMODE_COPY, LINEMODE_SOLID);
-  lb_gr_delay(10000);
+  lb_gr_implicit_2d(NULL, vp, &A, 3, lb_gr_12RGB(COLOR_RED),COPYMODE_BLEND, LINEMODE_FILTERED);
+  lb_gr_refresh();
+  lb_gr_BMPfile_save("implicit.bmp", NULL);
+
+  lb_ti_delay_ms(10000);
   lb_al_release_matrix_r(&A);
-  lb_fb_exit(1);
+  lb_gr_SDL_close();
 #endif
 
   //#define DEMO_PLOT2D_REVERSE
 #ifdef DEMO_PLOT2D_REVERSE
+  SDL_Event event;
   REAL_T t, t0, t1;
   SINT16_T i;
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 0*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200, 1024, 0xFF, 0xFF, 0xFF);
 
   /* Viewport definition */
   vp.xp_min = 0;
-  vp.xp_max = ty_width;
+  vp.xp_max = ty_screen.w;
   vp.yp_min = 0;
-  vp.yp_max = ty_height;
+  vp.yp_max = ty_screen.h;
 
-  vp.xr_min = -2*1.024;
-  vp.xr_max = 2*1.024;
-  vp.yr_min = -2*0.768;
-  vp.yr_max = 2*0.768;
+  vp.xr_min = -1.1;
+  vp.xr_max = 1.1;
+  vp.yr_min = -1.1;
+  vp.yr_max = 1.1;
 
   /* Create and load vectors */
-  Lx.items=400;
-  Ly.items=400;
+  Lx.items=8000;
+  Ly.items=8000;
   lb_al_create_vector_r(&Lx);
   lb_al_create_vector_r(&Ly);
 
@@ -2046,13 +2067,24 @@ int main(int argc, char *argv[])
       Ly.array[i]=cos(3*t)*sin(t);
       t+=(t1-t0)/(REAL_T)Lx.items;
     }
-  lb_gr_plot2d_line_reverse(NULL, vp, &Lx, &Ly, 8, lb_gr_12RGB(0xffaa), COPYMODE_BLEND);
-   
+  lb_gr_plot2d_curve_neighbor(NULL, vp, &Lx, &Ly, 12, lb_gr_12RGB(0xf00f), COPYMODE_BLEND);
+  lb_gr_refresh();
+  
   lb_gr_BMPfile_save("flower.bmp", NULL);
-  lb_gr_delay(15000);
+
   lb_al_release_vector_r(&Lx);
   lb_al_release_vector_r(&Ly);
-  lb_fb_exit(1);
+  
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   //#define DEMO_PLOT2D_REVERSE_SLOW
@@ -2097,7 +2129,7 @@ int main(int argc, char *argv[])
       t+=(t1-t0)/(REAL_T)Lx.items;
     }
 
-  lb_gr_plot2d_line_reverse_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_plot2d_curve_neighbor_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
   lb_gr_refresh();
       
   lb_al_release_vector_r(&Lx);
@@ -3387,10 +3419,10 @@ int main(int argc, char *argv[])
   lb_fb_exit(1);
 #endif
 
-  //#define DEMO_PLOT3D
+#define DEMO_PLOT3D
 #ifdef DEMO_PLOT3D
-  PICTURE_T Pic, Pic_console;
-  CONSOLE_T Con;
+  SDL_Event event;
+  PICTURE_T Pic;
   
   VIEWPORT_3D_T vp3d;
   //REAL_T u_a, u_b, v_a, v_b;
@@ -3399,38 +3431,19 @@ int main(int argc, char *argv[])
     
   //MATRIX_POINT_3D_REAL_T S;
   MATRIX_R_T Z;
-  char c;
+ 
   FONT_T font_console;
+  SINT8_T flag_paused;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-    
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
+
+  //SDL_EnableUNICODE(SDL_ENABLE);
+   
   
-  Pic.w=ty_width;
-  Pic.h=ty_height/2;
+  Pic.w=ty_screen.w;
+  Pic.h=ty_screen.h;
   lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
 
-  Pic_console.w=ty_width;
-  Pic_console.h=ty_height/2;
-  lb_gr_create_picture(&Pic_console,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID));
-
-
-  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &font_console);
-  font_console.scale_x=1;
-  font_console.scale_y=1;
-  font_console.gap_x=2;
-  font_console.gap_y=2;
-  font_console.max_x=10;
-  font_console.angle=0;
-  font_console.flag_fg=TRUE;
-  font_console.flag_bg=FALSE;
-  font_console.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
-  font_console.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
- 
-  lb_ft_resize_console(&Pic_console, &font_console, &Con);
-  Con.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
-  Con.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
-  lb_ft_create_console(&Con);
-  lb_ft_set_active_console(&Con);
     
   flag_exit=FALSE;
       
@@ -3534,95 +3547,104 @@ int main(int argc, char *argv[])
 			 "O","X","Y","Z",
 			 COPYMODE_BLEND, LINEMODE_FILTERED);
 
-      lb_gr_render_picture(&Pic, 0, 0, 1, 1, 1*RENDEROPTIONS_LINE);
+      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
+      lb_gr_refresh();
 
 	
       // Wait for the user to press a character.
 
-      lb_gr_clear_picture(&Pic_console, lb_gr_12RGB(COLOR_GRAY));
-      lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
-      lb_gr_render_picture(&Pic_console, 0, Pic.h, 1, 1, 0*RENDEROPTIONS_LINE);
 
-      SINT8_T flag_process_keys=TRUE;
-      while (!lb_co_kbhit()) ;
-      while (flag_process_keys)
+      while (SDL_PollEvent(&event))
 	{
-	  c=lb_co_getch_pc();
-	  
-	  switch(c)
+	  if (event.type == SDL_QUIT)
 	    {
-	    case 'r':
-	      vp3d.xp_min=0;
-	      vp3d.yp_min=0;
-	      vp3d.xp_max=ty_width;
-	      vp3d.yp_max=ty_height;
-	      vp3d.scale =100.0;    /* Zoom */
-	      vp3d.cam_d= 0.0;   /* Stereoscopic */
-	      vp3d.cam_h=10.0;    /* Depth */
-	      vp3d.cam.x=0.0;   /* Camera's location */
-	      vp3d.cam.y=0.0;   /* Camera's location */
-	      vp3d.cam.z=20.0;   /* Camera's location */
-	      break;
-	    case 'h':
-	      vp3d.cam_h*=1.1;
-	      break;
-	    case 'H':
-	      vp3d.cam_h/=1.1;
-	      break;
-	    case 'x':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
-	      break;
-	    case 'X':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
-	      break;
-	    case 'y':
-	      lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
-	      break;
-	    case 'Y':
-	      lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
-	      break;
-	    case 'z':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
-	      break;
-	    case 'Z':
-	      lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
-	      break;
-	    case PCKEY_PAGE_UP:
-	      vp3d.scale*=1.1;
-	      break;
-	    case PCKEY_PAGE_DOWN:
-	      vp3d.scale/=1.1;
-	      break;
-	    case PCKEY_UP:
-	      vp3d.cam.y+=1.0;
-	      break;
-	    case PCKEY_DOWN:
-	      vp3d.cam.y-=1.0;
-	      break;
-	    case PCKEY_LEFT:
-	      vp3d.cam.x+=1.0;
-	      break;
-	    case PCKEY_RIGHT:
-	      vp3d.cam.x-=1.0;
-	      break;
-	    case PCKEY_ESC:
-	      flag_exit=TRUE;
-	      break;
+	      SDL_Quit();
+	      return EXIT_SUCCESS;
 	    }
-	  if(lb_co_kbhit())
-	    flag_process_keys=TRUE;
-	  else
-	    flag_process_keys=FALSE;
+	  if (event.type== SDL_KEYDOWN)
+	    {
+	      //      SDL_EnableUNICODE(SDL_ENABLE);
+	      switch(event.key.keysym.sym)
+		{
+		case SDLK_r:
+		  vp3d.xp_min=0;
+		  vp3d.yp_min=0;
+		  vp3d.xp_max=ty_screen.w;
+		  vp3d.yp_max=ty_screen.h;
+		  vp3d.scale =100.0;    /* Zoom */
+		  vp3d.cam_d= 0.0;   /* Stereoscopic */
+		  vp3d.cam_h=10.0;    /* Depth */
+		  vp3d.cam.x=0.0;   /* Camera's location */
+		  vp3d.cam.y=0.0;   /* Camera's location */
+		  vp3d.cam.z=20.0;   /* Camera's location */
+		  break;
+		case SDLK_h:
+		  if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+		    vp3d.cam_h*=1.1;
+		  else
+		    vp3d.cam_h/=1.1;
+		  break;
+		case SDLK_x:
+		  if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+		    lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
+		  else
+		    lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
+		  break;
+		case SDLK_y:
+		  if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+		    lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
+		  else
+		    lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
+		  break;
+		case SDLK_z:
+		  if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+		    lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
+		  else
+		    lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
+		  break;
+		case SDLK_PAGEUP:
+		    vp3d.scale*=1.1;
+		    break;
+		case SDLK_PAGEDOWN:
+		    vp3d.scale/=1.1;
+		  break;
+		case SDLK_UP:
+		  vp3d.cam.y+=1.0;
+		  break;
+		case SDLK_DOWN:
+		  vp3d.cam.y-=1.0;
+		  break;
+		case SDLK_LEFT:
+		  vp3d.cam.x+=1.0;
+		    break;
+		case SDLK_RIGHT:
+		  vp3d.cam.x-=1.0;
+		  break;
+		case SDLK_ESCAPE:
+		  flag_exit=TRUE;
+		  break;
+		case SDLK_SPACE:
+		  if (flag_paused)
+		    flag_paused=FALSE;
+		  else
+		    flag_paused=TRUE;
+		  break;
+		}
+	    }
 	}
+
+      
     }
-  lb_ft_release_GLCDfont(&font_console);
   lb_gr_release_picture(&Pic);
-  lb_gr_release_picture(&Pic_console);
-  lb_ft_release_console(&Con);
-  lb_fb_exit_msg("Closing program\r\n");    
   //lb_al_release_matrix_p3d(&S);
   
 #endif
+
+  //if(lb_co_kbhit())
+  //	    flag_process_keys=TRUE;
+  //	  else
+  //	    flag_process_keys=FALSE;
+  //	}
 
 
   /*******************************************************************************************************************/
@@ -4001,6 +4023,7 @@ int main(int argc, char *argv[])
 
   //#define DEMO_HISTOGRAM
 #ifdef DEMO_HISTOGRAM
+  SDL_Event event;
   VIEWPORT_2D_T win;
   VECTOR_R_T Data, Bins;
   FONT_T my_font;
@@ -4009,17 +4032,17 @@ int main(int argc, char *argv[])
   SINT16_T i;
   REAL_T mu, sigma2;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Histogram", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
 
   win.xp_min=0;
-  win.xp_max=ty_width;
+  win.xp_max=ty_screen.w;
   win.yp_min=0;
-  win.yp_max=ty_height;
+  win.yp_max=ty_screen.h;
   win.xr_min=-40;
   win.xr_max=400;
-  win.yr_min=3000.0; 
-  win.yr_max=-30;
-
+  win.yr_min=-30; 
+  win.yr_max=3000;
+  
   /* Data generation */
   Data.items=30000;
   lb_al_create_vector_r(&Data);
@@ -4033,8 +4056,8 @@ int main(int argc, char *argv[])
 
   printf("mu=%f,  sigma2=%f\r\n",mu,sigma2);
   lb_gr_draw_histogram(NULL, win, &Bins, 
-		       lb_gr_12RGB(COLOR_WHITE), lb_gr_12RGB(COLOR_DIMGRAY),
-		       lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_DARKBLUE));
+		       lb_gr_12RGB(COLOR_DIMGRAY), lb_gr_12RGB(COLOR_WHITE),
+		       lb_gr_12RGB(COLOR_BLACK), lb_gr_12RGB(COLOR_BLUE));
            
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
@@ -4049,10 +4072,24 @@ int main(int argc, char *argv[])
   my_font.color_fg=lb_gr_12RGB(COLOR_BLUE);
   my_font.color_bg=lb_gr_12RGB(COLOR_RED);
 
-  lb_gr_delay(10000);
+  lb_gr_BMPfile_save("histogram.bmp", NULL);
+
+  lb_gr_refresh();
+  
   lb_ft_release_GLCDfont(&my_font);
   lb_al_release_vector_r(&Data);
-  lb_fb_exit(1);
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+
 #endif
 
   /*******************************************************************************************************************/
@@ -4577,9 +4614,6 @@ int main(int argc, char *argv[])
 	      exit(EXIT_SUCCESS);
 	    }
 	}
-
-
-
 #endif
 
     //#define DEMO_KEYBOARD
