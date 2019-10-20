@@ -2291,7 +2291,7 @@ int main(int argc, char *argv[])
      #define AXIS_DRAW_X_GRID          0b0000000000000100
      #define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
      #define AXIS_DRAW_X_LABEL         0b0000000000010000
-     #define AXIS_DRAW_Y               0b0000000000100000
+\     #define AXIS_DRAW_Y               0b0000000000100000
      #define AXIS_DRAW_Y_ARROWS        0b0000000001000000
      #define AXIS_DRAW_Y_GRID          0b0000000010000000
      #define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
@@ -2331,8 +2331,7 @@ int main(int argc, char *argv[])
       }
 #endif
 
-
-  //#define DEMO_AXIS_2D_LOG
+#define DEMO_AXIS_2D_LOG
 #ifdef DEMO_AXIS_2D_LOG
   VIEWPORT_2D_T win;
   SDL_Event event;
@@ -2352,28 +2351,25 @@ int main(int argc, char *argv[])
   my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
-  win.xp_min=20;
-  win.xp_max=ty_screen.w-20;
-  win.yp_min=ty_screen.h-20;
-  win.yp_max=20;
+  win.xp_min=100;
+  win.xp_max=ty_screen.w-100;
+  win.yp_min=ty_screen.h-200;
+  win.yp_max=200;
+
+  win.xr_min= 1;
+  win.xr_max=  1e4;
+  win.yr_min=  1e4;
+  win.yr_max=  1; 
 
 
-  win.xr_min= -5;
-  win.xr_max=  10;
-  win.yr_min=  -1;
-  win.yr_max=  4; 
 
-  //  win.xr_min= 1e-2;
-  //win.xr_max=  1e2;
-  //win.yr_min=  1e5;
-  //win.yr_max=  1E1; 
-
+  
   /* #define AXIS_DRAW_X               0b0000000000000001
      #define AXIS_DRAW_X_ARROWS        0b0000000000000010
      #define AXIS_DRAW_X_GRID          0b0000000000000100
      #define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
      #define AXIS_DRAW_X_LABEL         0b0000000000010000
-     #define AXIS_DRAW_Y               0b0000000000100000
+     \     #define AXIS_DRAW_Y               0b0000000000100000
      #define AXIS_DRAW_Y_ARROWS        0b0000000001000000
      #define AXIS_DRAW_Y_GRID          0b0000000010000000
      #define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
@@ -2384,21 +2380,33 @@ int main(int argc, char *argv[])
      #define AXIS_DRAW_COLORVALUES_Y_1 0b0001000000000000 Degradé 
      #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
 
-     lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
+		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-    lb_gr_12RGB(COLOR_BLUE), 5, 15,
-    lb_gr_12RGB(COLOR_GREEN), 1,
-    lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
-    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
-    0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-    COPYMODE_BLEND, LINEMODE_FILTERED);
-  
+		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
+		     lb_gr_12RGB(COLOR_GREEN), 10,
+		     lb_gr_12RGB(COLOR_YELLOW), 4, 3.0, 
+		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | 
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | 
+		     AXIS_DRAW_X_GRID_LOG | AXIS_DRAW_Y_GRID_LOG,
+		     COPYMODE_BLEND, LINEMODE_FILTERED);
+
+  UINT16_T i;
+  REAL_T xr, yr, xp, yp;
+  for (i=0;i<=27;i++)
+    {
+      xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
+      printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
+      yr=1;  
+      //printf("xr=%f, yr=%f\t\n",xr,yr); 
+      lb_gr_project_2d_log(win, xr, yr, &xp, &yp);
+      lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
+    } 
+     
   lb_gr_refresh();
-  lb_gr_BMPfile_save("axis_2d.bmp", NULL);
+  lb_gr_BMPfile_save("axis_2d_log.bmp", NULL);
 
 
   while (1)
@@ -2411,9 +2419,9 @@ int main(int argc, char *argv[])
 	    return EXIT_SUCCESS;
 	  }
       }
-
 #endif
 
+  
   //#define DEMO_PLOT_CONTINUOUS
 #ifdef DEMO_PLOT_CONTINUOUS
   VIEWPORT_2D_T win;

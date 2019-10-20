@@ -5508,38 +5508,26 @@ void lb_gr_project_2d_inv(VIEWPORT_2D_T vp2d, REAL_T xp, REAL_T yp, REAL_T *xr, 
   *yr =  vp2d.yr_min+(yp-vp2d.yp_max)*(vp2d.yr_max-vp2d.yr_min)/(vp2d.yp_min-vp2d.yp_max);
 }
 
-void lb_gr_project_2d_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp)
+SINT8_T lb_gr_project_2d_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp)
 {
-  if ( (xr<=0.0) || (vp2d.xr_min<=0) || (vp2d.xr_max<=0) )
-    {
-      printf("Error: lb_gr_project_2d_x_log() --> negative argument [xr=%f] [vp2d.xr_min=%f] [vp2d.xr_max=%f]\r\n",
-	     xr, vp2d.xr_min, vp2d.xr_max);
-      exit(EXIT_FAILURE);
-    }	
 
-  if (lb_re_equal(vp2d.xr_min, vp2d.xr_max))
+  if (lb_gr_project_2d_x_log(vp2d, xr, xp))
     {
-      printf("Error: lb_gr_project_2d_x_log() --> [vp2d.xr_min=%f] == [vp2d.xr_max=%f]\r\n",
-	     vp2d.xr_min, vp2d.xr_max);
-      exit(EXIT_FAILURE);
-    }	
-	
-  if ( (yr<=0.0) || (vp2d.yr_min<=0) || (vp2d.yr_max<=0) )
+      *xp = 0.0;
+      *yp = 0.0;
+      return 1;
+    }
+   			     
+  if (lb_gr_project_2d_y_log(vp2d, yr, yp))
     {
-      printf("Error: lb_gr_project_2d_y_log() --> negative argument [yr=%f] [vp2d.yr_min=%f] [vp2d.yr_max=%f]\r\n",
-	     yr, vp2d.yr_min, vp2d.yr_max);
-      exit(EXIT_FAILURE);
-    }	
-    
-  if (lb_re_equal(vp2d.yr_min, vp2d.yr_max))
-    {
-      printf("Error: lb_gr_project_2d_y_log() --> [vp2d.yr_min=%f] == [vp2d.yr_max=%f]\r\n",
-	     vp2d.yr_min, vp2d.yr_max);
-      exit(EXIT_FAILURE);
-    }	
-
+      *xp = 0.0;
+      *yp = 0.0;
+      return 1;
+    } 
+  return 0.0;
+  /* Let's keep these commented out in case I change mi mynd later 
   *xp = vp2d.xp_min + (log10(xr)-log10(vp2d.xr_min))*(vp2d.xp_max-vp2d.xp_min)/(log10(vp2d.xr_max)-log10(vp2d.xr_min));
-  *yp = vp2d.yp_min + (log10(yr)-log10(vp2d.yr_min))*(vp2d.yp_max-vp2d.yp_min)/(log10(vp2d.yr_max)-log10(vp2d.yr_min));
+  *yp = vp2d.yp_min + (log10(yr)-log10(vp2d.yr_min))*(vp2d.yp_max-vp2d.yp_min)/(log10(vp2d.yr_max)-log10(vp2d.yr_min)); */
 }
 
 void lb_gr_project_2d_x(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp)
@@ -5547,23 +5535,38 @@ void lb_gr_project_2d_x(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp)
   *xp = vp2d.xp_min + ( xr-vp2d.xr_min)*(vp2d.xp_max-vp2d.xp_min)/(vp2d.xr_max-vp2d.xr_min);
 }
 
-void lb_gr_project_2d_x_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp)
+SINT8_T lb_gr_project_2d_x_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp)
 {
-  if ( (xr<=0.0) || (vp2d.xr_min<=0) || (vp2d.xr_max<=0) )
+  if (xr<=0.0)
     {
-      printf("Error: lb_gr_project_2d_x_log() --> negative argument [xr=%f] [vp2d.xr_min=%f] [vp2d.xr_max=%f]\r\n",
-	     xr, vp2d.xr_min, vp2d.xr_max);
-      exit(EXIT_FAILURE);
+      printf("Warning: lb_gr_project_2d_x_log() --> zero or negative argument [xr=%f]\r\n",xr);
+      *xp=0.0;
+      return 1;
     }
-  
+
+  if (vp2d.xr_min<=0)
+    {
+      printf("Warning: lb_gr_project_2d_x_log() --> zero or negative argument [vp2d.xr_min=%f]\r\n",vp2d.xr_min);
+      *xp=0.0;
+      return 1;
+    }
+
+  if (vp2d.xr_max<=0)
+    {
+      printf("Warning: lb_gr_project_2d_x_log() --> zero negative argument [vp2d.xr_max=%f]\r\n",vp2d.xr_max);
+      *xp=0.0;
+      return 1;
+    }
+    
   if (lb_re_equal(vp2d.xr_min, vp2d.xr_max))
     {
-      printf("Error: lb_gr_project_2d_x_log() --> [vp2d.xr_min=%f] == [vp2d.xr_max=%f]\r\n",
+      printf("Warning: lb_gr_project_2d_x_log() --> [vp2d.xr_min=%f] == [vp2d.xr_max=%f]\r\n",
 	     vp2d.xr_min, vp2d.xr_max);
-      exit(EXIT_FAILURE);
-    }	
-
+      *xp=0.0;
+      return 1;
+   }	
   *xp = vp2d.xp_min + (log10(xr)-log10(vp2d.xr_min))*(vp2d.xp_max-vp2d.xp_min)/(log10(vp2d.xr_max)-log10(vp2d.xr_min));
+  return 0;
 }
 
 void lb_gr_project_2d_y(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp)
@@ -5571,34 +5574,39 @@ void lb_gr_project_2d_y(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp)
   *yp = vp2d.yp_min + ( yr-vp2d.yr_min)*(vp2d.yp_max-vp2d.yp_min)/(vp2d.yr_max-vp2d.yr_min);
 }
 
-void lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp)
+SINT8_T lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp)
 {
-  if ( yr<=0.0)
+  if (yr<=0.0) 
     {
-      printf("Error: lb_gr_project_2d_y_log() --> negative argument [yr=%f]\r\n",yr);
-      exit(EXIT_FAILURE);
+      printf("Warning: lb_gr_project_2d_y_log() --> zero or negative argument [yr=%f]\r\n",yr);
+      *yp=0.0;
+      return 1;
     }	
 
   if ( vp2d.yr_min<=0.0)
     {
-      printf("Error: lb_gr_project_2d_y_log() --> negative argument [vp2d.yr_min=%f]\r\n",vp2d.yr_min);
-      exit(EXIT_FAILURE);
+      printf("Warning: lb_gr_project_2d_y_log() --> zero or negative argument [vp2d.yr_min=%f]\r\n",vp2d.yr_min);
+      *yp=0.0;
+      return 1;
     }	
 
   if ( vp2d.yr_max<=0.0)
     {
-      printf("Error: lb_gr_project_2d_y_log() --> negative argument [vp2d.yr_max=%f]\r\n",vp2d.yr_max);
-      exit(EXIT_FAILURE);
+      printf("Warning: lb_gr_project_2d_y_log() --> zero negative argument [vp2d.yr_max=%f]\r\n",vp2d.yr_max);
+      *yp=0.0;
+      return 1;
     }	
 
   if (lb_re_equal(vp2d.yr_min, vp2d.yr_max))
     {
-      printf("Error: lb_gr_project_2d_y_log() --> [vp2d.yr_min=%f] == [vp2d.yr_max=%f]\r\n",
+      printf("Warning: lb_gr_project_2d_y_log() --> [vp2d.yr_min=%f] == [vp2d.yr_max=%f]\r\n",
 	     vp2d.yr_min, vp2d.yr_max);
-      exit(EXIT_FAILURE);
+      *yp=0.0;
+      return 1;
     }	
     
   *yp = vp2d.yp_min + (log10(yr)-log10(vp2d.yr_min))*(vp2d.yp_max-vp2d.yp_min)/(log10(vp2d.yr_max)-log10(vp2d.yr_min));
+  return 0;
 }
 
 void lb_gr_project_2d_vector_c_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_C_T *V, LINE_2D_SINT16_T *L)
@@ -5792,7 +5800,7 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
    
 	  if ((xr>=xr_min) && (xr<=xr_max))
 	    {
-	      //lb_ft_printf(ty_C, "k=%d xr=%f exp_inc=%d\r\n",k,xr,exp_inc);
+	      //Printf("k=%d xr=%f exp_inc=%d\r\n",k,xr,exp_inc);
 	      lb_gr_project_2d_x_log(vp2d, xr, &xp0);
 	      color=color_grid_x;
 	      if (options & AXIS_DRAW_COLORVALUES_X_1)
@@ -5843,7 +5851,7 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
    
 	  if ((yr>=yr_min) && (yr<=yr_max))
 	    {
-	      //		lb_ft_printf(ty_C, "k=%d yr=%f exp_inc=%d\r\n",k,yr,exp_inc);
+	      // printf(ty_C, "k=%d yr=%f exp_inc=%d\r\n",k,yr,exp_inc);
 	      lb_gr_project_2d_y_log(vp2d, yr, &yp0);
 	      color=color_grid_y;
 	      if (options & AXIS_DRAW_COLORVALUES_Y_1)

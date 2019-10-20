@@ -209,11 +209,11 @@ void       lb_gr_plot3d_surface(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  REAL_T Rot[
 
 void       lb_gr_project_2d(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp);
 void       lb_gr_project_2d_inv(VIEWPORT_2D_T vp2d, REAL_T xp, REAL_T yp, REAL_T *xr, REAL_T *yr);
-void       lb_gr_project_2d_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp);
+SINT8_T       lb_gr_project_2d_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp);
 void       lb_gr_project_2d_x(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp);
-void       lb_gr_project_2d_x_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp);
+SINT8_T      lb_gr_project_2d_x_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp);
 void       lb_gr_project_2d_y(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp);
-void       lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp);
+SINT8_T      lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp);
 
 void       lb_gr_project_2d_vector_c_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_C_T *V, LINE_2D_SINT16_T *L);
 void       lb_gr_project_2d_vector_r_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_R_T *X, VECTOR_R_T *Y, LINE_2D_SINT16_T *L);
