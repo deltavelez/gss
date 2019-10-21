@@ -107,6 +107,7 @@ REAL_T   lb_al_sum_matrix_r(MATRIX_R_T *M);
 COMPLEX_T lb_al_sum_vector_c(VECTOR_C_T *V);
 REAL_T   lb_al_sum_vector_r(VECTOR_R_T *V);
 void      lb_al_swap_vector_r(VECTOR_R_T *A, VECTOR_R_T *B);
+void lb_al_transpose_matrix33_r(REAL_T M1[3][3], REAL_T M2[3][3]);
 void      lb_al_transpose_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2);
 
 

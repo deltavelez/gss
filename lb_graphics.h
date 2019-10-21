@@ -44,7 +44,7 @@ SINT8_T  lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T qualit
 
 void       lb_gr_clear_picture(PICTURE_T *Pic, PIXEL_T default_color);
 SINT16_T lb_gr_check_left_i(POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P);
-SINT16_T lb_gr_check_left_f(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P);
+SINT16_T lb_gr_check_left_r(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P);
 
 void       lb_gr_create_line2d_i(LINE_2D_SINT16_T *L);
 void       lb_gr_create_line2d_r(LINE_2D_REAL_T *L);

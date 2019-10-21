@@ -2200,55 +2200,6 @@ int main(int argc, char *argv[])
       }
 #endif
 
-  //#define DEMO_POLAR_AXIS
-#ifdef DEMO_POLAR_AXIS
-  SDL_Event event;
-  int pix_x=10, pix_y=10;
-  VIEWPORT_2D_T win;
-  FONT_T my_font;
-
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
-
-  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
-  my_font.scale_x=1;
-  my_font.scale_y=1;
-  my_font.gap_x=2;
-  my_font.gap_y=1;
-  my_font.max_x=40;
-  my_font.angle=0;
-  my_font.flag_fg=TRUE;
-  my_font.flag_bg=FALSE;
-  my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
-  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
-
-  win.xp_min=0;
-  win.xp_max=ty_screen.w;
-  win.yp_min=0;
-  win.yp_max=ty_screen.h;
-
-  win.xr_min= -1.024*3;
-  win.xr_max=  1.024*3;
-  win.yr_min=  0.768*3;
-  win.yr_max= -0.768*3; 
-
-  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID),
-		       COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
-  lg_gr_draw_axis_2d_polar(NULL, win, &my_font, 0, 4, 1, lb_gr_12RGB(COLOR_BLUE), 0, 2*M_PI, 30*M_PI/180,
-			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
-  lb_gr_refresh();
-
-  while (1)
-    while (SDL_PollEvent(&event))
-      {
-	if (event.type == SDL_QUIT)
-	  {
-		      
-	    SDL_Quit();
-	    return EXIT_SUCCESS;
-	  }
-      }
-#endif
 
   //#define DEMO_AXIS_2D
 #ifdef DEMO_AXIS_2D
@@ -2331,7 +2282,7 @@ int main(int argc, char *argv[])
       }
 #endif
 
-#define DEMO_AXIS_2D_LOG
+  //#define DEMO_AXIS_2D_LOG
 #ifdef DEMO_AXIS_2D_LOG
   VIEWPORT_2D_T win;
   SDL_Event event;
@@ -2351,34 +2302,16 @@ int main(int argc, char *argv[])
   my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
-  win.xp_min=100;
-  win.xp_max=ty_screen.w-100;
-  win.yp_min=ty_screen.h-200;
-  win.yp_max=200;
+  win.xp_min=20;
+  win.xp_max=ty_screen.w-20;
+  win.yp_min=ty_screen.h-20;
+  win.yp_max=20;
 
   win.xr_min= 1;
   win.xr_max=  1e4;
-  win.yr_min=  1e4;
-  win.yr_max=  1; 
+  win.yr_min=  -0.1e4;
+  win.yr_max=  1e4; 
 
-
-
-  
-  /* #define AXIS_DRAW_X               0b0000000000000001
-     #define AXIS_DRAW_X_ARROWS        0b0000000000000010
-     #define AXIS_DRAW_X_GRID          0b0000000000000100
-     #define AXIS_DRAW_X_GRID_LOG      0b0000000000001000
-     #define AXIS_DRAW_X_LABEL         0b0000000000010000
-     \     #define AXIS_DRAW_Y               0b0000000000100000
-     #define AXIS_DRAW_Y_ARROWS        0b0000000001000000
-     #define AXIS_DRAW_Y_GRID          0b0000000010000000
-     #define AXIS_DRAW_Y_GRID_LOG      0b0000000100000000
-     #define AXIS_DRAW_Z_GRID          0b0000001000000000
-
-     #define AXIS_DRAW_COLORVALUES_X_1 0b0000010000000000 Degradé
-     #define AXIS_DRAW_COLORVALUES_X_2 0b0000100000000000 Color code 
-     #define AXIS_DRAW_COLORVALUES_Y_1 0b0001000000000000 Degradé 
-     #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
 		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
@@ -2387,26 +2320,32 @@ int main(int argc, char *argv[])
   lg_gr_draw_axis_2d(NULL, win, &my_font,
 		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
 		     lb_gr_12RGB(COLOR_GREEN), 10,
-		     lb_gr_12RGB(COLOR_YELLOW), 4, 3.0, 
-		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | 
-		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | 
-		     AXIS_DRAW_X_GRID_LOG | AXIS_DRAW_Y_GRID_LOG,
+		     lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
+		     AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
+		     AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
 		     COPYMODE_BLEND, LINEMODE_FILTERED);
 
   UINT16_T i;
   REAL_T xr, yr, xp, yp;
-  for (i=0;i<=27;i++)
+  xr=1;
+  //  yr=1;
+  for (i=0;i<=16;i++)
     {
-      xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
-      printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
-      yr=1;  
+      //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
+      //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
       //printf("xr=%f, yr=%f\t\n",xr,yr); 
-      lb_gr_project_2d_log(win, xr, yr, &xp, &yp);
+      yr=xr;
+      lb_gr_project_2d_x_log(win, xr,  &xp);
+      lb_gr_project_2d_y(win, yr,  &yp);
+      printf("xr=%f, yr=%f\t\n",xr,yr); 
+      
       lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
+      xr=xr*pow(10.0,1.0/4.0);
     } 
      
   lb_gr_refresh();
-  lb_gr_BMPfile_save("axis_2d_log.bmp", NULL);
+  lb_gr_BMPfile_save("axis_2d_semilog.bmp", NULL);
 
 
   while (1)
@@ -2421,6 +2360,57 @@ int main(int argc, char *argv[])
       }
 #endif
 
+  //#define DEMO_POLAR_AXIS
+#ifdef DEMO_POLAR_AXIS
+  SDL_Event event;
+  VIEWPORT_2D_T win;
+  FONT_T my_font;
+
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200, 800, 0, 0, 0);
+  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
+
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+  my_font.scale_x=1;
+  my_font.scale_y=1;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=FALSE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
+  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+
+  win.xp_min=20;
+  win.xp_max=ty_screen.w-20;
+  win.yp_min=20;
+  win.yp_max=ty_screen.h-20;
+
+  win.xr_min= 0.2*-1.024*3;
+  win.xr_max=  1.024*3;
+  win.yr_min= 0.2*-0.768*3;
+  win.yr_max= 0.768*3; 
+
+  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID),
+		       COPYMODE_COPY );
+  lg_gr_draw_axis_2d_polar(NULL, win, &my_font, 0, 4, 0.1, lb_gr_12RGB(COLOR_BLUE),
+			   0, 2*M_PI, 30*M_PI/180,
+			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY );
+  lb_gr_refresh();
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
+#endif
+
+  
   
   //#define DEMO_PLOT_CONTINUOUS
 #ifdef DEMO_PLOT_CONTINUOUS
@@ -3552,7 +3542,220 @@ int main(int argc, char *argv[])
   lb_fb_exit(1);
 #endif
 
-  //#define DEMO_PLOT3D
+#define DEMO_PLOT3D_BASIC
+#ifdef DEMO_PLOT3D_BASIC
+  SDL_Event event;
+
+  SINT16_T j;
+  VIEWPORT_3D_T vp3d;
+  REAL_T u_a, u_b, v_a, v_b;
+  REAL_T Rot[3][3], Rx_p[3][3], Rx_n[3][3], Ry_p[3][3], Ry_n[3][3], Rz_p[3][3], Rz_n[3][3], RotTranspose[3][3], temp[3][3];
+  SINT8_T flag_exit, flag_paused=FALSE;
+  MATRIX_POINT_3D_REAL_T S;
+  FONT_T my_font;
+
+  flag_exit=FALSE;
+
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+
+  lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
+  //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
+  my_font.scale_x=4;
+  my_font.scale_y=3;
+  my_font.gap_x=2;
+  my_font.gap_y=1;
+  my_font.max_x=40;
+  my_font.angle=0;
+  my_font.flag_fg=TRUE;
+  my_font.flag_bg=FALSE;
+  my_font.color_fg=lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK);
+  my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
+  
+    
+      
+  vp3d.xp_min=0;
+  vp3d.yp_min=0;
+  vp3d.xp_max=ty_screen.w;
+  vp3d.yp_max=ty_screen.h;
+  vp3d.scale =200.0;    /* Zoom */
+  vp3d.cam_d= 0.0;   /* Stereoscopic */
+  vp3d.cam_h=10.0;    /* Depth */
+  vp3d.cam.x=0.0;   /* Camera's location */
+  vp3d.cam.y=0.0;   /* Camera's location */
+  vp3d.cam.z=40.0;   /* Camera's location */
+		    
+      
+  lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
+  lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
+  lb_al_fill_rotation_matrix33_Y(Ry_p, M_PI/90);
+  lb_al_fill_rotation_matrix33_Y(Ry_n,-M_PI/90);
+  lb_al_fill_rotation_matrix33_X(Rx_p, M_PI/90);
+  lb_al_fill_rotation_matrix33_X(Rx_n,-M_PI/90);
+
+    
+  lb_al_print_matrix33_r(Rz_p,"Rz_p",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rz_n,"Rz_n",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Ry_p,"Ry_p",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Ry_n,"Ry_n",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rx_p,"Rx_p",FLOAT_FORMAT_MATRIX);
+  lb_al_print_matrix33_r(Rx_n,"Rx_n",FLOAT_FORMAT_MATRIX);
+
+  lb_al_fill_rotation_matrix33_tait_bryan_ZYX(Rot,0,0,-M_PI/4);
+
+  /* Surface */
+  S.rows=50;
+  S.cols=50;
+  lb_al_create_matrix_p3d(&S);
+  u_a=0.0;
+  u_b= M_PI;
+  v_a=0;
+  v_b=5.0;
+
+
+  for (i=0;i<S.rows;i++)
+    for (j=0;j<S.cols;j++)
+      {
+	S.array[i][j].x=(j*(v_b-v_a)/(S.cols-1))*cos(u_a + i*(u_b-u_a)/(S.rows-1));
+	S.array[i][j].y=(j*(v_b-v_a)/(S.cols-1))*sin(u_a + i*(u_b-u_a)/(S.rows-1));;
+	//S.array[i][j].z=sin(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/5;
+	S.array[i][j].z=(S.array[i][j].x*S.array[i][j].x+S.array[i][j].y*S.array[i][j].y)/10.0;
+	//printf("[%f\t%f\t%f]\r\n",S.array[i][j].x,S.array[i][j].y,S.array[i][j].z); 
+      }
+
+
+  while (!flag_exit)
+    {
+      lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_WHITE));
+
+	
+      lb_gr_plot3d_surface(NULL, vp3d, Rot, &S,
+			   3.5, lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
+
+      //lb_ft_draw_text(NULL, &my_font, 20, 20, "Hello", COPYMODE_COPY);
+
+
+	
+      vp3d.cam_d=0;
+
+
+      lg_gr_draw_axis_3d(NULL, vp3d, Rot, &my_font,
+			 5.0, 5.0, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK),
+			 0, 5.0, 1.0,
+			 0, 5.0, 1.0,
+			 0, 1.0, 1.0,
+			 3.0, lb_gr_12RGB(0xF000),
+			 0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | 0*AXIS_DRAW_Z_GRID,
+			 "O","X","Y","Z",
+			 COPYMODE_BLEND, LINEMODE_FILTERED);
+
+      lb_gr_refresh();
+	
+      // Wait for the user to press a character.
+      flag_paused=TRUE;
+      while (flag_paused && !flag_exit)
+	{
+	  while (SDL_PollEvent(&event))
+	    {
+	      if (event.type == SDL_QUIT)
+		flag_exit=TRUE;
+	      if (event.type== SDL_KEYDOWN)
+		{
+		  flag_paused=FALSE;
+		   
+		  switch(event.key.keysym.sym)
+		    {
+		    case SDLK_p:
+		      lb_gr_BMPfile_save("3d_plot.bmp", NULL);
+		      break;
+		    case SDLK_r:
+		      vp3d.xp_min=0;
+		      vp3d.yp_min=0;
+		      vp3d.xp_max=ty_screen.w;
+		      vp3d.yp_max=ty_screen.h;
+		      vp3d.scale =100.0;    /* Zoom */
+		      vp3d.cam_d= 0.0;   /* Stereoscopic */
+		      vp3d.cam_h=10.0;    /* Depth */
+		      vp3d.cam.x=0.0;   /* Camera's location */
+		      vp3d.cam.y=0.0;   /* Camera's location */
+		      vp3d.cam.z=20.0;   /* Camera's location */
+		      break;
+		    case SDLK_h:
+		      if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+			vp3d.cam_h*=1.1;
+		      else
+			vp3d.cam_h/=1.1;
+		      break;
+		    case SDLK_x:
+		      if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+			lb_al_multiply_matrix33_r_copy(Rot,Rx_p,Rot);
+		      else
+			lb_al_multiply_matrix33_r_copy(Rot,Rx_n,Rot);
+
+		      lb_al_print_matrix33_r(Rot,"Rot",FLOAT_FORMAT_MATRIX);
+		      lb_al_transpose_matrix33_r(Rot,RotTranspose);
+		      lb_al_multiply_matrix33_r(Rot,RotTranspose,temp);
+		      lb_al_print_matrix33_r(temp,"temp",FLOAT_FORMAT_MATRIX);
+		      printf("Determinant = %f\r\n",lb_al_determinant_matrix33_r(Rot));
+		      break;
+		    case SDLK_y:
+		      if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+			lb_al_multiply_matrix33_r_copy(Rot,Ry_p,Rot);
+		      else
+			lb_al_multiply_matrix33_r_copy(Rot,Ry_n,Rot);
+		      lb_al_print_matrix33_r(Rot,"Rot",FLOAT_FORMAT_MATRIX);
+		      break;
+		    case SDLK_z:
+		      if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT) )
+			lb_al_multiply_matrix33_r_copy(Rot,Rz_p,Rot);
+		      else
+			lb_al_multiply_matrix33_r_copy(Rot,Rz_n,Rot);
+		      lb_al_print_matrix33_r(Rot,"Rot",FLOAT_FORMAT_MATRIX);
+		      break;
+		    case SDLK_PAGEUP:
+		      vp3d.scale*=1.1;
+		      break;
+		    case SDLK_PAGEDOWN:
+		      vp3d.scale/=1.1;
+		      break;
+		    case SDLK_UP:
+		      vp3d.cam.y+=1.0;
+		      break;
+		    case SDLK_DOWN:
+		      vp3d.cam.y-=1.0;
+		      break;
+		    case SDLK_LEFT:
+		      vp3d.cam.x+=1.0;
+		      break;
+		    case SDLK_RIGHT:
+		      vp3d.cam.x-=1.0;
+		      break;
+		    case SDLK_INSERT:
+		      vp3d.cam.z+=1.0;
+		      break;
+		    case SDLK_DELETE:
+		      vp3d.cam.z-=1.0;
+		      break;
+		    case SDLK_ESCAPE:
+		      flag_exit=TRUE;
+		      break;
+		    case SDLK_SPACE:
+		      if (flag_paused)
+			flag_paused=FALSE;
+		      else
+			flag_paused=TRUE;
+		      break;
+		    }
+		}
+	    }
+	}
+    }
+  SDL_Quit();
+  lb_al_release_matrix_p3d(&S);
+  lb_ft_release_GLCDfont(&my_font);
+
+#endif
+
+      //#define DEMO_PLOT3D
 #ifdef DEMO_PLOT3D
   SDL_Event event;
   PICTURE_T Pic;
@@ -3676,7 +3879,7 @@ int main(int argc, char *argv[])
 			 0, 5.0, 1.0,
 			 0, 1.0, 1.0,
 			 2.0, lb_gr_12RGB(0xF911),
-			 0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | AXIS_DRAW_Z_GRID,
+			 0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | 0*AXIS_DRAW_Z_GRID,
 			 "O","X","Y","Z",
 			 COPYMODE_BLEND, LINEMODE_FILTERED);
 
@@ -3772,12 +3975,6 @@ int main(int argc, char *argv[])
   //lb_al_release_matrix_p3d(&S);
   
 #endif
-
-  //if(lb_co_kbhit())
-  //	    flag_process_keys=TRUE;
-  //	  else
-  //	    flag_process_keys=FALSE;
-  //	}
 
 
   /*******************************************************************************************************************/

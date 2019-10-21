@@ -2981,6 +2981,14 @@ void lb_al_swap_vector_r(VECTOR_R_T *A, VECTOR_R_T *B)
   (*A)=temp;
 }
 
+void lb_al_transpose_matrix33_r(REAL_T M1[3][3], REAL_T M2[3][3])
+{
+  UINT16_T i, j;
+
+  for (i=0;i<3;i++)
+    for (j=0;j<3;j++)
+      M2[i][j]=M1[j][i];
+}
 
 void lb_al_transpose_matrix_r(MATRIX_R_T *M1, MATRIX_R_T *M2)
 {

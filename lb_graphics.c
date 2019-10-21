@@ -966,7 +966,7 @@ SINT16_T lb_gr_check_left_i(POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D
 }
 
 /* Checks if a point us at the left, on, or at the right of a line.  I*/
-SINT16_T lb_gr_check_left_f(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P)
+SINT16_T lb_gr_check_left_r(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P)
 {
   REAL_T value;
   value=(P.y-P0.y)*(P1.x-P0.x)-(P.x-P0.x)*(P1.y-P0.y);
@@ -5100,13 +5100,13 @@ SINT8_T lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P)
 	{
 	  // start y <= P.y
 	  if ((*L).array[k+1].y > P.y)      // an upward crossing
-	    if (lb_gr_check_left_f((*L).array[k],(*L).array[k+1],P) > 0) /* P left of  edge */
+	    if (lb_gr_check_left_r((*L).array[k],(*L).array[k+1],P) > 0) /* P left of  edge */
 	      wn++;            // have  a valid up intersect
 	}
       else
 	{                        // start y > P.y (no test needed)
 	  if ((*L).array[k+1].y  <= P.y)     // a downward crossing
-	    if(lb_gr_check_left_f((*L).array[k],(*L).array[k+1],P) < 0) // P right of  edge
+	    if(lb_gr_check_left_r((*L).array[k],(*L).array[k+1],P) < 0) // P right of  edge
 	      wn--;            // have  a valid down intersect
 	}
     }
@@ -5502,6 +5502,12 @@ void lb_gr_project_2d(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL
   *xp = vp2d.xp_min + ( xr-vp2d.xr_min)*(vp2d.xp_max-vp2d.xp_min)/(vp2d.xr_max-vp2d.xr_min);
   *yp = vp2d.yp_max + ( yr-vp2d.yr_min)*(vp2d.yp_min-vp2d.yp_max)/(vp2d.yr_max-vp2d.yr_min);
 }
+
+void lb_gr_project_2d_options(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp, UINT16_T options)
+{
+
+}
+
 void lb_gr_project_2d_inv(VIEWPORT_2D_T vp2d, REAL_T xp, REAL_T yp, REAL_T *xr, REAL_T *yr)
 {
   *xr =  vp2d.xr_min+(xp-vp2d.xp_min)*(vp2d.xr_max-vp2d.xr_min)/(vp2d.xp_max-vp2d.xp_min);
@@ -6199,10 +6205,10 @@ void lg_gr_draw_axis_3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_T Rot[3][3], FO
   lb_gr_draw_line(Pic, p1_xp, p1_yp, y_xp, y_yp, w_axis, color_axis, copymode, linemode);
   lb_gr_draw_line(Pic, p1_xp, p1_yp, z_xp, z_yp, w_axis, color_axis, copymode, linemode);
 
-  lb_ft_draw_text(Pic, font, p1_xp, p1_yp, label_o, copymode);
-  lb_ft_draw_text(Pic, font, x_xp,  x_yp,  label_x, copymode);
-  lb_ft_draw_text(Pic, font, y_xp,  y_yp,  label_y, copymode);
-  lb_ft_draw_text(Pic, font, z_xp,  z_yp,  label_z, copymode);
+  lb_ft_draw_text(Pic, font, p1_xp+(*font).gap_x, p1_yp+(*font).gap_y, label_o, copymode);
+  lb_ft_draw_text(Pic, font, x_xp+(*font).gap_x,  x_yp+(*font).gap_y,  label_x, copymode);
+  lb_ft_draw_text(Pic, font, y_xp+(*font).gap_x,  y_yp+(*font).gap_y,  label_y, copymode);
+  lb_ft_draw_text(Pic, font, z_xp+(*font).gap_x,  z_yp+(*font).gap_y,  label_z, copymode);
 
   xr = 0.0;
   yr = 0.0;
@@ -6212,7 +6218,7 @@ void lg_gr_draw_axis_3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_T Rot[3][3], FO
   //{
   //	if (lb_re_equal(delta_grid_x,0.0))
   //	  {
-  //	    lb_ft_printf(ty_C, "Error: lg_gr_draw_axis_3d() --> delta_grid_x = 0\r\n");
+  //	    lb_ft_printf(ty_C, "Error: lg_gr_draw_axis_3d --> delta_grid_x = 0\r\n");
   //	    exit(1);
   //	  }
 
