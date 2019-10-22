@@ -178,8 +178,46 @@ int sum3(int a, int b, int c)
 #define WIDTH 1024
 #define HEIGHT 768
 
+
+void new_delay(UINT64_T delay_us)
+{
+  UINT64_T time_a, time_b, time;
+  time_a=clock();
+  time_b=time_a+delay_us;
+  do
+    {
+      time=clock();
+      if (time<time_a)
+	time+=0xFFFFFFFF;
+    } while (time<time_b);
+}
+
+
+void new_delay2(UINT32_T delay_us)
+{
+  UINT32_T time_a, time_b, time;
+  time_a=clock() & 0x7FFFFFFF;
+  time_b=time_a+delay_us;
+  do
+    {
+      time=clock() & 0x7FFFFFFF;
+      if (time<time_a)
+	time+=0x7FFFFFFF;
+    } while (time<time_b);
+}
+
+
 int main(int argc, char *argv[])
 {
+  /* Time tests */
+
+  SINT16_T i=0;
+  while (1)
+    {
+      printf("i=%d, clock=%u\r\n",i, clock());
+      i++;
+      new_delay(1000000);
+    }
 
   //#define MATRIX_NDIM
 #ifdef MATRIX_NDIM
@@ -3542,7 +3580,7 @@ int main(int argc, char *argv[])
   lb_fb_exit(1);
 #endif
 
-#define DEMO_PLOT3D_BASIC
+  //#define DEMO_PLOT3D_BASIC
 #ifdef DEMO_PLOT3D_BASIC
     SDL_Event event;
 
@@ -4841,8 +4879,8 @@ int main(int argc, char *argv[])
       win_BER.xr_min=   0;
       win_BER.xr_max=  18;
       N_exp_min = 1.0/pow(10.0,18.0/10.0);
-      win_BER.yr_min=  1.0;
-      win_BER.yr_max=  1e-8;
+      win_BER.yr_min=  1.0e-8;
+      win_BER.yr_max=  1;
 
       lg_gr_draw_axis_2d(NULL, win_BER, &my_font,
 			 lb_gr_12RGB(COLOR_YELLOW), 3, 25,
@@ -4852,6 +4890,11 @@ int main(int argc, char *argv[])
 			 AXIS_DRAW_Y_GRID_LOG | AXIS_DRAW_COLORVALUES_Y_1,
 			 COPYMODE_COPY, LINEMODE_SOLID); 
 
+
+      lb_gr_project_2d_y_log(win_BER, 0.1, &yp);
+      lb_gr_draw_circle_filled(NULL, 21, (int)yp, 8, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
+
+      
       printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
       
   
