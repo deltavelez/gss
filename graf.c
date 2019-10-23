@@ -211,12 +211,13 @@ int main(int argc, char *argv[])
 {
   /* Time tests */
 
-  SINT16_T i=0;
+  SINT16_T temp,i=0;
+  printf("Sizeof clock()=%d\r\n",sizeof(clock_t));
+  exit(1);
   while (1)
     {
-      printf("i=%d, clock=%u\r\n",i, clock());
-      i++;
-      new_delay(1000000);
+      printf("Progress=%f\r\n",100.0*(REAL_T)clock()/(REAL_T)0xFFFFFFFF);
+      lb_ti_delay_us(1);
     }
 
   //#define MATRIX_NDIM
