@@ -179,47 +179,24 @@ int sum3(int a, int b, int c)
 #define HEIGHT 768
 
 
-void new_delay(UINT64_T delay_us)
-{
-  UINT64_T time_a, time_b, time;
-  time_a=clock();
-  time_b=time_a+delay_us;
-  do
-    {
-      time=clock();
-      if (time<time_a)
-	time+=0xFFFFFFFF;
-    } while (time<time_b);
-}
-
-
-void new_delay2(UINT32_T delay_us)
-{
-  UINT32_T time_a, time_b, time;
-  time_a=clock() & 0x7FFFFFFF;
-  time_b=time_a+delay_us;
-  do
-    {
-      time=clock() & 0x7FFFFFFF;
-      if (time<time_a)
-	time+=0x7FFFFFFF;
-    } while (time<time_b);
-}
 
 
 int main(int argc, char *argv[])
 {
   /* Time tests */
 
+#ifdef DEMO_TIME
   SINT16_T temp,i=0;
-  printf("Sizeof clock()=%d\r\n",sizeof(clock_t));
-  exit(1);
   while (1)
     {
-      printf("Progress=%f\r\n",100.0*(REAL_T)clock()/(REAL_T)0xFFFFFFFF);
-      lb_ti_delay_us(1);
+      printf("Sec: %d, P=%02.1f\r\n",i,100.0*(REAL_T)clock()/(REAL_T)0xFFFFFFFF);
+      lb_ti_delay_us(1000000);
+      
+      //lb_ti_delay_ms(1000);
+      i++;
     }
-
+#endif
+  
   //#define MATRIX_NDIM
 #ifdef MATRIX_NDIM
   
@@ -2674,7 +2651,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-  //#define GPIO
+#define GPIO
 #ifdef GPIO
 
 #define PIN_CS_0   17
@@ -2689,7 +2666,7 @@ int main(int argc, char *argv[])
 
   STATUS_T status;
   
-  clock_t time_begin, time_end;
+  UINT64_T time_begin, time_end;
   char text[20];
   SINT8_T relay_status=0;
   SINT16_T shock_counter=1;
@@ -2754,13 +2731,13 @@ int main(int argc, char *argv[])
 	  my_port.CPHA=GPIO_LOW;
 	  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
 
-	  time_begin = clock();
+	  time_begin = lb_ti_clock64();
 	  time_end = time_begin + ceil(((REAL_T)time_stroke*CLOCKS_PER_SEC)/1000.0);
 	  relay_status = !relay_status;
 	  lb_gp_gpio_wr(PIN_RELAY,   relay_status);
 
 	  accel_max = 0.0;
-	  while (clock() < time_end)
+	  while (lb_ti_clock64() < time_end)
 	    {
 	      /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
 
@@ -2778,8 +2755,10 @@ int main(int argc, char *argv[])
 	      accel = (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3 - 5.601;
 	      if (accel>accel_max)
 		accel_max = accel;
+	      printf("*");
 	    }
-	  	  
+	  printf("\r\n");
+	   	  
 
 	  my_port.CPOL=GPIO_HIGH;
 	  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
@@ -2827,8 +2806,8 @@ int main(int argc, char *argv[])
 	  UINT32_T stamp;
 	  stamp=clock();
 	  
-	  printf("n=%d  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f  ts=%u\r\n",
-		 shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max,stamp);
+	  printf("n=%d  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f  ts=%0.2f\r\n",
+		 shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max,100.0*(REAL_T)stamp/0xFFFFFFFF);
 
 	  if (argc==2)
 	    {
