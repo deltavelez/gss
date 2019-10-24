@@ -2814,8 +2814,8 @@ int main(int argc, char *argv[])
 	      {
 	      case PCKEY_PAGE_UP:
 		time_stroke-=250;
-		if (time_stroke<2*time_sensor)
-		  time_stroke=2*time_sensor;
+		if (time_stroke<(2*time_sensor+500))
+		    time_stroke=2*time_sensor+500;
 		printf("Event: stroke time has  been set to %lu ms\r\n",time_stroke);
 		break;
 	      case PCKEY_PAGE_DOWN:
