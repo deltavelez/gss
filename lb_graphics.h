@@ -71,19 +71,14 @@ void       lb_gr_plot_zbuffer_pixel(PICTURE_T *Pic,  MATRIX_R_T *Z, REAL_T xp, R
 void       lb_gr_draw_arrow(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1, REAL_T w, REAL_T arrow_size, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 
 void       lb_gr_draw_circle(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color, COPYMODE_T copymode); 
-void       lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color,
-					  COPYMODE_T copymode); 
-void       lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color,
-					   COPYMODE_T copymode); 
-void       lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color,
-					   COPYMODE_T copymode); 
-void       lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color,
-						 COPYMODE_T copymode); 
+void       lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color); 
+void       lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color); 
+void       lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color); 
+void       lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color); 
 void       lb_gr_draw_circle_arc(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, REAL_T a1, REAL_T a2,
 				 PIXEL_T color, COPYMODE_T mode); 
-void       lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color,
-						 COPYMODE_T copymode);
-void       lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color, COPYMODE_T copymode); 
+void       lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color);
+void       lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color); 
 
 void       lb_gr_draw_circle_filled(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color,
 					 COPYMODE_T mode);
@@ -94,11 +89,13 @@ void       lb_gr_draw_ellipse(PICTURE_T *Pic, SINT32_T xc, SINT32_T yc, SINT32_T
 
 void       lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, REAL_T angle, PIXEL_T color, COPYMODE_T copymode);
 
-void       lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T a, REAL_T b, REAL_T angle, REAL_T w, SINT16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
+void lb_gr_draw_ellipse_rotated_aspolygon(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T a, REAL_T b, REAL_T angle,
+					  REAL_T w, SINT16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 
-void       lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color, COPYMODE_T copymode); 
 
-void       lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color, COPYMODE_T copymode);
+void       lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color); 
+
+void       lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color);
 
 void       lb_gr_draw_histogram(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *bins, 
 				PIXEL_T color_border, PIXEL_T color_background, PIXEL_T color_bar_border, PIXEL_T color_bar);
@@ -148,17 +145,17 @@ void       lb_gr_draw_line2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T
 void       lb_gr_draw_line3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1, PIXEL_T color,
 			    COPYMODE_T copymode);
 void       lb_gr_draw_line_antialiasing(PICTURE_T *Pic, REAL_T _xr0, REAL_T _yr0, REAL_T _xr1, REAL_T _yr1, REAL_T w,
-					PIXEL_T color, COPYMODE_T copymode);
+					PIXEL_T color);
 void       lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1,
-					 PIXEL_T color, COPYMODE_T copymode);
+					 PIXEL_T color);
 
 void       lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1,
-					 PIXEL_T color, COPYMODE_T copymode);
+					 PIXEL_T color);
 
 void       lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1,
-					 PIXEL_T color, COPYMODE_T copymode);
+					 PIXEL_T color);
 void       lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1,
-					 PIXEL_T color, COPYMODE_T copymode);
+					 PIXEL_T color);
 
 void       lb_gr_draw_pixel(PICTURE_T *Pic, SINT16_T x, SINT16_T y, PIXEL_T pixel, COPYMODE_T copymode);
 void       lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode,
@@ -166,7 +163,7 @@ void       lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, REAL_T w, P
 void       lb_gr_draw_polygon_r(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode,
 				LINEMODE_T linemode);
 void       lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T color, COPYMODE_T copymode);
-void       lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode);
+void       lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color);
 
 void       lb_gr_draw_rectangle(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1,  PIXEL_T color,
 				COPYMODE_T copymode);
@@ -191,7 +188,7 @@ void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCT
 				       SINT16_T max_exp, PIXEL_T color, COPYMODE_T copymode);
 void       lb_gr_plot_continuous_fn_2d_antialiasing(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
 					      REAL_T t0, REAL_T t1, REAL_T delta,
-						    SINT16_T max_exp, REAL_T w, PIXEL_T color, COPYMODE_T copymode);
+						    SINT16_T max_exp, REAL_T w, PIXEL_T color);
 
 void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T w,
 			PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);

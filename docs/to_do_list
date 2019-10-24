@@ -1,3 +1,7 @@
+In all antialiasing functions using main and adjacent pixels, to optimize
+by having the main pixel be directly copied, and the adyacent ones being blent.
+
+--------
 To  review the functions to proyect in logarithmic scale and better deal with error conditions such as zero or negative arguments
 
 ---------

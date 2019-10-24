@@ -1714,7 +1714,7 @@ void lb_gr_draw_circle(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius
     }
 }
 
-void lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color)
 {
   SINT16_T x, y, x_min, x_max, x_min_bk, y_min, y_max;
   REAL_T  distance, w2;
@@ -1750,35 +1750,33 @@ void lb_gr_draw_circle_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T
 		pix_main.a=round(MAX_A*(1.0-fabs(w2-distance))); 
 	    }
 	 
-	  lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); /* Oct 1 */
+	  lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, COPYMODE_BLEND); /* Oct 1 */
 	  if (x!=y)
-	    lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, copymode); /* Oct 2 */
+	    lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, COPYMODE_BLEND); /* Oct 2 */
 
 	  if (x != 0)
 	    {
-	      lb_gr_draw_pixel(Pic, xc-x, yc+y, pix_main, copymode); /* Oct 5 */
-	      lb_gr_draw_pixel(Pic, xc+y, yc+x, pix_main, copymode); /* Oct 7 */
+	      lb_gr_draw_pixel(Pic, xc-x, yc+y, pix_main, COPYMODE_BLEND); /* Oct 5 */
+	      lb_gr_draw_pixel(Pic, xc+y, yc+x, pix_main, COPYMODE_BLEND); /* Oct 7 */
 	    }
 	  
 	  if ((y != 0) && (x!=y))
 	    {
-	      lb_gr_draw_pixel(Pic, xc-y, yc-x, pix_main, copymode); /* Oct 3 */
-	      lb_gr_draw_pixel(Pic, xc+x, yc+y, pix_main, copymode); /* Oct 8 */
+	      lb_gr_draw_pixel(Pic, xc-y, yc-x, pix_main, COPYMODE_BLEND); /* Oct 3 */
+	      lb_gr_draw_pixel(Pic, xc+x, yc+y, pix_main, COPYMODE_BLEND); /* Oct 8 */
 	    }
       
 	  if ((x!=0) && (y!=0))
 	    {
-	      lb_gr_draw_pixel(Pic, xc-x,yc-y, pix_main, copymode); /* Oct 4 */
+	      lb_gr_draw_pixel(Pic, xc-x,yc-y, pix_main, COPYMODE_BLEND); /* Oct 4 */
 	      if (x!=y)
-		lb_gr_draw_pixel(Pic, xc-y,yc+x, pix_main, copymode); /* Oct 6 */
+		lb_gr_draw_pixel(Pic, xc-y,yc+x, pix_main, COPYMODE_BLEND); /* Oct 6 */
 	    }
-	    
-	  // lb_gr_picture_render(Pic, renderer, 0, 0, 8, RENDERMODE_BOX);
 	}
     }
 }
 
-void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color) 
 {
   SINT16_T x, y, sign, decisionOver2;
   REAL_T distance, dmax;
@@ -1814,37 +1812,37 @@ void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, S
 	
       //oxo 
 
-      lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); /* Oct 1 */
-      lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, copymode); /* Oct 2 */
+      lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, COPYMODE_BLEND); /* Oct 1 */
+      lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, COPYMODE_BLEND); /* Oct 2 */
 
-      lb_gr_draw_pixel(Pic, xc+(x+sign), yc-y, pix_adj, copymode); /* Oct 1 */
-      lb_gr_draw_pixel(Pic, xc+y, yc-(x+sign), pix_adj, copymode); /* Oct 2 */
+      lb_gr_draw_pixel(Pic, xc+(x+sign), yc-y, pix_adj, COPYMODE_BLEND); /* Oct 1 */
+      lb_gr_draw_pixel(Pic, xc+y, yc-(x+sign), pix_adj, COPYMODE_BLEND); /* Oct 2 */
 
       if (x!=0)
         {
-	  lb_gr_draw_pixel(Pic, xc-x, yc+y, pix_main, copymode); /* Oct 5 */
-	  lb_gr_draw_pixel(Pic, xc+y, yc+x, pix_main, copymode); /* Oct 7 */
+	  lb_gr_draw_pixel(Pic, xc-x, yc+y, pix_main, COPYMODE_BLEND); /* Oct 5 */
+	  lb_gr_draw_pixel(Pic, xc+y, yc+x, pix_main, COPYMODE_BLEND); /* Oct 7 */
 
-	  lb_gr_draw_pixel(Pic, xc-(x+sign), yc+y, pix_adj, copymode); /* Oct 5 */
-	  lb_gr_draw_pixel(Pic, xc+y, yc+(x+sign), pix_adj, copymode); /* Oct 7 */
+	  lb_gr_draw_pixel(Pic, xc-(x+sign), yc+y, pix_adj, COPYMODE_BLEND); /* Oct 5 */
+	  lb_gr_draw_pixel(Pic, xc+y, yc+(x+sign), pix_adj, COPYMODE_BLEND); /* Oct 7 */
 	}
       
       if (y!=0)
         {
-	  lb_gr_draw_pixel(Pic, xc-y, yc-x, pix_main, copymode); /* Oct 3 */
-	  lb_gr_draw_pixel(Pic, xc+x, yc+y, pix_main, copymode); /* Oct 8 */
+	  lb_gr_draw_pixel(Pic, xc-y, yc-x, pix_main, COPYMODE_BLEND); /* Oct 3 */
+	  lb_gr_draw_pixel(Pic, xc+x, yc+y, pix_main, COPYMODE_BLEND); /* Oct 8 */
 
-	  lb_gr_draw_pixel(Pic, xc-y, yc-(x+sign), pix_adj, copymode); /* Oct 3 */
-	  lb_gr_draw_pixel(Pic, xc+(x+sign), yc+y, pix_adj, copymode); /* Oct 8 */
+	  lb_gr_draw_pixel(Pic, xc-y, yc-(x+sign), pix_adj, COPYMODE_BLEND); /* Oct 3 */
+	  lb_gr_draw_pixel(Pic, xc+(x+sign), yc+y, pix_adj, COPYMODE_BLEND); /* Oct 8 */
 	}
       
       if ((x!= 0) && (y!=0))
         {
-	  lb_gr_draw_pixel(Pic, xc-x,yc-y, pix_main, copymode); /* Oct 4 */
-	  lb_gr_draw_pixel(Pic, xc-y,yc+x, pix_main, copymode); /* Oct 6 */
+	  lb_gr_draw_pixel(Pic, xc-x,yc-y, pix_main, COPYMODE_BLEND); /* Oct 4 */
+	  lb_gr_draw_pixel(Pic, xc-y,yc+x, pix_main, COPYMODE_BLEND); /* Oct 6 */
 
-	  lb_gr_draw_pixel(Pic, xc-(x+sign),yc-y, pix_adj, copymode); /* Oct 4 */
-	  lb_gr_draw_pixel(Pic, xc-y,yc+(x+sign), pix_adj, copymode); /* Oct 6 */
+	  lb_gr_draw_pixel(Pic, xc-(x+sign),yc-y, pix_adj, COPYMODE_BLEND); /* Oct 4 */
+	  lb_gr_draw_pixel(Pic, xc-y,yc+(x+sign), pix_adj, COPYMODE_BLEND); /* Oct 6 */
 	}
       y++;
       if (decisionOver2<=0)
@@ -1859,7 +1857,7 @@ void lb_gr_draw_circle_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, S
     }
 }
 
-void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color) 
 {
   SINT16_T x, y, decisionOver2;
   REAL_T distance;
@@ -1891,50 +1889,50 @@ void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, S
       else
 	pix_left.a=0;
       	
-      lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); /* Oct 1 */
-      lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, copymode); /* Oct 2 */
+      lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, COPYMODE_BLEND); /* Oct 1 */
+      lb_gr_draw_pixel(Pic, xc+y, yc-x, pix_main, COPYMODE_BLEND); /* Oct 2 */
 
-      lb_gr_draw_pixel(Pic, xc+(x+1), yc-y, pix_right, copymode); /* Oct 1 */
-      lb_gr_draw_pixel(Pic, xc+y, yc-(x+1), pix_right, copymode); /* Oct 2 */
+      lb_gr_draw_pixel(Pic, xc+(x+1), yc-y, pix_right, COPYMODE_BLEND); /* Oct 1 */
+      lb_gr_draw_pixel(Pic, xc+y, yc-(x+1), pix_right, COPYMODE_BLEND); /* Oct 2 */
 
-      lb_gr_draw_pixel(Pic, xc+(x-1), yc-y, pix_left, copymode); /* Oct 1 */
-      lb_gr_draw_pixel(Pic, xc+y, yc-(x-1), pix_left, copymode); /* Oct 2 */
+      lb_gr_draw_pixel(Pic, xc+(x-1), yc-y, pix_left, COPYMODE_BLEND); /* Oct 1 */
+      lb_gr_draw_pixel(Pic, xc+y, yc-(x-1), pix_left, COPYMODE_BLEND); /* Oct 2 */
 
       
       if (x != 0)
         {
-	  lb_gr_draw_pixel(Pic, xc-x, yc+y, pix_main, copymode); /* Oct 5 */
-	  lb_gr_draw_pixel(Pic, xc+y, yc+x, pix_main, copymode); /* Oct 7 */
+	  lb_gr_draw_pixel(Pic, xc-x, yc+y, pix_main, COPYMODE_BLEND); /* Oct 5 */
+	  lb_gr_draw_pixel(Pic, xc+y, yc+x, pix_main, COPYMODE_BLEND); /* Oct 7 */
 
-	  lb_gr_draw_pixel(Pic, xc-(x+1), yc+y, pix_right, copymode); /* Oct 5 */
-	  lb_gr_draw_pixel(Pic, xc+y, yc+(x+1), pix_right, copymode); /* Oct 7 */
+	  lb_gr_draw_pixel(Pic, xc-(x+1), yc+y, pix_right, COPYMODE_BLEND); /* Oct 5 */
+	  lb_gr_draw_pixel(Pic, xc+y, yc+(x+1), pix_right, COPYMODE_BLEND); /* Oct 7 */
 
-	  lb_gr_draw_pixel(Pic, xc-(x-1), yc+y, pix_left, copymode); /* Oct 5 */
-	  lb_gr_draw_pixel(Pic, xc+y, yc+(x-1), pix_left, copymode); /* Oct 7 */
+	  lb_gr_draw_pixel(Pic, xc-(x-1), yc+y, pix_left, COPYMODE_BLEND); /* Oct 5 */
+	  lb_gr_draw_pixel(Pic, xc+y, yc+(x-1), pix_left, COPYMODE_BLEND); /* Oct 7 */
 	}
       
       if (y != 0)
         {
-	  lb_gr_draw_pixel(Pic, xc-y, yc-x, pix_main, copymode); /* Oct 3 */
-	  lb_gr_draw_pixel(Pic, xc+x, yc+y, pix_main, copymode); /* Oct 8 */
+	  lb_gr_draw_pixel(Pic, xc-y, yc-x, pix_main, COPYMODE_BLEND); /* Oct 3 */
+	  lb_gr_draw_pixel(Pic, xc+x, yc+y, pix_main, COPYMODE_BLEND); /* Oct 8 */
 
-	  lb_gr_draw_pixel(Pic, xc-y, yc-(x+1), pix_right, copymode); /* Oct 3 */
-	  lb_gr_draw_pixel(Pic, xc+(x+1), yc+y, pix_right, copymode); /* Oct 8 */
+	  lb_gr_draw_pixel(Pic, xc-y, yc-(x+1), pix_right, COPYMODE_BLEND); /* Oct 3 */
+	  lb_gr_draw_pixel(Pic, xc+(x+1), yc+y, pix_right, COPYMODE_BLEND); /* Oct 8 */
 
-	  lb_gr_draw_pixel(Pic, xc-y, yc-(x-1), pix_left, copymode); /* Oct 3 */
-	  lb_gr_draw_pixel(Pic, xc+(x-1), yc+y, pix_left, copymode); /* Oct 8 */
+	  lb_gr_draw_pixel(Pic, xc-y, yc-(x-1), pix_left, COPYMODE_BLEND); /* Oct 3 */
+	  lb_gr_draw_pixel(Pic, xc+(x-1), yc+y, pix_left, COPYMODE_BLEND); /* Oct 8 */
 	}
       
       if (x != 0 && y != 0)
         {
-	  lb_gr_draw_pixel(Pic, xc-x,yc-y, pix_main, copymode); /* Oct 4 */
-	  lb_gr_draw_pixel(Pic, xc-y,yc+x, pix_main, copymode); /* Oct 6 */
+	  lb_gr_draw_pixel(Pic, xc-x,yc-y, pix_main, COPYMODE_BLEND); /* Oct 4 */
+	  lb_gr_draw_pixel(Pic, xc-y,yc+x, pix_main, COPYMODE_BLEND); /* Oct 6 */
 
-	  lb_gr_draw_pixel(Pic, xc-(x+1),yc-y, pix_right, copymode); /* Oct 4 */
-	  lb_gr_draw_pixel(Pic, xc-y,yc+(x+1), pix_right, copymode); /* Oct 6 */
+	  lb_gr_draw_pixel(Pic, xc-(x+1),yc-y, pix_right, COPYMODE_BLEND); /* Oct 4 */
+	  lb_gr_draw_pixel(Pic, xc-y,yc+(x+1), pix_right, COPYMODE_BLEND); /* Oct 6 */
 
-	  lb_gr_draw_pixel(Pic, xc-(x-1),yc-y, pix_left, copymode); /* Oct 4 */
-	  lb_gr_draw_pixel(Pic, xc-y,yc+(x-1), pix_left, copymode); /* Oct 6 */
+	  lb_gr_draw_pixel(Pic, xc-(x-1),yc-y, pix_left, COPYMODE_BLEND); /* Oct 4 */
+	  lb_gr_draw_pixel(Pic, xc-y,yc+(x-1), pix_left, COPYMODE_BLEND); /* Oct 6 */
 	}
       y++;
       if (decisionOver2<=0)
@@ -1949,7 +1947,7 @@ void lb_gr_draw_circle_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, S
     }
 }
 
-void lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, REAL_T w, PIXEL_T color)
 {
   SINT16_T x, y, x_min, x_max, y_min, y_max;
   REAL_T  distance, w2;
@@ -1976,7 +1974,7 @@ void lb_gr_draw_circle_antialiasing_simple(PICTURE_T *Pic, REAL_T xc, REAL_T yc,
 	else if(fabs(w2-distance)<=1.0)
 	  pix_main.a=round(MAX_A*(1.0-fabs(w2-distance))); 
 	if (pix_main.a!=0)
-	  lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, copymode); 
+	  lb_gr_draw_pixel(Pic, xc+x, yc-y, pix_main, COPYMODE_BLEND); 
       }
 }
 
@@ -2084,7 +2082,7 @@ void lb_gr_draw_circle_arc(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T ra
     }
 }
 
-void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T radius, PIXEL_T color) 
 {
   SINT16_T x = radius;
   SINT16_T y = 0;
@@ -2098,7 +2096,7 @@ void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T
     for(x=xc-limit; x<=xc+limit; x++)
       {
 	pixel.a=MAX_A;
-	lb_gr_draw_pixel(Pic, x, y , pixel, copymode);  
+	lb_gr_draw_pixel(Pic, x, y , pixel, COPYMODE_BLEND);  
       }
   for(x=0; x<=limit; x++)
     for(y=limit+1; y<=radius; y++)
@@ -2112,21 +2110,21 @@ void lb_gr_draw_circle_filled_antialiasing(PICTURE_T *Pic, SINT16_T xc, SINT16_T
 	    if(distance<=1.0)
 	      pixel.a=round(MAX_A*(1.0-distance)); 
 	  }
-	lb_gr_draw_pixel(Pic, xc + x, yc + y , pixel, copymode);  
-	lb_gr_draw_pixel(Pic, xc + y, yc + x , pixel, copymode);  
-	lb_gr_draw_pixel(Pic, xc + x, yc - y , pixel, copymode);  
-	lb_gr_draw_pixel(Pic, xc - y, yc + x , pixel, copymode);  
+	lb_gr_draw_pixel(Pic, xc + x, yc + y , pixel, COPYMODE_BLEND);  
+	lb_gr_draw_pixel(Pic, xc + y, yc + x , pixel, COPYMODE_BLEND);  
+	lb_gr_draw_pixel(Pic, xc + x, yc - y , pixel, COPYMODE_BLEND);  
+	lb_gr_draw_pixel(Pic, xc - y, yc + x , pixel, COPYMODE_BLEND);  
 	if (x!=0)
 	  {
-	    lb_gr_draw_pixel(Pic, xc - x, yc + y , pixel, copymode);  
-	    lb_gr_draw_pixel(Pic, xc + y, yc - x , pixel, copymode);  
-	    lb_gr_draw_pixel(Pic, xc - x, yc - y , pixel, copymode);  
-	    lb_gr_draw_pixel(Pic, xc - y, yc - x , pixel, copymode);  
+	    lb_gr_draw_pixel(Pic, xc - x, yc + y , pixel, COPYMODE_BLEND);  
+	    lb_gr_draw_pixel(Pic, xc + y, yc - x , pixel, COPYMODE_BLEND);  
+	    lb_gr_draw_pixel(Pic, xc - x, yc - y , pixel, COPYMODE_BLEND);  
+	    lb_gr_draw_pixel(Pic, xc - y, yc - x , pixel, COPYMODE_BLEND);  
 	  }
       }
 }
 
-void lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color, COPYMODE_T copymode) 
+void lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T radius, PIXEL_T color) 
 {
   REAL_T x = radius;
   REAL_T y = 0;
@@ -2138,7 +2136,7 @@ void lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T y
   pixel=color;
   for(y=yc-limit; y<=yc+limit; y++)
     for(x=xc-limit; x<=xc+limit; x++)
-      lb_gr_draw_pixel(Pic, round(x), round(y) , color, copymode);  
+      lb_gr_draw_pixel(Pic, round(x), round(y) , color, COPYMODE_BLEND);  
 
   for(x=0; x<=limit; x++)
     for(y=limit; y<=radius; y++)
@@ -2153,16 +2151,16 @@ void lb_gr_draw_circle_filled_antialiasing_r(PICTURE_T *Pic, REAL_T xc, REAL_T y
 	      pixel.a=round(MAX_A*(1.0-distance)); 
 	  }
 	
-	lb_gr_draw_pixel(Pic, round(xc + x), round(yc + y), pixel, copymode);  
-	lb_gr_draw_pixel(Pic, round(xc + y), round(yc + x), pixel, copymode);  
-	lb_gr_draw_pixel(Pic, round(xc + x), round(yc - y), pixel, copymode);  
-	lb_gr_draw_pixel(Pic, round(xc - y), round(yc + x), pixel, copymode);  
+	lb_gr_draw_pixel(Pic, round(xc + x), round(yc + y), pixel, COPYMODE_BLEND);  
+	lb_gr_draw_pixel(Pic, round(xc + y), round(yc + x), pixel, COPYMODE_BLEND);  
+	lb_gr_draw_pixel(Pic, round(xc + x), round(yc - y), pixel, COPYMODE_BLEND);  
+	lb_gr_draw_pixel(Pic, round(xc - y), round(yc + x), pixel, COPYMODE_BLEND);  
 	if (x!=0)
 	  {
-	    lb_gr_draw_pixel(Pic, round(xc - x), round(yc + y), pixel, copymode);  
-	    lb_gr_draw_pixel(Pic, round(xc + y), round(yc - x), pixel, copymode);  
-	    lb_gr_draw_pixel(Pic, round(xc - x), round(yc - y), pixel, copymode);  
-	    lb_gr_draw_pixel(Pic, round(xc - y), round(yc - x), pixel, copymode);  
+	    lb_gr_draw_pixel(Pic, round(xc - x), round(yc + y), pixel, COPYMODE_BLEND);  
+	    lb_gr_draw_pixel(Pic, round(xc + y), round(yc - x), pixel, COPYMODE_BLEND);  
+	    lb_gr_draw_pixel(Pic, round(xc - x), round(yc - y), pixel, COPYMODE_BLEND);  
+	    lb_gr_draw_pixel(Pic, round(xc - y), round(yc - x), pixel, COPYMODE_BLEND);  
 	  }
       }
 }
@@ -2276,8 +2274,8 @@ void lb_gr_draw_ellipse(PICTURE_T *Pic, SINT32_T xc, SINT32_T yc, SINT32_T a, SI
 }
 
 
-void lb_gr_draw_ellipse_rotated_antialiasing(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T a, REAL_T b, REAL_T angle,
-					     REAL_T w, SINT16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
+void lb_gr_draw_ellipse_rotated_aspolygon(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T a, REAL_T b, REAL_T angle,
+					  REAL_T w, SINT16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   REAL_T tetha, xr, yr, xrr, yrr, cos_val, sin_val;
   LINE_2D_REAL_T Pol;
@@ -2432,7 +2430,7 @@ void lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16
 }
 
 
-void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color, COPYMODE_T copymode)
+void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color)
 {
   SINT32_T  xp, yp, x_change, sign, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   REAL_T temp, dist_min, xr, yr;
@@ -2474,16 +2472,16 @@ void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc,
       dist_min=fabs(temp);
       pix_adj.a=round(MAX_A*(2.0*dist_min)); 
       
-      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, COPYMODE_BLEND);
 
       /* Draw anti-aliased closest pixel per scan row */
-      lb_gr_draw_pixel(Pic, xc + (xp+sign), yc - yp, pix_adj, copymode);
-      lb_gr_draw_pixel(Pic, xc - (xp+sign), yc - yp, pix_adj, copymode);
-      lb_gr_draw_pixel(Pic, xc - (xp+sign), yc + yp, pix_adj, copymode);
-      lb_gr_draw_pixel(Pic, xc + (xp+sign), yc + yp, pix_adj, copymode);
+      lb_gr_draw_pixel(Pic, xc + (xp+sign), yc - yp, pix_adj, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - (xp+sign), yc - yp, pix_adj, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - (xp+sign), yc + yp, pix_adj, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + (xp+sign), yc + yp, pix_adj, COPYMODE_BLEND);
 
       
       yp++;
@@ -2520,15 +2518,15 @@ void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc,
       dist_min=fabs(temp);
       pix_adj.a=round(MAX_A*(2.0*dist_min)); 
 
-      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, COPYMODE_BLEND);
 
-      lb_gr_draw_pixel(Pic, xc + xp, yc - (yp+sign), pix_adj, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - (yp+sign), pix_adj, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + (yp+sign), pix_adj, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + (yp+sign), pix_adj, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - (yp+sign), pix_adj, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - (yp+sign), pix_adj, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + (yp+sign), pix_adj, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + (yp+sign), pix_adj, COPYMODE_BLEND);
 
       /* Draw anti-aliased closest pixel per scan column */
 
@@ -2547,7 +2545,7 @@ void  lb_gr_draw_ellipse_antialiasing2(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc,
 }
 
 
-void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color, COPYMODE_T copymode)
+void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, PIXEL_T color)
 {
   SINT32_T  xp, yp, x_change, y_change, ellipse_error, two_a_square, two_b_square, stop_x, stop_y;
   REAL_T temp, xr, yr;
@@ -2586,21 +2584,21 @@ void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc,
       pix_right.a=MAX_A*(0.5+temp);
       pix_left.a=MAX_A*(1.0-0.5-temp);
       
-      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, COPYMODE_BLEND);
 
       /* Draw anti-aliased closest pixel per scan row */
-      lb_gr_draw_pixel(Pic, xc + (xp-1), yc - yp, pix_left, copymode);
-      lb_gr_draw_pixel(Pic, xc - (xp-1), yc - yp, pix_left, copymode);
-      lb_gr_draw_pixel(Pic, xc - (xp-1), yc + yp, pix_left, copymode);
-      lb_gr_draw_pixel(Pic, xc + (xp-1), yc + yp, pix_left, copymode);
+      lb_gr_draw_pixel(Pic, xc + (xp-1), yc - yp, pix_left, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - (xp-1), yc - yp, pix_left, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - (xp-1), yc + yp, pix_left, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + (xp-1), yc + yp, pix_left, COPYMODE_BLEND);
 
-      lb_gr_draw_pixel(Pic, xc + (xp+1), yc - yp, pix_right, copymode);
-      lb_gr_draw_pixel(Pic, xc - (xp+1), yc - yp, pix_right, copymode);
-      lb_gr_draw_pixel(Pic, xc - (xp+1), yc + yp, pix_right, copymode);
-      lb_gr_draw_pixel(Pic, xc + (xp+1), yc + yp, pix_right, copymode);
+      lb_gr_draw_pixel(Pic, xc + (xp+1), yc - yp, pix_right, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - (xp+1), yc - yp, pix_right, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - (xp+1), yc + yp, pix_right, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + (xp+1), yc + yp, pix_right, COPYMODE_BLEND);
 
       yp++;
       stop_y+=two_a_square;
@@ -2634,21 +2632,21 @@ void  lb_gr_draw_ellipse_antialiasing3(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc,
       pix_right.a=MAX_A*(0.5+temp);
       pix_left.a=MAX_A*(1.0-0.5-temp);
        
-      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + yp, pix_main, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + yp, pix_main, COPYMODE_BLEND);
 
       /* Draw anti-aliased closest pixel per scan column */
-      lb_gr_draw_pixel(Pic, xc + xp, yc - (yp-1), pix_left, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - (yp-1), pix_left, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + (yp-1), pix_left, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + (yp-1), pix_left, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - (yp-1), pix_left, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - (yp-1), pix_left, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + (yp-1), pix_left, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + (yp-1), pix_left, COPYMODE_BLEND);
 
-      lb_gr_draw_pixel(Pic, xc + xp, yc - (yp+1), pix_right, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc - (yp+1), pix_right, copymode);
-      lb_gr_draw_pixel(Pic, xc - xp, yc + (yp+1), pix_right, copymode);
-      lb_gr_draw_pixel(Pic, xc + xp, yc + (yp+1), pix_right, copymode);
+      lb_gr_draw_pixel(Pic, xc + xp, yc - (yp+1), pix_right, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc - (yp+1), pix_right, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc - xp, yc + (yp+1), pix_right, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, xc + xp, yc + (yp+1), pix_right, COPYMODE_BLEND);
 
       
       /* Draw anti-aliased closest pixel per scan column */
@@ -2788,15 +2786,13 @@ void lb_gr_draw_line(PICTURE_T *Pic, REAL_T x0, REAL_T y0, REAL_T x1, REAL_T y1,
     case LINEMODE_FILTERED:
       /* When using anti-aliasing techniques, the copymode becomes irrelevant and to be COPYMODE_BLEND */
       if (w_int==2)
-	lb_gr_draw_line_antialiasing2(Pic, round(x0), round(y0), round(x1), round(y1),
-				      color, copymode);
+	lb_gr_draw_line_antialiasing2(Pic, round(x0), round(y0), round(x1), round(y1), color);
     
       else
 	if (w_int==3)
-	  lb_gr_draw_line_antialiasing3(Pic, round(x0), round(y0), round(x1), round(y1),
-					color, copymode);
+	  lb_gr_draw_line_antialiasing3(Pic, round(x0), round(y0), round(x1), round(y1), color);
 	else
-	  lb_gr_draw_line_antialiasing(Pic, x0, y0, x1, y1, w, color, copymode);
+	  lb_gr_draw_line_antialiasing(Pic, x0, y0, x1, y1, w, color);
       break;
     default:
       printf("Error: lb_gr_draw_line --> Invalid LINEMODE\r\n");
@@ -3064,7 +3060,7 @@ void lb_gr_draw_line3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, 
   }
 }
 
-void lb_gr_draw_line_antialiasing(PICTURE_T *Pic, REAL_T _xr0, REAL_T _yr0, REAL_T _xr1, REAL_T _yr1, REAL_T w, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing(PICTURE_T *Pic, REAL_T _xr0, REAL_T _yr0, REAL_T _xr1, REAL_T _yr1, REAL_T w, PIXEL_T color)  
 {
   SINT16_T i_a, i_b, j_a, j_b, i, j, sign, xi, yi;
   SINT8_T flag_mirror;
@@ -3147,15 +3143,14 @@ void lb_gr_draw_line_antialiasing(PICTURE_T *Pic, REAL_T _xr0, REAL_T _yr0, REAL
 	    temp_color.a=0;
 	  
 	  if (!flag_mirror)
-	    lb_gr_draw_pixel(Pic, xi, yi, temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, xi, yi, temp_color, COPYMODE_BLEND);
 	  else
-	    lb_gr_draw_pixel(Pic, yi, xi, temp_color, copymode);
-
+	    lb_gr_draw_pixel(Pic, yi, xi, temp_color, COPYMODE_BLEND);
 	}
     }
 }
 
-void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1, PIXEL_T color)  
 {
   SINT16_T x0, y0, x1, y1, i, i_max, sign;
   SINT8_T flag_mirror;
@@ -3183,7 +3178,8 @@ void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, S
 
   if(x1==x0)
     {
-      lb_gr_draw_pixel(Pic, round(x0), round(y0), temp_color, copymode);
+      /* oxo: what is max_k here ?  */
+      lb_gr_draw_pixel(Pic, round(x0), round(y0), temp_color, COPYMODE_BLEND);
       return;
     }
   
@@ -3202,32 +3198,32 @@ void lb_gr_draw_line_antialiasing2(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, S
 
       temp_color.a=MAX_A;
       if (!flag_mirror)
-	lb_gr_draw_pixel(Pic, round(x_real),round(y_real), temp_color, copymode);
+	lb_gr_draw_pixel(Pic, round(x_real),round(y_real), temp_color, COPYMODE_BLEND);
       else
-	lb_gr_draw_pixel(Pic, round(y_real), round(x_real), temp_color, copymode);
+	lb_gr_draw_pixel(Pic, round(y_real), round(x_real), temp_color, COPYMODE_BLEND);
 
       distance=lb_re_frac(y_real)-0.5;
       if (distance<0) /* pixel below */
 	{
 	  temp_color.a=MAX_A*(1.0+2.0*distance);
 	  if (!flag_mirror)
-	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)+1, temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)+1, temp_color, COPYMODE_BLEND);
 	  else
-	    lb_gr_draw_pixel(Pic, round(y_real)+1, round(x_real), temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(y_real)+1, round(x_real), temp_color, COPYMODE_BLEND);
 	}
       else /* pixel above */
 	{
 	  temp_color.a=MAX_A*(1.0-2.0*distance);
 	  if (!flag_mirror)
-	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)-1, temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)-1, temp_color, COPYMODE_BLEND);
 	  else
-	    lb_gr_draw_pixel(Pic, round(y_real)-1, round(x_real), temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(y_real)-1, round(x_real), temp_color, COPYMODE_BLEND);
 	}
     }
 }
 
 
-void lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1, PIXEL_T color)  
 {
   REAL_T x0, y0, x1, y1, y_real, x_real, m, distance;
   SINT16_T i, i_max, sign;
@@ -3254,9 +3250,10 @@ void lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REA
     }
 
   /* Draw a point if  x1=x0 && y1=y0  */
+  /* Oxo:  what is max_k here */
   if(lb_re_equal(x1,x0))
     {
-      lb_gr_draw_pixel(Pic, round(x0), round(y0), temp_color, copymode);
+      lb_gr_draw_pixel(Pic, round(x0), round(y0), temp_color, COPYMODE_BLEND);
       return;
     }
   if (x1>=x0)
@@ -3275,31 +3272,31 @@ void lb_gr_draw_line_antialiasing2_r(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REA
 
       temp_color.a=MAX_A;
       if (!flag_mirror)
-	lb_gr_draw_pixel(Pic, round(x_real), round(y_real), temp_color, copymode);
+	lb_gr_draw_pixel(Pic, round(x_real), round(y_real), temp_color, COPYMODE_BLEND);
       else
-	lb_gr_draw_pixel(Pic, round(y_real), round(x_real), temp_color, copymode);
+	lb_gr_draw_pixel(Pic, round(y_real), round(x_real), temp_color, COPYMODE_BLEND);
 
       distance=lb_re_frac(y_real)-0.5;
       if (distance<0) /* pixel below */
 	{
 	  temp_color.a=MAX_A*(1.0+2.0*distance);
 	  if (!flag_mirror)
-	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)+1, temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)+1, temp_color, COPYMODE_BLEND);
 	  else
-	    lb_gr_draw_pixel(Pic, round(y_real)+1, round(x_real), temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(y_real)+1, round(x_real), temp_color, COPYMODE_BLEND);
 	}
       else /* pixel above */
 	{
 	  temp_color.a=MAX_A*(1.0-2.0*distance);
 	  if (!flag_mirror)
-	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)-1, temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(x_real), round(y_real)-1, temp_color, COPYMODE_BLEND);
 	  else
-	    lb_gr_draw_pixel(Pic, round(y_real)-1, round(x_real), temp_color, copymode);
+	    lb_gr_draw_pixel(Pic, round(y_real)-1, round(x_real), temp_color, COPYMODE_BLEND);
 	}
     }
 }
 
-void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, SINT16_T _x1, SINT16_T _y1, PIXEL_T color)  
 {
   SINT16_T x0, y0, x1, y1, i, i_max, sign;
   SINT8_T flag_mirror;
@@ -3329,17 +3326,17 @@ void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, S
   if(x1==x0)
     {
       temp_color.a = MAX_A;
-      lb_gr_draw_pixel(Pic, x0, y0, temp_color, copymode);
+      lb_gr_draw_pixel(Pic, x0, y0, temp_color, COPYMODE_BLEND);
       temp_color.a = MAX_A>>1;
-      lb_gr_draw_pixel(Pic, x0-1, y0,   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, x0+1, y0,   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, x0,   y0-1, temp_color, copymode);
-      lb_gr_draw_pixel(Pic, x0,   y0+1, temp_color, copymode);
+      lb_gr_draw_pixel(Pic, x0-1, y0,   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, x0+1, y0,   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, x0,   y0-1, temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, x0,   y0+1, temp_color, COPYMODE_BLEND);
       temp_color.a = MAX_A>>2;
-      lb_gr_draw_pixel(Pic, x0-1, y0-1,  temp_color, copymode);
-      lb_gr_draw_pixel(Pic, x0-1, y0+1,  temp_color, copymode);
-      lb_gr_draw_pixel(Pic, x0+1, y0-1,  temp_color, copymode);
-      lb_gr_draw_pixel(Pic, x0+1, y0+1,  temp_color, copymode);
+      lb_gr_draw_pixel(Pic, x0-1, y0-1,  temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, x0-1, y0+1,  temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, x0+1, y0-1,  temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, x0+1, y0+1,  temp_color, COPYMODE_BLEND);
       return;
     }
 
@@ -3362,29 +3359,29 @@ void lb_gr_draw_line_antialiasing3(PICTURE_T *Pic, SINT16_T _x0, SINT16_T _y0, S
       if (!flag_mirror)
 	{
 	  /* Middle */
-      	  lb_gr_draw_pixel(Pic, x_real, y_real, temp_color, copymode);
+      	  lb_gr_draw_pixel(Pic, x_real, y_real, temp_color, COPYMODE_BLEND);
 	  //printf("x_real=%f, y_real=%f, temp_float=%f \r\n",x_real,y_real,temp_float);
 
 	  temp_color.a=round(MAX_A*(1-lb_re_frac(y_real)));
-	  lb_gr_draw_pixel(Pic, x_real, y_real-1, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, x_real, y_real-1, temp_color, COPYMODE_BLEND);
 
 	  temp_color.a=round(MAX_A*(lb_re_frac(y_real)));
-      	  lb_gr_draw_pixel(Pic, x_real, y_real+1, temp_color, copymode);
+      	  lb_gr_draw_pixel(Pic, x_real, y_real+1, temp_color, COPYMODE_BLEND);
 	}
       else
 	{
-	  lb_gr_draw_pixel(Pic, y_real, x_real, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, y_real, x_real, temp_color, COPYMODE_BLEND);
 
 	  temp_color.a=round(MAX_A*(1-lb_re_frac(y_real)));
-	  lb_gr_draw_pixel(Pic, y_real-1, x_real, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, y_real-1, x_real, temp_color, COPYMODE_BLEND);
 
 	  temp_color.a=round(MAX_A*(lb_re_frac(y_real)));
-	  lb_gr_draw_pixel(Pic, y_real+1, x_real, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, y_real+1, x_real, temp_color, COPYMODE_BLEND);
 	}
     }
 }
 
-void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1, PIXEL_T color, COPYMODE_T copymode)  
+void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REAL_T _x1, REAL_T _y1, PIXEL_T color)  
 {
   REAL_T x0, y0, x1, y1;
   SINT16_T i, i_max, sign;
@@ -3415,17 +3412,17 @@ void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REA
   if(lb_re_equal(x1,x0))
     {
       temp_color.a = MAX_A;
-      lb_gr_draw_pixel(Pic, round(x0), round(y0), temp_color, copymode);
+      lb_gr_draw_pixel(Pic, round(x0), round(y0), temp_color, COPYMODE_BLEND);
       temp_color.a = MAX_A>>1;
-      lb_gr_draw_pixel(Pic, round(x0)-1, round(y0),   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, round(x0)+1, round(y0),   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, round(x0),   round(y0)-1, temp_color, copymode);
-      lb_gr_draw_pixel(Pic, round(x0),   round(y0)+1, temp_color, copymode);
+      lb_gr_draw_pixel(Pic, round(x0)-1, round(y0),   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, round(x0)+1, round(y0),   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, round(x0),   round(y0)-1, temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, round(x0),   round(y0)+1, temp_color, COPYMODE_BLEND);
       temp_color.a = MAX_A>>2;
-      lb_gr_draw_pixel(Pic, round(x0)-1, round(y0)-1,   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, round(x0)-1, round(y0)+1,   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, round(x0)+1, round(y0)-1,   temp_color, copymode);
-      lb_gr_draw_pixel(Pic, round(x0)+1, round(y0)+1,   temp_color, copymode);
+      lb_gr_draw_pixel(Pic, round(x0)-1, round(y0)-1,   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, round(x0)-1, round(y0)+1,   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, round(x0)+1, round(y0)-1,   temp_color, COPYMODE_BLEND);
+      lb_gr_draw_pixel(Pic, round(x0)+1, round(y0)+1,   temp_color, COPYMODE_BLEND);
       return;
     }
   
@@ -3447,24 +3444,24 @@ void lb_gr_draw_line_antialiasing3_f(PICTURE_T *Pic, REAL_T _x0, REAL_T _y0, REA
       if (!flag_mirror)
 	{
 	  /* Middle */
-      	  lb_gr_draw_pixel(Pic, x_real, y_real, temp_color, copymode);
+      	  lb_gr_draw_pixel(Pic, x_real, y_real, temp_color, COPYMODE_BLEND);
 	  //printf("x_real=%f, y_real=%f, temp_float=%f \r\n",x_real,y_real,temp_float);
 
 	  temp_color.a=round(MAX_A*(1-lb_re_frac(y_real)));
-	  lb_gr_draw_pixel(Pic, x_real, y_real-1, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, x_real, y_real-1, temp_color, COPYMODE_BLEND);
 
 	  temp_color.a=round(MAX_A*(lb_re_frac(y_real)));
-      	  lb_gr_draw_pixel(Pic, x_real, y_real+1, temp_color, copymode);
+      	  lb_gr_draw_pixel(Pic, x_real, y_real+1, temp_color, COPYMODE_BLEND);
 	}
       else
 	{
-	  lb_gr_draw_pixel(Pic, y_real, x_real, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, y_real, x_real, temp_color, COPYMODE_BLEND);
 
 	  temp_color.a=round(MAX_A*(1-lb_re_frac(y_real)));
-	  lb_gr_draw_pixel(Pic, y_real-1, x_real, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, y_real-1, x_real, temp_color, COPYMODE_BLEND);
 
 	  temp_color.a=round(MAX_A*(lb_re_frac(y_real)));
-	  lb_gr_draw_pixel(Pic, y_real+1, x_real, temp_color, copymode);
+	  lb_gr_draw_pixel(Pic, y_real+1, x_real, temp_color, COPYMODE_BLEND);
 	}
     }
 }
@@ -4359,7 +4356,7 @@ void lb_gr_draw_polygon_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, REAL_T w, PIXEL_T
     case LINEMODE_DOTS_FILTERED:
       for(k=0;k<(*L).items;k++)
 	if ((*L).array[k].flag)
-	  lb_gr_draw_circle_filled_antialiasing(Pic, (*L).array[k].x, (*L).array[k].y, w, color, copymode);
+	  lb_gr_draw_circle_filled_antialiasing(Pic, (*L).array[k].x, (*L).array[k].y, w, color);
       break;
     default:
       for(k=0;k<(*L).items-1;k++)
@@ -4389,7 +4386,7 @@ void lb_gr_draw_polygon_r(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T c
     case LINEMODE_DOTS_FILTERED:
       for(k=0;k<(*L).items;k++)
 	if ((*L).array[k].flag)
-	  lb_gr_draw_circle_filled_antialiasing(Pic, (*L).array[k].x, (*L).array[k].y, w, color, copymode); 
+	  lb_gr_draw_circle_filled_antialiasing(Pic, (*L).array[k].x, (*L).array[k].y, w, color); 
       break;
     default:
       for (k=0;k<(*L).items-1;k++)
@@ -4694,7 +4691,7 @@ void lb_gr_draw_polygon_fill_i(PICTURE_T *Pic, LINE_2D_SINT16_T *L, PIXEL_T colo
     }
 }
 
-void lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w, PIXEL_T color)
 {
   SINT16_T i, j, k, width, height;
   REAL_T distance, temp, w_2, t0, tmp1, tmp2, tmp3;
@@ -4747,12 +4744,14 @@ void lb_gr_draw_polygon_antialiasing(PICTURE_T *Pic, LINE_2D_REAL_T *L, REAL_T w
 	      distance=temp;
 	  }
 	pixel.a=0;
+
+	/* Oxo:  this can be improved by doing a direct copy when distance <= w_2, otherwise blend */
 	if(distance<=w_2)
 	  pixel.a=MAX_A;
 	else
 	  if(distance<(w_2+1.0))
 	    pixel.a=MAX_A*(1.0-lb_re_frac(distance-w_2));
-	lb_gr_draw_pixel(Pic, j, i, pixel, copymode);  
+	lb_gr_draw_pixel(Pic, j, i, pixel, COPYMODE_BLEND);  
       }
 }
 
@@ -5181,7 +5180,7 @@ void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr
 	lb_gr_draw_circle_filled(Pic, round(xp), round(yp), w, color, copymode);
       break;
     case LINEMODE_DOTS_FILTERED:
-      lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color, copymode);
+      lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color);
       break;
     default:
       printf("Error: lb_gr_plot2d() --> invalid mode\r\n");
@@ -5212,7 +5211,7 @@ void lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_REAL_T *L, RE
       for(k=0;k<(*L).items;k++)
 	{
 	  lb_gr_project_2d(vp2d, (*L).array[k].x, (*L).array[k].y, &xp, &yp);
-	  lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color, copymode);
+	  lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color);
 	}
       break;
     case LINEMODE_SOLID:
@@ -5427,7 +5426,7 @@ void lb_gr_plot3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  REAL_T Rot[3][3], POINT_3
 	lb_gr_draw_circle_filled(Pic, round(xp), round(yp), w, color, copymode);
       break;
     case LINEMODE_DOTS_FILTERED:
-      lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color, copymode);
+      lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color);
       break;
     default:
       printf("Error: lb_gr_plot3d() --> invalid mode\r\n");
@@ -6620,7 +6619,7 @@ void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCT
 
 void lb_gr_plot_continuous_fn_2d_antialiasing(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
 					      REAL_T t0, REAL_T t1, REAL_T delta,
-					      SINT16_T max_exp, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+					      SINT16_T max_exp, REAL_T w, PIXEL_T color)
 {
   MATRIX_SINT8_T Mflags;
   VECTOR_R_T Vx, Vy;
@@ -6809,13 +6808,15 @@ void lb_gr_plot_continuous_fn_2d_antialiasing(PICTURE_T *Pic, VIEWPORT_2D_T vp2d
 	      if (temp<distance)
 		distance=temp;
 	      //lb_ft_printf(ty_C, "distance=%f\r\n",distance);
+
+	      /* Oxo: this can be improved by doing a direct copy when distance < w2, otherwise blend */
 	      if(distance<w2)
 		pix_main.a=MAX_A;
 	      else if(fabs(w2-distance)<=1.0)
 		pix_main.a=round(MAX_A*(1.0-fabs(w2-distance))*M_SQRT1_2); 
 	    }
 	  if (pix_main.a!=0)
-	    lb_gr_draw_pixel(Pic, j+vp2d.xp_min, i+vp2d.yp_min, pix_main, copymode); 
+	    lb_gr_draw_pixel(Pic, j+vp2d.xp_min, i+vp2d.yp_min, pix_main, COPYMODE_BLEND); 
 	}
   lb_al_release_matrix_si8(&Mflags);
   lb_al_release_vector_r(&Vx);

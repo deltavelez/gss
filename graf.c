@@ -698,102 +698,62 @@ int main(int argc, char *argv[])
 #endif  	
 
 
-  //#define DEMO_FRAMEBUFFER_PRIMITIVES
-#ifdef DEMO_FRAMEBUFFER_PRIMITIVES
-  int x, y;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, RENDEROPTIONS_LINE );
-  lb_fb_parse_finfo();
-  lb_fb_parse_vinfo();
-  printf("ty_width=%d, ty_height=%d\r\n",ty_width, ty_height);
-  for (y=0;y<ty_height;y++)
-    lb_fb_line_h(ty_fb_main, y, 100, 200, 0, 0, y % 255, 255);
-
-  lb_gr_delay(2000);
-
-  for (x=0;x<ty_width;x++)
-    lb_fb_line_v(ty_fb_main, x, 100, 200, 0, x % 255, 0, 255);
-
-  lb_gr_delay(2000);
-  
-  lb_fb_rectangle(ty_fb_main, 150, 150, 450, 450, 255,0,0, 255);
-  lb_gr_delay(2000);
-
-  lb_fb_exit(1);
-#endif
-
-
   /*******************************************************************************************************************/
   /* Graphic Primitives */
   /******************************************************************************************************************/
 
-  //#define DEMO_PIXEL
+#define DEMO_PIXEL
 #ifdef DEMO_PIXEL
   SDL_Event event;
-  SINT16_T x, y, z, width, height;
+  SINT16_T x, y, z;
   clock_t begin, end;
   REAL_T time_total=0;
   int frames_count=0;
   PIXEL_T color;
   
-  //lb_gr_SDL_init(SDL_INIT_VIDEO, 1920, 1080, 0, 22, 33, 55);
-  lb_gr_SDL_init(SDL_INIT_VIDEO, 800, 600, 0, 22, 33, 55);
-  //ty_videomode= VIDEOMODE_FAST;
-
+  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
+ 
   printf("Speed comparison"); 
 
-  long n;
-  int neg_offset=-RAND_MAX/2;
-  int x1, y1, x2, y2;
   time_total=0;
 
-  int flag_test=0;
-  
-  
-
-  //lb_gr_buffer_line_v(200, 10, ty_height-10, 2550, 1, 0);
-  for(z=0;z<255*8;z++)
+  for(y=0;y<ty_screen.h;y++)
     {
-      lb_gr_buffer_clear(0, 5, z% 255);
+      lb_gr_fb_line_h(&ty_screen, y, 0, ty_screen.h, y % 255, 0, 0);
       lb_gr_refresh();
     }
-  lb_gr_delay(4000);
  
-  
-  if (1)
+  lb_ti_delay_ms(4000);
+
+  for(z=0;z<2055;z++)
     {
-      for(z=0;z<2055;z++)
-	{
-	  lb_gr_buffer_rectangle(rand() % ty_width, rand() % ty_height,
-				 rand() % ty_width, rand() % ty_height,
-				 rand() % 255, rand() % 255, rand() % 255);
-	  //lb_gr_buffer_rectangle(200,200, 410, 720, 0,0, 255);
-	  lb_gr_refresh();
-	}
-      lb_gr_delay(4000);
-      exit(1);
+      lb_gr_draw_rectangle_solid(NULL, rand() % ty_screen.w, rand() % ty_screen.h,
+				 rand() % ty_screen.h, rand() % ty_screen.h,
+				 lb_gr_12RGB(rand() % 0xFFFF));
+      lb_gr_refresh();
     }
+  lb_ti_delay_ms(4000);
+
   
-  if (0) for(z=0;z<255;z++) 
-	   {
-	     begin=clock();
-	     for(y=0;y<ty_height;y++)
-	       for(x=0;x<ty_width;x++)
-		 {
-		   color.r= x % MAX_R;
-		   color.g= y % MAX_G;
-		   color.b= z % MAX_B;
-		   //printf("color.r= %d, color.g =%d, color.b = %d\r\n",color.r,color.g, color.b); 
-		   lb_gr_draw_pixel(NULL, x, y, color, COPYMODE_COPY);
-		   //lb_gr_draw_pixel_fast(x, y,  255, 155, 55);
-		 }
-	     lb_gr_refresh();
-	     end=clock();
-	     time_total+=(REAL_T)end-(REAL_T)begin;
-	     frames_count++;
-	     printf("FPS = %f\n",(double)CLOCKS_PER_SEC*frames_count/time_total);
-	     int i=0;
-	   }
+  for(z=0;z<255;z++) 
+    {
+      begin=clock();
+      for(y=0;y<ty_screen.h;y++)
+	for(x=0;x<ty_screen.w;x++)
+	  {
+	    color.r= x % MAX_R;
+	    color.g= y % MAX_G;
+	    color.b= z % MAX_B;
+	    //printf("color.r= %d, color.g =%d, color.b = %d\r\n",color.r,color.g, color.b); 
+	    lb_gr_draw_pixel(NULL, x, y, color, COPYMODE_COPY);
+	    //lb_gr_draw_pixel_fast(x, y,  255, 155, 55);
+	  }
+      lb_gr_refresh();
+      end=clock();
+      time_total+=(REAL_T)end-(REAL_T)begin;
+      frames_count++;
+      printf("FPS = %f\n",(double)CLOCKS_PER_SEC*frames_count/time_total);
+    }
   SDL_Quit();
   return EXIT_SUCCESS;
   
@@ -2651,8 +2611,8 @@ int main(int argc, char *argv[])
   
 #endif
 
-#define GPIO
-#ifdef GPIO
+  //#define DEMO_GPIO
+#ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
 #define PIN_CS_1   18
