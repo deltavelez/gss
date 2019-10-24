@@ -2816,16 +2816,16 @@ int main(int argc, char *argv[])
 		time_stroke-=250;
 		if (time_stroke<2*time_sensor)
 		  time_stroke=2*time_sensor;
-		printf("Event: stroke time has  been set to %d ms\r\n",time_stroke);
+		printf("Event: stroke time has  been set to %lu ms\r\n",time_stroke);
 		break;
 	      case PCKEY_PAGE_DOWN:
 		time_stroke+=250;
-		printf("Event: stroke time has  been set to %d ms\r\n",time_stroke);
+		printf("Event: stroke time has  been set to %lu ms\r\n",time_stroke);
 		break;
 	      case 'a':
 	      case 'A':
 		status=Status_auto;
-		printf("Event: mode has been set to AUTOMATIC.  Total time per stroke is: %0.2f seconds.\r\n",0.001*time_stroke);
+		printf("Event: mode has been set to AUTOMATIC.  Total time per stroke is: %lu ms\r\n",time_stroke);
 		break;
 	      
 	      case 'p':
