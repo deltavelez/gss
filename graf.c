@@ -848,7 +848,7 @@ int main(int argc, char *argv[])
     SDL_Event event;
     REAL_T angle;
     PICTURE_T Pic;
-    UINT8_T pix_x=32, pix_y=32;
+    UINT8_T pix_x=32, pix_y=32, flag_running=TRUE;
   
     lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
     Pic.w= ty_screen.w/pix_x;
@@ -857,32 +857,27 @@ int main(int argc, char *argv[])
     lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
 
     angle=0.0;
-    //  while (angle<2*M_PI)
+    while (flag_running)
     {
-      angle = 32.0*M_PI/180;
       printf("angle=%f\r\n",angle*180.0/M_PI);
       lb_gr_draw_rectangle(&Pic,0,0,Pic.w,Pic.h,lb_gr_12RGB(0xFFFF),COPYMODE_COPY);
       lb_gr_draw_line_antialiasing(&Pic, 0.5*Pic.w, 0.5*Pic.h,
 				   0.5*Pic.w  + 0.5*Pic.h*cos(angle),
 				   0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
-				   7, lb_gr_12RGB(0xF090), COPYMODE_BLEND );
+				   1, lb_gr_12RGB(0xF090));
       lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
       lb_gr_refresh();
 
       angle+=M_PI/180;
-      lb_ti_delay_ms(10000);
+      lb_ti_delay_ms(100);
 
-      lb_gr_BMPfile_save("line.bmp", &Pic);
- 
       while (SDL_PollEvent(&event))
-	{
 	  if (event.type == SDL_QUIT)
-	    {
-	      SDL_Quit();
-	      return EXIT_SUCCESS;
-	    }
-	}
+	      flag_running=FALSE;
     }
+    lb_gr_BMPfile_save("line.bmp", &Pic);
+    lb_gr_release_picture(&Pic);
+    SDL_Quit();
 #endif
 
     //#define DEMO_LINE_ANTIALIASING2
@@ -890,7 +885,7 @@ int main(int argc, char *argv[])
     SDL_Event event;
     REAL_T angle;
     PICTURE_T Pic;
-    UINT8_T pix_x=32, pix_y=32;
+    UINT8_T pix_x=32, pix_y=32, flag_running=TRUE;
   
     lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
     Pic.w= ty_screen.w/pix_x;
@@ -899,71 +894,37 @@ int main(int argc, char *argv[])
     lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
 
     angle=0.0;
-    //  while (angle<2*M_PI)
+    while (flag_running)
     {
-      angle = 32.0*M_PI/180;
       printf("angle=%f\r\n",angle*180.0/M_PI);
       lb_gr_draw_rectangle(&Pic,0,0,Pic.w,Pic.h,lb_gr_12RGB(0xFFFF),COPYMODE_COPY);
       lb_gr_draw_line_antialiasing3(&Pic, 0.5*Pic.w, 0.5*Pic.h,
 				    0.5*Pic.w  + 0.5*Pic.h*cos(angle),
 				    0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
-				    lb_gr_12RGB(0xF900), COPYMODE_BLEND );
+				    lb_gr_12RGB(0xF900));
+      //lb_gr_draw_line_antialiasing2(&Pic, 0.5*Pic.w, 0.5*Pic.h,
+      //				    0.5*Pic.w  + 0.5*Pic.h*cos(angle),
+      //			    0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
+      //			    lb_gr_12RGB(0xF900));
       lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
       lb_gr_refresh();
 
       angle+=M_PI/180;
-      lb_ti_delay_ms(10000);
+      lb_ti_delay_ms(500);
 
-      lb_gr_BMPfile_save("line.bmp", &Pic);
- 
+
       while (SDL_PollEvent(&event))
 	{
 	  if (event.type == SDL_QUIT)
-	    {
-	      SDL_Quit();
-	      return EXIT_SUCCESS;
-	    }
+	      flag_running=FALSE;
 	}
     }
+    lb_gr_BMPfile_save("line.bmp", &Pic);
+    lb_gr_release_picture(&Pic);
+    SDL_Quit();
 #endif
 
   
-    //#define DEMO_LINE_ANTIALIASING3
-#ifdef DEMO_LINE_ANTIALIASING3
-    SDL_Event event;
-    SINT32_T i;
-    SINT16_T x1, y1, x2, y2;
-    PIXEL_T color;
-
-    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
-    lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
-  
-    for (i=0;i<1000000;i++)
-      {
-	x1= rand() % ty_screen.w;
-	y1= rand() % ty_screen.h;
-	x2= rand() % ty_screen.w;
-	y2= rand() % ty_screen.h;
-
-	color.r= rand() % MAX_R;
-	color.g= rand() % MAX_G;
-	color.b= rand() % MAX_B;
-	lb_gr_draw_line_antialiasing2(NULL, x1, y1, x2, y2, color, COPYMODE_BLEND);
-	//lb_gr_draw_line_antialiasing3(NULL, x1, y1, x2, y2, color, COPYMODE_BLEND);
-	if (! (i % 100) )
-	  lb_gr_refresh();
-	//lb_gr_delay(1000);
-
-	while (SDL_PollEvent(&event))
-	  {
-	    if (event.type == SDL_QUIT)
-	      {
-		SDL_Quit();
-		return EXIT_SUCCESS;
-	      }
-	  }
-      }
-#endif
 
     //#define DEMO_LINE_GENERAL
 #ifdef DEMO_LINE_GENERAL
@@ -1595,7 +1556,46 @@ int main(int argc, char *argv[])
     /*******************************************************************************************************************/
     /* Advanced 2D Graphics */
     /******************************************************************************************************************/
+#define DEMO_PLOT2D
+#ifdef  DEMO_PLOT2D
+    SDL_Event event;
+    VIEWPORT_2D_T vp2d;
+    PICTURE_T Pic;
+    UINT8_T pix_x=32, pix_y=32, flag_running=TRUE;
+  
+    lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
+    Pic.w= ty_screen.w/pix_x;
+    Pic.h= ty_screen.h/pix_y;
 
+    lb_gr_create_picture(&Pic,lb_gr_12RGB(0xFFFF));
+
+    vp2d.xp_min=0;
+    vp2d.yp_min=0.;
+    vp2d.xp_max=Pic.w;
+    vp2d.yp_max=Pic.h;
+    vp2d.xr_min=-2.0;
+    vp2d.xr_max=2.0;
+    vp2d.yr_min=-2.0;
+    vp2d.yr_max=2.0;
+
+    lb_gr_plot2d(&Pic, vp2d, 0, 0, 4, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY, LINEMODE_DOTS_SOLID);
+    lb_gr_plot2d(&Pic, vp2d, 1.5, 0, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
+    lb_gr_render_picture(&Pic, 0,0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+
+    
+    lb_gr_refresh();
+    while (flag_running)
+      while (SDL_PollEvent(&event))
+	if (event.type == SDL_QUIT)
+	  flag_running=FALSE;
+    
+    //lb_gr_BMPfile_save("line.bmp", &Pic);
+    lb_gr_release_picture(&Pic);
+    SDL_Quit();
+#endif
+    
+
+    
     //#define ROTATE_ALGORITHM
 #ifdef ROTATE_ALGORITHM
     /* This helps ilustrating  an older algorithm used to rotate bitmaps */
@@ -2043,7 +2043,7 @@ int main(int argc, char *argv[])
 	Ly.array[i]=cos(3*t)*sin(t);
 	t+=(t1-t0)/(REAL_T)Lx.items;
       }
-    lb_gr_plot2d_curve_neighbor(NULL, vp, &Lx, &Ly, 12, lb_gr_12RGB(0xf00f), COPYMODE_BLEND);
+    lb_gr_plot2d_line_antialiasing_neighbor(NULL, vp, &Lx, &Ly, 12, lb_gr_12RGB(0xf00f), COPYMODE_BLEND);
     lb_gr_refresh();
   
     lb_gr_BMPfile_save("flower.bmp", NULL);
@@ -2105,7 +2105,7 @@ int main(int argc, char *argv[])
 	t+=(t1-t0)/(REAL_T)Lx.items;
       }
 
-    lb_gr_plot2d_curve_neighbor_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+    lb_gr_plot2d_line_antialiasing_neighbor_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
     lb_gr_refresh();
       
     lb_al_release_vector_r(&Lx);
@@ -2611,7 +2611,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-#define DEMO_GPIO
+    //#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17

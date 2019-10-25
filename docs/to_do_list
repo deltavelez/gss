@@ -1,3 +1,27 @@
+in function erfc(), to add a parameter to pass the relative error instead of having it defined as a fixed constant
+-----------------
+To review lb_gr_plot2d_line() and improve the plotting of lines,
+adding a method to handle potential discontinuities in a line, for example,
+be it:
+
+y=f(x)=1/(x-3)
+
+L[0]=0 , 1/(0-3) --> good, can be plotted
+L[1]=1 , 1/(1-3) --> good, can be plotted
+L[2]=1 , 1/(2-3) --> good, can be plotted
+L[3]=1 , 1/(3-3) --> invalid, can not be plotted
+L[4]=1 , 1/(4-3) --> good, can be plotted
+L[5] = good, etc.
+
+A better plotting routine would trace segments from L0 up to L2, then stop.
+Then, would resume from L4 to L5, to L6, etc.
+
+Thus, in lines, having xr, yr is not enough.  A point needs a flag to indicate
+whether the data is valid or not.
+
+-----------
+to review the thickness of lb_gr_draw_line_antialiasing()
+----------
 In all antialiasing functions using main and adjacent pixels, to optimize
 by having the main pixel be directly copied, and the adyacent ones being blent.
 

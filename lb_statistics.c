@@ -88,6 +88,9 @@ void lb_st_marsaglia_polar2(REAL_T variance, REAL_T *r1, REAL_T *r2)
   *r2=variance*y*sqrt(-2.0*log(s)/s);
 }
 
+/* This function calculates the area under the bell, following the widely-spread-over-the-entire-Internet 
+   recipe outlined by Abramowitz and Stegun in their "Handbook of Mathematical Functions, in section 7.1.26. */
+  
 REAL_T lb_st_gauss_area(REAL_T x)
 {
   // constants
@@ -104,7 +107,6 @@ REAL_T lb_st_gauss_area(REAL_T x)
     sign = -1;
   x = fabs(x)/sqrt(2.0);
   
-  // A&S formula 7.1.26
   REAL_T t = 1.0/(1.0 + p*x);
   REAL_T y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*exp(-x*x);
   

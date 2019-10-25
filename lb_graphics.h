@@ -190,14 +190,14 @@ void       lb_gr_plot_continuous_fn_2d_antialiasing(PICTURE_T *Pic, VIEWPORT_2D_
 					      REAL_T t0, REAL_T t1, REAL_T delta,
 						    SINT16_T max_exp, REAL_T w, PIXEL_T color);
 
-void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T w,
+void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T radius,
 			PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 void       lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_REAL_T *L, REAL_T w,
 			     PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
-void       lb_gr_plot2d_curve_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
-				     PIXEL_T color, COPYMODE_T copymode);
-void       lb_gr_plot2d_curve_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
-					  PIXEL_T color, COPYMODE_T copymode);
+void       lb_gr_plot2d_line_antialiasing_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
+				     PIXEL_T color);
+void       lb_gr_plot2d_line_antialiasing_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w,
+					  PIXEL_T color);
 void       lb_gr_plot3d(PICTURE_T *Pic, VIEWPORT_3D_T vp3d,  REAL_T Rot[3][3], POINT_3D_REAL_T Pr, REAL_T w,
 			PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 

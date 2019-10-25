@@ -3105,6 +3105,7 @@ void lb_gr_draw_line_antialiasing(PICTURE_T *Pic, REAL_T _xr0, REAL_T _yr0, REAL
       m=0.0;
       csc_tetha=1.0;
     }
+  w++; /* Quick and dirty fix to the width issue */
   i_a=floor(-(0.5+0.5*w));
   i_b=ceil(0.5+fabs(xr1-xr0)+0.5*w);
   j_a=floor(-(0.5+0.5*fabs(w*csc_tetha)));
@@ -5165,7 +5166,7 @@ SINT8_T lb_gr_matrix_gs_to_pic(MATRIX_R_T *A, PICTURE_T *Pic)
   return 1;
 }
 
-void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T w,
+void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T radius,
 			PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode)
 {
   REAL_T xp, yp;
@@ -5174,13 +5175,13 @@ void       lb_gr_plot2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr
   switch(linemode)
     {
     case LINEMODE_DOTS_SOLID:
-      if (w<=1.0)
+      if (radius<=1.0)
 	lb_gr_draw_pixel(Pic, round(xp), round(yp), color, copymode);
       else
-	lb_gr_draw_circle_filled(Pic, round(xp), round(yp), w, color, copymode);
+	lb_gr_draw_circle_filled(Pic, round(xp), round(yp), radius, color, copymode);
       break;
     case LINEMODE_DOTS_FILTERED:
-      lb_gr_draw_circle_filled_antialiasing(Pic, round(xp), round(yp), w, color);
+      lb_gr_draw_circle_filled_antialiasing(Pic, xp, yp, radius, color);
       break;
     default:
       printf("Error: lb_gr_plot2d() --> invalid mode\r\n");
@@ -5216,6 +5217,7 @@ void lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_REAL_T *L, RE
       break;
     case LINEMODE_SOLID:
     case LINEMODE_FILTERED:
+      /* oxo: this should be improved to deal with discontinuities */
       Lpx.items=(*L).items;
       Lpy.items=(*L).items;
       lb_al_create_vector_r(&Lpx);
@@ -5238,14 +5240,14 @@ void lb_gr_plot2d_line(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, LINE_2D_REAL_T *L, RE
     }
 }
 
-void lb_gr_plot2d_curve_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_plot2d_line_antialiasing_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color)
 {
   /* This function draws an anti-aliased plot of a set of P(xi,yi) by efficiently checking the shortest distance from
      only the neighbor pixels to P(xi,yi) to each P(xi,y).  The function offers very good results at the expense of
      speed compared with other functions which just plot lines or anti-alised lines between points.
      This implementation has some academic merit as it also ilustrates the concept of using a reverse transformation
      from pixel coordinates to real coordinates.
-     A simpler implementation, with no efficiency improvements is: lb_gr_plot2d_curve_neighbor_slow */ 
+     A simpler implementation, with no efficiency improvements is: lb_gr_plot2d_line_antialiasing_neighbor_slow */ 
 
   REAL_T xr, yr, distance, temp, w2;
   SINT16_T i_min, i, j, i_max, j_min, j_max, k, xi, yi;
@@ -5280,7 +5282,7 @@ void lb_gr_plot2d_curve_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T 
 
   if ((*Lx).items != (*Ly).items)
     {
-      printf("Error: lb_gr_plot2d_curve_neighbor --> vectors with different dimensions [%d] != [%d]\r\n",
+      printf("Error: lb_gr_plot2d_line_antialiasing_neighbor --> vectors with different dimensions [%d] != [%d]\r\n",
 	     (*Lx).items,(*Ly).items);
       exit(EXIT_FAILURE);
     }	
@@ -5342,12 +5344,12 @@ void lb_gr_plot2d_curve_neighbor(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T 
 		pix_main.a=round(MAX_A*(1.0-fabs(w2-distance))); 
 	    }
 	  if (pix_main.a!=0)
-	    lb_gr_draw_pixel(Pic, xi, yi, pix_main, copymode); 
+	    lb_gr_draw_pixel(Pic, xi, yi, pix_main, COPYMODE_BLEND); 
 	}
   lb_al_release_matrix_si8(&Mflags);
 }
   
-void lb_gr_plot2d_curve_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color, COPYMODE_T copymode)
+void lb_gr_plot2d_line_antialiasing_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR_R_T *Lx, VECTOR_R_T *Ly, REAL_T w, PIXEL_T color)
 {
   REAL_T xr, yr, distance, temp, w2;
   SINT16_T i, xi, yi, width, height;
@@ -5371,7 +5373,7 @@ void lb_gr_plot2d_curve_neighbor_slow(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, VECTOR
 
   if ((*Lx).items != (*Ly).items)
     {
-      printf("Error: lb_gr_plot2d_curve_neighbor_slow --> vectors with different dimensions [%d] != [%d]\r\n",
+      printf("Error: lb_gr_plot2d_line_antialiasing_neighbor_slow --> vectors with different dimensions [%d] != [%d]\r\n",
 	     (*Lx).items,(*Ly).items);
       exit(EXIT_FAILURE);
     }	
