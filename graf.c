@@ -2729,6 +2729,7 @@ int main(int argc, char *argv[])
 		  {
 		    printf("Event: system has been PAUSED\r\n");
 		    status=Status_paused;
+		    break;
 		  }
 	      }
 	   	  
