@@ -2726,7 +2726,10 @@ int main(int argc, char *argv[])
 		if (accel>accel_max)
 		  accel_max = accel;
 		if (accel_max>500.0)
-		  status=Status_paused;
+		  {
+		    printf("Event: system has been PAUSED\r\n");
+		    status=Status_paused;
+		  }
 	      }
 	   	  
 	    my_port.CPOL=GPIO_HIGH;
