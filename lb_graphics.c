@@ -5765,20 +5765,20 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
     {
       xr_min=vp2d.xr_max;
       xr_max=vp2d.xr_min;
-      sign_re_x=-1.0;
+      sign_re_x=-1;
     }
 
   if (vp2d.yr_min<vp2d.yr_max)
     {
       yr_min=vp2d.yr_min;
       yr_max=vp2d.yr_max;
-      sign_re_y=1.0;
+      sign_re_y=1;
     }
   else
     {
       yr_min=vp2d.yr_max;
       yr_max=vp2d.yr_min;
-      sign_re_y=-1.0;
+      sign_re_y=-1;
     }
 
   if (options & AXIS_DRAW_X_GRID_LOG)

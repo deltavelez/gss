@@ -1556,7 +1556,7 @@ int main(int argc, char *argv[])
     /*******************************************************************************************************************/
     /* Advanced 2D Graphics */
     /******************************************************************************************************************/
-#define DEMO_PLOT2D
+    //#define DEMO_PLOT2D
 #ifdef  DEMO_PLOT2D
     SDL_Event event;
     VIEWPORT_2D_T vp2d;
@@ -2611,7 +2611,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-    //#define DEMO_GPIO
+#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
@@ -2629,7 +2629,7 @@ int main(int argc, char *argv[])
     UINT64_T time_begin, time_end;
     char text[20];
     SINT8_T relay_status=0;
-    SINT16_T shock_counter=1;
+    SINT32_T shock_counter=1;
     REAL_T accel, accel_max;
     FILE *fp;
 
@@ -2725,6 +2725,8 @@ int main(int argc, char *argv[])
 		accel = (((value & 0xFFF)*3.3/0xFFF)-3.3/2.0)/1.52e-3 - 5.601;
 		if (accel>accel_max)
 		  accel_max = accel;
+		if (accel_max>500.0)
+		  status=Status_paused;
 	      }
 	   	  
 	    my_port.CPOL=GPIO_HIGH;
@@ -2787,12 +2789,12 @@ int main(int argc, char *argv[])
 	    lb_co_reset_attributes();
 	    
 	    
-	    printf(" n=%d  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f\r\n",
+	    printf(" n=%ld  Dir=%s  T0=%4.2f  P0=%4.2f T1=%4.2f P1=%4.2f a=%4.1f\r\n",
 		   shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max);
 
 	    if (argc==2)
 	      {
-		fprintf(fp,"n=;%d;Dir=;%s;T0=;%4.2f;P0=;%4.2f;T1=;%4.2f;P1=;%4.2f;a=;%4.1f\r\n",
+		fprintf(fp,"n=;%ld;Dir=;%s;T0=;%4.2f;P0=;%4.2f;T1=;%4.2f;P1=;%4.2f;a=;%4.1f\r\n",
 			shock_counter,text,temp0.f, press0.f,temp1.f, press1.f, accel_max);
 		fflush(fp);
 	      }

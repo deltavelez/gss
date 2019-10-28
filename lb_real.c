@@ -430,9 +430,9 @@ REAL_T lb_re_ramp(REAL_T x)
 
 SINT8_T lb_re_sign(REAL_T x)
 {
-  if (x>=0) return 1.0;
-  if (x<0) return -1.0;
-  return 0.0;
+  if (x>=0) return 1;
+  if (x<0) return -1;
+  return 0;
 }
 
 REAL_T lb_re_pulse(REAL_T a, REAL_T b, REAL_T x)
