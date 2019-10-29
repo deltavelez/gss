@@ -5772,7 +5772,7 @@ void       lg_gr_draw_axis_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FONT_T *font,
     {
       yr_min=vp2d.yr_min;
       yr_max=vp2d.yr_max;
-      sign_re_y=1;
+      sign_re_y=1.0;
     }
   else
     {

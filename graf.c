@@ -3184,8 +3184,6 @@ int main(int argc, char *argv[])
 #endif
 
 
-
-  
     //#define DEMO_ORBITS
 #ifdef DEMO_ORBITS
 #define G 6.674e-11
@@ -3284,7 +3282,7 @@ int main(int argc, char *argv[])
     win.yp_max=ty_screen.h;
     win.xr_max= 2.0*1.496e11;
     win.xr_min=-win.xr_max;
-    win.yr_min=win.xr_max*ty_screen.h/ty_screen.w;
+    win.yr_min=-win.xr_max*ty_screen.h/ty_screen.w;
     win.yr_max=-win.yr_min; 
 
 
@@ -3301,7 +3299,7 @@ int main(int argc, char *argv[])
     my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
 
       
-    dt=60*10;  /* seconds */
+    dt=60;  /* seconds */
     t=0;      /* tracks the elapsed time */
 
   
@@ -3431,24 +3429,23 @@ int main(int argc, char *argv[])
 	  
 		if (i==1) 
 		  {
-		    if ( (step_counter==0) || (UINT32_T)((t+dt)/(365*24*3600))>(UINT32_T)(t/(365*24*3600)) )
+		    if ( !(step_counter % (UINT64_T)(365.0*24.0*3600.0/dt)) )
+		     	  flag_paused=TRUE;
+		  
+		    if ((step_counter % 50) == 0)
 		      {
 			lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
 			lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
 			lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
-						       fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
-			if (t/(365*24*3600)>199)
-			  flag_paused=TRUE;
-		      }
-		    if ((step_counter % 50) == 0)
-		      {
+						       fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK));
+		
 			sprintf(text,"dt: %02.2f [s]",dt);
 			lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
 
 			sprintf(text,"t: %02.2f [a]",t/(24.0*365.0*3600.0));
 			lb_ft_draw_text(NULL, &my_font, 20, 80, text, COPYMODE_COPY);
 
-			sprintf(text,"n: %0d",step_counter);
+			sprintf(text,"n: %0ld",step_counter);
 			lb_ft_draw_text(NULL, &my_font, 20, 130, text, COPYMODE_COPY);
 
 
@@ -3456,14 +3453,22 @@ int main(int argc, char *argv[])
 			//printf("EU: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_euler[i].p.x, M_euler[i].p.y, M_euler[i].p.z);
 			//printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
 			//printf("\n");
-			lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
-			lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+
+			lb_gr_plot2d(NULL, win, M_euler[i].p.x, M_euler[i].p.y, 7, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
+			//lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
+			//lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
 			//lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF00F), COPYMODE_COPY); 
 
-
+			//lb_gr_plot2d(NULL, win, M_rk4[i].p.x, M_rk4[i].p.y, 8, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
 			lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
-			lb_gr_draw_circle_filled_fast(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
-			//lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY); 
+			lb_gr_draw_rectangle_line(NULL, xp-8, yp-8, xp+8, yp+8, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+			//lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY);
+
+			REAL_T angle;
+			angle=2*M_PI*t/(365.0*24.0*3600.0);
+			lb_gr_project_2d(win, 1.496e11*cos(angle),1.496e11*sin(angle), &xp, &yp);
+			lb_gr_draw_line(NULL, xp-8, yp-8, xp+8, yp+8, 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY, LINEMODE_SOLID);
+			lb_gr_draw_line(NULL, xp+8, yp-8, xp-8, yp+8, 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY, LINEMODE_SOLID);
 	      
 
 			//printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
@@ -3493,6 +3498,7 @@ int main(int argc, char *argv[])
 		      flag_paused=FALSE;
 		    else
 		      flag_paused=TRUE;
+		    lb_gr_BMPfile_save("orbits.bmp", NULL);
 		  }
 	      }
 	  }
@@ -3500,6 +3506,7 @@ int main(int argc, char *argv[])
     lb_gr_SDL_close();
     
 #endif
+
     
     //#define DEMO_VIDEO
 #ifdef DEMO_VIDEO
