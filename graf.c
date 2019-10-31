@@ -2708,7 +2708,8 @@ int main(int argc, char *argv[])
 	  lb_gp_gpio_wr(PIN_RELAY,   relay_status);
 
 	  accel_max = 0.0;
-	  while (lb_ti_clock64() < time_end)
+	   
+	  if (0) while (lb_ti_clock64() < time_end)
 	    {
 	      /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
 
@@ -2752,11 +2753,55 @@ int main(int argc, char *argv[])
 	  my_port.CPOL=GPIO_HIGH;
 	  lb_gp_gpio_wr(PIN_CLK, my_port.CPOL); /* Always remember to set the default Clock idle state prior to selecting the SPI device */
 	  my_port.CPHA=GPIO_HIGH;
-      	 
+
+	  //#define RESTORE_CELSIUS ==>  This block works
+#ifdef RESTORE_CELSIUS
+	  lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+	  lb_ti_delay_us(500);
+	  /* Enter Level 1 */
+	  lb_gp_gpio_SPI_rw(&my_port, 0x3C);
+	  for (i=1;i<8;i++)
+	    lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	  lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
+	  lb_ti_delay_us(500);
+	  lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+	  
+	  /* Command to set to Celsius */
+	  lb_gp_gpio_SPI_rw(&my_port, 0x21);
+	  lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	  for (i=2;i<8;i++)
+	    lb_gp_gpio_SPI_rw(&my_port, 0x00);
+#endif
+
+	  //#define RESTORE_DEFAULT
+#ifdef RESTORE_DEFAULT
+	  lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+	  lb_ti_delay_us(500);
+	  /* Enter Level 1 */
+	  lb_gp_gpio_SPI_rw(&my_port, 0x3C);
+	  for (i=1;i<8;i++)
+	    lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	  lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
+	  lb_ti_delay_us(500);
+	  lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
+	  
+	  /* Command to restore the defaults */
+	  lb_gp_gpio_SPI_rw(&my_port, 0xBB);
+	  lb_gp_gpio_SPI_rw(&my_port, 0x00);
+	  for (i=2;i<8;i++)
+	    lb_gp_gpio_SPI_rw(&my_port, 0x00);
+#endif
+
+	  
+	  
+	  #define FIRST_SENSOR
+#ifdef FIRST_SENSOR
+	  /* First sensor */
 	  lb_gp_gpio_wr(PIN_CS_0, GPIO_LOW);
-	  lb_ti_delay_us(100);
-	  for (i=0;i<8;i++)
-	    lb_gp_gpio_SPI_rw(&my_port, 0x03);
+	  lb_ti_delay_us(500);
+	  lb_gp_gpio_SPI_rw(&my_port, 0x03);
+	  for (i=1;i<8;i++)
+	    lb_gp_gpio_SPI_rw(&my_port, 0x00);
 
 	  time_end = time_begin + (time_stroke-time_sensor)*1000;
 	  while (lb_ti_clock64() < time_end)
@@ -2771,20 +2816,24 @@ int main(int argc, char *argv[])
 	    press0.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
 
 	  lb_gp_gpio_wr(PIN_CS_0, GPIO_HIGH);
+#endif
 
-
+	 
+#define SECOND_SENSOR
+#ifdef SECOND_SENSOR
+ 
 	  /* Second sensor */
 	  lb_gp_gpio_wr(PIN_CS_1, GPIO_LOW);
 	  lb_ti_delay_us(500);
-	  for (i=0;i<8;i++)
-	    lb_gp_gpio_SPI_rw(&my_port, 0x03);
+	  lb_gp_gpio_SPI_rw(&my_port, 0x03);
+	  for (i=1;i<8;i++)
+	    lb_gp_gpio_SPI_rw(&my_port, 0x00);
 
 	  time_end = time_begin + time_stroke*1000;
 	  while (lb_ti_clock64() < time_end)
 	    {
 	      ; /* Heat up the room which is cold */
 	    }
-	    
 	    
 	  for (i=0;i<4;i++)
 	    temp1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
@@ -2793,6 +2842,7 @@ int main(int argc, char *argv[])
 	    press1.uc[3-i]=lb_gp_gpio_SPI_rw(&my_port, 0x00);
 
 	  lb_gp_gpio_wr(PIN_CS_1, GPIO_HIGH);
+#endif
 
 	  /* We measure the acceleration */
 
