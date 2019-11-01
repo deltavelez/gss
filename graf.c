@@ -2611,7 +2611,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-#define DEMO_GPIO
+  //#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
@@ -4147,11 +4147,15 @@ int main(int argc, char *argv[])
   /* Parsing */
   /******************************************************************************************************************/
 
-  //#define DEMO_PARSER_REAL
+#define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
   MATHERROR_T e_code;
   REAL_T x,y,z,result;
   char variables[]="x,y,i"; 
+
+  lb_ft_generate_fontfiles();
+
+
   x=1;
   y=M_PI*60/180;
   z=3;  
