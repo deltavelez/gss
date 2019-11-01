@@ -2611,7 +2611,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-  //#define DEMO_GPIO
+#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
@@ -2709,7 +2709,7 @@ int main(int argc, char *argv[])
 
 	  accel_max = 0.0;
 	   
-	  if (0) while (lb_ti_clock64() < time_end)
+	  while (lb_ti_clock64() < time_end)
 	    {
 	      /* This section reads a low-cost , 4 channel ADC: MPC3204 */ 
 
@@ -4147,7 +4147,7 @@ int main(int argc, char *argv[])
   /* Parsing */
   /******************************************************************************************************************/
 
-#define DEMO_PARSER_REAL
+  //#define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
   MATHERROR_T e_code;
   REAL_T x,y,z,result;
