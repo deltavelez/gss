@@ -1696,13 +1696,13 @@ REAL_T lb_pa_formula(char *fnstr, char *vars, REAL_T f1, REAL_T f2, REAL_T f3, M
   vector[2]=f3;
 
   lb_pa_parse(fnstr, &fnrec, vars, &n_vars);
-  //lb_pa_print_output(&fnrec,TEXT_COLOR_BACKGROUND+TEXT_COLOR_BLUE);
+  lb_pa_print_output(&fnrec,TEXT_COLOR_BACKGROUND+TEXT_COLOR_BLUE);
   if (n_vars>3)
     {
       printf("Error: lb_pa_formula(): too many variables: %d\r\n",n_vars);
       exit(1);
     }
-  //printf("Parsed formula:\r\n");
+  printf("Parsed formula:\r\n");
   //lb_pa_print_output(&fnrec,TEXT_COLOR_BACKGROUND+TEXT_COLOR_GREEN);
 
   //printf("Before executing shunting yard:\r\n");

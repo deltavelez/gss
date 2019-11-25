@@ -2611,7 +2611,7 @@ int main(int argc, char *argv[])
   
 #endif
 
-#define DEMO_GPIO
+  //#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
@@ -3250,7 +3250,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-  //#define DEMO_ORBITS
+#define DEMO_ORBITS
 #ifdef DEMO_ORBITS
 #define G 6.674e-11
 #define N_OBJECTS 2
@@ -3338,15 +3338,16 @@ int main(int argc, char *argv[])
   REAL_T xp, yp;
   SINT32_T step_counter=0;
   SINT8_T flag_paused=FALSE;
+  const SINT8_T skip_steps=50;
 
-  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1280, 960, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1600, 1200, 0xFF, 0xFF, 0xFF);
  
   
   win.xp_min=0;
   win.yp_min=0;
   win.xp_max=ty_screen.w;
   win.yp_max=ty_screen.h;
-  win.xr_max= 2.0*1.496e11;
+  win.xr_max= 1.5*1.496e11;
   win.xr_min=-win.xr_max;
   win.yr_min=-win.xr_max*ty_screen.h/ty_screen.w;
   win.yr_max=-win.yr_min; 
@@ -3365,7 +3366,7 @@ int main(int argc, char *argv[])
   my_font.color_bg=lb_gr_12RGB(COLOR_WHITE);
 
       
-  dt=60;  /* seconds */
+  dt=60.0;  /* seconds */
   t=0;      /* tracks the elapsed time */
 
   
@@ -3433,6 +3434,7 @@ int main(int argc, char *argv[])
       M_rk4[i].m = M_euler[i].m;
     }
 
+  flag_paused=TRUE;
   while (1)
     {
       if (!flag_paused)
@@ -3495,15 +3497,32 @@ int main(int argc, char *argv[])
 	  
 	      if (i==1) 
 		{
-		  if ( !(step_counter % (UINT64_T)(365.0*24.0*3600.0/dt)) )
-		    flag_paused=TRUE;
-		  
-		  if ((step_counter % 50) == 0)
+		  if ( !(step_counter % (UINT64_T)(365.0*24.0*3600.0/dt)) && (step_counter >= (UINT64_T)(300*365.0*24.0*3600.0/dt))   )
 		    {
-		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
-		      lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
-		      lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
-						     fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK));
+		      flag_paused=TRUE;
+
+		      REAL_T angle;
+		      angle=2*M_PI*t/(365.0*24.0*3600.0);
+		      lb_gr_project_2d(win, 1.496e11*cos(angle),1.496e11*sin(angle), &xp, &yp);
+		      lb_gr_draw_circle_antialiasing(NULL, xp, yp, 10, 3, lb_gr_12RGB(0x0000));
+
+		      
+		      lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
+		      lb_gr_draw_rectangle_line(NULL, xp-15, yp-15, xp+15, yp+15, 2, lb_gr_12RGB(0xf07f),COPYMODE_COPY); 
+		
+		      lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
+		      lb_gr_draw_line(NULL, xp-12, yp-12, xp+12, yp+12, 4, lb_gr_12RGB(0xFF33),COPYMODE_COPY, LINEMODE_FILTERED); 
+		      lb_gr_draw_line(NULL, xp+12, yp-12, xp-12, yp+12, 4, lb_gr_12RGB(0xFF33),COPYMODE_COPY, LINEMODE_FILTERED); 
+
+		      lb_gr_BMPfile_save("orbits.bmp", NULL);
+
+
+		      //lb_gr_project_2d(win, 1.496e11, 0, &xp, &yp);
+		      //lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/2, ty_screen.h/2,
+		      //				     fabs(ty_screen.w/2-xp), 2, lb_gr_12RGB(COLOR_BLACK));
+		    }
+		  if ((step_counter % skip_steps) == 0)
+		    {
 		
 		      sprintf(text,"dt: %02.2f [s]",dt);
 		      lb_ft_draw_text(NULL, &my_font, 20, 30, text, COPYMODE_COPY);
@@ -3520,23 +3539,32 @@ int main(int argc, char *argv[])
 		      //printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
 		      //printf("\n");
 
-		      lb_gr_plot2d(NULL, win, M_euler[i].p.x, M_euler[i].p.y, 7, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
-		      //lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
-		      //lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF00F), COPYMODE_COPY); 
+		      SINT32_T flag_dashed;
+		      flag_dashed= (step_counter/2000) % 8;
 
-		      //lb_gr_plot2d(NULL, win, M_rk4[i].p.x, M_rk4[i].p.y, 8, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
-		      lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
-		      lb_gr_draw_rectangle_line(NULL, xp-8, yp-8, xp+8, yp+8, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-		      //lb_gr_draw_pixel(NULL, xp, yp,lb_gr_12RGB(0xF0B0), COPYMODE_COPY);
+			  REAL_T angle;
+			  angle=2*M_PI*t/(365.0*24.0*3600.0);
+			  lb_gr_project_2d(win, 1.496e11*cos(angle),1.496e11*sin(angle), &xp, &yp);
+			  //	      lb_gr_draw_circle_filled(NULL, xp, yp, 3, lb_gr_12RGB(0xF33F), COPYMODE_BLEND);
+			  lb_gr_draw_circle_filled(NULL, xp, yp, 1, lb_gr_12RGB(0xF000), COPYMODE_COPY);
 
-		      REAL_T angle;
-		      angle=2*M_PI*t/(365.0*24.0*3600.0);
-		      lb_gr_project_2d(win, 1.496e11*cos(angle),1.496e11*sin(angle), &xp, &yp);
-		      lb_gr_draw_line(NULL, xp-8, yp-8, xp+8, yp+8, 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY, LINEMODE_SOLID);
-		      lb_gr_draw_line(NULL, xp+8, yp-8, xp-8, yp+8, 2, lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY, LINEMODE_SOLID);
+			  if( flag_dashed <=1)
+			{
+			  //lb_gr_plot2d(NULL, win, M_euler[i].p.x, M_euler[i].p.y, 3, lb_gr_12RGB(0xFF33), COPYMODE_BLEND, LINEMODE_DOTS_SOLID);
+			  lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
+			  //lb_gr_draw_circle_filled(NULL, xp, yp, 2, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+			  lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(0xf07f),COPYMODE_COPY); 
+			}
+
+		      if( (flag_dashed == 4) || (flag_dashed ==5) )
+			{
+			  //lb_gr_plot2d(NULL, win, M_rk4[i].p.x, M_rk4[i].p.y, 8, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
+			  lb_gr_project_2d(win, M_rk4[i].p.x, M_rk4[i].p.y, &xp, &yp);
+			  //lb_gr_draw_circle_filled(NULL, xp, yp, 3, lb_gr_12RGB(0xF3F3), COPYMODE_BLEND);
+			  lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(0xFf33), COPYMODE_COPY);
+			}
+
 	      
-
 		      //printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
 		      //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
 		      //printf("\n\n");
@@ -3561,10 +3589,12 @@ int main(int argc, char *argv[])
 	      if (event.key.keysym.sym == SDLK_SPACE)
 		{
 		  if (flag_paused)
-		    flag_paused=FALSE;
+		    {
+		      flag_paused=FALSE;
+		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
+		    }
 		  else
 		    flag_paused=TRUE;
-		  lb_gr_BMPfile_save("orbits.bmp", NULL);
 		}
 	    }
 	}
@@ -4162,7 +4192,7 @@ int main(int argc, char *argv[])
     
       
   /* Example: pi as an infinite addition - Machin */
-  //char expression[]="4*SIGMA(1,20000,(-1)^(i+1)/(2*i-1),i,1)";   
+  char expression[]="4*SIGMA(1,10^10,(-1)^(i+1)/(2*i-1),i,1)";   
      
   /* Example: pi as an infinite product */
   //char expression[]="2*PROD(1,100000,4*i^2/(4*i^2-1),i,1)";   
@@ -4187,7 +4217,7 @@ int main(int argc, char *argv[])
   //char expression[]="idef(0,pi/6,sin(x),x,2)"; 
       
   /* Example: double integral */
-  char expression[]="idef2(1,5,0,2,x^2*y^3,x,y,5)"; 
+  //char expression[]="idef2(1,5,0,2,x^2*y^3,x,y,5)"; 
 
   /* Example: first order differential */
   //char expression[]="diff(-x^2,x,10,1e-5)";   
@@ -4218,7 +4248,7 @@ int main(int argc, char *argv[])
   //char expression[]="diff(cos(x),x,pi/2,0.001)";   
   //char expression[]="exp(3.25)";   
   //char expression[]="idef(pi/2,pi,sin(x),x,65000)";   
-  //char expression[]="sin(1+y*cos(3+pi/4))";   
+  // char expression[]="sin(1+y*cos(3+pi/4))";   
   //char expression[]="1+2-avg(x,2,3,4,5,6,7,8)+10*sin(pi/4)+1000+2000+1+2+3";   
   //char expression[]="100+250+10*sin(pi/4)+1000+2000+sin(pi/4)";   
   //char expression[]="sin(sin(1,2,3,4,5)+2+3,sin(1,2,3,4,5,6),sin(1))"; 
@@ -4232,7 +4262,7 @@ int main(int argc, char *argv[])
   printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
   result=lb_pa_formula(expression,variables,x,y,z,&e_code);
   printf("Error: %s\r\n", errors[e_code].msg);
-  printf("Result=%0.6f\r\n",result);
+  printf("Result=%0.9f\r\n",result);
   exit(1);
 #endif
 
@@ -4253,8 +4283,9 @@ int main(int argc, char *argv[])
   //char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k+1,1)";   
     
   /* Example: Gauss'childhood sum, using complex numbers  */
-  char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
-    
+  //  char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
+
+ 
   
   /* Example: first order derivate */
   //char expression[]="diff(e^x,x,30*pi/180+0.5*i,1e-4)";   
@@ -4310,9 +4341,11 @@ int main(int argc, char *argv[])
        
   e_code=e_none;
   system("clear");
+  srand(0xabcdef);
   printf("Expression: %s\r\n",expression);
   printf(" Variables: %s\r\n", variables);
   printf(" Values: x=[%0.4f , %0.4f]  y=[%0.4f , %0.4f]\r\n", var1.r,var1.i,var2.r,var2.i);
+     
   result=lb_pa_formula_complex(expression,variables,var1,var2,imag,&e_code);
   printf("Error: %s\r\n", errors[e_code].msg);
   printf("Result= [%0.8f , %0.8f] \r\n",result.r, result.i);
