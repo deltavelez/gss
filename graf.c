@@ -3250,7 +3250,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-#define DEMO_ORBITS
+  //#define DEMO_ORBITS
 #ifdef DEMO_ORBITS
 #define G 6.674e-11
 #define N_OBJECTS 2
@@ -3534,6 +3534,8 @@ int main(int argc, char *argv[])
 		      lb_ft_draw_text(NULL, &my_font, 20, 130, text, COPYMODE_COPY);
 
 
+		      
+
 		      //
 		      //printf("EU: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_euler[i].p.x, M_euler[i].p.y, M_euler[i].p.z);
 		      //printf("\nRK: t=%4.2f: %4.5e, %4.5e, %4.5e",t/(3600*24), M_rk4[i].p.x,   M_rk4[i].p.y,   M_rk4[i].p.z);
@@ -3564,9 +3566,23 @@ int main(int argc, char *argv[])
 			  lb_gr_draw_circle_filled(NULL, xp, yp, 4, lb_gr_12RGB(0xFf33), COPYMODE_COPY);
 			}
 
+		      if (!(step_counter % (UINT64_T)(0.25*365.0*24.0*3600.0/dt)))
+			{
+			  REAL_T xreal, yreal;
+			  
+			  angle=2*M_PI*t/(365.0*24.0*3600.0);
+			  xreal=1.496e11*cos(angle);
+			  yreal=1.496e11*sin(angle);
+
+		      
 	      
-		      //printf("\n EU: r= %4.9f %%", 100*fabs(sqrt(M_euler[i].p.x*M_euler[i].p.x+M_euler[i].p.y*M_euler[i].p.y)-1.496e11)/1.496e11);
-		      //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
+			  printf("t=%f EU: e= %4.9f  RK4: e=%f%% \r\n",
+				 t/(365.0*24.0*3600.0),
+				 100.0*fabs(sqrt(   (xreal-M_euler[i].p.x)*(xreal-M_euler[i].p.x) + (yreal-M_euler[i].p.y)*(yreal-M_euler[i].p.y)))/sqrt(xreal*xreal+yreal*yreal),
+				 100.0*fabs(sqrt(   (xreal-M_rk4[i].p.x)*(xreal-M_rk4[i].p.x) + (yreal-M_rk4[i].p.y)*(yreal-M_rk4[i].p.y)))/sqrt(xreal*xreal+yreal*yreal));
+
+			}
+			  //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
 		      //printf("\n\n");
 		      //delay(200);
 		      lb_gr_refresh();
@@ -4830,7 +4846,7 @@ int main(int argc, char *argv[])
 
   /* BER vs Noise using a Montecarlo simulation */
   
-  //#define DEMO_ZERO_CROSSING
+#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
   VECTOR_R_T Signal, Noise_mag, Noise_phase;
   SDL_Event event;
@@ -4840,7 +4856,6 @@ int main(int argc, char *argv[])
   const REAL_T freq_1=3000;         /* Frequency associated to the other symbolsymbol */
   SINT32_T n_experiments; /* Maximum number of experiments. Not declared as a const to allow a possible
 			     upgrade to variable-step size */
-  const SINT32_T timeout=3600*24; /* Maximum time in seconds allowed to run the simulation. (default: 1 day) */
   REAL_T noise_variance=0.1;        /* The variance of the noise in a Gaussian model */
   REAL_T f_max_noise=6.0e3;  /* Maximum noise frequency */
   REAL_T N_exp_max=1.0;            /* Maximum (initial) amound of noise tried out during a series of experiments */
@@ -4869,8 +4884,7 @@ int main(int argc, char *argv[])
   SINT16_T i, k;                       /* General-use counters */
  
   FONT_T my_font;
-  char text[80];
-
+  
   REAL_T wave(REAL_T t, REAL_T f0, REAL_T f1) 
   {
     if (t<1.0/(2.0*f0)) 
@@ -4956,8 +4970,8 @@ int main(int argc, char *argv[])
   win_BER.xr_min=   0;
   win_BER.xr_max=  18;
   N_exp_min = 1.0/pow(10.0,18.0/10.0);
-  win_BER.yr_min=  1.0e-8;
-  win_BER.yr_max=  1;
+  win_BER.yr_min=  1.0;
+  win_BER.yr_max=  1.0e-8;
 
   lg_gr_draw_axis_2d(NULL, win_BER, &my_font,
 		     lb_gr_12RGB(COLOR_YELLOW), 3, 25,
@@ -4968,8 +4982,8 @@ int main(int argc, char *argv[])
 		     COPYMODE_COPY, LINEMODE_SOLID); 
 
 
-  lb_gr_project_2d_y_log(win_BER, 0.1, &yp);
-  lb_gr_draw_circle_filled(NULL, 21, (int)yp, 8, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
+  //lb_gr_project_2d_y_log(win_BER, 0.1, &yp);
+  //lb_gr_draw_circle_filled(NULL, 21, (int)yp, 8, lb_gr_12RGB(COLOR_YELLOW), COPYMODE_COPY);
 
       
   printf("t_mon = %f, t_max=%f\r\n", t_min, t_max);
@@ -5075,7 +5089,7 @@ int main(int argc, char *argv[])
 		}
 	    }
 	}
-      printf("N_experiment=%f\tN_total=%f\tE(0,0)=%d, E(0.025, -0.025)=%d, E(0.05, -0.05)=%d\r\n",
+      printf("N_experiment=%f\tN_total=%f\tE(0,0)=%lu, E(0.025, -0.025)=%lu, E(0.05, -0.05)=%lu\r\n",
 	     N_experiment,N_total, errors_count_threshold_00, errors_count_threshold_01, errors_count_threshold_02);
 
       REAL_T temp_00, temp_01, temp_02, temp;
@@ -5087,22 +5101,28 @@ int main(int argc, char *argv[])
 	  if (temp_00>0)
 	    {
 	      lb_gr_project_2d_y_log(win_BER, temp_00, &yp);
-	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+	      lb_gr_draw_circle_antialiasing(NULL, xp, yp, 10, 3, lb_gr_12RGB(0x0000));
+
 	    }
 
 	  temp_01=(REAL_T)errors_count_threshold_01/n_experiments;
 	  if (temp_01>0)
 	    {
 	      lb_gr_project_2d_y_log(win_BER, temp_01, &yp);
-	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_GREEN), COPYMODE_COPY);
+	      lb_gr_draw_rectangle_line(NULL, xp-15, yp-15, xp+15, yp+15, 2, lb_gr_12RGB(0xf07f),COPYMODE_COPY); 
 	    }
 	  temp_02=(REAL_T)errors_count_threshold_02/n_experiments;
 
 	  if (temp_02>0)
 	    {
 	      lb_gr_project_2d_y_log(win_BER, temp_02, &yp);
-	      lb_gr_draw_circle_filled(NULL, (int)xp, (int)yp, 8, lb_gr_12RGB(COLOR_GRAY), COPYMODE_COPY);
+	      lb_gr_draw_line(NULL, xp-12, yp-12, xp+12, yp+12, 4, lb_gr_12RGB(0xFF33),COPYMODE_COPY, LINEMODE_FILTERED); 
+	      lb_gr_draw_line(NULL, xp+12, yp-12, xp-12, yp+12, 4, lb_gr_12RGB(0xFF33),COPYMODE_COPY, LINEMODE_FILTERED); 
 	    }
+
+	  
+		      
+
 	    
 	  MATHERROR_T error;
 	  temp = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(REAL_T)1.0/N_experiment, &error));
@@ -5119,7 +5139,7 @@ int main(int argc, char *argv[])
 	}
       N_experiment/=pow(10.0,1.0/10.0); /* plot in 1.0 dB increments */
       n_experiments*=2;
-      printf("n_experiments=%d\r\n",n_experiments);
+      printf("n_experiments=%lu\r\n",n_experiments);
       if (N_experiment<N_exp_min)
 	flag_running=FALSE;
     }
