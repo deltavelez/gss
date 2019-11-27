@@ -4884,6 +4884,9 @@ int main(int argc, char *argv[])
   SINT16_T i, k;                       /* General-use counters */
  
   FONT_T my_font;
+  char file_name[24];
+  SINT8_T file_counter=0;
+
   
   REAL_T wave(REAL_T t, REAL_T f0, REAL_T f1) 
   {
@@ -5119,10 +5122,6 @@ int main(int argc, char *argv[])
 	      lb_gr_draw_line(NULL, xp-12, yp-12, xp+12, yp+12, 4, lb_gr_12RGB(0xFF33),COPYMODE_COPY, LINEMODE_FILTERED); 
 	      lb_gr_draw_line(NULL, xp+12, yp-12, xp-12, yp+12, 4, lb_gr_12RGB(0xFF33),COPYMODE_COPY, LINEMODE_FILTERED); 
 	    }
-
-	  
-		      
-
 	    
 	  MATHERROR_T error;
 	  temp = 0.5*lb_st_erfc(lb_re_sqrt(0.5*(REAL_T)1.0/N_experiment, &error));
@@ -5137,15 +5136,19 @@ int main(int argc, char *argv[])
 	      
 	  lb_gr_refresh();
 	}
+      sprintf(file_name,"zero_mod_%03d",file_counter);
+      lb_gr_BMPfile_save(file_name, NULL);
+      file_counter++;
+       
       N_experiment/=pow(10.0,1.0/10.0); /* plot in 1.0 dB increments */
+      
       n_experiments*=2;
       printf("n_experiments=%lu\r\n",n_experiments);
       if (N_experiment<N_exp_min)
 	flag_running=FALSE;
     }
 
-  lb_gr_BMPfile_save("zero_mod.bmp", NULL);
-
+ 
   printf("Program completed: waiting to be closed by user\r\n");
   while (1)
     while (SDL_PollEvent(&event))
