@@ -2607,9 +2607,11 @@ int main(int argc, char *argv[])
 
       t+=h;
     }
+  
+  
 #endif
 
-  #define DEMO_GPIO
+  //#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
@@ -2620,11 +2622,7 @@ int main(int argc, char *argv[])
 #define PIN_MISO    9
 #define PIN_RELAY  13
 
-  typedef enum { Status_auto=0,
-		 Status_single=1,
-		 Status_paused=2,
-		 Status_confirm=3,
-		 Status_end=4 } STATUS_T;
+  typedef enum { Status_auto=0, Status_single, Status_paused, Status_confirm, Status_end } STATUS_T;
 
   STATUS_T status;
   
@@ -2633,7 +2631,6 @@ int main(int argc, char *argv[])
   SINT8_T relay_status=0;
   SINT32_T shock_counter=1, counter_bad=0, counter_good=0;
   REAL_T accel, accel_max;
-  char c;
   FILE *fp;
     
 
@@ -2680,33 +2677,6 @@ int main(int argc, char *argv[])
   lb_gp_gpio_setup_pin(PIN_CS_ADC, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_MOSI, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_CLK,  GPIO_OUTPUT);
-
-
-  //#define SPEED_TEST
-#ifdef SPEED_TEST
-  volatile unsigned int *my_gpio_high =lb_gp_gpio + 7;
-  volatile unsigned int *my_gpio_low = lb_gp_gpio + 10;
-  //extern volatile unsigned int *lb_gp_gpio;  // They have to be found somewhere, but can't be i
-  UINT32_T my_bit = 1<<22;
-
-  lb_gp_gpio_setup_pin(22,  GPIO_OUTPUT);
-  while (1)
-    {
-      //*(lb_gp_gpio+7)=1<22;
-      //printf("+");
-      //*(lb_gp_gpio+10)=1<22;
-      //printf("-");
-
-      *(my_gpio_high) = my_bit;
-      *(my_gpio_low) = my_bit;
-      //*(lb_gp_gpio + 10) =my_bit;
-
-      //      *(lb_gp_gpio + 7) = my_bit;
-      //*(lb_gp_gpio + 10) =my_bit;
-      //lb_gp_gpio_wr(22,GPIO_HIGH);
-      //lb_gp_gpio_wr(22,GPIO_LOW);
-    }
-#endif
   lb_gp_gpio_setup_pin(PIN_RELAY,  GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_MISO, GPIO_INPUT);
 
@@ -2761,12 +2731,13 @@ int main(int argc, char *argv[])
 	  if (accel_max>525.0)
 	    {
 	      counter_bad++;
-	      if (counter_bad>=3)
+	      if (counter_bad==3)
 		{
-		  counter_bad=0;
-		  counter_good=0;
 		  printf("Event: system has been PAUSED\r\n");
 		  status=Status_paused;
+		  counter_bad=0;
+		  counter_good=0;
+		  break;
 		}
 	    }
 	  else
@@ -2907,6 +2878,7 @@ int main(int argc, char *argv[])
 
       while (lb_co_kbhit())
 	{
+	  char c;
 	  c=lb_co_getch_pc();
 	  printf("lb_co_kbhit(), c=%c\r\n",c);
 	  
@@ -2935,7 +2907,7 @@ int main(int argc, char *argv[])
 	      break;
 	    case 'r':
 	    case 'R':
-	      shock_counter=0;
+	      shock_counter=1;
 	      printf("Event: counter has been reset\r\n");
 	      break;
 	    case ' ':
@@ -2950,51 +2922,7 @@ int main(int argc, char *argv[])
 		  printf("Event: mode has been set to PAUSED\r\n");
 		}
 	      break;
-	    case 'q':
-	    case 'Q':
-	      status=Status_confirm;
-	      printf("Event: Quitting program, press Y if you're sure\r\n");
-	      break;
-	    case 'y':
-	    case 'Y':
-	      if (status==Status_confirm)
-		{
-		  status=Status_end;
-		  printf("Event: Closing program\r\n");
-		}
-	      break;
-	    default:
-	      if (status==Status_confirm)
-		{
-		  status=Status_paused;
-		  printf("Event: Cancelling quit\r\n");
-		}
-	      break;
-	    }
-	}
-    }
-  if (argc==2)
-    fclose(fp);
-  
-  lb_gp_gpio_close();
-  return EXIT_SUCCESS;
-  
-#endif
-
-  /*
-    unsigned int value;
-    value= lb_gp_gpio_rd_all();
-    value= lb_gp_gpio_rd(4);
-    lb_gp_print_u32_as_binary(value, 32);
-      
-    printf("VALUE=%d\r\n", value);
-    
-    lb_gp_gpio_wr(4,0);
-    lb_ti_delay(100);
-    lb_gp_gpio_wr(4,1);
-    lb_ti_delay(100); */
-
-  
+ 
   
   //#define DEMO_SHAKER
 #ifdef DEMO_SHAKER
@@ -4875,7 +4803,7 @@ int main(int argc, char *argv[])
 
   /* BER vs Noise using a Montecarlo simulation */
   
-  //#define DEMO_ZERO_CROSSING
+#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
   VECTOR_R_T Signal, Noise_mag, Noise_phase;
   SDL_Event event;
