@@ -185,17 +185,6 @@ int main(int argc, char *argv[])
 {
   /* Time tests */
 
-#ifdef DEMO_TIME
-  SINT16_T temp,i=0;
-  while (1)
-    {
-      printf("Sec: %d, P=%02.1f\r\n",i,100.0*(REAL_T)clock()/(REAL_T)0xFFFFFFFF);
-      lb_ti_delay_us(1000000);
-      
-      //lb_ti_delay_ms(1000);
-      i++;
-    }
-#endif
   
   //#define MATRIX_NDIM
 #ifdef MATRIX_NDIM
@@ -2230,17 +2219,17 @@ int main(int argc, char *argv[])
      #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-    lb_gr_12RGB(COLOR_BLUE), 5, 15,
-    lb_gr_12RGB(COLOR_GREEN), 1,
-    lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
-    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
-    0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-    COPYMODE_BLEND, LINEMODE_FILTERED);
+		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
+		     lb_gr_12RGB(COLOR_GREEN), 1,
+		     lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
+		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
+		     0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+		     COPYMODE_BLEND, LINEMODE_FILTERED);
   
   lb_gr_refresh();
   lb_gr_BMPfile_save("axis_2d.bmp", NULL);
@@ -2249,13 +2238,13 @@ int main(int argc, char *argv[])
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
+	if (event.type == SDL_QUIT)
+	  {
 		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   //#define DEMO_AXIS_2D_LOG
@@ -2290,17 +2279,17 @@ int main(int argc, char *argv[])
 
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-    lb_gr_12RGB(COLOR_BLUE), 5, 15,
-    lb_gr_12RGB(COLOR_GREEN), 10,
-    lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
-    AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
-    AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-    COPYMODE_BLEND, LINEMODE_FILTERED);
+		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
+		     lb_gr_12RGB(COLOR_GREEN), 10,
+		     lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
+		     AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
+		     AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+		     COPYMODE_BLEND, LINEMODE_FILTERED);
 
   UINT16_T i;
   REAL_T xr, yr, xp, yp;
@@ -2308,17 +2297,17 @@ int main(int argc, char *argv[])
   //  yr=1;
   for (i=0;i<=16;i++)
     {
-  //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
-  //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
-  //printf("xr=%f, yr=%f\t\n",xr,yr); 
-  yr=xr;
-  lb_gr_project_2d_x_log(win, xr,  &xp);
-  lb_gr_project_2d_y(win, yr,  &yp);
-  printf("xr=%f, yr=%f\t\n",xr,yr); 
+      //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
+      //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
+      //printf("xr=%f, yr=%f\t\n",xr,yr); 
+      yr=xr;
+      lb_gr_project_2d_x_log(win, xr,  &xp);
+      lb_gr_project_2d_y(win, yr,  &yp);
+      printf("xr=%f, yr=%f\t\n",xr,yr); 
       
-  lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
-  xr=xr*pow(10.0,1.0/4.0);
-} 
+      lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
+      xr=xr*pow(10.0,1.0/4.0);
+    } 
      
   lb_gr_refresh();
   lb_gr_BMPfile_save("axis_2d_semilog.bmp", NULL);
@@ -2327,13 +2316,13 @@ int main(int argc, char *argv[])
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
+	if (event.type == SDL_QUIT)
+	  {
 		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   //#define DEMO_POLAR_AXIS
@@ -2368,22 +2357,22 @@ int main(int argc, char *argv[])
   win.yr_max= 0.768*3; 
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID),
-    COPYMODE_COPY );
+		       COPYMODE_COPY );
   lg_gr_draw_axis_2d_polar(NULL, win, &my_font, 0, 4, 0.1, lb_gr_12RGB(COLOR_BLUE),
-    0, 2*M_PI, 30*M_PI/180,
-    lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY );
+			   0, 2*M_PI, 30*M_PI/180,
+			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY );
   lb_gr_refresh();
 
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
+	if (event.type == SDL_QUIT)
+	  {
 		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   
@@ -2420,14 +2409,14 @@ int main(int argc, char *argv[])
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_DIMGRAY), COPYMODE_COPY);
       
   lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 2.5,
-    lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
-    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-    COPYMODE_BLEND, LINEMODE_FILTERED); 
+		     lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
+		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
+		     COPYMODE_BLEND, LINEMODE_FILTERED); 
 
   lb_gr_plot_continuous_fn_2d(NULL, win, diego_x, diego_y,
-    0, 2*10*M_PI, 1,
-    20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
+			      0, 2*10*M_PI, 1,
+			      20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
 
   lb_gr_delay(10000);
     
@@ -2464,17 +2453,17 @@ int main(int argc, char *argv[])
   win.yr_max= -0.768; 
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-    lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID), COPYMODE_COPY);
+		       lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID), COPYMODE_COPY);
       
   lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_BLACK), 3,
-    lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
-    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-    COPYMODE_COPY, LINEMODE_SOLID); 
+		     lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
+		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
+		     COPYMODE_COPY, LINEMODE_SOLID); 
 
   lb_gr_plot_continuous_fn_2d_antialiasing(NULL, win, diego_x, diego_y,
-    0, 2*M_PI, 0.1, 32,
-    16, lb_gr_12RGB(COLOR_BLUE|COLOR_SOLID), COPYMODE_BLEND);
+					   0, 2*M_PI, 0.1, 32,
+					   16, lb_gr_12RGB(COLOR_BLUE|COLOR_SOLID), COPYMODE_BLEND);
   lb_gr_delay(10000);
   lb_fb_exit(1);
 #endif
@@ -2503,31 +2492,31 @@ int main(int argc, char *argv[])
   for(xp=0;xp<win.xp_max;xp++)
     for(yp=0;yp<win.yp_max;yp++)
       {
-  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
-  iterations=0;
-  z.r=xr;
-  z.i=yr;
-  while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
-    {
-  p.r=xr;
-  p.i=yr;
-  z=lb_cp_add(lb_cp_multiply(z,z),p);
-  iterations++;
-}
-  lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations<<8), COPYMODE_COPY);
-}
+	lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+	iterations=0;
+	z.r=xr;
+	z.i=yr;
+	while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
+	  {
+	    p.r=xr;
+	    p.i=yr;
+	    z=lb_cp_add(lb_cp_multiply(z,z),p);
+	    iterations++;
+	  }
+	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations<<8), COPYMODE_COPY);
+      }
   lb_gr_refresh();
   lb_gr_BMPfile_save("./media/images/mandelbrot.bmp",NULL);
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
+	if (event.type == SDL_QUIT)
+	  {
 		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   //  #define EULER_2ND_ORDER
@@ -2609,7 +2598,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-  #define DEMO_GPIO
+  //#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
 #define PIN_CS_0   17
@@ -2823,7 +2812,7 @@ int main(int argc, char *argv[])
 
 	  
 	  
-	  #define FIRST_SENSOR
+#define FIRST_SENSOR
 #ifdef FIRST_SENSOR
 	  /* First sensor */
 	  lb_gp_gpio_wr(PIN_CS_0, GPIO_LOW);
@@ -3573,13 +3562,13 @@ int main(int argc, char *argv[])
 		      SINT32_T flag_dashed;
 		      flag_dashed= (step_counter/2000) % 8;
 
-			  REAL_T angle;
-			  angle=2*M_PI*t/(365.0*24.0*3600.0);
-			  lb_gr_project_2d(win, 1.496e11*cos(angle),1.496e11*sin(angle), &xp, &yp);
-			  //	      lb_gr_draw_circle_filled(NULL, xp, yp, 3, lb_gr_12RGB(0xF33F), COPYMODE_BLEND);
-			  lb_gr_draw_circle_filled(NULL, xp, yp, 1, lb_gr_12RGB(0xF000), COPYMODE_COPY);
+		      REAL_T angle;
+		      angle=2*M_PI*t/(365.0*24.0*3600.0);
+		      lb_gr_project_2d(win, 1.496e11*cos(angle),1.496e11*sin(angle), &xp, &yp);
+		      //	      lb_gr_draw_circle_filled(NULL, xp, yp, 3, lb_gr_12RGB(0xF33F), COPYMODE_BLEND);
+		      lb_gr_draw_circle_filled(NULL, xp, yp, 1, lb_gr_12RGB(0xF000), COPYMODE_COPY);
 
-			  if( flag_dashed <=1)
+		      if( flag_dashed <=1)
 			{
 			  //lb_gr_plot2d(NULL, win, M_euler[i].p.x, M_euler[i].p.y, 3, lb_gr_12RGB(0xFF33), COPYMODE_BLEND, LINEMODE_DOTS_SOLID);
 			  lb_gr_project_2d(win, M_euler[i].p.x, M_euler[i].p.y, &xp, &yp);
@@ -3611,7 +3600,7 @@ int main(int argc, char *argv[])
 				 100.0*fabs(sqrt(   (xreal-M_rk4[i].p.x)*(xreal-M_rk4[i].p.x) + (yreal-M_rk4[i].p.y)*(yreal-M_rk4[i].p.y)))/sqrt(xreal*xreal+yreal*yreal));
 
 			}
-			  //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
+		      //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
 		      //printf("\n\n");
 		      //delay(200);
 		      lb_gr_refresh();
@@ -5194,6 +5183,26 @@ int main(int argc, char *argv[])
 
 #endif
 
+  /*******************************************************************************************************************/
+  /* Time Functions */
+  /******************************************************************************************************************/
+
+  /* Test for the time delay funcions with milli and micro-second resolution */
+  /* Status: Pass */
+#define DEMO_TIME
+#ifdef DEMO_TIME
+  SINT16_T temp,i=0;
+  while (1)
+    {
+      printf("Sec: %d, P=%02.1f\r\n",i,100.0*(REAL_T)clock()/(REAL_T)0xFFFFFFFF);
+      lb_ti_delay_us(1000000);
+      
+      //lb_ti_delay_ms(1000);
+      i++;
+    }
+#endif
+
+  
   //#define DEMO_KEYBOARD
 #ifdef DEMO_KEYBOARD
   unsigned char c;

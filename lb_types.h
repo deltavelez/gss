@@ -123,8 +123,8 @@ typedef REAL_T(*FUNCTION_X)(REAL_T, MATHERROR_T*);
 /******************************************************/
 /* Computer Graphics constants */
 /******************************************************/
-#define PICTURE_MAX_HEIGHT 1080
-#define PICTURE_MAX_WIDTH 1920
+#define PICTURE_MAX_HEIGHT 65535
+#define PICTURE_MAX_WIDTH 65535
 
 #define N_BITS_R 8            /* Number of bits for red channel for PICTURE_T */
 #define N_BITS_G 8            /* Number of bits for green channel for PICTURE_T */
