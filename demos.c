@@ -2448,11 +2448,11 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   REAL_T k=1.5, x_center, y_center, size;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 600,400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
   
   win.yp_min=0;
-  win.yp_max=600;
+  win.yp_max=400;
   //win.yp_max=11020;
 
   win.xp_min=0;
@@ -2499,7 +2499,7 @@ int main(int argc, char *argv[])
 		  iterations=0;
 		  z.r=xr;
 		  z.i=yr;
-		  while ((lb_cp_abs(z)<2.5) && (iterations<512)) 
+		  while ((lb_cp_abs(z)<5.0) && (iterations<512)) 
 		    {
 		      p.r=xr;
 		      p.i=yr;
@@ -2534,11 +2534,13 @@ int main(int argc, char *argv[])
 	      switch(event.key.keysym.sym)
 		{
 		case SDLK_PAGEUP:
-		  size/=1.2;
+		  size/=powf(2.0,0.25);
+		  printf("size=%f\r\n",size);
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_PAGEDOWN:
-		  size*=1.2;
+		  size*=powf(2.0,0.25);;
+		  printf("size=%f\r\n",size);
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_LEFT:
