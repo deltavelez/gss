@@ -34,6 +34,38 @@
 #define DEBUGGING
 
 
+extern PICTURE_T ty_pic_shadow;
+extern CONSOLE_T *ty_C;
+
+
+/* for DEMO_PARALELL */
+
+void *floatsum(void *x_max_par)
+{
+  double  x, x_max, sum;
+  clock_t begin, end;
+
+  x_max= *((double *)x_max_par);
+
+  begin=clock();
+
+  sum=0.0;
+  x=0;
+  begin=clock();
+  while (x<x_max)
+    {
+      sum+=x;
+      x+=1e-8;
+    }
+  end = clock();
+  printf("sum=%0.4e  ",sum);
+  printf("time elapsed = %.4e\n",(double)(end - begin) / CLOCKS_PER_SEC);
+  /* Check CPU usage: 
+     mpstat -P ALL 1
+  */
+  return 0;
+}
+
 
 REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
 {
@@ -2429,7 +2461,6 @@ int main(int argc, char *argv[])
 		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
 		     COPYMODE_COPY, LINEMODE_SOLID); 
 
-  
   lb_gr_plot_continuous_fn_2d_antialiasing(NULL, win, diego_x, diego_y,
 					   0, 2*M_PI, 0.1, 32,
 					   16, lb_gr_12RGB(COLOR_BLUE|COLOR_SOLID), COPYMODE_BLEND);
@@ -2441,154 +2472,51 @@ int main(int argc, char *argv[])
 #define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
-  SINT32_T xp, yp, iterations;
+  int xp, yp, iterations;
   REAL_T xr, yr;
   COMPLEX_T z, p;
   VIEWPORT_2D_T win;
-  PICTURE_T Pic;
-  REAL_T k=1.5, x_center, y_center, size;
 
-
-  
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
-  
-  
-  win.yp_min=0;
-  //   win.yp_max=300;
-
-
-  win.yp_max=11020;
-  //  win.yp_max=510;
-
   win.xp_min=0;
-  win.xp_max=k*win.yp_max;
+  win.yp_min=0;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
+  win.xr_min=-1.024*2;
+  win.xr_max=1.024*2;
+  win.yr_min=-0.768*2; 
+  win.yr_max=0.768*2;
 
-  Pic.w=win.xp_max;
-  Pic.h=win.yp_max;
-
-  lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
-  
-  //x_center =-1.155176;
-  //y_center =0.279934;
-  //size = 0.011531;
-
-  //  x_center =-1.158879;
-  
-  //y_center =0.285082;
-  //size = 0.001552;
-
-
-  x_center =0.337700;
-  y_center =0.573170;
-  size = 0.009610;
-
-  
-
-
-
-  
-
-
-  unsigned char c;
-  SINT8_T flag_exit, flag_changed;
-
-  flag_exit=FALSE;
-  flag_changed=TRUE;
-
-  while (!flag_exit)
-    {
-      if (flag_changed)
-	{
-	  flag_changed=FALSE;
-	  win.xr_min=x_center-size;
-	  win.xr_max=x_center+size;
-
-	  win.yr_min=y_center-size/k;
-	  win.yr_max=y_center+size/k;
-	  for(xp=0;xp<win.xp_max;xp++)
-	    {
-	      printf("Processing: %0.2f %\r",100.0*xp/win.xp_max); 
-	      for(yp=0;yp<win.yp_max;yp++)
-		{
-		  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
-		  iterations=0;
-		  z.r=xr;
-		  z.i=yr;
-		  while ((lb_cp_abs(z)<2.5) && (iterations<1023)) 
-		    {
-		      p.r=xr;
-		      p.i=yr;
-		      z=lb_cp_add(lb_cp_multiply(z,z),p);
-		      iterations++;
-		    }
-		  PIXEL_T pix;
-
-		  float L;
-		  L=1.0-iterations/1024.0;
-		  pix.b=50+(128-50)*(1-L);
-		  pix.g=128*L;
-		  pix.r=0;
-		  
-		  lb_gr_draw_pixel(&Pic, xp, yp, pix, COPYMODE_COPY);
-		}
-	    }
-
-	  printf("Saving file\r\n");
-	  //lb_gr_BMPfile_save("./media/images/mandelbrot2.bmp",&Pic);
-	  lb_gr_JPGfile_save("./media/images/mandelbrot2.jpg", &Pic, 98);
-      
-	  printf("File saved\r\n");
-	  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
-	  lb_gr_refresh();
-	}
-
-      while (SDL_PollEvent(&event))
-	{
-	  if (event.type == SDL_QUIT)
-	    flag_exit=TRUE;
-	  if (event.type== SDL_KEYDOWN)
-	    {
-	      switch(event.key.keysym.sym)
-		{
-		case SDLK_PAGEUP:
-		  size/=1.2;
-		  flag_changed=TRUE;
-		  break;
-		case SDLK_PAGEDOWN:
-		  size*=1.2;
-		  flag_changed=TRUE;
-		  break;
-		case SDLK_LEFT:
-		  x_center-=size/16.0;
-		  flag_changed=TRUE;
-		  break;
-		case SDLK_RIGHT:
-		  x_center+=size/16.0;
-		  flag_changed=TRUE;
-		  break;
-		case SDLK_UP:
-		  y_center+=size/16.0;
-		  flag_changed=TRUE;
-		  break;
-		case SDLK_DOWN:
-		  y_center-=size/16.0;
-		  flag_changed=TRUE;
-		  break;
-		case SDLK_ESCAPE:
-		  flag_exit=TRUE;
-		  break;
-		}
-	      printf("x_center =%f;\r\n",x_center);
-	      printf("y_center =%f;\r\n",y_center);
-	      printf("size = %f;\r\n",size);
-
-	      printf("x: [%f ; %f]\r\n",x_center-size/2,x_center+size/2);
-	      printf("y: [%f ; %f]\r\n",y_center-size/2,y_center+size/2);
-	    }
-	}
-    }
+  for(xp=0;xp<win.xp_max;xp++)
+    for(yp=0;yp<win.yp_max;yp++)
+      {
+	lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+	iterations=0;
+	z.r=xr;
+	z.i=yr;
+	while ((lb_cp_abs(z)<2.0) && (iterations<15)) 
+	  {
+	    p.r=xr;
+	    p.i=yr;
+	    z=lb_cp_add(lb_cp_multiply(z,z),p);
+	    iterations++;
+	  }
+	lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(iterations<<8), COPYMODE_COPY);
+      }
+  lb_gr_refresh();
+  lb_gr_BMPfile_save("./media/images/mandelbrot.bmp",NULL);
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   //  #define EULER_2ND_ORDER
@@ -4573,36 +4501,6 @@ int main(int argc, char *argv[])
 
   //#define DEMO_PARALELL
 #ifdef DEMO_PARALELL
-
-/* for DEMO_PARALELL */
-
-void *floatsum(void *x_max_par)
-{
-  double  x, x_max, sum;
-  clock_t begin, end;
-
-  x_max= *((double *)x_max_par);
-
-  begin=clock();
-
-  sum=0.0;
-  x=0;
-  begin=clock();
-  while (x<x_max)
-    {
-      sum+=x;
-      x+=1e-8;
-    }
-  end = clock();
-  printf("sum=%0.4e  ",sum);
-  printf("time elapsed = %.4e\n",(double)(end - begin) / CLOCKS_PER_SEC);
-  /* Check CPU usage: 
-     mpstat -P ALL 1
-  */
-  return 0;
-}
-
-  
   pthread_t threads[4];
   int rc;
   double l0, l1, l2, l3;
@@ -5291,7 +5189,7 @@ void *floatsum(void *x_max_par)
 
   /* Test for the time delay funcions with milli and micro-second resolution */
   /* Status: Pass */
-  //#define DEMO_TIME
+#define DEMO_TIME
 #ifdef DEMO_TIME
   SINT16_T temp,i=0;
   while (1)
