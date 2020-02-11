@@ -2456,10 +2456,10 @@ int main(int argc, char *argv[])
   
   
   win.yp_min=0;
-  //   win.yp_max=300;
+     win.yp_max=600;
 
 
-  win.yp_max=11020;
+     win.yp_max=11020;
   //  win.yp_max=510;
 
   win.xp_min=0;
@@ -2527,9 +2527,15 @@ int main(int argc, char *argv[])
 
 		  float L;
 		  L=1.0-iterations/1024.0;
-		  pix.b=50+(128-50)*(1-L);
-		  pix.g=128*L;
-		  pix.r=0;
+		  //pix.b=50+(128-50)*(1-L);
+		  //pix.g=128*L;
+		  //pix.r=0;
+
+
+		  pix.b=128+(255-128)*L;
+		  pix.g=255*L;
+		  pix.r=255*L;
+		 
 		  
 		  lb_gr_draw_pixel(&Pic, xp, yp, pix, COPYMODE_COPY);
 		}
@@ -2537,7 +2543,7 @@ int main(int argc, char *argv[])
 
 	  printf("Saving file\r\n");
 	  //lb_gr_BMPfile_save("./media/images/mandelbrot2.bmp",&Pic);
-	  lb_gr_JPGfile_save("./media/images/mandelbrot2.jpg", &Pic, 98);
+	  lb_gr_JPGfile_save("./media/images/mandelbrot2.jpg", &Pic, 100);
       
 	  printf("File saved\r\n");
 	  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
