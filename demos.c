@@ -2448,19 +2448,12 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   REAL_T k=1.5, x_center, y_center, size;
 
-
-  
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
-
-  
   
   win.yp_min=0;
-     win.yp_max=600;
-
-
-     win.yp_max=11020;
-  //  win.yp_max=510;
+  win.yp_max=600;
+  //win.yp_max=11020;
 
   win.xp_min=0;
   win.xp_max=k*win.yp_max;
@@ -2474,24 +2467,14 @@ int main(int argc, char *argv[])
   //y_center =0.279934;
   //size = 0.011531;
 
-  //  x_center =-1.158879;
-  
+  //x_center =-1.158879;
   //y_center =0.285082;
   //size = 0.001552;
-
 
   x_center =0.337700;
   y_center =0.573170;
   size = 0.009610;
 
-  
-
-
-
-  
-
-
-  unsigned char c;
   SINT8_T flag_exit, flag_changed;
 
   flag_exit=FALSE;
@@ -2509,14 +2492,14 @@ int main(int argc, char *argv[])
 	  win.yr_max=y_center+size/k;
 	  for(xp=0;xp<win.xp_max;xp++)
 	    {
-	      printf("Processing: %0.2f %\r",100.0*xp/win.xp_max); 
+	      printf("Processing: %0.2f\r",100.0*xp/win.xp_max); 
 	      for(yp=0;yp<win.yp_max;yp++)
 		{
 		  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
 		  iterations=0;
 		  z.r=xr;
 		  z.i=yr;
-		  while ((lb_cp_abs(z)<2.5) && (iterations<1023)) 
+		  while ((lb_cp_abs(z)<2.5) && (iterations<512)) 
 		    {
 		      p.r=xr;
 		      p.i=yr;
@@ -2526,26 +2509,18 @@ int main(int argc, char *argv[])
 		  PIXEL_T pix;
 
 		  float L;
-		  L=1.0-iterations/1024.0;
+		  L=1.0-iterations/512.0;
 		  //pix.b=50+(128-50)*(1-L);
 		  //pix.g=128*L;
 		  //pix.r=0;
 
-
 		  pix.b=128+(255-128)*L;
 		  pix.g=255*L;
 		  pix.r=255*L;
-		 
-		  
 		  lb_gr_draw_pixel(&Pic, xp, yp, pix, COPYMODE_COPY);
 		}
 	    }
 
-	  printf("Saving file\r\n");
-	  //lb_gr_BMPfile_save("./media/images/mandelbrot2.bmp",&Pic);
-	  lb_gr_JPGfile_save("./media/images/mandelbrot2.jpg", &Pic, 100);
-      
-	  printf("File saved\r\n");
 	  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
 	  lb_gr_refresh();
 	}
@@ -2584,6 +2559,16 @@ int main(int argc, char *argv[])
 		  break;
 		case SDLK_ESCAPE:
 		  flag_exit=TRUE;
+		  break;
+		case SDLK_b:
+		  printf("Saving file as BMP\r\n");
+		  lb_gr_BMPfile_save("./media/images/mandelbrot2.bmp",&Pic);
+		  printf("File saved\r\n");
+		  break;
+		case SDLK_j:
+		  printf("Saving file as JPG\r\n");
+		  lb_gr_JPGfile_save("./media/images/mandelbrot2.jpg", &Pic, 100);
+		  printf("File saved\r\n");
 		  break;
 		}
 	      printf("x_center =%f;\r\n",x_center);
