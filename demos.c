@@ -2441,62 +2441,104 @@ int main(int argc, char *argv[])
 #define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
-  int xp, yp, iterations;
+  SINT32_T xp, yp, iterations;
   REAL_T xr, yr;
   COMPLEX_T z, p;
   VIEWPORT_2D_T win;
+  PICTURE_T Pic;
   REAL_T k=1.5, x_center, y_center, size;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+
+  
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
   
   win.yp_min=0;
-  win.yp_max=16532;
+   win.yp_max=300;
+
+
+  //win.yp_max=11020;
 
   win.xp_min=0;
   win.xp_max=k*win.yp_max;
 
-  x_center =-1.155176;
-  y_center =0.279934;
-  size = 0.011531;
+  Pic.w=win.xp_max;
+  Pic.h=win.yp_max;
+
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
+  
+  //x_center =-1.155176;
+  //y_center =0.279934;
+  //size = 0.011531;
+
+  //  x_center =-1.158879;
+  
+  //y_center =0.285082;
+  //size = 0.001552;
+
+
+  x_center =0.337700;
+  y_center =0.573170;
+  size = 0.009610;
+
+  
+
+
+
+  
 
 
   unsigned char c;
-  SINT8_T flag_exit;
+  SINT8_T flag_exit, flag_changed;
 
   flag_exit=FALSE;
+  flag_changed=TRUE;
 
-      
   while (!flag_exit)
     {
-      win.xr_min=x_center-size;
-      win.xr_max=x_center+size;
+      if (flag_changed)
+	{
+	  flag_changed=FALSE;
+	  win.xr_min=x_center-size;
+	  win.xr_max=x_center+size;
 
-      win.yr_min=y_center-size/k;
-      win.yr_max=y_center+size/k;
-      for(xp=0;xp<win.xp_max;xp++)
-	for(yp=0;yp<win.yp_max;yp++)
-	  {
-	    lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
-	    iterations=0;
-	    z.r=xr;
-	    z.i=yr;
-	    while ((lb_cp_abs(z)<2.0) && (iterations<255)) 
-	      {
-		p.r=xr;
-		p.i=yr;
-		z=lb_cp_add(lb_cp_multiply(z,z),p);
-		iterations++;
-	      }
-	    PIXEL_T pix;
-	    pix.r=0;
-	    pix.g=0;
-	    pix.b=iterations;
-	    lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
-	  }
-      lb_gr_refresh();
-      lb_gr_BMPfile_save("./media/images/mandelbrot.bmp",NULL);
+	  win.yr_min=y_center-size/k;
+	  win.yr_max=y_center+size/k;
+	  for(xp=0;xp<win.xp_max;xp++)
+	    {
+	      printf("Processing: %0.2f %\r",100.0*xp/win.xp_max); 
+	      for(yp=0;yp<win.yp_max;yp++)
+		{
+		  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+		  iterations=0;
+		  z.r=xr;
+		  z.i=yr;
+		  while ((lb_cp_abs(z)<2.5) && (iterations<1023)) 
+		    {
+		      p.r=xr;
+		      p.i=yr;
+		      z=lb_cp_add(lb_cp_multiply(z,z),p);
+		      iterations++;
+		    }
+		  PIXEL_T pix;
+
+		  float L;
+		  L=1.0-iterations/1024.0;
+		  pix.b=160+(255-160)*L;
+		  pix.r=255*L;
+		  pix.g=255*L;
+		
+		  lb_gr_draw_pixel(&Pic, xp, yp, pix, COPYMODE_COPY);
+		}
+	    }
+
+	  printf("Saving file\r\n");
+	  lb_gr_BMPfile_save("./media/images/mandelbrot2.bmp",&Pic);
+	  printf("File saved\r\n");
+	  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
+	  lb_gr_refresh();
+	}
 
       while (SDL_PollEvent(&event))
 	{
@@ -2504,40 +2546,44 @@ int main(int argc, char *argv[])
 	    flag_exit=TRUE;
 	  if (event.type== SDL_KEYDOWN)
 	    {
-	   
 	      switch(event.key.keysym.sym)
 		{
 		case SDLK_PAGEUP:
 		  size/=1.2;
-		    break;
+		  flag_changed=TRUE;
+		  break;
 		case SDLK_PAGEDOWN:
 		  size*=1.2;
-		    break;
+		  flag_changed=TRUE;
+		  break;
 		case SDLK_LEFT:
 		  x_center-=size/16.0;
+		  flag_changed=TRUE;
 		  break;
 		case SDLK_RIGHT:
 		  x_center+=size/16.0;
+		  flag_changed=TRUE;
 		  break;
 		case SDLK_UP:
 		  y_center+=size/16.0;
+		  flag_changed=TRUE;
 		  break;
 		case SDLK_DOWN:
 		  y_center-=size/16.0;
+		  flag_changed=TRUE;
 		  break;
-
-
 		case SDLK_ESCAPE:
 		  flag_exit=TRUE;
 		  break;
 		}
-	      printf("x_center =%f\r\n",x_center);
-	      printf("y_center =%f\r\n",y_center);
-	      printf("size = %f\r\n",size);
-	      
+	      printf("x_center =%f;\r\n",x_center);
+	      printf("y_center =%f;\r\n",y_center);
+	      printf("size = %f;\r\n",size);
+
+	      printf("x: [%f ; %f]\r\n",x_center-size/2,x_center+size/2);
+	      printf("y: [%f ; %f]\r\n",y_center-size/2,y_center+size/2);
 	    }
 	}
-
     }
 #endif
 
