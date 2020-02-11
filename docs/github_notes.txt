@@ -67,6 +67,11 @@ Deleted branch pixelargs (was 9cfdcda).
 Creating a local branch of a specific commit:
  git branch pixelargs 9cfdcda4f263be8e197bc1e75821552a72782701
 
+How to check the commits which havent been yet pushed:
+
+git log origin/master..HEAD
+
+
 Emacs: creating a simple TAGS file, useful, for example, to change a string across multiple files:
 execute command: etags *c *.h
 
