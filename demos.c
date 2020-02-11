@@ -2499,7 +2499,7 @@ int main(int argc, char *argv[])
 		  iterations=0;
 		  z.r=xr;
 		  z.i=yr;
-		  while ((lb_cp_abs(z)<5.0) && (iterations<512)) 
+		  while ((lb_cp_abs(z)<5.0) && (iterations<1024)) 
 		    {
 		      p.r=xr;
 		      p.i=yr;
@@ -2509,7 +2509,7 @@ int main(int argc, char *argv[])
 		  PIXEL_T pix;
 
 		  float L;
-		  L=1.0-iterations/512.0;
+		  L=1.0-iterations/1024.0;
 		  //pix.b=50+(128-50)*(1-L);
 		  //pix.g=128*L;
 		  //pix.r=0;
