@@ -2499,7 +2499,7 @@ int main(int argc, char *argv[])
 		  iterations=0;
 		  z.r=xr;
 		  z.i=yr;
-		  while ((lb_cp_abs(z)<5.0) && (iterations<1024)) 
+		  while ((lb_cp_abs(z)<2.0) && (iterations<1024)) 
 		    {
 		      p.r=xr;
 		      p.i=yr;
