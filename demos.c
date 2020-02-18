@@ -31,135 +31,20 @@
 #include "lb_gpio.h"
 #include "lb_time.h" 
 
-#define DEBUGGING
-
-
-
-REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
-{
-  return -0.1*x;
-}
-
-REAL_T diego_x(REAL_T t, MATHERROR_T *error)
-{
-  return 0.75*sin(5*t)*cos(t);
-}
-
-REAL_T diego_y(REAL_T t, MATHERROR_T *error)
-{
-  return 0.75*sin(5*t)*sin(t);
   
-}
-
-
-SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
-{
-  FILE *fp;
-  char filename[16];
-  char str[4];
-  long pos_lat, pos_lon;
-  int height;
-    
-  strcpy(filename,"\0");
-  if (lat>=0.0)
-    {
-      strcat(filename,"N");
-      sprintf(str, "%02d", (SINT16_T)lat);
-      pos_lat=round(1201.0*lb_re_frac(lat));
-    }
-  else
-    {
-      strcat(filename,"S");
-      sprintf(str, "%02d", (SINT16_T)ceil(-lat));
-      pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
-    }
-  strcat(filename,str);
-  if (lon>=0.0)
-    {
-      strcat(filename,"E");
-      sprintf(str, "%03d", (SINT16_T)lon);
-      pos_lon=round(1201*lb_re_frac(lon));
-    }
-  else
-    {
-      strcat(filename,"W");
-      sprintf(str, "%03d", (SINT16_T)ceil(-lon));
-      pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
-    }
-  strcat(filename,str);
-  strcat(filename,".hgt");
-  // printf("Filename: %s, lon=%f pos_lon=%d, lat=%f pos_lat=%d  ",filename,lat,pos_lon,pos_lat);
-  
-  if (!(fp = fopen(filename, "r")))
-    {
-      perror("invalid filename\r\n");
-      return 0;
-    }
-  
-  fseek(fp,2*1201*pos_lat+2*pos_lon,SEEK_SET);
-  fread(&height,sizeof(height),1,fp);
-  fclose(fp);
-  return lb_in_littleS16_to_bigS16(height);
-}
-
-
-
-  
-int test_f1(int x, int y, int z)
-{
-  return x+y+z;
-}
-
-int test_f2(int x, int y, int z)
-{
-  return test_f1(x, y, z);
-}
-
-int (*ptr2)(int, int);
-int (*ptr3)(int, int, int);
-
-int sum2(int a, int b)
-{
-  return a+b;
-}
-
-int sum3(int a, int b, int c)
-{
-  return a+b+c;
-}
-
-
-#define pel(surf, x, y, rgb) ((unsigned char *)(surf->pixels))[y*(surf->pitch)+x*3+rgb]
-
-//#define WIDTH 1920
-//#define HEIGHT 1080
-
-//#define WIDTH 1200
-//#define HEIGHT 800
-
-//#define WIDTH 512
-//#define HEIGHT 512
-
-//#define WIDTH 256
-//#define HEIGHT 256
-
-#define WIDTH 1024
-#define HEIGHT 768
-
-
-
-
 int main(int argc, char *argv[])
 {
   /* Time tests */
 
+  /******************************************************************************/
+  /* Demo: Multi_dimensional Matrices.                                          */
+  /* This shows the creation, printing, and release of multi-dimentional        */
+  /* matrices.  A memory-leak test can also be performed, which can also show   */
+  /* such a test could be applied to other cases.                               */
+  /******************************************************************************/
   
   //#define MATRIX_NDIM
 #ifdef MATRIX_NDIM
-  
-  /*******************************************************************************************************************/
-  /* General Matrix Handling test                                                                                        */
-  /*******************************************************************************************************************/
   	  
   ARRAY_R_T M;
   M.n=4;
@@ -204,12 +89,10 @@ int main(int argc, char *argv[])
   lb_al_release_array_r(&M);
   
 
-  exit(1);
-  
   cummulative=0;
   /* Checking for memory leaks */
 
-  if (0) for (l=0;l<1000000;l++)
+  if (1) for (l=0;l<10000;l++)
 	   {
 	     //printf("size=%d\r\n",sizeof(REAL_T));
 
@@ -243,15 +126,16 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
   
-  
-  /*******************************************************************************************************************/
-  /* General Computer Science                                                                                        */
-  /*******************************************************************************************************************/
-  
-  
-      
+  /******************************************************************************/
+  /* General Computer Science Demos.                                            */
+  /******************************************************************************/
 
-  
+  /******************************************************************************/
+  /* Demo: A two-dimentional circular Buffer.                                   */
+  /* Shows the fundamentals for building a text console.                        */
+  /* to_do: to implement an 'insert' feature.                                   */
+  /******************************************************************************/
+
   //#define DEMO_2D_CIRCULAR_BUFFER_TEXT
 #ifdef DEMO_2D_CIRCULAR_BUFFER_TEXT
 #define MAX_COLS 4
@@ -435,9 +319,13 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* Vectors and Matrices */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Vectors and Matrices.                                                      */
+  /******************************************************************************/
+
+  /******************************************************************************/
+  /* Demo: Creation, swap, and printing of Vectors.                             */
+  /******************************************************************************/
 
   //#define DEMO_SWAP_VECTOR
 #ifdef DEMO_SWAP_VECTOR
@@ -467,6 +355,10 @@ int main(int argc, char *argv[])
   exit(1);
 #endif 
 
+  /******************************************************************************/
+  /* Demo: Insertion of elements in a Vector.                                   */
+  /******************************************************************************/
+
   //#define DEMO_INSERT_VECTOR
 #ifdef DEMO_INSERT_VECTOR
   VECTOR_R_T V;
@@ -482,7 +374,11 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
-  // #define DEMO_DELETE_ITEM_VECTOR
+  /******************************************************************************/
+  /* Demo: Deletion of elements in a Vector.                                    */
+  /******************************************************************************/
+
+  //#define DEMO_DELETE_ITEM_VECTOR
 #ifdef DEMO_DELETE_ITEM_VECTOR
   VECTOR_R_T V;
   UINT16_T i, k;
@@ -515,7 +411,12 @@ int main(int argc, char *argv[])
 #endif 
 
   
-  //#define DEMO_INTERPOLATE
+  /******************************************************************************/
+  /* Demo: Bi-inear Interpolation of data contained within a Matrix.            */
+  /* to_do: A similar function could be created using non-linear techniques.    */
+  /******************************************************************************/
+
+  //  #define DEMO_INTERPOLATE
 #ifdef DEMO_INTERPOLATE
   MATRIX_R_T A;
   SINT16_T i,j;
@@ -536,9 +437,13 @@ int main(int argc, char *argv[])
   printf("Q= %f\r\n",Q);
 
   lb_al_release_matrix_r(&A);
-  lb_gr_delay(10000);
+  lb_ti_delay_ms(1000);
   exit(1);
 #endif
+
+  /******************************************************************************/
+  /* Demo: Determinants.                                                        */
+  /******************************************************************************/
 
   //#define DEMO_DETERMINANT
 #ifdef DEMO_DETERMINANT
@@ -565,6 +470,12 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
+  /******************************************************************************/
+  /* Demo: Matrix 3x3 multiplication and determinants.                          */
+  /* The "classic" c-style for defining matrices is difficult to be beat-up     */
+  /* when it comes to performance.  This example is just a brush-up.            */
+  /******************************************************************************/
+
   //#define DEMO_MATRIX_33
 #ifdef  DEMO_MATRIX_33
   REAL_T M[3][3],  G[3][3], x;
@@ -585,7 +496,11 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
-  // #define DEMO_MATRIX_22
+  /******************************************************************************/
+  /* Demo: Matrix 2x2 determinants.                                             */
+  /******************************************************************************/
+
+#define DEMO_MATRIX_22
 #ifdef  DEMO_MATRIX_22
   REAL_T M1[2][2], x;
   
@@ -2347,6 +2262,16 @@ int main(int argc, char *argv[])
   
   //#define DEMO_PLOT_CONTINUOUS
 #ifdef DEMO_PLOT_CONTINUOUS
+REAL_T diego_x(REAL_T t, MATHERROR_T *error)
+{
+  return 0.75*sin(5*t)*cos(t);
+}
+
+  REAL_T diego_y(REAL_T t, MATHERROR_T *error)
+{
+  return 0.75*sin(5*t)*sin(t);
+}
+
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
@@ -2438,7 +2363,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-#define DEMO_MANDELBROT
+  //#define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
   SINT32_T xp, yp, iterations;
@@ -2448,7 +2373,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   REAL_T k=1.5, x_center, y_center, size;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 600,400, 0, 0, 0);
+  lb_gr_SDL_init("Exploring  the Mandelbrot Set", SDL_INIT_VIDEO, 600,400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
   
   win.yp_min=0;
@@ -4530,6 +4455,57 @@ int main(int argc, char *argv[])
 
   //#define DEMO_GIS_HEIGHT
 #ifdef DEMO_GIS_HEIGHT
+SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
+{
+  FILE *fp;
+  char filename[16];
+  char str[4];
+  long pos_lat, pos_lon;
+  int height;
+    
+  strcpy(filename,"\0");
+  if (lat>=0.0)
+    {
+      strcat(filename,"N");
+      sprintf(str, "%02d", (SINT16_T)lat);
+      pos_lat=round(1201.0*lb_re_frac(lat));
+    }
+  else
+    {
+      strcat(filename,"S");
+      sprintf(str, "%02d", (SINT16_T)ceil(-lat));
+      pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
+    }
+  strcat(filename,str);
+  if (lon>=0.0)
+    {
+      strcat(filename,"E");
+      sprintf(str, "%03d", (SINT16_T)lon);
+      pos_lon=round(1201*lb_re_frac(lon));
+    }
+  else
+    {
+      strcat(filename,"W");
+      sprintf(str, "%03d", (SINT16_T)ceil(-lon));
+      pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
+    }
+  strcat(filename,str);
+  strcat(filename,".hgt");
+  // printf("Filename: %s, lon=%f pos_lon=%d, lat=%f pos_lat=%d  ",filename,lat,pos_lon,pos_lat);
+  
+  if (!(fp = fopen(filename, "r")))
+    {
+      perror("invalid filename\r\n");
+      return 0;
+    }
+  
+  fseek(fp,2*1201*pos_lat+2*pos_lon,SEEK_SET);
+  fread(&height,sizeof(height),1,fp);
+  fclose(fp);
+  return lb_in_littleS16_to_bigS16(height);
+}
+
+  
   SINT16_T i, j, height, height_max;
 
   lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
@@ -4801,6 +4777,12 @@ void *floatsum(void *x_max_par)
 
   //#define DEMO_RK4
 #ifdef DEMO_RK4
+REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
+{
+  return -0.1*x;
+}
+
+  
   REAL_T t_n, y_rk4, y_euler, xp, yp;
   VIEWPORT_2D_T win;
   MATHERROR_T error;
