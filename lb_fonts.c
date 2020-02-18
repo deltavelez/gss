@@ -1503,6 +1503,9 @@ void lb_ft_printc(CONSOLE_T *C, char c)
   SINT16_T j, n;
   switch (c)
     {
+    case 0:
+      return;
+      break;
     case PCKEY_UP:
       (*C).n_back++;
 
@@ -1784,7 +1787,7 @@ void lb_ft_printf(CONSOLE_T *C, const char *format, ...)
 
   va_start(args,format);
 
-  /* If the framebuffer hasn't been opened, do a regular printf to tty */
+  /* If the virtual console is NULL, we do a regular printf to tty */
   if ( C==NULL )
     {
       vprintf(format, args);

@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
   /* Demo: Matrix 2x2 determinants.                                             */
   /******************************************************************************/
 
-#define DEMO_MATRIX_22
+  //#define DEMO_MATRIX_22
 #ifdef  DEMO_MATRIX_22
   REAL_T M1[2][2], x;
   
@@ -512,13 +512,134 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
+
+  /******************************************************************************/
+  /* Demo: Virtual Consoles                                                     */
+  /* This is the foundation on how to build your own 'console'                  */
+  /* To_do: it would be nice to implement 'insertion', fast jumps, etc.         */
+  /******************************************************************************/
    
   //#define DEMO_VIRTUAL_CONSOLE
 #ifdef DEMO_VIRTUAL_CONSOLE
+  char SDL_Keysym_to_char(SDL_Keysym ks)
+  {
+    char c;
+    switch(ks.sym)
+      {
+      case SDLK_UP:
+	c=PCKEY_UP;
+	break;
+      case SDLK_DOWN:
+	c=PCKEY_DOWN;
+	break;
+      case SDLK_RIGHT:
+	c=PCKEY_RIGHT;
+	break;
+      case SDLK_LEFT:
+	c=PCKEY_LEFT;
+	break;
+      case SDLK_PAGEUP:
+	c=PCKEY_PAGE_UP;
+	break;
+      case SDLK_PAGEDOWN:
+	c=PCKEY_PAGE_DOWN;
+	break;
+      case SDLK_INSERT:
+	c=PCKEY_INSERT;
+	break;
+      case SDLK_BACKSPACE:
+	c=PCKEY_BS;
+	break;
+      case SDLK_TAB:
+	c=PCKEY_TAB;
+	break;
+      case SDLK_RETURN:
+	c=PCKEY_ENTER;
+	break;
+      case SDLK_F1:
+	c=PCKEY_F1;
+	break;
+      case SDLK_F2:
+	c=PCKEY_F2;
+	break;
+      case SDLK_F3:
+	c=PCKEY_F3;
+	break;
+      case SDLK_F4:
+	c=PCKEY_F4;
+	break;
+      case SDLK_F5:
+	c=PCKEY_F5;
+	break;
+      case SDLK_F6:
+	c=PCKEY_F6;
+	break;
+      case SDLK_F7:
+	c=PCKEY_F7;
+	break;
+      case SDLK_F8:
+	c=PCKEY_F8;
+	break;
+      case SDLK_F9:
+	c=PCKEY_F9;
+	break;
+      case SDLK_F10:
+	c=PCKEY_F10;
+	break;
+      case SDLK_F11:
+	c=PCKEY_F11;
+	break;
+      case SDLK_F12:
+	c=PCKEY_F12;
+	break;
+      case SDLK_HOME:
+	c=PCKEY_HOME;
+	break;
+      case SDLK_PAUSE:
+	c=PCKEY_PAUSE;
+	break;
+      case SDLK_LALT:
+      case SDLK_RALT:
+	c=PCKEY_ALT;
+	break;
+      case SDLK_SCROLLLOCK:
+	c=PCKEY_SCROLL_LOCK;
+	break;
+      case SDLK_ESCAPE:
+	c=PCKEY_ESC;
+	break;
+      case SDLK_CAPSLOCK:
+	c=PCKEY_CAPS_LOCK;
+	break;
+      case SDLK_LSHIFT:
+      case SDLK_RSHIFT:
+	c=PCKEY_SHIFT;
+	break;
+      case SDLK_LCTRL:
+      case SDLK_RCTRL:
+	c=PCKEY_CONTROL;
+	break;
+      case SDLK_NUMLOCKCLEAR:
+	c=PCKEY_NUM_LOCK;
+	break;
+      case SDLK_DELETE:
+	c=PCKEY_DEL;
+	break;
+      case SDLK_END:
+	c=PCKEY_END;
+	break;
+      default:
+	c = 0;
+	break;
+      }
+    return c;
+  }
+  
   SDL_Event event;
   PICTURE_T Pic_console;
   FONT_T font_console;
-  CONSOLE_T Con;  char c;
+  CONSOLE_T Con;
+  char c;
 
   lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
   
@@ -527,8 +648,8 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&Pic_console,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID));
 
   lb_ft_load_GLCDfont("./fonts/Font_hp48G_large.lcd", &font_console);
-  font_console.scale_x=1;
-  font_console.scale_y=1;
+  font_console.scale_x=2;
+  font_console.scale_y=2;
   font_console.gap_x=2;
   font_console.gap_y=2;
   font_console.max_x=10;
@@ -543,36 +664,61 @@ int main(int argc, char *argv[])
   Con.color_fg=lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID);
   Con.color_bg=lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID);
   lb_ft_create_console(&Con);
-  lb_ft_set_active_console(&Con);
-    
-  
+
+  SDL_StartTextInput();
+  UINT8_T flag_console_changed=FALSE;
   while (1)
     while (SDL_PollEvent(&event))
       {
 	switch (event.type)
 	  {
+	  case SDL_TEXTINPUT:
+	    printf("\r\nSDL_TEXTINPUT: %s",event.text.text);
+	    c=event.text.text[0];
+	    lb_ft_printc(&Con,c);
+	    flag_console_changed=TRUE;
+	    break; 
 	  case SDL_QUIT:
 	    lb_ft_release_console(&Con);
 	    lb_gr_release_picture(&Pic_console);
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
-	  case SDL_KEYDOWN:
-	    printf("\r\n%x\r\n",event.key.keysym.sym);
-	    fflush(stdout);
-	    lb_ft_printc(&Con,event.key.keysym.sym);
-	    lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
-	    lb_gr_render_picture(&Pic_console, 0, 0, COPYMODE_COPY ,
-				 RENDERMODE_BGCOLOR(0x0Fabc) | RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(1) |  RENDERMODE_SCALE_Y(1));
-	    lb_gr_refresh();
+	  case SDL_KEYUP:
+	    c=SDL_Keysym_to_char(event.key.keysym);
+	    if ( (c==PCKEY_UP) || (c== PCKEY_DOWN) || (c==PCKEY_LEFT) || (c==PCKEY_RIGHT) || (c==PCKEY_INSERT) ||
+		 (c==PCKEY_BS) || (c==PCKEY_ENTER) )
+	      {
+		printf("\r\nSDL_KEYUP: %x",c);
+		lb_ft_printc(&Con,c);
+		flag_console_changed=TRUE;
+	      }
 	    break;
 	  }
+	fflush(stdout);
+	if (flag_console_changed)
+	  {
+	    flag_console_changed=FALSE;
+	    
+	    lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
+	    lb_gr_render_picture(&Pic_console, 0, 0, COPYMODE_COPY,
+				 RENDERMODE_BGCOLOR(0x0Fabc) | RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(1) |  RENDERMODE_SCALE_Y(1));
+	    lb_gr_refresh();
+	  }
       }
+  lb_gr_SDL_close();
 #endif  	
 
 
-  /*******************************************************************************************************************/
-  /* Graphic Primitives */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Demo: Graphic Primitves                                                    */
+  /******************************************************************************/
+
+
+  /******************************************************************************/
+  /* Demo: Pixels                                                               */
+  /* Shows: graphics initialization, pixel manupulation, horizontal lines,      */
+  /* rectangles, screen refreshing, and benchmarking.                           */
+  /******************************************************************************/
 
   //#define DEMO_PIXEL
 #ifdef DEMO_PIXEL
@@ -605,7 +751,6 @@ int main(int argc, char *argv[])
       lb_gr_refresh();
     }
   lb_ti_delay_ms(4000);
-
   
   for(z=0;z<255;z++) 
     {
@@ -634,29 +779,29 @@ int main(int argc, char *argv[])
       if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
 	break;
     }
+  lb_gr_SDL_close();
 #endif
 
+  /******************************************************************************/
+  /* Demo: Line1                                                                */
+  /* Shows: graphics initialization, pixel manupulation, horizontal lines,      */
+  /* rectangles, screen refreshing, and benchmarking.                           */
+  /******************************************************************************/
 
   //#define DEMO_LINE1
 #ifdef DEMO_LINE1
   SDL_Event event;
-  SINT16_T x, y, z, width, height;
+  SINT16_T z;
   clock_t begin, end;
-  PIXEL_T color;
-  
-  //lb_gr_SDL_init(SDL_INIT_VIDEO, 1920, 1080, 1, 1, 0);
-  lb_gr_SDL_init(SDL_INIT_VIDEO, 800, 600, 1, 1, 0);
-  ty_videomode= VIDEOMODE_FAST;
-  
-  
-  printf("ty_scale_x=%d, ty_scale_y=%d\r\n",ty_scale_x,ty_scale_y);
  
+  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
   
   for(z=0;z<1000;z++) 
     {
       begin=clock();
       {
-	lb_gr_draw_line1(NULL, ty_width/2, ty_height/2, rand() % ty_width, rand() % ty_height, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID),COPYMODE_COPY);
+	lb_gr_draw_line1(NULL, ty_screen.w/2, ty_screen.h/2,
+			 rand() % ty_screen.w, rand() % ty_screen.h,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID),COPYMODE_COPY);
       }
       lb_gr_refresh();
       end=clock();
@@ -670,50 +815,95 @@ int main(int argc, char *argv[])
       if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
 	break;
     }
+  lb_gr_SDL_close();
 #endif
 
- 
+  /******************************************************************************/
+  /* Demo: Line2                                                                */
+  /* Shows: Simple test using 2-pixel width lines                               */
+  /******************************************************************************/
   
-
   //#define DEMO_LINE2
 #ifdef DEMO_LINE2
+  SDL_Event event;
   int i;
-  lb_fb_open("/dev/fb0", "/dev/tty1", 8, 8,  0*RENDEROPTIONS_LINE);
-  lb_fb_clear(ty_fb_main, 50,50,50,255);
-  //printf("ty_width=%d, ty_height=%d\r\n",ty_width, ty_height);
-  for (i=0;i<30000; i++)
-    lb_gr_draw_line2(NULL, rand() % ty_width, rand() % ty_height, rand() % ty_width, rand() % ty_height,
-		     lb_gr_12RGB(rand() % 0x0FFF), COPYMODE_COPY);
-  lb_gr_delay(10000);
-  lb_fb_exit(1);
+
+  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 220, 120, 155);
+
+  for (i=0;i<3000; i++)
+    {
+      lb_gr_draw_line2(NULL, rand() % ty_screen.w, rand() % ty_screen.h,
+		       rand() % ty_screen.w, rand() % ty_screen.h,
+		       lb_gr_12RGB(rand() % 0x0FFF), COPYMODE_COPY);
+      lb_gr_refresh();
+    }
+  while (1)
+    {
+      if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
+	break;
+    }
+  lb_gr_SDL_close();
 #endif
+
+  /******************************************************************************/
+  /* Demo: Line3                                                                */
+  /* Shows: Simple test using 3-pixel width lines                               */
+  /******************************************************************************/
 
   //#define DEMO_LINE3
 #ifdef DEMO_LINE3
+  SDL_Event event;
   int i;
-  lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0, 55,0);
+
+  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 220, 200, 255);
 
   for (i=0;i<1000; i++)
-    lb_gr_draw_line3(NULL, rand() % ty_width, rand() % ty_height, rand() % ty_width, rand() % ty_height,
-		     lb_gr_12RGB(rand() % 0x0FFF), COPYMODE_COPY);
-  lb_gr_delay(2000);
-  lb_fb_exit(1);
+    {
+      lb_gr_draw_line3(NULL, rand() % ty_screen.w, rand() % ty_screen.h,
+		       rand() % ty_screen.w, rand() % ty_screen.h,
+		       lb_gr_12RGB(rand() % 0x0FFF), COPYMODE_COPY);
+      lb_gr_refresh();
+    }
+  while (1)
+    {
+      if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
+	break;
+    }
+  lb_gr_SDL_close();
 #endif
+
+  /******************************************************************************/
+  /* Demo: Line1_float                                                          */
+  /* Shows: Simple test plotting a line using a floating point method           */
+  /******************************************************************************/
 
   //#define DEMO_LINE1_FLOAT
 #ifdef DEMO_LINE1_FLOAT
-  SINT16_T i, j,k;
+  SDL_Event event;
+  SINT16_T i;
 
-  lb_fb_open("/dev/fb0","/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 20, 255, 255);
   lb_gr_clear_picture(NULL , lb_gr_12RGB(0x333 | COLOR_SOLID));
   for(i=0;i<1000;i++)
-    lb_gr_draw_line1(NULL, ty_width/2, ty_height/2, rand() % ty_width , rand() % ty_height,
-		     lb_gr_12RGB(rand() % 0xFFF |0xF000),COPYMODE_COPY);
-  lb_gr_delay(10000);
-  lb_fb_exit(1);
+    {
+      lb_gr_draw_line1(NULL, ty_screen.w/2, ty_screen.h/2, rand() % ty_screen.w , rand() % ty_screen.h,
+		       lb_gr_12RGB(rand() % 0xFFF |0xF000),COPYMODE_COPY);
+      lb_gr_refresh();
+    }
+
+  while (1)
+    {
+      if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
+	break;
+    }
+  lb_gr_SDL_close();
 #endif
 
+
+  /******************************************************************************/
+  /* Demo: Line_antialiasing                                                    */
+  /* Shows the use and advantages of the Antialiasing primitives.        */
+  /******************************************************************************/
 
   //#define DEMO_LINE_ANTIALIASING
 #ifdef DEMO_LINE_ANTIALIASING
@@ -749,8 +939,15 @@ int main(int argc, char *argv[])
     }
   lb_gr_BMPfile_save("line.bmp", &Pic);
   lb_gr_release_picture(&Pic);
-  SDL_Quit();
+  lb_gr_SDL_close();
 #endif
+
+
+  /******************************************************************************/
+  /* Demo: Line_antialiasing                                                    */
+  /* Shows a variation of the Antialiasing primitives to draw lines with a      */
+  /* two or three pixel width.                                                           */
+  /******************************************************************************/
 
   //#define DEMO_LINE_ANTIALIASING2
 #ifdef DEMO_LINE_ANTIALIASING2
@@ -793,24 +990,32 @@ int main(int argc, char *argv[])
     }
   lb_gr_BMPfile_save("line.bmp", &Pic);
   lb_gr_release_picture(&Pic);
-  SDL_Quit();
+  lb_gr_SDL_close();
 #endif
 
-  
 
-  //#define DEMO_LINE_GENERAL
+  /******************************************************************************/
+  /* Demo: Line_general                                                         */
+  /* lb_gr_draw_line() is a wrapper which call a number of line functions,      */
+  /* according to the parameters being passed                                   */
+  /* to_do:  the blending (add/or/xor, etc.) seems not to work anymore for      */
+  /* line widths larger than 3                                                  */
+  /******************************************************************************/
+  
+  //Define DEMO_LINE_GENERAL
 #ifdef DEMO_LINE_GENERAL
   SDL_Event event;
+  
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
       
-  lb_gr_draw_line(NULL, 0, 0, ty_screen.w, ty_screen.h, 50,
-		  lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY, LINEMODE_FILTERED);
+  lb_gr_draw_line(NULL, 0, 0, ty_screen.w, ty_screen.h, 30,
+		  lb_gr_12RGB(COLOR_BLUE | 0*COLOR_SOLID), COPYMODE_COPY, LINEMODE_SOLID);
 
-  lb_gr_draw_line(NULL, ty_screen.w, 0,  0, ty_screen.h, 30,
-		  lb_gr_12RGB(COLOR_RED | COLOR_SOLID), COPYMODE_COPY, LINEMODE_FILTERED);
+  lb_gr_draw_line(NULL, ty_screen.w, 0,  0, ty_screen.h, 50,
+		  lb_gr_12RGB(COLOR_RED | 0*COLOR_SOLID), COPYMODE_ADD, LINEMODE_SOLID);
 	
-  lb_gr_draw_line(NULL, ty_screen.w/2,0, ty_screen.h/2, ty_screen.h, 20,
-		  lb_gr_12RGB(COLOR_GREEN | COLOR_SOLID), COPYMODE_XOR, LINEMODE_FILTERED);
+  lb_gr_draw_line(NULL, ty_screen.w/2,0, ty_screen.h/2, ty_screen.h, 40,
+		  lb_gr_12RGB(COLOR_GREEN | 0*COLOR_SOLID), COPYMODE_XOR, LINEMODE_SOLID);
 
   lb_gr_refresh();
 
@@ -819,11 +1024,17 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-	    SDL_Quit();
+	    lb_gr_SDL_close();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+
+  /******************************************************************************/
+  /* Demo: Circle                                                               */
+  /* Just a simple, 1-pixel width circle.                                       */
+  /******************************************************************************/
 
   //#define DEMO_CIRCLE
 #ifdef DEMO_CIRCLE
@@ -832,24 +1043,23 @@ int main(int argc, char *argv[])
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
   lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);
   lb_gr_refresh();
-  lb_gr_delay(2000);
-
-  //  lb_gr_resize(100, 100);
-
-  //  lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
-  //lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);
-  //lb_gr_refresh();
   
   while (1)
     while (SDL_PollEvent(&event))
       {
 	if (event.type == SDL_QUIT)
 	  {
-	    SDL_Quit();
+	    lb_gr_SDL_close();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+  
+  /******************************************************************************/
+  /* Demo: Circle                                                               */
+  /* Just a simple, 1-pixel width circle with antialiasing.                     */
+  /******************************************************************************/
 
   //#define DEMO_CIRCLE_ANTIALIASING_SIMPLE
 #ifdef DEMO_CIRCLE_ANTIALIASING_SIMPLE
@@ -858,7 +1068,7 @@ int main(int argc, char *argv[])
 
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0xFFFF | COLOR_SOLID));
   lb_gr_draw_circle_antialiasing_simple(NULL, ty_screen.w/2, ty_screen.h/2, 0.35*ty_screen.h,20,
-					lb_gr_12RGB(0x1F00), COPYMODE_BLEND);
+					lb_gr_12RGB(0x1F00));
 
   lb_gr_BMPfile_save("circle.bmp", NULL);
 
@@ -869,16 +1079,20 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-	    SDL_Quit();
+	    lb_gr_SDL_close();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Circle 2, 3                                                          */
+  /* Just a simple, 1-pixel width circle with antialiasing.                     */
+  /******************************************************************************/
+
   //#define DEMO_CIRCLE_ANTIALIASING23
 #ifdef DEMO_CIRCLE_ANTIALIASING23
   SDL_Event event;
-
   PICTURE_T Pic;
   UINT8_T pix_x=20, pix_y=20;
   
@@ -886,18 +1100,12 @@ int main(int argc, char *argv[])
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
 
-  lb_gr_create_picture(&Pic,lb_gr_12RGB(0xFFFF) );
-
-     
-  lb_gr_draw_circle_antialiasing3(&Pic, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFF00),  COPYMODE_BLEND);
-
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(0xFFFF));
+  lb_gr_draw_circle_antialiasing3(&Pic, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFF00));
   lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
   
-  
   lb_gr_refresh();
-
   lb_ti_delay_ms(1000);
-  
   lb_gr_BMPfile_save("circle2.bmp", NULL);
 
   while (1)
@@ -905,11 +1113,18 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-	    SDL_Quit();
+	    lb_gr_SDL_close();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Circle with antialiasing.                                            */
+  /* A circle with an arbitrary with and antialiasing.                          */
+  /* to_do:  when trying to render a picture with a NULL parameter, an error    */
+  /* should be reported.    */
+  /******************************************************************************/
 
   //#define DEMO_CIRCLE_ANTIALIASING 
 #ifdef DEMO_CIRCLE_ANTIALIASING
@@ -919,14 +1134,12 @@ int main(int argc, char *argv[])
   //      lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0xff, 0xff, 0xff, 0xff, 0);
   lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0, 0, 0, 0xff, 0);
 
-  lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(2*pix_x),   ty_screen.h/(2*pix_y), 0.25*ty_screen.w/pix_x, 10, lb_gr_12RGB(0xfF00),
-				 COPYMODE_BLEND |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-  lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf0f0), 
-				 COPYMODE_BLEND |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-
-  lb_gr_draw_circle_antialiasing(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf00F),
-				 COPYMODE_BLEND |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-   
+  lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(2*pix_x),   ty_screen.h/(2*pix_y), 0.25*ty_screen.w/pix_x, 10, lb_gr_12RGB(0xfF00));
+  lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf0f0)); 
+  lb_gr_draw_circle_antialiasing(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf00F));
+  
+  //lb_gr_render_picture(NULL, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
+  
 
   lb_gr_refresh();
   while (1)
@@ -934,6 +1147,7 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
@@ -2102,17 +2316,17 @@ int main(int argc, char *argv[])
      #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
-		     lb_gr_12RGB(COLOR_GREEN), 1,
-		     lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
-		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
-		     0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-		     COPYMODE_BLEND, LINEMODE_FILTERED);
+    lb_gr_12RGB(COLOR_BLUE), 5, 15,
+    lb_gr_12RGB(COLOR_GREEN), 1,
+    lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
+    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
+    0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+    COPYMODE_BLEND, LINEMODE_FILTERED);
   
   lb_gr_refresh();
   lb_gr_BMPfile_save("axis_2d.bmp", NULL);
@@ -2121,13 +2335,13 @@ int main(int argc, char *argv[])
   while (1)
     while (SDL_PollEvent(&event))
       {
-	if (event.type == SDL_QUIT)
-	  {
+  if (event.type == SDL_QUIT)
+    {
 		      
-	    SDL_Quit();
-	    return EXIT_SUCCESS;
-	  }
-      }
+  SDL_Quit();
+  return EXIT_SUCCESS;
+}
+}
 #endif
 
   //#define DEMO_AXIS_2D_LOG
@@ -2162,17 +2376,17 @@ int main(int argc, char *argv[])
 
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
+    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
-		     lb_gr_12RGB(COLOR_GREEN), 10,
-		     lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
-		     AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
-		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
-		     AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-		     COPYMODE_BLEND, LINEMODE_FILTERED);
+    lb_gr_12RGB(COLOR_BLUE), 5, 15,
+    lb_gr_12RGB(COLOR_GREEN), 10,
+    lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
+    AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
+    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
+    AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+    COPYMODE_BLEND, LINEMODE_FILTERED);
 
   UINT16_T i;
   REAL_T xr, yr, xp, yp;
@@ -2180,17 +2394,17 @@ int main(int argc, char *argv[])
   //  yr=1;
   for (i=0;i<=16;i++)
     {
-      //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
-      //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
-      //printf("xr=%f, yr=%f\t\n",xr,yr); 
-      yr=xr;
-      lb_gr_project_2d_x_log(win, xr,  &xp);
-      lb_gr_project_2d_y(win, yr,  &yp);
-      printf("xr=%f, yr=%f\t\n",xr,yr); 
+  //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
+  //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
+  //printf("xr=%f, yr=%f\t\n",xr,yr); 
+  yr=xr;
+  lb_gr_project_2d_x_log(win, xr,  &xp);
+  lb_gr_project_2d_y(win, yr,  &yp);
+  printf("xr=%f, yr=%f\t\n",xr,yr); 
       
-      lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
-      xr=xr*pow(10.0,1.0/4.0);
-    } 
+  lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
+  xr=xr*pow(10.0,1.0/4.0);
+} 
      
   lb_gr_refresh();
   lb_gr_BMPfile_save("axis_2d_semilog.bmp", NULL);
@@ -2199,13 +2413,13 @@ int main(int argc, char *argv[])
   while (1)
     while (SDL_PollEvent(&event))
       {
-	if (event.type == SDL_QUIT)
-	  {
+  if (event.type == SDL_QUIT)
+    {
 		      
-	    SDL_Quit();
-	    return EXIT_SUCCESS;
-	  }
-      }
+  SDL_Quit();
+  return EXIT_SUCCESS;
+}
+}
 #endif
 
   //#define DEMO_POLAR_AXIS
@@ -2240,35 +2454,35 @@ int main(int argc, char *argv[])
   win.yr_max= 0.768*3; 
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID),
-		       COPYMODE_COPY );
+    COPYMODE_COPY );
   lg_gr_draw_axis_2d_polar(NULL, win, &my_font, 0, 4, 0.1, lb_gr_12RGB(COLOR_BLUE),
-			   0, 2*M_PI, 30*M_PI/180,
-			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY );
+    0, 2*M_PI, 30*M_PI/180,
+    lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY );
   lb_gr_refresh();
 
   while (1)
     while (SDL_PollEvent(&event))
       {
-	if (event.type == SDL_QUIT)
-	  {
+  if (event.type == SDL_QUIT)
+    {
 		      
-	    SDL_Quit();
-	    return EXIT_SUCCESS;
-	  }
-      }
+  SDL_Quit();
+  return EXIT_SUCCESS;
+}
+}
 #endif
 
   
   
   //#define DEMO_PLOT_CONTINUOUS
 #ifdef DEMO_PLOT_CONTINUOUS
-REAL_T diego_x(REAL_T t, MATHERROR_T *error)
-{
+  REAL_T diego_x(REAL_T t, MATHERROR_T *error)
+  {
   return 0.75*sin(5*t)*cos(t);
 }
 
   REAL_T diego_y(REAL_T t, MATHERROR_T *error)
-{
+  {
   return 0.75*sin(5*t)*sin(t);
 }
 
@@ -2302,14 +2516,14 @@ REAL_T diego_x(REAL_T t, MATHERROR_T *error)
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_DIMGRAY), COPYMODE_COPY);
       
   lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 2.5,
-		     lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
-		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-		     COPYMODE_BLEND, LINEMODE_FILTERED); 
+    lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
+    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
+    COPYMODE_BLEND, LINEMODE_FILTERED); 
 
   lb_gr_plot_continuous_fn_2d(NULL, win, diego_x, diego_y,
-			      0, 2*10*M_PI, 1,
-			      20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
+    0, 2*10*M_PI, 1,
+    20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
 
   lb_gr_delay(10000);
     
@@ -3378,7 +3592,7 @@ REAL_T diego_x(REAL_T t, MATHERROR_T *error)
   t=0;      /* tracks the elapsed time */
 
   
-  /* Initialize values for Euler Matrix */
+	    /* Initialize values for Euler Matrix */
   M_euler[0].m=1.9891e30;
  
   M_euler[0].p.x=0;
@@ -3617,6 +3831,7 @@ REAL_T diego_x(REAL_T t, MATHERROR_T *error)
 		      flag_paused=FALSE;
 		      lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_WHITE));
 		    }
+
 		  else
 		    flag_paused=TRUE;
 		}
@@ -4455,55 +4670,55 @@ REAL_T diego_x(REAL_T t, MATHERROR_T *error)
 
   //#define DEMO_GIS_HEIGHT
 #ifdef DEMO_GIS_HEIGHT
-SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
-{
-  FILE *fp;
-  char filename[16];
-  char str[4];
-  long pos_lat, pos_lon;
-  int height;
+  SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
+  {
+    FILE *fp;
+    char filename[16];
+    char str[4];
+    long pos_lat, pos_lon;
+    int height;
     
-  strcpy(filename,"\0");
-  if (lat>=0.0)
-    {
-      strcat(filename,"N");
-      sprintf(str, "%02d", (SINT16_T)lat);
-      pos_lat=round(1201.0*lb_re_frac(lat));
-    }
-  else
-    {
-      strcat(filename,"S");
-      sprintf(str, "%02d", (SINT16_T)ceil(-lat));
-      pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
-    }
-  strcat(filename,str);
-  if (lon>=0.0)
-    {
-      strcat(filename,"E");
-      sprintf(str, "%03d", (SINT16_T)lon);
-      pos_lon=round(1201*lb_re_frac(lon));
-    }
-  else
-    {
-      strcat(filename,"W");
-      sprintf(str, "%03d", (SINT16_T)ceil(-lon));
-      pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
-    }
-  strcat(filename,str);
-  strcat(filename,".hgt");
-  // printf("Filename: %s, lon=%f pos_lon=%d, lat=%f pos_lat=%d  ",filename,lat,pos_lon,pos_lat);
+    strcpy(filename,"\0");
+    if (lat>=0.0)
+      {
+	strcat(filename,"N");
+	sprintf(str, "%02d", (SINT16_T)lat);
+	pos_lat=round(1201.0*lb_re_frac(lat));
+      }
+    else
+      {
+	strcat(filename,"S");
+	sprintf(str, "%02d", (SINT16_T)ceil(-lat));
+	pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
+      }
+    strcat(filename,str);
+    if (lon>=0.0)
+      {
+	strcat(filename,"E");
+	sprintf(str, "%03d", (SINT16_T)lon);
+	pos_lon=round(1201*lb_re_frac(lon));
+      }
+    else
+      {
+	strcat(filename,"W");
+	sprintf(str, "%03d", (SINT16_T)ceil(-lon));
+	pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
+      }
+    strcat(filename,str);
+    strcat(filename,".hgt");
+    // printf("Filename: %s, lon=%f pos_lon=%d, lat=%f pos_lat=%d  ",filename,lat,pos_lon,pos_lat);
   
-  if (!(fp = fopen(filename, "r")))
-    {
-      perror("invalid filename\r\n");
-      return 0;
-    }
+    if (!(fp = fopen(filename, "r")))
+      {
+	perror("invalid filename\r\n");
+	return 0;
+      }
   
-  fseek(fp,2*1201*pos_lat+2*pos_lon,SEEK_SET);
-  fread(&height,sizeof(height),1,fp);
-  fclose(fp);
-  return lb_in_littleS16_to_bigS16(height);
-}
+    fseek(fp,2*1201*pos_lat+2*pos_lon,SEEK_SET);
+    fread(&height,sizeof(height),1,fp);
+    fclose(fp);
+    return lb_in_littleS16_to_bigS16(height);
+  }
 
   
   SINT16_T i, j, height, height_max;
@@ -4543,33 +4758,33 @@ SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
   //#define DEMO_PARALELL
 #ifdef DEMO_PARALELL
 
-/* for DEMO_PARALELL */
+  /* for DEMO_PARALELL */
 
-void *floatsum(void *x_max_par)
-{
-  double  x, x_max, sum;
-  clock_t begin, end;
+  void *floatsum(void *x_max_par)
+  {
+    double  x, x_max, sum;
+    clock_t begin, end;
 
-  x_max= *((double *)x_max_par);
+    x_max= *((double *)x_max_par);
 
-  begin=clock();
+    begin=clock();
 
-  sum=0.0;
-  x=0;
-  begin=clock();
-  while (x<x_max)
-    {
-      sum+=x;
-      x+=1e-8;
-    }
-  end = clock();
-  printf("sum=%0.4e  ",sum);
-  printf("time elapsed = %.4e\n",(double)(end - begin) / CLOCKS_PER_SEC);
-  /* Check CPU usage: 
-     mpstat -P ALL 1
-  */
-  return 0;
-}
+    sum=0.0;
+    x=0;
+    begin=clock();
+    while (x<x_max)
+      {
+	sum+=x;
+	x+=1e-8;
+      }
+    end = clock();
+    printf("sum=%0.4e  ",sum);
+    printf("time elapsed = %.4e\n",(double)(end - begin) / CLOCKS_PER_SEC);
+    /* Check CPU usage: 
+       mpstat -P ALL 1
+    */
+    return 0;
+  }
 
   
   pthread_t threads[4];
@@ -4777,10 +4992,10 @@ void *floatsum(void *x_max_par)
 
   //#define DEMO_RK4
 #ifdef DEMO_RK4
-REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
-{
-  return -0.1*x;
-}
+  REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
+  {
+    return -0.1*x;
+  }
 
   
   REAL_T t_n, y_rk4, y_euler, xp, yp;
