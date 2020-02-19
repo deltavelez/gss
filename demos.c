@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
       lb_al_insert_item_vector_r(&V, k,0);
       lb_al_print_vector_r(&V, "V", "%0.4f\r\n");
     }
-  //lb_al_release_vector_r(&V);
+  lb_al_release_vector_r(&V);
   exit(1);
 #endif
 
@@ -516,7 +516,7 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: Virtual Consoles                                                     */
   /* This is the foundation on how to build your own 'console'                  */
-  /* To_do: it would be nice to implement 'insertion', fast jumps, etc.         */
+  /* to_do: it would be nice to implement 'insertion', fast jumps, etc.         */
   /******************************************************************************/
    
   //#define DEMO_VIRTUAL_CONSOLE
@@ -946,7 +946,7 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: Line_antialiasing                                                    */
   /* Shows a variation of the Antialiasing primitives to draw lines with a      */
-  /* two or three pixel width.                                                           */
+  /* two or three pixel width.                                                  */
   /******************************************************************************/
 
   //#define DEMO_LINE_ANTIALIASING2
@@ -1138,8 +1138,8 @@ int main(int argc, char *argv[])
   lb_gr_draw_circle_antialiasing(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf0f0)); 
   lb_gr_draw_circle_antialiasing(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf00F));
   
-  //lb_gr_render_picture(NULL, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
-  
+  // --> This should be improved:
+  //     lb_gr_render_picture(NULL, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
 
   lb_gr_refresh();
   while (1)
@@ -1154,6 +1154,11 @@ int main(int argc, char *argv[])
       }
 #endif
 
+
+  /******************************************************************************/
+  /* Demo: Slow filled-circle drawing routine                                   */
+  /******************************************************************************/
+
   //#define DEMO_CIRCLE_FILLED_SLOW
 #ifdef DEMO_CIRCLE_FILLED_SLOW
   SDL_Event event;
@@ -1161,19 +1166,27 @@ int main(int argc, char *argv[])
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLUE));
 
-  lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(2*pix_y), lb_gr_12RGB(0xF00F),
-				COPYMODE_COPY |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  //  lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(2*pix_y), lb_gr_12RGB(0xF00F),
+  //COPYMODE_COPY |  COPYMODE_BGCOLOR(0xFFFF) | COPYMODE_PIXELMODE_1 | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+
+  lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(2*pix_y), lb_gr_12RGB(0xF00F), COPYMODE_COPY);
+
   lb_gr_refresh();
   while (1)
     while (SDL_PollEvent(&event))
       {
 	if (event.type == SDL_QUIT)
 	  {
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Fast filled-circle drawing routine                                   */
+  /******************************************************************************/
 
   //#define DEMO_CIRCLE_FILLED_FAST
 #ifdef DEMO_CIRCLE_FILLED_FAST
@@ -1183,38 +1196,38 @@ int main(int argc, char *argv[])
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
       
   lb_gr_draw_circle_filled_antialiasing_r(NULL, ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
-					  lb_gr_12RGB(COLOR_RED | COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+					  lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
   lb_gr_draw_circle_filled_antialiasing_r(NULL, 2*ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
-					  lb_gr_12RGB(COLOR_LIME  | COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+					  lb_gr_12RGB(COLOR_LIME  | COLOR_SOLID));
   lb_gr_draw_circle_filled_antialiasing_r(NULL, ty_screen.w/(2*pix_x), 2*ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
-					  lb_gr_12RGB(COLOR_BLUE  | COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+					  lb_gr_12RGB(COLOR_BLUE  | COLOR_SOLID));
   lb_gr_refresh();
   while (1)
     while (SDL_PollEvent(&event))
       {
 	if (event.type == SDL_QUIT)
 	  {
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
 
-  //#define DEMO_CIRCLE_FILLED_ANTIALIASING
+  /******************************************************************************/
+  /* Demo: Fast filled-circle drawing routine with antialiasing                 */
+  /******************************************************************************/
+
+#define DEMO_CIRCLE_FILLED_ANTIALIASING
 #ifdef DEMO_CIRCLE_FILLED_ANTIALIASING
   SDL_Event event;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
-
-  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/3, ty_screen.h/3, ty_screen.h/4,
-					lb_gr_12RGB(0xF00F), COPYMODE_BLEND);
-  lb_gr_draw_circle_filled_antialiasing(NULL, 2*ty_screen.w/3, ty_screen.h/3, ty_screen.h/4,
-					lb_gr_12RGB(0xf0F0), COPYMODE_BLEND);
-  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4,
-					lb_gr_12RGB(0xfF00), COPYMODE_BLEND);
-  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4,
-					lb_gr_12RGB(0xfF00), COPYMODE_BLEND);
+  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/3,   ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xF00F));
+  lb_gr_draw_circle_filled_antialiasing(NULL, 2*ty_screen.w/3, ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xf0F0));
+  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xfF00));
+  lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xfF00));
   lb_gr_refresh();
   lb_gr_BMPfile_save("filled_circles.bmp", NULL);
 
@@ -1223,7 +1236,7 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
