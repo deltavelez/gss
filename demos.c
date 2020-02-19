@@ -1573,10 +1573,13 @@ int main(int argc, char *argv[])
       }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Polygon Filling                                                      */
+  /******************************************************************************/
+
   //#define DEMO_POLYGON_FILL
 #ifdef DEMO_POLYGON_FILL
   SDL_Event event;
-  int pix_x=1, pix_y=1;
   LINE_2D_SINT16_T myPol;
   int k=40;
 
@@ -1617,7 +1620,7 @@ int main(int argc, char *argv[])
   /* digital operators such as NO, XOR, AND, OR, etc.                           */
   /******************************************************************************/
 
-#define DUFF_PORTER
+  //#define DUFF_PORTER
 #ifdef DUFF_PORTER
   SDL_Event event;
   PICTURE_T pic1;
@@ -1690,16 +1693,21 @@ int main(int argc, char *argv[])
       }
 #endif
     
-  
-  /*******************************************************************************************************************/
-  /* Advanced 2D Graphics */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Demo: Advanced 2D Graphics                                                 */
+  /******************************************************************************/
+
+  /******************************************************************************/
+  /* Demo: Plot 2D: transforms the xr, yr real coordinates of a point to screen */
+  /* coordinates, and plots a dot                                               */
+  /******************************************************************************/
+
   //#define DEMO_PLOT2D
 #ifdef  DEMO_PLOT2D
   SDL_Event event;
   VIEWPORT_2D_T vp2d;
   PICTURE_T Pic;
-  UINT8_T pix_x=32, pix_y=32, flag_running=TRUE;
+  UINT8_T pix_x=8, pix_y=8, flag_running=TRUE;
   
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
   Pic.w= ty_screen.w/pix_x;
@@ -1720,7 +1728,6 @@ int main(int argc, char *argv[])
   lb_gr_plot2d(&Pic, vp2d, 1.5, 0, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
   lb_gr_render_picture(&Pic, 0,0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
 
-    
   lb_gr_refresh();
   while (flag_running)
     while (SDL_PollEvent(&event))
@@ -1729,26 +1736,31 @@ int main(int argc, char *argv[])
     
   //lb_gr_BMPfile_save("line.bmp", &Pic);
   lb_gr_release_picture(&Pic);
+  lb_gr_SDL_close();
   SDL_Quit();
 #endif
     
+  /******************************************************************************/
+  /* Demo: Rotation of bitmaps                                                  */
+  /* This shows an older technique called "Shearing"for rotating bitmaps.       */
+  /* https://www.ocf.berkeley.edu/~fricke/projects/israel/paeth/rotation_by_shearing.html    */
+  /******************************************************************************/
 
-    
-  //#define ROTATE_ALGORITHM
+  //  #define ROTATE_ALGORITHM
 #ifdef ROTATE_ALGORITHM
-  /* This helps ilustrating  an older algorithm used to rotate bitmaps */
+  SDL_Event event;
   PICTURE_T Pic;
   SINT16_T k;
   LINE_2D_REAL_T P1, P2, P3;
   VIEWPORT_2D_T win;
   REAL_T angle;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2,  0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
  
   angle=45.0*M_PI/180;
      
-  Pic.w=ty_width;
-  Pic.h=ty_height;
+  Pic.w=ty_screen.w;
+  Pic.h=ty_screen.h;
             
   win.xp_min=0;
   win.yp_min=0.;
@@ -1793,84 +1805,142 @@ int main(int argc, char *argv[])
       lb_gr_plot2d_line(&Pic, win, &P2, 3, lb_gr_12RGB(COLOR_LIME | COLOR_SOLID), COPYMODE_BLEND, LINEMODE_FILTERED);
       lb_gr_plot2d_line(&Pic, win, &P3, 3, lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID), COPYMODE_BLEND, LINEMODE_FILTERED);
 
-      lb_gr_render_picture(&Pic, 0, 0, 2, 2, RENDEROPTIONS_DEFAULT);
-      lb_gr_delay(1000);
+      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0);
+      lb_gr_refresh();
+      lb_ti_delay_ms(1000);
     }
+
   lb_gr_release_picture(&Pic);
   lb_gr_release_line2d_f(&P1);
   lb_gr_release_line2d_f(&P2);
   lb_gr_release_line2d_f(&P3);
-  lb_fb_exit(1);
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
-  
+  /******************************************************************************/
+  /* Demo: Rotation of bitmaps                                                  */
+  /******************************************************************************/
+
   //#define DEMO_ROTATE_BITMAP
 #ifdef  DEMO_ROTATE_BITMAP
+  SDL_Event event;
   PICTURE_T pic_src, pic_dst;
   SINT16_T width, height;
+  UINT8_T pix_x=2, pix_y=2;
   REAL_T angle;
-  //pending: strange line on top
+  const char *filename="./media/images/test24bit.bmp";
   
-  lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  //pending: strange line on top
 
-  /* Load initial image and present it */
-  lb_gr_BMPfile_getsize("test24bit.bmp",&width,&height);
+   /* Load initial image and present it */
+  lb_gr_BMPfile_getsize(filename,&width,&height);
   pic_src.w=384;
   pic_src.h=256;
   printf("%d %d\r\n",width, height);
-  //lb_fb_exit(1);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, width*pix_x*2, height*pix_y*2, 0xFF, 0xFF, 0xFF);
   lb_gr_create_picture(&pic_src,lb_gr_12RGB(COLOR_RED));
        
-  lb_gr_BMPfile_load_to_pic("sdl24bit.bmp",&pic_src, 0);
-  lb_gr_render_picture(&pic_src, 0, 0, 2, 2, 0*RENDEROPTIONS_LINE);
+  lb_gr_BMPfile_load_to_pic(filename,&pic_src, 0);
   
   for(angle=0;angle<2*M_PI;angle+=M_PI/180)
     {
       lb_gr_bitmap_rotate(&pic_src, &pic_dst, angle, lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
-      lb_gr_render_picture(&pic_dst, 0, 0, 2, 2, RENDEROPTIONS_DEFAULT);
-      lb_gr_delay(500);
+      lb_gr_render_picture(&pic_dst, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_refresh();
+      printf("\r\nangle= %f",angle);
+      lb_ti_delay_ms(500);
     }
-  lb_gr_delay(20000);
   lb_gr_release_picture(&pic_src);
-  lb_fb_exit(1);
+  
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Rotation of bitmaps                                                  */
+  /* The "sampling" technique is shown here.                                    */
+  /******************************************************************************/
 
   //#define DEMO_ROTATE_BITMAP_SAMPLING
 #ifdef  DEMO_ROTATE_BITMAP_SAMPLING
+  SDL_Event event;
   PICTURE_T pic_src, pic_dst;
   SINT16_T width, height;
   REAL_T angle;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  UINT8_T pix_x=2, pix_y=2;
+  const char *filename="./media/images/test24bit.bmp";
 
   /* Load initial image and present it */
-  lb_gr_BMPfile_getsize("sdl24bit.bmp",&width,&height);
+  lb_gr_BMPfile_getsize(filename,&width,&height);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, width*pix_x*2, height*pix_y*2, 0xFF, 0xFF, 0xFF);
+
   pic_src.w=width;
   pic_src.h=height;
   lb_gr_create_picture(&pic_src,lb_gr_12RGB(COLOR_RED));
      
-  lb_gr_BMPfile_load_to_pic("sdl24bit.bmp",&pic_src, 0);
+  lb_gr_BMPfile_load_to_pic(filename,&pic_src, 0);
 
   for(angle=0.0;angle<2*M_PI;angle+=0.5*M_PI/180)
     {
-      lb_gr_bitmap_rotate_sampling(&pic_src, &pic_dst, angle, 3, lb_gr_12RGB(COLOR_LIME));
-      lb_gr_render_picture(&pic_dst, 0, 0, 2, 2, RENDEROPTIONS_DEFAULT);
+      lb_gr_bitmap_rotate_sampling(&pic_src, &pic_dst, angle, 10, lb_gr_12RGB(COLOR_LIME));
+      lb_gr_render_picture(&pic_dst, 0, 0, COPYMODE_COPY,
+			   RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_refresh();
     }
   lb_gr_release_picture(&pic_src);
   lb_gr_release_picture(&pic_dst);
-  lb_fb_exit(1);
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Matrix to BMP                                                        */
+  /* Shows how picture data can be loaded to a Matrix to do image processing.   */
+  /* In this example, the data is decomposed in their Red, Green, and Blue      */
+  /* components.  Each component is plotted separately.  Then, they're again    */
+  /* merged.                                                                    */
+  /******************************************************************************/
+  
   //#define DEMO_BMP_TO_MATRIX
 #ifdef DEMO_BMP_TO_MATRIX
+  SDL_Event event;
   MATRIX_R_T R, G, B;
   SINT16_T i,j;
   PIXEL_T color;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  const char *filename="./media/images/test24bit.bmp";
+
   lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_BLACK));
 
-  lb_gr_BMPfile_getsize("sdl24bit.bmp",&i,&j);
+  lb_gr_BMPfile_getsize(filename,&i,&j);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, i*3, j*2, 0xaF, 0xaF, 0x8F);
 
   R.rows=j;
   R.cols=i;
@@ -1884,7 +1954,7 @@ int main(int argc, char *argv[])
   B.cols=i;
   lb_al_create_matrix_r(&B);
       
-  lb_gr_BMPfile_load_to_matrix("sdl24bit.bmp",&R,&G,&B);
+  lb_gr_BMPfile_load_to_matrix(filename,&R,&G,&B);
 
   for (i=0;i<R.rows;i++)
     for (j=0;j<R.cols;j++)
@@ -1909,25 +1979,41 @@ int main(int argc, char *argv[])
 	color.b=B.array[i][j]*MAX_B;
 	lb_gr_draw_pixel(NULL,j+G.cols,2*G.rows-i,color,COPYMODE_COPY);
       }
-  lb_gr_delay(10000);
+  lb_gr_refresh();
+  lb_ti_delay_ms(10000);
           
   lb_al_release_matrix_r(&R);
   lb_al_release_matrix_r(&G);
   lb_al_release_matrix_r(&B);
-  lb_fb_exit(1);
+  
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Two-dimensional projection.                                          */
+  /* Shows how to convert 2d real coordinates to screen coordinates.            */
+  /******************************************************************************/
 
   //#define DEMO_PROJECT_2D
 #ifdef DEMO_PROJECT_2D
   REAL_T xr, yr, xp, yp;
   VIEWPORT_2D_T win;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
 
   win.xp_min=0;
   win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
   win.xr_min=-2.5;
   win.xr_max=2.5;
   win.yr_min=5.5; 
@@ -1939,138 +2025,37 @@ int main(int argc, char *argv[])
       lb_gr_project_2d(win, xr, yr, &xp, &yp);
       lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
     }
-  lb_gr_delay(5000);
-  lb_fb_exit(1);
-#endif
-
-  //#define DEMO_GAMMA
-#ifdef DEMO_GAMMA
-  REAL_T xr, yr, xr_min, yr_min, xr_max, yr_max;
-  VIEWPORT_2D_T win;
-
-  SDL_Event event;
-  PIXEL_T color;
-
-  FILE *file;
-  char c;
-
-  xr_min=1e10;
-  yr_min=1e10;
-  xr_max=-1e10;
-  yr_max=-1e10;
-  
-  lb_gr_SDL_init(SDL_INIT_VIDEO, 1600, 900, 1, 1, 0, 255,255,255);
-  ty_videomode= VIDEOMODE_FAST;
   lb_gr_refresh();
-
-  win.xp_min=0;
-  win.xp_max=ty_width;
-  win.yp_min=0;
-  win.yp_max=ty_height;
-  win.xr_min=-40;
-  win.xr_max=160;
-  win.yr_min=2330; 
-  win.yr_max=2420;
-
-  char words[15][200];
-  int col, char_counter,i;
-  
-  /* Parsing Accelerometer Data */
-
-  file = fopen("GAMMA_Complete_cycle.txt","r");
-  if (file==NULL)
-    {
-      printf("Error: could not open file\r\n");
-      exit(EXIT_FAILURE);
-    }
-
-  col=0;
-  char_counter=0;
-  while ( !feof(file) )
-    {
-      c= fgetc(file);
-
-      switch (c)
-	{
-	case '\n':
-	  words[col][char_counter]='\0';
-	  for (i=0;i<11;i++)
-	    {
-	      //printf("%s",words[i]);
-	      //printf("\t");
-	      /* Here we do the conversion */
-	      if (atoll(words[0])==0)
-		{
-		  xr = atof(words[3]);
-		  yr = atof(words[5]);
-		  if (xr<xr_min)
-		    xr_min=xr;
-		  if (yr<yr_min)
-		    yr_min=yr;
-		  if (xr>xr_max)
-		    xr_max=xr;
-		  if (yr>yr_max)
-		    yr_max=yr;
-		  
-		  printf("xr=%4.1f  yr=%4.1f  xr: [%4.1f, %4.1f], xr: [%4.1f, %4.1f]\r\n",xr,yr,xr_min,xr_max,yr_min,yr_max);
-		  lb_gr_plot2d(NULL, win, xr, yr, 1, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_DOTS_SOLID);
-		  //		  lb_gr_refresh();
-		}
-	    }
-	  printf("\r\n");
-	      
-	  col=0;
-	  char_counter=0;
-	   
-	  break;
-	case ' ':
-	case '\t':
-	case ',':
-	  // if (char_counter)
-	  {
-	    words[col][char_counter]='\0';
-	    col++;
-	    char_counter=0;
-	  }  
-	  break;
-	case '\r':
-	  /* Ignore */
-	  break;
-	default:
-	  words[col][char_counter]=c;
-	  char_counter++;
-	  break;
-	}
-    }
-   	 
-  fclose(file);
-  lb_gr_refresh();
-    
   while (1)
-    {
-      if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
-	{
-	  SDL_Quit();
-	  return EXIT_SUCCESS;
-	}
-      if (SDL_PollEvent(&event) && event.type == SDL_WINDOWEVENT)
-	lb_gr_refresh();
-    }
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
-  
-    
+  /******************************************************************************/
+  /* Demo: Plotting complex numbers                                             */
+  /* Data is loaded to a vector of Complex Numbers, then converted to a Vector  */
+  /* of Integer 2D_points (a Polygon), and finally plotted.                     */
+  /******************************************************************************/
+
   //#define DEMO_PLOT2D_COMPLEX
 #ifdef DEMO_PLOT2D_COMPLEX
+  SDL_Event event;
   int i;
   VIEWPORT_2D_T win;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
 
   win.xp_min=0;
   win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
   win.xr_min=-3.1416;
   win.xr_max=3.1416;
   win.yr_min=-1.2;
@@ -2094,15 +2079,31 @@ int main(int argc, char *argv[])
   lb_gr_project_2d_vector_c_to_line_int(win, &vec, &vec_i);
   lb_gr_draw_polygon_i(NULL,&vec_i,3,lb_gr_12RGB(COLOR_BLUE),COPYMODE_BLEND,LINEMODE_FILTERED);
       
-  lb_gr_delay(20000);
-     
   lb_al_release_vector_c(&vec);
   lb_gr_release_line2d_i(&vec_i);
-  lb_fb_exit(1);
+  lb_gr_refresh();
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
-    
+
+  /******************************************************************************/
+  /* Demo: Plotting implicit-form functions                                     */
+  /* to_do: in lb_gr_BMPfile_save(), an invalid path causes a segmentation      */
+  /* fault.                                                                     */
+  /* to_do: it looks like there is a minor glitch at the boundaries.            */
+  /******************************************************************************/
+
   //#define DEMO_PLOT_IMPLICIT 
 #ifdef DEMO_PLOT_IMPLICIT
+  SDL_Event event;
   MATRIX_R_T A;
   VIEWPORT_2D_T vp;
   SINT16_T i,j;
@@ -2138,12 +2139,31 @@ int main(int argc, char *argv[])
   lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_WHITE));
   lb_gr_implicit_2d(NULL, vp, &A, 3, lb_gr_12RGB(COLOR_RED),COPYMODE_BLEND, LINEMODE_FILTERED);
   lb_gr_refresh();
-  lb_gr_BMPfile_save("implicit.bmp", NULL);
-
-  lb_ti_delay_ms(10000);
+  lb_gr_BMPfile_save("./media/images/implicit.bmp", NULL);
   lb_al_release_matrix_r(&A);
   lb_gr_SDL_close();
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Plot2d_Reverse                                                       */
+  /* It is tricky to generate proper (high quality) anti-aliased polygonal      */
+  /* lines.                                                                     */
+  /* This method examines all the points in the neighborhood of a Polygon in    */
+  /* order to determine whether each one is solid, should be blended,           */
+  /* or -otherwise- should not be plotted at all. This is a slow method.        */
+  /* It is usually enough (as well as much faster) to trace the polygon by a    */
+  /* sucession or filtered lines.                                               */
+  /******************************************************************************/
 
   //#define DEMO_PLOT2D_REVERSE
 #ifdef DEMO_PLOT2D_REVERSE
@@ -2181,7 +2201,7 @@ int main(int argc, char *argv[])
       Ly.array[i]=cos(3*t)*sin(t);
       t+=(t1-t0)/(REAL_T)Lx.items;
     }
-  lb_gr_plot2d_line_antialiasing_neighbor(NULL, vp, &Lx, &Ly, 12, lb_gr_12RGB(0xf00f), COPYMODE_BLEND);
+  lb_gr_plot2d_line_antialiasing_neighbor(NULL, vp, &Lx, &Ly, 12, lb_gr_12RGB(0xf00f));
   lb_gr_refresh();
   
   lb_gr_BMPfile_save("flower.bmp", NULL);
@@ -2201,10 +2221,19 @@ int main(int argc, char *argv[])
       }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Plot2d_Reverse_slow                                                  */
+  /* It is tricky to generate proper (high quality) anti-aliased polygonal      */
+  /* lines.                                                                     */
+  /* This method examines all the points in the window to determine whether     */
+  /* each one is solid, should be blended, or -otherwise- should not be         */
+  /* plotted at all. This is a VERY slow method but it is easier to understand  */
+  /* and could possibly be adapted for doing other things.                      */
+  /******************************************************************************/
+
   //#define DEMO_PLOT2D_REVERSE_SLOW
 #ifdef DEMO_PLOT2D_REVERSE_SLOW
   SDL_Event event;
-  int pix_x=1, pix_y=8;
   REAL_T t, t0, t1;
   SINT16_T i;
   VIEWPORT_2D_T vp;
@@ -2215,22 +2244,22 @@ int main(int argc, char *argv[])
 
   /* Viewport definition */
   vp.xp_min = 0;
-  vp.xp_max = ty_screen.w/pix_x;
+  vp.xp_max = ty_screen.w;
   vp.yp_min = 0;
-  vp.yp_max = ty_screen.h/pix_y;
+  vp.yp_max = ty_screen.h;
 
   vp.xr_min = -2*1.024;
   vp.xr_max = 2*1.024;
   vp.yr_min = -2*0.768;
   vp.yr_max = 2*0.768;
 
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(3*pix_x),   ty_screen.h/(3*pix_y),   ty_screen.h/(5*pix_y), lb_gr_12RGB(0xf00f), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y),   ty_screen.h/(5*pix_y), lb_gr_12RGB(0xf0f0), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
-  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/(2*pix_x),   ty_screen.h*2/(3*pix_y), ty_screen.h/(5*pix_y), lb_gr_12RGB(0x3F00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/3,   ty_screen.h/3,   ty_screen.h/5, lb_gr_12RGB(0xf00f));
+  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w*2/3, ty_screen.h/3,   ty_screen.h/5, lb_gr_12RGB(0xf0f0));
+  lb_gr_draw_circle_antialiasing3(NULL, ty_screen.w/2,   ty_screen.h*2/3, ty_screen.h/5, lb_gr_12RGB(0x3F00));
 
   /* Create and load vectors */ 
-  Lx.items=150;
-  Ly.items=150;
+  Lx.items=450;
+  Ly.items=450;
   lb_al_create_vector_r(&Lx);
   lb_al_create_vector_r(&Ly);
 
@@ -2243,7 +2272,7 @@ int main(int argc, char *argv[])
       t+=(t1-t0)/(REAL_T)Lx.items;
     }
 
-  lb_gr_plot2d_line_antialiasing_neighbor_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y) );
+  lb_gr_plot2d_line_antialiasing_neighbor_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00));
   lb_gr_refresh();
       
   lb_al_release_vector_r(&Lx);
@@ -2260,12 +2289,17 @@ int main(int argc, char *argv[])
 	  }
       }
 #endif
-    
+
+  /******************************************************************************/
+  /* Demo: Handling JPEG files.                                                 */
+  /* to_do:  It would be nice to have also a function for loading JPG's to a    */
+  /* picture.                                                                   */
+  /******************************************************************************/
 
   //#define DEMO_JPG
 #ifdef DEMO_JPG
   SDL_Event event;
-  int pix_x=3, pix_y=3;
+  int pix_x=2, pix_y=2;
   PICTURE_T pic1, pic2;
   SINT16_T i,j;
 
@@ -2278,12 +2312,12 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&pic1,lb_gr_12RGB(0x1000));
 	    
   lb_gr_BMPfile_load_to_pic("./media/images/sdl24bit.bmp", &pic1, 0xFF);
-  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
   lb_gr_refresh();
 
-  lb_gr_delay(1000);
+  lb_ti_delay_ms(1000);
   lb_gr_BMPfile_load_to_pic("./media/images/test.bmp",&pic1,0xFF);
-  lb_gr_render_picture(&pic1, 300, 300, COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  lb_gr_render_picture(&pic1, 300, 300, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
   lb_gr_refresh();
 
   pic2.w=pic1.h;
@@ -2294,10 +2328,10 @@ int main(int argc, char *argv[])
     for (i=0;i<pic1.h;i++)
       pic2.pic[j][i]=pic1.pic[i][j];
 
-  lb_gr_render_picture(&pic2, 0, 0, COPYMODE_COPY |  COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+  lb_gr_render_picture(&pic2, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
   lb_gr_refresh();
 	    
-  lb_gr_JPGfile_save("./media/images/delete_me.jpg", &pic1, 80);
+  lb_gr_JPGfile_save("./media/images/delete_me.jpg", &pic1, 40);
 
   lb_gr_release_picture(&pic1);
   lb_gr_release_picture(&pic2);
