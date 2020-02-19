@@ -1218,7 +1218,7 @@ int main(int argc, char *argv[])
   /* Demo: Fast filled-circle drawing routine with antialiasing                 */
   /******************************************************************************/
 
-#define DEMO_CIRCLE_FILLED_ANTIALIASING
+  //#define DEMO_CIRCLE_FILLED_ANTIALIASING
 #ifdef DEMO_CIRCLE_FILLED_ANTIALIASING
   SDL_Event event;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
@@ -1243,6 +1243,10 @@ int main(int argc, char *argv[])
       }
 #endif
 
+  /******************************************************************************/
+  /* Demo: A circular arc                                                       */
+  /******************************************************************************/
+
   //#define DEMO_CIRCLE_ARC
 #ifdef DEMO_CIRCLE_ARC
   SDL_Event event;
@@ -1251,21 +1255,25 @@ int main(int argc, char *argv[])
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
   lb_gr_draw_circle_arc(NULL, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.h/(pix_y*2)-1,
-			0, M_PI/3,lb_gr_12RGB(0xFfff), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
+			0, M_PI/3,lb_gr_12RGB(0xFfff), COPYMODE_COPY);
   lb_gr_refresh();
-  
+
 
   while (1)
     while (SDL_PollEvent(&event))
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Ellipse primitive                                                    */
+  /******************************************************************************/
 
   //#define DEMO_ELLIPSE
 #ifdef DEMO_ELLIPSE
@@ -1279,59 +1287,52 @@ int main(int argc, char *argv[])
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
 
-  lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000) );
+  lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000));
   
-  
-  /* Example 1: */
-  //lb_gr_draw_ellipse(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x, ty_screen.h*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
-  //		     COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-	
-  /* Example 2: */
-  //lb_gr_draw_ellipse_antialiasing2(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x,ty_screen.h*0.22/pix_y, lb_gr_12RGB(COLOR_WHITE),
-  //				   COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
-
-  /* Example 3: */
-  //lb_gr_draw_ellipse_antialiasing3(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.25/pix_x,ty_screen.w*0.22/pix_y,lb_gr_12RGB(COLOR_WHITE),
-  //				   COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y)); 
-	
   angle=0.0;
   lb_gr_refresh();
-  //  if (1) for (angle=0;angle<=M_PI/2;angle+=1*M_PI/180)
-  angle = 30.0*M_PI/180.0;
-  {
-    lb_gr_clear_picture(&Pic, lb_gr_12RGB(COLOR_WHITE));
-    // lb_gr_draw_rectangle(NULL,0,0,ty_width,ty_height,lb_gr_12RGB(0xF000),COPYMODE_COPY);
-    //	     lb_gr_draw_ellipse_rotated_antialiasing(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_x, angle, 8, 100,
-    //						     lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
-    lb_gr_draw_ellipse_rotated(&Pic, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_y, angle, 
-			       lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
+  for (angle=0;angle<=M_PI/2;angle+=1.0*M_PI/180.0)
+    {
+      lb_gr_clear_picture(&Pic, lb_gr_12RGB(COLOR_WHITE));
+      
+      lb_gr_draw_ellipse_rotated(&Pic, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_y, angle, 
+				 lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
 	     
-    lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-    lb_gr_BMPfile_save("rotated_ellipse.bmp", NULL);
+      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_BMPfile_save("rotated_ellipse.bmp", NULL);
 	     
-    lb_gr_refresh();
-    lb_ti_delay_ms(1000);
-  }
+      lb_gr_refresh();
+      lb_ti_delay_ms(500);
+      printf("Angle=%f\r\n",angle);
+    }
 
   while (1)
     while (SDL_PollEvent(&event))
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
 
-  
+
+  /******************************************************************************/
+  /* Demo: Filled Triangles                                                     */
+  /* Triangles are a special shape, as they are tha basis of any polyedra       */
+  /* It is important, therefore, to draw them FAST.                             */
+  /* In fact, if there is ANY primitive i CG you must get really fast, this is  */
+  /* the one.                                                                   */
+  /******************************************************************************/
+
   //#define DEMO_TRIANGLE
 #ifdef DEMO_TRIANGLE
   SDL_Event event;
   int pix_x=1, pix_y=1;
   SINT16_T i;
-  POINT_2D_SINT16_T A, B, C, D, X;
+  POINT_2D_SINT16_T A, B, C;
   clock_t begin, end;
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
@@ -1358,14 +1359,18 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
-
   
+  /******************************************************************************/
+  /* Demo: Filled Polygons                                                      */
+  /* the one.                                                                   */
+  /******************************************************************************/
+
   //#define DEMO_POLYGON
 #ifdef DEMO_POLYGON
   SDL_Event event;
@@ -1389,11 +1394,11 @@ int main(int argc, char *argv[])
 	  myPol.array[i].x=round(0.5*ty_screen.w/pix_x + 0.4*ty_screen.h*cos(phase+6.2832*i/(myPol.items-1))/pix_y);
 	  myPol.array[i].y=round(0.5*ty_screen.h/pix_x - 0.4*ty_screen.h*sin(phase+6.2832*i/(myPol.items-1))/pix_y);
 	}
-      //lb_gr_draw_polygon_i(NULL,&myPol,7,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND,LINEMODE_DOTS_FILTERED);
-      lb_gr_draw_polygon_i(NULL,&myPol,3,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
+      lb_gr_draw_polygon_i(NULL,&myPol,3,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND, LINEMODE_DOTS_FILTERED);
+      lb_gr_draw_polygon_i(NULL,&myPol,3,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND, LINEMODE_FILTERED);
       lb_gr_refresh();
 		 
-      lb_gr_delay(500);
+      lb_ti_delay_ms(500);
     }
   lb_gr_release_line2d_i(&myPol);
 
@@ -1402,12 +1407,17 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Filled Polygons (floating point version)                             */
+  /* the one.                                                                   */
+  /******************************************************************************/
 
   //#define DEMO_POLYGON_FLOAT
 #ifdef DEMO_POLYGON_FLOAT
@@ -1418,25 +1428,23 @@ int main(int argc, char *argv[])
   float phase;
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
-  lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
-  lb_gr_refresh();
  
   /* Polygon creation and testing */ 
   myPol.items=10;
   lb_gr_create_line2d_r(&myPol);
   printf("\a\r\n");
-  for (phase=0; phase<6.2832; phase+=0.01) 
+  for (phase=0; phase<6.2832; phase+=M_PI/180.0) 
     {
-      //lb_gr_clear_picture(NULL,lb_gr_12RGB(0xffff));
+      lb_gr_clear_picture(NULL,lb_gr_12RGB(0xfaaa));
       for (i=0;i<myPol.items;i++)
 	{
 	  myPol.array[i].x=0.5*ty_screen.w/pix_x + 0.45*ty_screen.h*cos(phase+6.2832*i/(myPol.items-1)/pix_y);
 	  myPol.array[i].y=0.5*ty_screen.h/pix_y - 0.45*ty_screen.h*sin(phase+6.2832*i/(myPol.items-1)/pix_y);
 	}
-      lb_gr_draw_polygon_antialiasing(NULL,&myPol,6.1,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
+      lb_gr_draw_polygon_antialiasing(NULL,&myPol,6.1,lb_gr_12RGB(COLOR_BLUE));
       printf("hi\r\n");
+      //lb_ti_delay_ms(50);
       lb_gr_refresh();
-      //lb_gr_delay(50);
     }
   lb_gr_release_line2d_f(&myPol);
   while (1)
@@ -1444,13 +1452,18 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
 
-  //	    #define DEMO_INSIDE_POLYGON_INT
+  /******************************************************************************/
+  /* Demo: Detecting whether an integer point is located within a Polygon       */
+  /******************************************************************************/
+
+  //#define DEMO_INSIDE_POLYGON_INT
 #ifdef DEMO_INSIDE_POLYGON_INT
   SDL_Event event;
   int pix_x=12, pix_y=12;
@@ -1471,9 +1484,9 @@ int main(int argc, char *argv[])
     }
   Poly_int.array[Poly_int.items-1] = Poly_int.array[0]; /* This ensures the polygon is "closed" */
       
-  lb_gr_draw_polygon_i(NULL,&Poly_int,4,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y), LINEMODE_FILTERED);
+  lb_gr_draw_polygon_i(NULL,&Poly_int,4,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
   lb_gr_refresh();
-  lb_gr_delay(5000);
+  lb_ti_delay_ms(500);
 
   for(i=0;i<ty_screen.h/pix_y;i++)
     for(j=0;j<ty_screen.w/pix_x;j++)
@@ -1481,9 +1494,9 @@ int main(int argc, char *argv[])
 	P.x=j;
 	P.y=i;
 	if (lb_gr_is_in_polygon_i(&Poly_int,P))
-	  lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_BEIGE), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
+	  lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_BEIGE), COPYMODE_COPY);
 	else
-	  lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY | COPYMODE_SCALE_X(pix_x) | COPYMODE_SCALE_Y(pix_y));
+	  lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY);
       }
   lb_gr_refresh();
 
@@ -1492,12 +1505,17 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Detecting whether an integer point is located within a Polygon       */
+  /* (floating point version)                                                   */
+  /******************************************************************************/
 
   //#define DEMO_INSIDE_POLYGON_FLOAT
 #ifdef DEMO_INSIDE_POLYGON_FLOAT
@@ -1548,7 +1566,7 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
@@ -1586,24 +1604,32 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
+  
+  /******************************************************************************/
+  /* Demo: The Duff-Porter operators                                            */
+  /* These operator can be seen as generalizations in the analog world of       */
+  /* digital operators such as NO, XOR, AND, OR, etc.                           */
+  /******************************************************************************/
 
-  //#define DUFF_PORTER
+#define DUFF_PORTER
 #ifdef DUFF_PORTER
+  SDL_Event event;
   PICTURE_T pic1;
   SINT16_T i,j, alpha;
   LINE_2D_SINT16_T myPol;
   int k=40;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 4, 4, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-
-  lb_gr_BMPfile_getsize("sdl24bit.bmp",&i,&j);
-
+  int pix_x=3, pix_y=3;
+  const char *filename="./media/images/sdl24bit.bmp";
+  
+  lb_gr_BMPfile_getsize(filename,&i,&j);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, pix_x*i,pix_y*j, 0, 0, 0);
+  
   pic1.w=i;
   pic1.h=j;
 
@@ -1636,19 +1662,32 @@ int main(int argc, char *argv[])
 
   //      for(alpha=0;alpha<=MAX_K;alpha++)
   //lb_gr_clear_picture(&pic1, lb_gr_12RGB(0x0000));
-  alpha=MAX_K;
-  lb_gr_BMPfile_load_to_pic("sdl24bit.bmp",&pic1,alpha);
+  alpha=MAX_A;
+  lb_gr_BMPfile_load_to_pic(filename,&pic1,alpha);
   printf("1. alpha=%d\r\n",alpha);
   lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
-  lb_gr_render_picture(&pic1, 0, 0, 4, 4, RENDEROPTIONS_DEFAULT);
-  lb_gr_delay(5000);
+  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  
+  lb_gr_refresh();
+  lb_ti_delay_ms(3000);
   lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
-  lb_gr_render_picture(&pic1, 0, 0, 4, 4, RENDEROPTIONS_DEFAULT);
-  lb_gr_delay(5000);
+  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_refresh();
+  lb_ti_delay_ms(3000);
      
   lb_gr_release_line2d_i(&myPol);
   lb_gr_release_picture(&pic1);
-  lb_fb_exit(1);
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+   	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
     
   
@@ -3319,7 +3358,6 @@ int main(int argc, char *argv[])
 
 
   /* simulation */  
-  //oxo 
   t=0;
   while (t<=t_max)
     {
