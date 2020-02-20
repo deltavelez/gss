@@ -2214,7 +2214,7 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
@@ -2283,8 +2283,8 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
-	    SDL_Quit();
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
@@ -2341,13 +2341,16 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
-	    SDL_Quit();
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Adding one axis or two axes, and a grid, to build a chart.           */
+  /******************************************************************************/
 
   //#define DEMO_AXIS_2D
 #ifdef DEMO_AXIS_2D
@@ -2402,33 +2405,36 @@ int main(int argc, char *argv[])
      #define AXIS_DRAW_COLORVALUES_Y_2 0b0010000000000000 Color code */
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-
+		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-    lb_gr_12RGB(COLOR_BLUE), 5, 15,
-    lb_gr_12RGB(COLOR_GREEN), 1,
-    lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
-    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
-    0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-    COPYMODE_BLEND, LINEMODE_FILTERED);
+		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
+		     lb_gr_12RGB(COLOR_GREEN), 1,
+		     lb_gr_12RGB(COLOR_YELLOW), 1, 2, 
+		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID |
+		     0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+		     COPYMODE_BLEND, LINEMODE_FILTERED);
   
   lb_gr_refresh();
   lb_gr_BMPfile_save("axis_2d.bmp", NULL);
 
-
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
-		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Adding one log-axis or two log axes to build a semilog or log-log    */
+  /* chart.                                                                     */
+  /******************************************************************************/
 
   //#define DEMO_AXIS_2D_LOG
 #ifdef DEMO_AXIS_2D_LOG
@@ -2460,19 +2466,17 @@ int main(int argc, char *argv[])
   win.yr_min=  -0.1e4;
   win.yr_max=  1e4; 
 
-
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
-    lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
-
+		       lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
 
   lg_gr_draw_axis_2d(NULL, win, &my_font,
-    lb_gr_12RGB(COLOR_BLUE), 5, 15,
-    lb_gr_12RGB(COLOR_GREEN), 10,
-    lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
-    AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
-    AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
-    COPYMODE_BLEND, LINEMODE_FILTERED);
+		     lb_gr_12RGB(COLOR_BLUE), 5, 15,
+		     lb_gr_12RGB(COLOR_GREEN), 10,
+		     lb_gr_12RGB(COLOR_YELLOW), 1e3, 2.0, 
+		     AXIS_DRAW_X | 0*AXIS_DRAW_X_ARROWS | 
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID | 
+		     AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
+		     COPYMODE_BLEND, LINEMODE_FILTERED);
 
   UINT16_T i;
   REAL_T xr, yr, xp, yp;
@@ -2480,33 +2484,38 @@ int main(int argc, char *argv[])
   //  yr=1;
   for (i=0;i<=16;i++)
     {
-  //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
-  //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
-  //printf("xr=%f, yr=%f\t\n",xr,yr); 
-  yr=xr;
-  lb_gr_project_2d_x_log(win, xr,  &xp);
-  lb_gr_project_2d_y(win, yr,  &yp);
-  printf("xr=%f, yr=%f\t\n",xr,yr); 
+      //xr=(i%9+1)*pow(10.0,(SINT16_T)i/9);
+      //printf("a=%d b=%d c=%f\r\n",(i%9+1),(SINT16_T)i/9,xr); 
+      //printf("xr=%f, yr=%f\t\n",xr,yr); 
+      yr=xr;
+      lb_gr_project_2d_x_log(win, xr,  &xp);
+      lb_gr_project_2d_y(win, yr,  &yp);
+      printf("xr=%f, yr=%f\t\n",xr,yr); 
       
-  lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
-  xr=xr*pow(10.0,1.0/4.0);
-} 
+      lb_gr_draw_rectangle_solid(NULL, xp-6, yp-6, xp+6, yp+6, lb_gr_12RGB(i*15/27));
+      xr=xr*pow(10.0,1.0/4.0);
+    } 
      
   lb_gr_refresh();
   lb_gr_BMPfile_save("axis_2d_semilog.bmp", NULL);
 
-
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
-		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
+
+  /******************************************************************************/
+  /* Demo: Building a polar chart, with angular and radial grids.               */
+  /* to_do: to elaborate an anti-aliased version of this chart.                 */
+  /* hint: it isn't as easy as one would think...                               */
+  /******************************************************************************/
 
   //#define DEMO_POLAR_AXIS
 #ifdef DEMO_POLAR_AXIS
@@ -2549,33 +2558,43 @@ int main(int argc, char *argv[])
   while (1)
     while (SDL_PollEvent(&event))
       {
-  if (event.type == SDL_QUIT)
-    {
-		      
-  SDL_Quit();
-  return EXIT_SUCCESS;
-}
-}
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
-  
+  /******************************************************************************/
+  /* Demo: Plot_continuous                                                      */
+  /* Background: one challenge when plotting parametric curves is choosing the  */
+  /* right step: if it is too small, there will be gaps in the curve.  If it is */
+  /* too small, the curve will take too long to be drawn.                       */
+  /* This experimental method can adjust the step keeping a continuous curve    */
+  /* provided (this is important!) the curve is continous and differentiable    */
+  /* (smooth).                                                                  */
+  /* The demo also reminds us how to pass functions as parameters in good old C */
+  /******************************************************************************/
   
   //#define DEMO_PLOT_CONTINUOUS
 #ifdef DEMO_PLOT_CONTINUOUS
-  REAL_T diego_x(REAL_T t, MATHERROR_T *error)
+  REAL_T fn_x(REAL_T t, MATHERROR_T *error)
   {
-  return 0.75*sin(5*t)*cos(t);
-}
+    return 0.75*sin(5*t)*cos(t);
+  }
 
-  REAL_T diego_y(REAL_T t, MATHERROR_T *error)
+  REAL_T fn_y(REAL_T t, MATHERROR_T *error)
   {
-  return 0.75*sin(5*t)*sin(t);
-}
+    return 0.75*sin(5*t)*sin(t);
+  }
 
+  SDL_Event event;
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 2, 2, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2590,38 +2609,71 @@ int main(int argc, char *argv[])
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
   win.xp_min=5;
-  win.xp_max=ty_width-5;
+  win.xp_max=ty_screen.w-5;
   win.yp_min=5;
-  win.yp_max=ty_height-5;
+  win.yp_max=ty_screen.h-5;
 
   win.xr_min= -1.024;
   win.xr_max=  1.024;
   win.yr_min= -0.768;
   win.yr_max=  0.768; 
 
-  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max, lb_gr_12RGB(COLOR_DIMGRAY), COPYMODE_COPY);
+  lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
+		       lb_gr_12RGB(COLOR_DIMGRAY), COPYMODE_COPY);
       
-  lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_WHITE), 2.5,
-    lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
-    AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
-    AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
-    COPYMODE_BLEND, LINEMODE_FILTERED); 
+  lg_gr_draw_axis_2d(NULL, win, &my_font,
+		     lb_gr_12RGB(COLOR_WHITE), 2.5, 5,
+		     lb_gr_12RGB(COLOR_GREEN), 0.1,
+		     lb_gr_12RGB(COLOR_BLUE), 0.1, 3,
+		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
+		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
+		     COPYMODE_BLEND, LINEMODE_FILTERED); 
 
-  lb_gr_plot_continuous_fn_2d(NULL, win, diego_x, diego_y,
-    0, 2*10*M_PI, 1,
-    20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
 
-  lb_gr_delay(10000);
-    
-  lb_fb_exit(1); 
+    lb_gr_plot_continuous_fn_2d(NULL, win, fn_x, fn_y,
+			      0, 2*10*M_PI, 1,
+			      20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
+
+  lb_gr_refresh();
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
+
+
+  /******************************************************************************/
+  /* Demo: Plot_continuous with anti-aliasing                                   */
+  /* This experimental method can adjust the step keeping plots a continuous    */
+  /* curve with antialiasing at the expense of much longer processing time.     */
+  /* The neighborhood of each dot is examined to determine whether is solid,    */
+  /* if it shuld be blent with the backgroun, or not drawn at all.              */
+  /* The curve must be continous and differentiable (smooth).                   */                                    /* The demo also reminds us how to pass functions as parameters in good old C */
+  /******************************************************************************/
 
   //#define DEMO_PLOT_CONTINUOUS_ANTIALIASING
 #ifdef DEMO_PLOT_CONTINUOUS_ANTIALIASING
+  REAL_T fn_x(REAL_T t, MATHERROR_T *error)
+  {
+    return 0.75*sin(5*t)*cos(t);
+  }
+
+  REAL_T fn_y(REAL_T t, MATHERROR_T *error)
+  {
+    return 0.75*sin(5*t)*sin(t);
+  }
+
+  SDL_Event event;
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2636,9 +2688,9 @@ int main(int argc, char *argv[])
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
   win.xp_min=5;
-  win.xp_max=ty_width-5;
+  win.xp_max=ty_screen.w-5;
   win.yp_min=5;
-  win.yp_max=ty_height-5;
+  win.yp_max=ty_screen.h-5;
      
   win.xr_min= -1.024;
   win.xr_max=  1.024;
@@ -2647,23 +2699,45 @@ int main(int argc, char *argv[])
 
   lb_gr_draw_rectangle(NULL, win.xp_min, win.yp_min, win.xp_max, win.yp_max,
 		       lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID), COPYMODE_COPY);
-      
-  lg_gr_draw_axis_2d(NULL, win, &my_font, 3, lb_gr_12RGB(COLOR_BLACK), 3,
-		     lb_gr_12RGB(COLOR_GREEN),1, lb_gr_12RGB(COLOR_BLUE),1,
+
+  lg_gr_draw_axis_2d(NULL, win, &my_font,
+		     lb_gr_12RGB(COLOR_BLACK), 3, 1,
+		     lb_gr_12RGB(COLOR_GREEN), 0.1,
+		     lb_gr_12RGB(COLOR_BLUE), 0.1, 2,
 		     AXIS_DRAW_X | AXIS_DRAW_X_ARROWS | AXIS_DRAW_X_GRID |
 		     AXIS_DRAW_Y | AXIS_DRAW_Y_ARROWS | AXIS_DRAW_Y_GRID,
 		     COPYMODE_COPY, LINEMODE_SOLID); 
 
   
-  lb_gr_plot_continuous_fn_2d_antialiasing(NULL, win, diego_x, diego_y,
+  lb_gr_plot_continuous_fn_2d_antialiasing(NULL, win, fn_x, fn_y,
 					   0, 2*M_PI, 0.1, 32,
-					   16, lb_gr_12RGB(COLOR_BLUE|COLOR_SOLID), COPYMODE_BLEND);
-  lb_gr_delay(10000);
-  lb_fb_exit(1);
+					   16, lb_gr_12RGB(COLOR_BLUE|COLOR_SOLID));
+  lb_gr_refresh();
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+ 	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
 
-  //#define DEMO_MANDELBROT
+  /******************************************************************************/
+  /* Demo: Plotting the Mandlelbrot set.                                        */
+  /* This was one of the most memorable tests carried out during the project.   */
+  /* Once the first graphic engine became functional, I looked for something    */
+  /* cool to test it. Never having plot a Mandelbrot Set before, I consulted    */
+  /* its theory and, by using the complex-type functions already built,         */
+  /* got it within 15 minutes and worked fine at the very first try.            */
+  /* Ironically, the graphic engine took MUCH longer!                           */
+  /* Later on, zoom and shifts were added to explore any section of the Set.    */
+  /******************************************************************************/
+
+  // #define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
   SINT32_T xp, yp, iterations;
@@ -2724,7 +2798,7 @@ int main(int argc, char *argv[])
 		  iterations=0;
 		  z.r=xr;
 		  z.i=yr;
-		  while ((lb_cp_abs(z)<2.0) && (iterations<1024)) 
+		  while ((lb_cp_abs(z)<=2.0) && (iterations<255)) 
 		    {
 		      p.r=xr;
 		      p.i=yr;
@@ -2733,15 +2807,9 @@ int main(int argc, char *argv[])
 		    }
 		  PIXEL_T pix;
 
-		  float L;
-		  L=1.0-iterations/1024.0;
-		  //pix.b=50+(128-50)*(1-L);
-		  //pix.g=128*L;
-		  //pix.r=0;
-
-		  pix.b=128+(255-128)*L;
-		  pix.g=255*L;
-		  pix.r=255*L;
+		  pix.b=iterations;
+		  pix.g=256-iterations;
+		  pix.r=0;
 		  lb_gr_draw_pixel(&Pic, xp, yp, pix, COPYMODE_COPY);
 		}
 	    }
@@ -2882,8 +2950,6 @@ int main(int argc, char *argv[])
       k4 = h*f_x1_div_dt(t + h,     x0_copy , x1_copy + k3     );
 
       x1 = x1 + (k1 + 2*k2 + 2*k3 + k4)/6;  
-
-
       t+=h;
     }
 #endif
