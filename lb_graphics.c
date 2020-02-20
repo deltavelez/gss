@@ -853,6 +853,8 @@ SINT8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T quality
   JSAMPROW row_pointer;          /* pointer to a single row */
   UINT16_T j;
   unsigned  char *buffer;
+  UINT32_T dat_offset;
+
   if(quality>100)
     {
       printf("Error: lb_gr_JPGfile_save() --> quality>100\r\n");
@@ -903,9 +905,10 @@ SINT8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T quality
       {
 	for(j=0;j<width;j++)
 	  {
-	    //	    buffer[(unsigned int)3*j]   = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].r*FACTOR_N_TO_8_R;
-	    //buffer[(unsigned int)3*j+1] = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].g*FACTOR_N_TO_8_G;
-	    //buffer[(unsigned int)3*j+2] = (unsigned char)ty_pic_shadow.pic[cinfo.next_scanline][j].b*FACTOR_N_TO_8_B;
+	    dat_offset=4*(ty_screen.w*cinfo.next_scanline+j);
+	    buffer[(unsigned int)3*j]   = *((UINT8_T*)ty_screen.dat + dat_offset + 2);
+	    buffer[(unsigned int)3*j+1] = *((UINT8_T*)ty_screen.dat + dat_offset + 1);
+	    buffer[(unsigned int)3*j+2] = *((UINT8_T*)ty_screen.dat + dat_offset    );
 	  }
 	row_pointer= (JSAMPROW) buffer;
 	jpeg_write_scanlines(&cinfo, &row_pointer, 1);
