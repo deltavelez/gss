@@ -2654,7 +2654,7 @@ int main(int argc, char *argv[])
   /* curve with antialiasing at the expense of much longer processing time.     */
   /* The neighborhood of each dot is examined to determine whether is solid,    */
   /* if it shuld be blent with the backgroun, or not drawn at all.              */
-  /* The curve must be continous and differentiable (smooth).                   */                                    /* The demo also reminds us how to pass functions as parameters in good old C */
+  /* The curve must be continous and differentiable (smooth).                   */
   /******************************************************************************/
 
   //#define DEMO_PLOT_CONTINUOUS_ANTIALIASING
@@ -2877,63 +2877,93 @@ int main(int argc, char *argv[])
     }
 #endif
 
+  /******************************************************************************/
+  /* Demo: 2nd order Euler method  skeleton                                     */
+  /* This is just a clean implementation of the Euler method for a 2nd order    */
+  /* differential equations. No special features are used. This demo is         */
+  /* being kept since it could be reused or adapted to build something else.    */
+  /******************************************************************************/
+
   //  #define EULER_2ND_ORDER
 #ifdef EULER_2ND_ORDER
-
-  REAL_T t, x0, x1, t_max, delta, x0_copy, x1_copy;
-  delta=0.05;
-  t_max=10;
-  x0 = 10; /* position */
-  x1 = 0;  /* speed */
-  
-  
-  t=0;
-  while (t<t_max)
-    {
-      x0_copy=x0;
-      x1_copy=x1;
-
-      x0 += delta*x1_copy;
-
-      if (fabs(x0)>1e-6)
-	x1 += delta*(-1.0)*x0/fabs(x0);
-
-      printf("%4.4f %4.4f %4.4f\r\n",t, x0, x1);  
-
-      t+=delta;
-    }
-  
-  
-#endif
-
-
-
-  //#define RK4_2ND_ORDER
-#ifdef RK4_2ND_ORDER
-
-  REAL_T t, x0, x1, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
-  h=0.001;
-  t_max=45;
-  x0 = 10; /* position */
-  x1 = 10;  /* speed */
-
 
   REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
   {
     return _x1;
   }
-
   
   REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
   {
-    return -1.0;
+    return -9.8;
   }
 
+  REAL_T t, x0, x1, x0_0, x1_0, t_max, h, x0_copy, x1_copy;
+
+  h=0.01;
+  t_max=10;
+
+  x0_0 = 10; /* Initial condition: position */
+  x1_0 = 10; /* Initial condition: speed */
+
+  x0 = x0_0;
+  x1 = x1_0;
+  
+  t=0;
+  while (t<t_max)
+    {
+      printf("t=%4.4f Euler [x, x']= [%4.4f , %4.4f], Analytic [x, x']= [%4.4f , %4.4f]\r\n",
+	     t, x0, x1, x0_0+x1_0*t-0.5*9.8*t*t, x1_0-9.8*t);  
+     
+      x0_copy=f_x0_div_dt(t+h, x0, x1);
+      x1_copy=f_x1_div_dt(t+h, x0, x1);
+      x0 += h*x0_copy;
+      x1 += h*x1_copy;
+
+      t+=h;
+      lb_ti_delay_ms(500);
+    }
+#endif
+
+
+  /******************************************************************************/
+  /* Demo: 2nd order RK4 skeleton                                               */
+  /* This is just a clean implementation of the RK4 method for a 2nd order      */
+  /* differential equations. No special features are used.  This demo is        */
+  /* being kept since it could be reused or adapted to build something else.    */
+  /* The example below solves the equation d2x/dt2 = -g   [g=9.8 m/s^2]         */
+  /* This problem has an analytical solution, whose results are printed as well */
+  /* for comparison.                                                            */
+  /******************************************************************************/
+
+  //#define RK4_2ND_ORDER
+#ifdef RK4_2ND_ORDER
+
+  REAL_T t, x0, x1, x0_0, x1_0, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
+  h=0.01;
+  t_max=15;
+  
+  x0_0 = 10; /* Initial condition: position */
+  x1_0 = 10; /* Initial condition: speed */
+
+  x0 = x0_0;
+  x1 = x1_0;
+ 
+  REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
+  {
+    return _x1;
+  }
+  
+  REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
+  {
+    return -9.8;
+  }
 
   t=0;
   while (t<t_max)
     {
-      printf("%4.4f %4.4f %4.4f,%4.4f, %4.4f\r\n",t, x0, x1,10.0+10.0*t-0.5*t*t, 10.0-t);  
+      printf("t=%4.4f RK4 [x, x']= [%4.4f , %4.4f], Analytic [x, x']= [%4.4f , %4.4f]\r\n",
+	     t, x0, x1, x0_0+x1_0*t-0.5*9.8*t*t, x1_0-9.8*t);  
+     
       x0_copy=x0;
       x1_copy=x1;
 
@@ -2951,9 +2981,23 @@ int main(int argc, char *argv[])
 
       x1 = x1 + (k1 + 2*k2 + 2*k3 + k4)/6;  
       t+=h;
+      lb_ti_delay_ms(500);
     }
 #endif
 
+  /******************************************************************************/
+  /* Demo: GPIO                                                                 */
+  /* This is a complete application which was put together to evaluate the      */
+  /* feasibility of the system within an industrial setting.                    */
+  /* A Raspberry Pi 3 is required.                                              */
+  /* The program was used to control a pneumatic jig to perform shock/vibration */
+  /* analysis of certain electronic sensors.  Data is being read via SPI from   */
+  /* the sensors, and also from an accelerometer attached to them.              */
+  /* Note this demo is rather specific, and may not be the best choice for      */
+  /* trying out the GPIO library for the first time.                            */
+  /* However, it can be used for doing a general overview of the GPIO functions.*/
+  /******************************************************************************/
+  
   //#define DEMO_GPIO
 #ifdef DEMO_GPIO
 
@@ -3323,23 +3367,8 @@ int main(int argc, char *argv[])
   
   lb_gp_gpio_close();
   return EXIT_SUCCESS;
-  
 #endif
 
-  /*
-    unsigned int value;
-    value= lb_gp_gpio_rd_all();
-    value= lb_gp_gpio_rd(4);
-    lb_gp_print_u32_as_binary(value, 32);
-      
-    printf("VALUE=%d\r\n", value);
-    
-    lb_gp_gpio_wr(4,0);
-    lb_ti_delay(100);
-    lb_gp_gpio_wr(4,1);
-    lb_ti_delay(100); */
-
-  
   
   //#define DEMO_SHAKER
 #ifdef DEMO_SHAKER
