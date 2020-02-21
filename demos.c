@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 #endif
   
   /******************************************************************************/
-  /* General Computer Science Demos.                                            */
+  /* General Computer Science Demos                                             */
   /******************************************************************************/
 
   /******************************************************************************/
@@ -317,6 +317,61 @@ int main(int argc, char *argv[])
 	  }
       }
   exit(1);
+#endif
+  
+  /******************************************************************************/
+  /* Demo: Exploring paralelism                                                 */
+  /* Shows the basis of multi-threading processing.                             */
+  /******************************************************************************/
+
+  //#define DEMO_PARALELL
+#ifdef DEMO_PARALELL
+  
+  pthread_t threads[4];
+  int rc;
+  double l0, l1, l2, l3;
+
+  void *floatsum(void *x_max_par)
+  {
+    double  x, x_max, sum;
+    clock_t begin, end;
+
+    x_max= *((double *)x_max_par);
+
+    begin=clock();
+
+    sum=0.0;
+    x=0;
+    begin=clock();
+    while (x<x_max)
+      {
+	sum+=x;
+	x+=1e-6;
+      }
+    end = clock();
+    printf("sum=%0.4e  ",sum);
+    printf("time elapsed = %.4e\n",(double)(end - begin) / CLOCKS_PER_SEC);
+    /* Check CPU usage: 
+       mpstat -P ALL 1
+    */
+    return 0;
+  }
+
+  printf("Starting...\r\n");
+  l3=100;
+  l2=200;
+  l1=400;
+  l0=800;
+  rc=pthread_create(&threads[0],NULL, floatsum, (void *) &l0);
+  rc=pthread_create(&threads[1],NULL, floatsum, (void *) &l1);
+  rc=pthread_create(&threads[2],NULL, floatsum, (void *) &l2);
+  rc=pthread_create(&threads[3],NULL, floatsum, (void *) &l3);
+
+  rc=pthread_join(threads[0],NULL);;
+  rc=pthread_join(threads[1],NULL);;
+  rc=pthread_join(threads[2],NULL);;
+  rc=pthread_join(threads[3],NULL);;
+  
 #endif
 
   /******************************************************************************/
@@ -641,7 +696,7 @@ int main(int argc, char *argv[])
   CONSOLE_T Con;
   char c;
 
-  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_VIRTUAL_CONSOLE", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
   
   Pic_console.w=ty_screen.w;
   Pic_console.h=ty_screen.h;
@@ -729,7 +784,7 @@ int main(int argc, char *argv[])
   int frames_count=0;
   PIXEL_T color;
   
-  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
+  lb_gr_SDL_init("DEMO_PIXEL", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
  
   printf("Speed comparison"); 
 
@@ -794,7 +849,7 @@ int main(int argc, char *argv[])
   SINT16_T z;
   clock_t begin, end;
  
-  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
+  lb_gr_SDL_init("DEMO_LINE1", SDL_INIT_VIDEO, 800, 600, 22, 33, 55);
   
   for(z=0;z<1000;z++) 
     {
@@ -828,7 +883,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   int i;
 
-  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 220, 120, 155);
+  lb_gr_SDL_init("DEMO_LINE2", SDL_INIT_VIDEO, 800, 600, 220, 120, 155);
 
   for (i=0;i<3000; i++)
     {
@@ -855,7 +910,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   int i;
 
-  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 220, 200, 255);
+  lb_gr_SDL_init("DEMO_LINE3", SDL_INIT_VIDEO, 800, 600, 220, 200, 255);
 
   for (i=0;i<1000; i++)
     {
@@ -882,7 +937,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   SINT16_T i;
 
-  lb_gr_SDL_init("Hello", SDL_INIT_VIDEO, 800, 600, 20, 255, 255);
+  lb_gr_SDL_init("DEMO_LINE1_FLOAT", SDL_INIT_VIDEO, 800, 600, 20, 255, 255);
   lb_gr_clear_picture(NULL , lb_gr_12RGB(0x333 | COLOR_SOLID));
   for(i=0;i<1000;i++)
     {
@@ -912,7 +967,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   UINT8_T pix_x=32, pix_y=32, flag_running=TRUE;
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  lb_gr_SDL_init("DEMO_LINE_ANTIALIASING", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
 
@@ -956,7 +1011,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   UINT8_T pix_x=32, pix_y=32, flag_running=TRUE;
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  lb_gr_SDL_init("DEMO_LINE_ANTIALIASING2", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
 
@@ -1006,7 +1061,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_LINE_GENERAL
   SDL_Event event;
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  lb_gr_SDL_init("DEMO_LINE_GENERAL", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
       
   lb_gr_draw_line(NULL, 0, 0, ty_screen.w, ty_screen.h, 30,
 		  lb_gr_12RGB(COLOR_BLUE | 0*COLOR_SOLID), COPYMODE_COPY, LINEMODE_SOLID);
@@ -1039,7 +1094,7 @@ int main(int argc, char *argv[])
   //#define DEMO_CIRCLE
 #ifdef DEMO_CIRCLE
   SDL_Event event;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  lb_gr_SDL_init("DEMO_CIRCLE", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
   lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);
   lb_gr_refresh();
@@ -1064,7 +1119,7 @@ int main(int argc, char *argv[])
   //#define DEMO_CIRCLE_ANTIALIASING_SIMPLE
 #ifdef DEMO_CIRCLE_ANTIALIASING_SIMPLE
   SDL_Event event;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  lb_gr_SDL_init("DEMO_CIRCLE_ANTIALIASING_SIMPLE", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
 
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0xFFFF | COLOR_SOLID));
   lb_gr_draw_circle_antialiasing_simple(NULL, ty_screen.w/2, ty_screen.h/2, 0.35*ty_screen.h,20,
@@ -1096,7 +1151,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   UINT8_T pix_x=20, pix_y=20;
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
+  lb_gr_SDL_init("DEMO_CIRCLE_ANTIALIASING23", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
 
@@ -1130,7 +1185,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_CIRCLE_ANTIALIASING
   SDL_Event event;
   int pix_x=10, pix_y=10;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_CIRCLE_ANTIALIASING", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   //      lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0xff, 0xff, 0xff, 0xff, 0);
   lb_gr_fb_rectangle_copymode(&ty_screen, 0, 0, ty_screen.w, ty_screen.h, 0, 0, 0, 0xff, 0);
 
@@ -1163,7 +1218,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_CIRCLE_FILLED_SLOW
   SDL_Event event;
   int pix_x=30, pix_y=30;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_CIRCLE_FILLED_SLOW", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLUE));
 
   //  lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(2*pix_y), lb_gr_12RGB(0xF00F),
@@ -1192,7 +1247,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_CIRCLE_FILLED_FAST
   SDL_Event event;
   int pix_x=10, pix_y=10;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_CIRCLE_FILLED_FAST", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
       
   lb_gr_draw_circle_filled_antialiasing_r(NULL, ty_screen.w/(3*pix_x), ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
@@ -1221,7 +1276,7 @@ int main(int argc, char *argv[])
   //#define DEMO_CIRCLE_FILLED_ANTIALIASING
 #ifdef DEMO_CIRCLE_FILLED_ANTIALIASING
   SDL_Event event;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_CIRCLE_FILLED_ANTIALIASING", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/3,   ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xF00F));
@@ -1251,7 +1306,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_CIRCLE_ARC
   SDL_Event event;
   int pix_x=10, pix_y=10;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_CIRCLE_ARC", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
   lb_gr_draw_circle_arc(NULL, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.h/(pix_y*2)-1,
@@ -1282,7 +1337,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   SINT16_T pix_x=20, pix_y=20;
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_ELLIPSE", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
 
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
@@ -1334,7 +1389,7 @@ int main(int argc, char *argv[])
   SINT16_T i;
   POINT_2D_SINT16_T A, B, C;
   clock_t begin, end;
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_TRIANGLE", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 	    
   begin=clock();
@@ -1379,7 +1434,7 @@ int main(int argc, char *argv[])
   int i;
   float phase;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_POLYGON", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 	
   /* Polygon creation and testing */
@@ -1427,7 +1482,7 @@ int main(int argc, char *argv[])
   int i;
   float phase;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_POLYGON_FLOAT", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0, 0, 0);
  
   /* Polygon creation and testing */ 
   myPol.items=10;
@@ -1471,7 +1526,7 @@ int main(int argc, char *argv[])
   LINE_2D_SINT16_T Poly_int;
   POINT_2D_SINT16_T P;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_INSIDE_POLYGON_INT", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 	    
   /* Polygon creation and testing */
@@ -1526,7 +1581,7 @@ int main(int argc, char *argv[])
   POINT_2D_REAL_T P;
   VIEWPORT_2D_T win;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_INSIDE_POLYGON_FLOAT", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   win.xp_min=0;
@@ -1583,7 +1638,7 @@ int main(int argc, char *argv[])
   LINE_2D_SINT16_T myPol;
   int k=40;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_POLYGON_FILL", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
   /* Polygon creation and testing */
@@ -1620,8 +1675,8 @@ int main(int argc, char *argv[])
   /* digital operators such as NO, XOR, AND, OR, etc.                           */
   /******************************************************************************/
 
-  //#define DUFF_PORTER
-#ifdef DUFF_PORTER
+  //#define DEMO_DUFF_PORTER
+#ifdef DEMO_DUFF_PORTER
   SDL_Event event;
   PICTURE_T pic1;
   SINT16_T i,j, alpha;
@@ -1631,7 +1686,7 @@ int main(int argc, char *argv[])
   const char *filename="./media/images/sdl24bit.bmp";
   
   lb_gr_BMPfile_getsize(filename,&i,&j);
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, pix_x*i,pix_y*j, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_DUFF_PORTER", SDL_INIT_VIDEO, pix_x*i,pix_y*j, 0, 0, 0);
   
   pic1.w=i;
   pic1.h=j;
@@ -1709,7 +1764,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   UINT8_T pix_x=8, pix_y=8, flag_running=TRUE;
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("DEMO_PLOT2D", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
   Pic.w= ty_screen.w/pix_x;
   Pic.h= ty_screen.h/pix_y;
 
@@ -1746,8 +1801,8 @@ int main(int argc, char *argv[])
   /* https://www.ocf.berkeley.edu/~fricke/projects/israel/paeth/rotation_by_shearing.html    */
   /******************************************************************************/
 
-  //  #define ROTATE_ALGORITHM
-#ifdef ROTATE_ALGORITHM
+  //  #define DEMO_ROTATE_ALGORITHM
+#ifdef DEMO_ROTATE_ALGORITHM
   SDL_Event event;
   PICTURE_T Pic;
   SINT16_T k;
@@ -1755,7 +1810,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T win;
   REAL_T angle;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("DEMO_ROTATE_ALGORITHM", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0xFF, 0xFF, 0xFF);
  
   angle=45.0*M_PI/180;
      
@@ -1847,7 +1902,7 @@ int main(int argc, char *argv[])
   pic_src.w=384;
   pic_src.h=256;
   printf("%d %d\r\n",width, height);
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, width*pix_x*2, height*pix_y*2, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("DEMO_ROTATE_BITMAP", SDL_INIT_VIDEO, width*pix_x*2, height*pix_y*2, 0xFF, 0xFF, 0xFF);
   lb_gr_create_picture(&pic_src,lb_gr_12RGB(COLOR_RED));
        
   lb_gr_BMPfile_load_to_pic(filename,&pic_src, 0);
@@ -1890,7 +1945,7 @@ int main(int argc, char *argv[])
 
   /* Load initial image and present it */
   lb_gr_BMPfile_getsize(filename,&width,&height);
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, width*pix_x*2, height*pix_y*2, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("DEMO_ROTATE_BITMAP_SAMPLING", SDL_INIT_VIDEO, width*pix_x*2, height*pix_y*2, 0xFF, 0xFF, 0xFF);
 
   pic_src.w=width;
   pic_src.h=height;
@@ -1940,7 +1995,7 @@ int main(int argc, char *argv[])
   lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_BLACK));
 
   lb_gr_BMPfile_getsize(filename,&i,&j);
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, i*3, j*2, 0xaF, 0xaF, 0x8F);
+  lb_gr_SDL_init("DEMO_BMP_TO_MATRIX", SDL_INIT_VIDEO, i*3, j*2, 0xaF, 0xaF, 0x8F);
 
   R.rows=j;
   R.cols=i;
@@ -2008,7 +2063,7 @@ int main(int argc, char *argv[])
   REAL_T xr, yr, xp, yp;
   VIEWPORT_2D_T win;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
+  lb_gr_SDL_init("DEMO_PROJECT_2D", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
 
   win.xp_min=0;
   win.yp_min=0;
@@ -2050,7 +2105,7 @@ int main(int argc, char *argv[])
   int i;
   VIEWPORT_2D_T win;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
+  lb_gr_SDL_init("DEMO_PLOT2D_COMPLEX", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
 
   win.xp_min=0;
   win.yp_min=0;
@@ -2109,7 +2164,7 @@ int main(int argc, char *argv[])
   SINT16_T i,j;
   REAL_T xr, yr, zr;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1024, 1024, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_PLOT_IMPLICIT", SDL_INIT_VIDEO, 1024, 1024, 0, 0, 0);
 
   A.rows=100; /* vertical */
   A.cols=100; /* horizontal */
@@ -2173,7 +2228,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200, 1024, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("DEMO_PLOT2D_REVERSE", SDL_INIT_VIDEO, 1200, 1024, 0xFF, 0xFF, 0xFF);
 
   /* Viewport definition */
   vp.xp_min = 0;
@@ -2239,7 +2294,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T vp;
   VECTOR_R_T Lx, Ly;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_PLOT2D_REVERSE_SLOW", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
 
   /* Viewport definition */
@@ -2303,7 +2358,7 @@ int main(int argc, char *argv[])
   PICTURE_T pic1, pic2;
   SINT16_T i,j;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_JPG", SDL_INIT_VIDEO, 0*400,0*400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   lb_gr_BMPfile_getsize("./media/images/sdl24bit.bmp",&i,&j);
@@ -2358,7 +2413,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   FONT_T my_font;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200,800, 0xff, 0xff, 0xff);
+  lb_gr_SDL_init("DEMO_AXIS_2D", SDL_INIT_VIDEO, 1200,800, 0xff, 0xff, 0xff);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2442,7 +2497,7 @@ int main(int argc, char *argv[])
   SDL_Event event;
   FONT_T my_font;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200,800, 0xff, 0xff, 0xff);
+  lb_gr_SDL_init("DEMO_AXIS_2D_LOG", SDL_INIT_VIDEO, 1200,800, 0xff, 0xff, 0xff);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2523,7 +2578,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1200, 800, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_POLAR_AXIS", SDL_INIT_VIDEO, 1200, 800, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
@@ -2594,7 +2649,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_PLOT_CONTINUOUS", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2673,7 +2728,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T win;
   FONT_T my_font;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
+  lb_gr_SDL_init("EMO_PLOT_CONTINUOUS_ANTIALIASING", SDL_INIT_VIDEO, 800, 600, 0, 0, 0);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -2747,7 +2802,7 @@ int main(int argc, char *argv[])
   PICTURE_T Pic;
   REAL_T k=1.5, x_center, y_center, size;
 
-  lb_gr_SDL_init("Exploring  the Mandelbrot Set", SDL_INIT_VIDEO, 600,400, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_MANDELBROT", SDL_INIT_VIDEO, 600,400, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
   
   win.yp_min=0;
@@ -2897,7 +2952,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T win;
   PIXEL_T pix;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
 
   z_zoom=0.1;
   win.xp_min=0;
@@ -3379,7 +3434,7 @@ int main(int argc, char *argv[])
   lb_al_create_vector_r(&R);
   lb_al_create_vector_r(&T);
   
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_LEVER", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   Pic_Vel.w = ty_screen.w/2-15;
@@ -3689,7 +3744,7 @@ int main(int argc, char *argv[])
   SINT8_T flag_paused=FALSE;
   const SINT8_T skip_steps=50;
 
-  lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1600, 1200, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("N_BODY_PROBLEM", SDL_INIT_VIDEO, 1600, 1200, 0xFF, 0xFF, 0xFF);
    
   win.xp_min=0;
   win.yp_min=0;
@@ -3974,7 +4029,7 @@ int main(int argc, char *argv[])
 
   flag_exit=FALSE;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_PLOT3D_BASIC", SDL_INIT_VIDEO, 0,0, 0, 0, 0);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
@@ -4193,7 +4248,7 @@ int main(int argc, char *argv[])
   FONT_T font_console;
   SINT8_T flag_paused;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
+  lb_gr_SDL_init("DEMO_PLOT3D", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
@@ -4424,8 +4479,7 @@ int main(int argc, char *argv[])
   char text[40];
   REAL_T x;
 
-  lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
-
+  lb_gr_SDL_init("DEMO_NEW_FONT", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
   
   //printf("-10/10=%d\r\n",lb_in_round_div_up(1000,1001));
   //lb_fb_exit(1);
@@ -4638,7 +4692,7 @@ int main(int argc, char *argv[])
   /* Any of the expressions commented our below can be tried                    */
   /******************************************************************************/
   
-#define DEMO_PARSER_COMPLEX
+  //#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
   MATHERROR_T e_code;
   COMPLEX_T var1,var2,imag,result;
@@ -4721,224 +4775,13 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* GIS demos */
-  /******************************************************************************************************************/
-
-  //#define DEMO_GIS
-#ifdef DEMO_GIS
-  REAL_T lon, lat;
-  FILE *fp;
-  int i_lat, i_lon, parsing_lon;
-  SINT16_T i, j;
-  char c, str_lat[128], str_lon[128];
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
-  
-  if (!(fp = fopen("world_map_large.csv", "r")))
-    {
-      perror("invalid world data file");
-      lb_fb_exit(1);
-    }
-
-  i_lat=0; i_lon=0;
-  parsing_lon=TRUE;
-  while ((c = fgetc(fp)) != EOF)
-    {
-      if (parsing_lon)
-	{
-	  if(isdigit(c) || (c=='.') || (c=='-'))
-	    {
-	      str_lon[i_lon]=c;
-	      i_lon++;
-	    }
-	  else
-	    {
-	      if ((i_lon>0) && (c==' '))
-		{
-		  str_lon[i_lon]='\0';
-		  lon=atof(str_lon);
-		  //printf("%f",lat);
-		  parsing_lon=FALSE;
-		  i_lon=0;		      
-		}
-	    }
-	}
-      else
-	{
-	  if(isdigit(c) || (c=='.') || (c=='-'))
-	    {
-	      str_lat[i_lat]=c;
-	      i_lat++;
-	    }
-	  else
-	    {
-	      if ((i_lat>0) && ((c==',') || (c==')')))
-		{
-		  str_lat[i_lat]='\0';
-		  lat=atof(str_lat);
-		  //printf("***%f\r\n",lon);
-		  fflush(stdout);
-		  parsing_lon=TRUE;
-		  i_lat=0;
-
-		  j=0.5*ty_width*(1.0+lon/180.0);
-		  i=0.3*ty_height*(1.0-lat/90.0);
-
-		  if ( (-90.0<lat) && (lat<90.0) && (-180.0<lon) && (lon<180.0))
-		    lb_gr_draw_pixel(NULL,j,i,lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
-		}
-	    }
-	}
-      //printf("%c",c);
-    }
-  fclose(fp);
-  lb_gr_delay(30000);
-  lb_fb_exit(1);
-#endif
-
-  //#define DEMO_GIS_HEIGHT
-#ifdef DEMO_GIS_HEIGHT
-  SINT16_T lb_gis_height(REAL_T lon, REAL_T lat)
-  {
-    FILE *fp;
-    char filename[16];
-    char str[4];
-    long pos_lat, pos_lon;
-    int height;
-    
-    strcpy(filename,"\0");
-    if (lat>=0.0)
-      {
-	strcat(filename,"N");
-	sprintf(str, "%02d", (SINT16_T)lat);
-	pos_lat=round(1201.0*lb_re_frac(lat));
-      }
-    else
-      {
-	strcat(filename,"S");
-	sprintf(str, "%02d", (SINT16_T)ceil(-lat));
-	pos_lat=round(1201.0*(1.0+lb_re_frac(lat)));
-      }
-    strcat(filename,str);
-    if (lon>=0.0)
-      {
-	strcat(filename,"E");
-	sprintf(str, "%03d", (SINT16_T)lon);
-	pos_lon=round(1201*lb_re_frac(lon));
-      }
-    else
-      {
-	strcat(filename,"W");
-	sprintf(str, "%03d", (SINT16_T)ceil(-lon));
-	pos_lon=round(1201.0*(1.0+lb_re_frac(lon)));
-      }
-    strcat(filename,str);
-    strcat(filename,".hgt");
-    // printf("Filename: %s, lon=%f pos_lon=%d, lat=%f pos_lat=%d  ",filename,lat,pos_lon,pos_lat);
-  
-    if (!(fp = fopen(filename, "r")))
-      {
-	perror("invalid filename\r\n");
-	return 0;
-      }
-  
-    fseek(fp,2*1201*pos_lat+2*pos_lon,SEEK_SET);
-    fread(&height,sizeof(height),1,fp);
-    fclose(fp);
-    return lb_in_littleS16_to_bigS16(height);
-  }
-
-  
-  SINT16_T i, j, height, height_max;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
-
-  height_max=0;
-      
-  for (i=0;i<ty_height;i++)
-    for (j=0;j<ty_width;j++)
-      {
-	height=lb_gis_height(-73+(REAL_T)j/ty_width, 8.0+(REAL_T)i/ty_height);
-
-	if (height>height_max)
-	  height_max=height;
-	    
-	//printf("height=%d\r\n",height);
-
-	PIXEL_T pix;
-	pix.r=0;
-	pix.g=round(MAX_R*(REAL_T)height/3619.0);
-	pix.b=0;
-	pix.k=MAX_K;
-	  
-	lb_gr_draw_pixel(NULL,j,i,pix,COPYMODE_COPY);
-
-	//lb_gr_delay(50);
-      }
-  printf("height-max=%d\r\n",height_max);      
-
-  char c;
-  while ((c=lb_co_getch())!='x') ;
-  lb_fb_exit(1);
-#endif
-
-  //#define DEMO_PARALELL
-#ifdef DEMO_PARALELL
-
-  /* for DEMO_PARALELL */
-
-  void *floatsum(void *x_max_par)
-  {
-    double  x, x_max, sum;
-    clock_t begin, end;
-
-    x_max= *((double *)x_max_par);
-
-    begin=clock();
-
-    sum=0.0;
-    x=0;
-    begin=clock();
-    while (x<x_max)
-      {
-	sum+=x;
-	x+=1e-8;
-      }
-    end = clock();
-    printf("sum=%0.4e  ",sum);
-    printf("time elapsed = %.4e\n",(double)(end - begin) / CLOCKS_PER_SEC);
-    /* Check CPU usage: 
-       mpstat -P ALL 1
-    */
-    return 0;
-  }
-
-  
-  pthread_t threads[4];
-  int rc;
-  double l0, l1, l2, l3;
-  l3=200;
-  l2=200;
-  l1=200;
-  l0=200;
-  rc=pthread_create(&threads[0],NULL, floatsum, (void *) &l0);
-  rc=pthread_create(&threads[1],NULL, floatsum, (void *) &l1);
-  rc=pthread_create(&threads[2],NULL, floatsum, (void *) &l2);
-  rc=pthread_create(&threads[3],NULL, floatsum, (void *) &l3);
-
-  rc=pthread_join(threads[0],NULL);;
-  rc=pthread_join(threads[1],NULL);;
-  rc=pthread_join(threads[2],NULL);;
-  rc=pthread_join(threads[3],NULL);;
-  
-#endif
-      
-  /*******************************************************************************************************************/
-  /* Statistics */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Demo: Statistics: the ubiquitous Gauss bell from an Histogram              */
+  /* Notes: In spite of its widespread use, it is very hard to find             */
+  /* properly-drawn Histograms nor tools to correctly generate them.            */
+  /* Even Excel won't generate by default a good Histogram and one needs to     */
+  /* follow a number of special steps to create one.                            */
+  /******************************************************************************/
 
   //#define DEMO_HISTOGRAM
 #ifdef DEMO_HISTOGRAM
@@ -4950,7 +4793,7 @@ int main(int argc, char *argv[])
   SINT16_T i;
   REAL_T mu, sigma2;
 
-  lb_gr_SDL_init("Histogram", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("DEMO_HISTOGRAM", SDL_INIT_VIDEO, 1800, 1000, 0xFF, 0xFF, 0xFF);
 
   win.xp_min=0;
   win.xp_max=ty_screen.w;
@@ -5008,8 +4851,6 @@ int main(int argc, char *argv[])
 
   lb_gr_plot2d_line(NULL, win, &L, 4, lb_gr_12RGB(0xF00a), COPYMODE_BLEND, LINEMODE_FILTERED);
 
- 
-	 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
   my_font.scale_x=2;
@@ -5035,27 +4876,32 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
-		      
+	    lb_gr_SDL_close();
 	    SDL_Quit();
 	    return EXIT_SUCCESS;
 	  }
       }
-
 #endif
 
-  /*******************************************************************************************************************/
-  /* General Mathematics */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Demo: Prime numbers                                                        */
+  /* There is nothing special about this demo. This is just a log-log           */ 
+  /* plot of the first primes                                                   */
+  /* Some off things about primes:                                              */
+  /* - Other than 2 or 5, all primes end in 1, 3, 7 or 9.                       */
+  /* - Prime numbers don't like repeating their last digit                      */
+  /******************************************************************************/
 
-  //#define DEMO_PRIMES
+  // #define DEMO_PRIMES
 #ifdef DEMO_PRIMES
+  SDL_Event event;
   VIEWPORT_2D_T win;
   FONT_T my_font;
   VECTOR_SINT16_T P;
   SINT32_T k,j;
-  REAL_T t, x, y, xp, yp;
+  REAL_T x, y, xp, yp;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
+  lb_gr_SDL_init("DEMO_PRIMES", SDL_INIT_VIDEO, 800, 600, 0x1F, 0x1F, 0x1F);
 
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   my_font.scale_x=1;
@@ -5069,23 +4915,18 @@ int main(int argc, char *argv[])
   my_font.color_fg=lb_gr_12RGB(COLOR_YELLOW | COLOR_SOLID);
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
 
-          
   win.xp_min=5;
-  win.xp_max=ty_width-5;
+  win.xp_max=ty_screen.w-5;
   win.yp_min=5;
-  win.yp_max=ty_height-5;
+  win.yp_max=ty_screen.h-5;
 
-   
   win.xr_min= 0.0;
   win.xr_max=  10.0;
-  win.yr_min=  10.0;
-  win.yr_max= 0.0; 
-
+  win.yr_min=  0.0;
+  win.yr_max= 15.0; 
 
   P.items=100;
   lb_al_create_vector_si16(&P);
-
-
 
   lb_sieve_erathostenes_2(&P, 32500);
   lb_al_print_vector_si16(&P,"Primes");
@@ -5095,13 +4936,13 @@ int main(int argc, char *argv[])
     {
       if(lb_in_is_perfectsquare(k)==TRUE)
 	{
-	  printf("%d\r\n",k);
+	  printf("%ld\r\n",k);
 	  j++;
 	}
     }
 
   k=10000000000;
-  printf("isqrt(%d)=%d\r\n",k,lb_in_isqrt(k));
+  printf("isqrt(%ld)=%ld\r\n",k,lb_in_isqrt(k));
 
   for (k=1;k<P.items;k++)
     {
@@ -5110,9 +4951,19 @@ int main(int argc, char *argv[])
       lb_gr_project_2d(win, x, y, &xp, &yp);
       lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
     }
-  lb_gr_delay(10000);
+  lb_gr_refresh();
   lb_al_release_vector_si16(&P);
-  lb_fb_exit(1);
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    lb_gr_SDL_close();
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
   /******************************************************************************/
@@ -5164,6 +5015,63 @@ int main(int argc, char *argv[])
       t+=h;
       lb_ti_delay_ms(500);
     }
+#endif
+
+  /******************************************************************************/
+  /* Demo: 1st order RK4 skeleton                                               */
+  /* This is just a clean implementation of the RK4 method for a 1st order      */
+  /* differential equation. No special features are used.                       */
+  /******************************************************************************/
+
+  //#define DEMO_RK4_FIRST_ORDER
+#ifdef DEMO_RK4_FIRST_ORDER
+  SDL_Event event;
+  REAL_T fn(REAL_T x, REAL_T y, MATHERROR_T *error)
+  {
+    return -0.1*x;
+  }
+  
+  REAL_T t_n, y_rk4, y_euler, xp, yp;
+  VIEWPORT_2D_T win;
+  MATHERROR_T error;
+
+  lb_gr_SDL_init("DEMO_RK4_FIRST_ORDER", SDL_INIT_VIDEO, 800, 600, 0xfF, 0xfF, 0xfF);
+
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
+  win.xr_min=0.0;
+  win.xr_max=6.2832*8.0;
+  win.yr_min=-2.5; 
+  win.yr_max=2.5;
+
+  t_n=0;
+  y_rk4=0;
+  y_euler=0;
+  error=e_none;
+      
+  while((t_n<=win.xr_max) && (error==e_none))
+    {
+      printf("t_n= %f, y_euler=%f, y_rk4=%f\r\n",t_n,y_euler, y_rk4);
+      lb_gr_project_2d(win, t_n, y_rk4, &xp, &yp);
+      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
+      lb_gr_project_2d(win, t_n, y_euler, &xp, &yp);
+      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
+      rk4(&t_n, &y_rk4, 0.1, &error, fn);
+      rk4(&t_n, &y_euler, 0.1, &error, fn);
+    }
+  lb_gr_refresh();
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
 
@@ -5227,66 +5135,29 @@ int main(int argc, char *argv[])
     }
 #endif
 
-
-  //#define DEMO_RK4
-#ifdef DEMO_RK4
-  REAL_T diego_sin(REAL_T x, REAL_T y, MATHERROR_T *error)
-  {
-    return -0.1*x;
-  }
-
-  
-  REAL_T t_n, y_rk4, y_euler, xp, yp;
-  VIEWPORT_2D_T win;
-  MATHERROR_T error;
-
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
-  
-  win.xp_min=0;
-  win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
-  win.xr_min=0.0;
-  win.xr_max=6.2832*8.0;
-  win.yr_min=-2.5; 
-  win.yr_max=2.5;
-
-  t_n=0;
-  y_rk4=0;
-  y_euler=0;
-  error=e_none;
-      
-  while((t_n<=win.xr_max) && (error==e_none))
-    {
-      printf("t_n= %f, y_euler=%f, y_rk4=%f\r\n",t_n,y_euler, y_rk4);
-      lb_gr_project_2d(win, t_n, y_rk4, &xp, &yp);
-      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
-      lb_gr_project_2d(win, t_n, y_euler, &xp, &yp);
-      lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY);
-      rk4(&t_n, &y_rk4, 0.1, &error, diego_sin);
-      rk4(&t_n, &y_euler, 0.1, &error, diego_sin);
-    }
-  lb_gr_delay(20000);
-  lb_fb_exit(1); 
-#endif
+  /******************************************************************************/
+  /* Demo: 1st order RK4 General Method                                         */
+  /* Long story made short: all the RK4 methods can be defined by a Matrix      */
+  /* containing its coefficients.                                               */
+  /* This skeletton can be improved, e.g, the function to be solved is          */
+  /* and could be instead passed as a parameter.                                */
+  /******************************************************************************/
 
   //#define DEMO_GENERAL_RUNGE_KUTTA
 #ifdef DEMO_GENERAL_RUNGE_KUTTA
+  SDL_Event event;
   VECTOR_R_T C, B, K;
   MATRIX_R_T A;
   SINT16_T i, j;
   REAL_T t_n, y_n, h, temp_t, temp_y, y_next, xp, yp;
   VIEWPORT_2D_T win;
 
-  lb_fb_open("/dev/fb0", "/dev/tty1", 1, 1, 0*RENDEROPTIONS_LINE | 1*RENDEROPTIONS_GRAPHICS_ONLY);
-  lb_fb_clear(ty_fb_main, 0,0,0,255);
-
+  lb_gr_SDL_init("DEMO_GENERAL_RUNGE_KUTTA", SDL_INIT_VIDEO, 800, 600, 0x1F, 0x1F, 0x1F);
   
   win.xp_min=0;
   win.yp_min=0;
-  win.xp_max=ty_width;
-  win.yp_max=ty_height;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
   win.xr_min=-5.0;
   win.xr_max=5.0;
   win.yr_min=-3.5; 
@@ -5351,46 +5222,23 @@ int main(int argc, char *argv[])
       y_n=y_next;
       t_n+=h;
     }
-  lb_gr_delay(4000);
-      
+  lb_gr_refresh();
   lb_al_release_matrix_r(&A);
   lb_al_release_vector_r(&B);
   lb_al_release_vector_r(&C);
-  lb_fb_exit(1); 
+
+  while (1)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+		      
+	    SDL_Quit();
+	    return EXIT_SUCCESS;
+	  }
+      }
 #endif
 
-  /*******************************************************************************************************************/
-  /* System Functions */
-  /******************************************************************************************************************/
-      
-  //#define DEMO_TIME_TEST
-#ifdef DEMO_TIME_TEST
-  unsigned long i, max;
-  SINT16_T j;
-  clock_t begin, end;
-
-  max=1000000;
-
-  begin=clock();
-  for (i=0;i<max;i++)
-    j=round(12.232);
-  end = clock();
-  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
-
-  begin=clock();
-  for (i=0;i<max;i++)
-    j=lround(12.232);
-  end = clock();
-  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
-
-  begin=clock();
-  for (i=0;i<max;i++)
-    j=0.5+12.232;
-  end = clock();
-  printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
-
-  exit(1);
-#endif
 
   /* BER vs Noise using a Montecarlo simulation */
   
