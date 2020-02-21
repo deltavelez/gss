@@ -13,6 +13,7 @@
 #include "lb_numer.h"
 #include "lb_parser.h"
 #include "lb_statistics.h"
+#include "lb_time.h"
 
 OPERATOR_T ops[MAX_OPERATORS] = { { op_positive,              "+",  a_right, 5, op_unary  },
 				  { op_negative,              "-",  a_right, 5, op_unary  }, 
@@ -584,8 +585,8 @@ REAL_T lb_pa_eval_real(FN_RECORD_T *fnrec, REAL_T *values, MATHERROR_T *error)
 	  printf("Error: lb_pa_eval(): right parenthesis in stack \r\n");
 	  break;
 	}
-      // printf("Completed i= %d  ",i);
-      // lb_pa_print_item((*fnrec).out[i], values);
+      //printf("Completed i= %d  ",i);
+       //lb_pa_print_item((*fnrec).out[i], values);
 
       if ((*error)!=e_none)
 	return 0.0;
@@ -1712,7 +1713,6 @@ REAL_T lb_pa_formula(char *fnstr, char *vars, REAL_T f1, REAL_T f2, REAL_T f3, M
 
   //printf("After reducing:\r\n");
   //lb_pa_print_output(&fnrec,TEXT_COLOR_BACKGROUND+TEXT_COLOR_CYAN);
-  
   return lb_pa_eval_real(&fnrec, vector, error);
 }
 

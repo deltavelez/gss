@@ -2887,7 +2887,7 @@ int main(int argc, char *argv[])
   /* ffmpeg -framerate 24 -i man%06d.jpg output.mp4                             */
   /******************************************************************************/
 
-#define DEMO_VIDEO_MANDELBROT
+  //#define DEMO_VIDEO_MANDELBROT
 #ifdef DEMO_VIDEO_MANDELBROT
   int xp, yp, iterations;
   int k;
@@ -2942,115 +2942,6 @@ int main(int argc, char *argv[])
   lb_gr_SDL_close();
   SDL_Quit();
   return EXIT_SUCCESS;
-#endif
-
-  
-  /******************************************************************************/
-  /* Demo: 2nd order Euler method  skeleton                                     */
-  /* This is just a clean implementation of the Euler method for a 2nd order    */
-  /* differential equations. No special features are used. This demo is         */
-  /* being kept since it could be reused or adapted to build something else.    */
-  /******************************************************************************/
-
-  //  #define EULER_2ND_ORDER
-#ifdef EULER_2ND_ORDER
-
-  REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
-  {
-    return _x1;
-  }
-  
-  REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
-  {
-    return -9.8;
-  }
-
-  REAL_T t, x0, x1, x0_0, x1_0, t_max, h, x0_copy, x1_copy;
-
-  h=0.01;
-  t_max=10;
-
-  x0_0 = 10; /* Initial condition: position */
-  x1_0 = 10; /* Initial condition: speed */
-
-  x0 = x0_0;
-  x1 = x1_0;
-  
-  t=0;
-  while (t<t_max)
-    {
-      printf("t=%4.4f Euler [x, x']= [%4.4f , %4.4f], Analytic [x, x']= [%4.4f , %4.4f]\r\n",
-	     t, x0, x1, x0_0+x1_0*t-0.5*9.8*t*t, x1_0-9.8*t);  
-     
-      x0_copy=f_x0_div_dt(t+h, x0, x1);
-      x1_copy=f_x1_div_dt(t+h, x0, x1);
-      x0 += h*x0_copy;
-      x1 += h*x1_copy;
-
-      t+=h;
-      lb_ti_delay_ms(500);
-    }
-#endif
-
-
-  /******************************************************************************/
-  /* Demo: 2nd order RK4 skeleton                                               */
-  /* This is just a clean implementation of the RK4 method for a 2nd order      */
-  /* differential equations. No special features are used.  This demo is        */
-  /* being kept since it could be reused or adapted to build something else.    */
-  /* The example below solves the equation d2x/dt2 = -g   [g=9.8 m/s^2]         */
-  /* This problem has an analytical solution, whose results are printed as well */
-  /* for comparison.                                                            */
-  /******************************************************************************/
-
-  //#define RK4_2ND_ORDER
-#ifdef RK4_2ND_ORDER
-
-  REAL_T t, x0, x1, x0_0, x1_0, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
-  h=0.01;
-  t_max=15;
-  
-  x0_0 = 10; /* Initial condition: position */
-  x1_0 = 10; /* Initial condition: speed */
-
-  x0 = x0_0;
-  x1 = x1_0;
- 
-  REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
-  {
-    return _x1;
-  }
-  
-  REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
-  {
-    return -9.8;
-  }
-
-  t=0;
-  while (t<t_max)
-    {
-      printf("t=%4.4f RK4 [x, x']= [%4.4f , %4.4f], Analytic [x, x']= [%4.4f , %4.4f]\r\n",
-	     t, x0, x1, x0_0+x1_0*t-0.5*9.8*t*t, x1_0-9.8*t);  
-     
-      x0_copy=x0;
-      x1_copy=x1;
-
-      k1 = h*f_x0_div_dt(t,         x0_copy,          x1_copy);
-      k2 = h*f_x0_div_dt(t + 0.5*h, x0_copy + 0.5*k1, x1_copy);
-      k3 = h*f_x0_div_dt(t + 0.5*h, x0_copy + 0.5*k2, x1_copy);
-      k4 = h*f_x0_div_dt(t + h,     x0_copy + k3,     x1_copy);
-
-      x0 = x0 + (k1 + 2*k2 + 2*k3 + k4)/6;  
-
-      k1 = h*f_x1_div_dt(t,         x0_copy,  x1_copy          );
-      k2 = h*f_x1_div_dt(t + 0.5*h, x0_copy , x1_copy + 0.5*k1 );
-      k3 = h*f_x1_div_dt(t + 0.5*h, x0_copy , x1_copy + 0.5*k2 );
-      k4 = h*f_x1_div_dt(t + h,     x0_copy , x1_copy + k3     );
-
-      x1 = x1 + (k1 + 2*k2 + 2*k3 + k4)/6;  
-      t+=h;
-      lb_ti_delay_ms(500);
-    }
 #endif
 
   /******************************************************************************/
@@ -3736,7 +3627,6 @@ int main(int argc, char *argv[])
   ASTRO_T M_euler[N_OBJECTS];
   ASTRO_T M_rk4[N_OBJECTS];
 
-
   VECTOR_3D_T calc_acceleration(const ASTRO_T M[], int i)
   {
     VECTOR_3D_T accel;
@@ -3762,7 +3652,6 @@ int main(int argc, char *argv[])
       }
     return accel;
   }
-
  
   VECTOR_3D_T future_acc(ASTRO_T M[], int i, REAL_T delta_t, REAL_T delta_v_x,REAL_T delta_v_y, REAL_T delta_v_z)
   {
@@ -3801,8 +3690,7 @@ int main(int argc, char *argv[])
   const SINT8_T skip_steps=50;
 
   lb_gr_SDL_init("Virtual Console", SDL_INIT_VIDEO, 1600, 1200, 0xFF, 0xFF, 0xFF);
- 
-  
+   
   win.xp_min=0;
   win.yp_min=0;
   win.xp_max=ty_screen.w;
@@ -4307,7 +4195,6 @@ int main(int argc, char *argv[])
 
   lb_gr_SDL_init("Hola", SDL_INIT_VIDEO, 800,600, 0, 0, 0);
 
-  
   lb_ft_load_GLCDfont("fonts/Font_hp48G_large.lcd", &my_font);
   //lb_ft_load_GLCDfont("fonts/Font_hp48G_small.lcd", &my_font);
   my_font.scale_x=4;
@@ -4321,11 +4208,9 @@ int main(int argc, char *argv[])
   my_font.color_fg=lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK);
   my_font.color_bg=lb_gr_12RGB(COLOR_BLACK);
    
-  
   Pic.w=ty_screen.w;
   Pic.h=ty_screen.h;
   lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_RED | COLOR_SOLID));
-
     
   flag_exit=FALSE;
       
@@ -4339,7 +4224,6 @@ int main(int argc, char *argv[])
   vp3d.cam.x=0.0;   /* Camera's location */
   vp3d.cam.y=0.0;   /* Camera's location */
   vp3d.cam.z=40.0;   /* Camera's location */
-		    
       
   lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
   lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
@@ -4347,7 +4231,6 @@ int main(int argc, char *argv[])
   lb_al_fill_rotation_matrix33_Y(Ry_n,-M_PI/90);
   lb_al_fill_rotation_matrix33_X(Rx_p, M_PI/90);
   lb_al_fill_rotation_matrix33_X(Rx_n,-M_PI/90);
-
     
   lb_al_print_matrix33_r(Rz_p,"Rz_p",FLOAT_FORMAT_MATRIX);
   lb_al_print_matrix33_r(Rz_n,"Rz_n",FLOAT_FORMAT_MATRIX);
@@ -4355,7 +4238,6 @@ int main(int argc, char *argv[])
   lb_al_print_matrix33_r(Ry_n,"Ry_n",FLOAT_FORMAT_MATRIX);
   lb_al_print_matrix33_r(Rx_p,"Rx_p",FLOAT_FORMAT_MATRIX);
   lb_al_print_matrix33_r(Rx_n,"Rx_n",FLOAT_FORMAT_MATRIX);
-
 
   lb_al_fill_rotation_matrix33_tait_bryan_ZYX(Rot,0,0,-M_PI/4);
 
@@ -4417,7 +4299,6 @@ int main(int argc, char *argv[])
 
 	
       vp3d.cam_d=0;
-
 
       lg_gr_draw_axis_3d(&Pic, vp3d, Rot, &font_console,
 			 5.0, 4.0, lb_gr_12RGB(COLOR_WHITE),
@@ -4614,27 +4495,83 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* Parsing */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Demo: Function parsing - Benchmarking                                      */
+  /******************************************************************************/
 
-  //#define DEMO_PARSER_REAL
+  //#define DEMO_PARSER_BENCHMARK
+#ifdef DEMO_PARSER_BENCHMARK
+  REAL_T vector[3], result, time_compiler, time_parser;
+  clock_t begin, end;
+  MATHERROR_T error=e_none;
+
+  FN_RECORD_T fnrec;
+  SINT16_T n_vars;
+
+
+  /* Comparison with compiled code */
+  REAL_T i;
+  REAL_T sum;
+  begin=clock();
+  sum=0;
+  for (i=1;i<10000000;i++)
+    {
+      sum+=pow(-1.0,i+1)/(2*i-1.0);
+    }
+  sum*=4;
+  end=clock();
+  time_compiler=(double)(end - begin) / CLOCKS_PER_SEC;
+
+  printf("Result [Compiled code]= %f\r\n",sum);
+  printf("Time elapsed [Compiled code]= %.4f seconds\n",time_compiler);
+ 
+  
+  vector[0]=0;
+  vector[1]=0;
+  vector[2]=0;
+
+  lb_pa_parse("4*SIGMA(1,10000000,(-1)^(i+1)/(2*i-1),i,1)", &fnrec, "i", &n_vars);
+  lb_pa_shunting_yard(&fnrec);
+  
+  begin=clock();
+  result=lb_pa_eval_real(&fnrec, vector, &error);
+  end=clock();
+  time_parser=(double)(end - begin) / CLOCKS_PER_SEC;
+
+
+  printf("Result [Parsed code]= %f\r\n",result);
+  printf("Time elapsed [Parsed code]= %.4f seconds\n",time_parser);
+  printf("Ratio parser/compiler = %.4f times\n",time_parser/time_compiler);
+#endif
+
+  /******************************************************************************/
+  /* Demo: Function parsing (Real Variable)                                     */
+  /* Any of the expressions commenetd our below can be tried                    */
+  /******************************************************************************/
+
+  //  #define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
   MATHERROR_T e_code;
   REAL_T x,y,z,result;
   char variables[]="x,y,i"; 
-
-  lb_ft_generate_fontfiles();
-
-
-  x=1;
+ 
+   x=1;
   y=M_PI*60/180;
   z=3;  
     
       
   /* Example: pi as an infinite addition - Machin */
-  char expression[]="4*SIGMA(1,10^10,(-1)^(i+1)/(2*i-1),i,1)";   
-     
+  char expression[]="4*SIGMA(1,10^7,(-1)^(i+1)/(2*i-1),i,1)";   
+   e_code=e_none;
+  printf("Formula: %s\r\n",expression);
+  printf(" Variables: %s\r\n", variables);
+  printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
+
+  result=lb_pa_formula(expression,variables,x,y,z,&e_code);
+  printf("Error: %s\r\n", errors[e_code].msg);
+  printf("Result=%0.9f\r\n",result);
+ 
+  
   /* Example: pi as an infinite product */
   //char expression[]="2*PROD(1,100000,4*i^2/(4*i^2-1),i,1)";   
         
@@ -4694,21 +4631,14 @@ int main(int argc, char *argv[])
   //char expression[]="100+250+10*sin(pi/4)+1000+2000+sin(pi/4)";   
   //char expression[]="sin(sin(1,2,3,4,5)+2+3,sin(1,2,3,4,5,6),sin(1))"; 
   //char expression[]="avg(10,20)";
-     
-      
-  e_code=e_none;
-  system("clear");
-  printf("Formula: %s\r\n",expression);
-  printf(" Variables: %s\r\n", variables);
-  printf(" Values: %0.4f y=%0.4f z=%0.4f\r\n", x,y,z);
-  result=lb_pa_formula(expression,variables,x,y,z,&e_code);
-  printf("Error: %s\r\n", errors[e_code].msg);
-  printf("Result=%0.9f\r\n",result);
-  exit(1);
 #endif
 
+  /******************************************************************************/
+  /* Demo: Function parsing (Complex Variable)                                  */
+  /* Any of the expressions commented our below can be tried                    */
+  /******************************************************************************/
   
-  //#define DEMO_PARSER_COMPLEX
+#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
   MATHERROR_T e_code;
   COMPLEX_T var1,var2,imag,result;
@@ -4721,12 +4651,10 @@ int main(int argc, char *argv[])
 
   /* Example: pi as a product */
   char variables[]="x,k,i";
-  //char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k+1,1)";   
+  char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k,1)";   
     
   /* Example: Gauss'childhood sum, using complex numbers  */
   //  char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
-
- 
   
   /* Example: first order derivate */
   //char expression[]="diff(e^x,x,30*pi/180+0.5*i,1e-4)";   
@@ -5187,10 +5115,118 @@ int main(int argc, char *argv[])
   lb_fb_exit(1);
 #endif
 
-    
-  /*******************************************************************************************************************/
-  /* Numerical Methods */
-  /******************************************************************************************************************/
+  /******************************************************************************/
+  /* Numerical Methods                                                          */
+  /******************************************************************************/
+
+  /******************************************************************************/
+  /* Demo: 2nd order Euler method  skeleton                                     */
+  /* This is just a clean implementation of the Euler method for a 2nd order    */
+  /* differential equations. No special features are used. This demo is         */
+  /* being kept since it could be reused or adapted to build something else.    */
+  /******************************************************************************/
+
+  //  #define EULER_2ND_ORDER
+#ifdef EULER_2ND_ORDER
+
+  REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
+  {
+    return _x1;
+  }
+  
+  REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
+  {
+    return -9.8;
+  }
+
+  REAL_T t, x0, x1, x0_0, x1_0, t_max, h, x0_copy, x1_copy;
+
+  h=0.01;
+  t_max=10;
+
+  x0_0 = 10; /* Initial condition: position */
+  x1_0 = 10; /* Initial condition: speed */
+
+  x0 = x0_0;
+  x1 = x1_0;
+  
+  t=0;
+  while (t<t_max)
+    {
+      printf("t=%4.4f Euler [x, x']= [%4.4f , %4.4f], Analytic [x, x']= [%4.4f , %4.4f]\r\n",
+	     t, x0, x1, x0_0+x1_0*t-0.5*9.8*t*t, x1_0-9.8*t);  
+     
+      x0_copy=f_x0_div_dt(t+h, x0, x1);
+      x1_copy=f_x1_div_dt(t+h, x0, x1);
+      x0 += h*x0_copy;
+      x1 += h*x1_copy;
+
+      t+=h;
+      lb_ti_delay_ms(500);
+    }
+#endif
+
+
+  /******************************************************************************/
+  /* Demo: 2nd order RK4 skeleton                                               */
+  /* This is just a clean implementation of the RK4 method for a 2nd order      */
+  /* differential equations. No special features are used.  This demo is        */
+  /* being kept since it could be reused or adapted to build something else.    */
+  /* The example below solves the equation d2x/dt2 = -g   [g=9.8 m/s^2]         */
+  /* This problem has an analytical solution, whose results are printed as well */
+  /* for comparison.                                                            */
+  /******************************************************************************/
+
+  //#define RK4_2ND_ORDER
+#ifdef RK4_2ND_ORDER
+
+  REAL_T t, x0, x1, x0_0, x1_0, t_max, h, x0_copy, x1_copy, k1, k2, k3, k4;
+  h=0.01;
+  t_max=15;
+  
+  x0_0 = 10; /* Initial condition: position */
+  x1_0 = 10; /* Initial condition: speed */
+
+  x0 = x0_0;
+  x1 = x1_0;
+ 
+  REAL_T f_x0_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
+  {
+    return _x1;
+  }
+  
+  REAL_T f_x1_div_dt(REAL_T t, REAL_T _x0, REAL_T _x1)
+  {
+    return -9.8;
+  }
+
+  t=0;
+  while (t<t_max)
+    {
+      printf("t=%4.4f RK4 [x, x']= [%4.4f , %4.4f], Analytic [x, x']= [%4.4f , %4.4f]\r\n",
+	     t, x0, x1, x0_0+x1_0*t-0.5*9.8*t*t, x1_0-9.8*t);  
+     
+      x0_copy=x0;
+      x1_copy=x1;
+
+      k1 = h*f_x0_div_dt(t,         x0_copy,          x1_copy);
+      k2 = h*f_x0_div_dt(t + 0.5*h, x0_copy + 0.5*k1, x1_copy);
+      k3 = h*f_x0_div_dt(t + 0.5*h, x0_copy + 0.5*k2, x1_copy);
+      k4 = h*f_x0_div_dt(t + h,     x0_copy + k3,     x1_copy);
+
+      x0 = x0 + (k1 + 2*k2 + 2*k3 + k4)/6;  
+
+      k1 = h*f_x1_div_dt(t,         x0_copy,  x1_copy          );
+      k2 = h*f_x1_div_dt(t + 0.5*h, x0_copy , x1_copy + 0.5*k1 );
+      k3 = h*f_x1_div_dt(t + 0.5*h, x0_copy , x1_copy + 0.5*k2 );
+      k4 = h*f_x1_div_dt(t + h,     x0_copy , x1_copy + k3     );
+
+      x1 = x1 + (k1 + 2*k2 + 2*k3 + k4)/6;  
+      t+=h;
+      lb_ti_delay_ms(500);
+    }
+#endif
+
 
   //#define DEMO_RK4
 #ifdef DEMO_RK4
@@ -6059,180 +6095,5 @@ int main(int argc, char *argv[])
   lb_se_close(&port2);
 #endif
 
-  //#define DEMO_BATTERY
-#ifdef DEMO_BATTERY
-
-  /******************************************************************************/
-  /*          B A T T E R Y    C H A R G I N G    P R O F I L E S               */
-  /******************************************************************************/
-  
-
-  /* End of Battery Profile Definition ********************************************************************************/
-  char message[90];
-  char Key;
-
-  fd_set set;
-  struct timeval timeout;
-  int select_result;
-  int FLAG_STOP=0;
-
-  fprintf(stderr,"\r\nGot here");
-  
-  if (argc != 7)
-    {
-      printf("Error: invalid number of parameters\r\n");
-      printf("device [/dev/ttyS0] baud_rate [1200 2400 9600] data_bits [db8, db7] stop_bits [sb1, sb2] parity [none, even, odd] flow_control [no hw sw] \r\n");
-      lb_fb_exit(0);
-    }
-  
-  if (!(strcmp(argv[1],"/dev/ttyS0"))) Data_Parameters.device=dev_S0;
-  else if (!(strcmp(argv[1],"/dev/ttyS1"))) Data_Parameters.device=dev_S1;
-  else
-    {
-      printf("Error: invalid device");
-      lb_fb_exit(0);
-    }
-      
-  if (!(strcmp(argv[2],"50")))
-    Data_Parameters.baud_rate=B50;
-  else if (!(strcmp(argv[2],"75")))
-    Data_Parameters.baud_rate=B75;
-  else if (!(strcmp(argv[2],"110")))
-    Data_Parameters.baud_rate=B110;
-  else if (!(strcmp(argv[2],"134")))
-    Data_Parameters.baud_rate=B134;
-  else if (!(strcmp(argv[2],"150")))
-    Data_Parameters.baud_rate=B150;
-  else if (!(strcmp(argv[2],"200")))
-    Data_Parameters.baud_rate=B200;
-  else if (!(strcmp(argv[2],"300")))
-    Data_Parameters.baud_rate=B300;
-  else if (!(strcmp(argv[2],"600")))
-    Data_Parameters.baud_rate=B600;
-  else if (!(strcmp(argv[2],"1200")))
-    Data_Parameters.baud_rate=B1200;
-  else if (!(strcmp(argv[2],"1800")))
-    Data_Parameters.baud_rate=B1800;
-  else if (!(strcmp(argv[2],"2400")))
-    Data_Parameters.baud_rate=B2400;
-  else if (!(strcmp(argv[2],"4800")))
-    Data_Parameters.baud_rate=B4800;
-  else if (!(strcmp(argv[2],"9600")))
-    Data_Parameters.baud_rate=B9600;
-  else if (!(strcmp(argv[2],"19200")))
-    Data_Parameters.baud_rate=B19200;
-  else if (!(strcmp(argv[2],"38400")))
-    Data_Parameters.baud_rate=B38400;
-  else if (!(strcmp(argv[2],"57600")))
-    Data_Parameters.baud_rate=B57600;
-  else if (!(strcmp(argv[2],"115200")))
-    Data_Parameters.baud_rate=B115200;
-  else 
-    {
-      printf("Error: invalid baud rate");
-      lb_fb_exit(0);
-    }
-
-  if (!strcmp(argv[3],"db5")) Data_Parameters.data_bits      = CS5;
-  else if (!strcmp(argv[3],"db6")) Data_Parameters.data_bits = CS6;
-  else if (!strcmp(argv[3],"db7")) Data_Parameters.data_bits = CS7;
-  else if (!strcmp(argv[3],"db8")) Data_Parameters.data_bits = CS8;
-  else 
-    {
-      printf("Error: invalid data bits");
-      lb_fb_exit(0);
-    }
-
-  if (!strcmp(argv[4],"sb1")) Data_Parameters.stop_bits=SB_1;
-  else if (!strcmp(argv[4],"sb2")) Data_Parameters.stop_bits=SB_2;
-  else 
-    {
-      printf("Error: invalid stop bits");
-      lb_fb_exit(0);
-    }
-
-  if (!strcmp(argv[5],"none")) Data_Parameters.parity=PA_none;
-  else if (!strcmp(argv[5],"even")) Data_Parameters.parity=PA_even;
-  else if (!strcmp(argv[5],"odd")) Data_Parameters.parity=PA_odd;
-  else 
-    {
-      printf("Error: invalid parity");
-      lb_fb_exit(0);
-    }
-
-  if (!strcmp(argv[6],"no")) Data_Parameters.flow_control=FC_none;
-  else if (!strcmp(argv[6],"hw")) Data_Parameters.flow_control=FC_hw;
-  else if (!strcmp(argv[6],"sw")) Data_Parameters.flow_control=FC_sw;
-  else 
-    {
-      printf("Error: invalid flow control");
-      lb_fb_exit(0);
-    }
-
-  text_file=fopen("./charge_data.txt", "w");
-  if (text_file== NULL)
-    { 
-      fprintf(stderr,"Error in opening text file..\r\n");
-      return 1;
-    }
-  CONSOLE_Initialize();
-  SERCOM_Initialize();
-  
-  fprintf(output,"\E[H\E[2J");
-  fflush(output);
-  
-  sprintf(message,"BATTERY TEST PROGRAM\r\n");
-  fputs(message,output);   
-  fflush(output);
-  fprintf(stderr,"--------------------------------------------------------------------------------\r\n");
-
-  gettimeofday(&t_initial, NULL);
-  /* printf("\r\nt_initial = %f",(float)t_initial.tv_sec); */
-  t_previous=0;
-  t_delta=0;
-  SetupPSU(0);
-
-  while (!FLAG_STOP)
-    {
-      /************************************************************************/
-      /*  Re-initialize the file descriptor set.                              */
-      /************************************************************************/
-      FD_ZERO (&set);
-      FD_SET (fd, &set);
-      FD_SET (tty, &set);
-      /* Initialize the timeout data structure. */
-      timeout.tv_sec = 0.25;
-      timeout.tv_usec = 0;
-      select_result=select(sizeof(set)*8,&set,NULL,NULL,&timeout);
-      /************************************************************************/
-
-      if (current_stage==N_STAGES)
-	{
-	  fprintf(output,"Sequence completed...\r\n");
-	  FLAG_STOP=1;
-	}  
-
-      if (CONSOLE_RxByte(&Key))  /* if a key was hit */
-	{
-	  CONSOLE_TxByte(Key);
-	  SERCOM_TxByte(Key);
-	  if (Key==0x1b) 
-	    FLAG_STOP=1;
-	}
-
-      if (FLAG_STOP)
-	{
-	  SERCOM_TxStr("OUTP:STAT 0\r\n");
-	  SERCOM_Flush();
-	  SERCOM_Close();
-	  CONSOLE_Close();
-	  fclose(text_file);
-	  lb_fb_exit(0);
-	}
-      RunProcess();
-    }
-#endif
-
-  
 }
 
