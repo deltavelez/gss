@@ -2792,7 +2792,7 @@ int main(int argc, char *argv[])
   /* Later on, zoom and shifts were added to explore any section of the Set.    */
   /******************************************************************************/
 
-  // #define DEMO_MANDELBROT
+  #define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
   SINT32_T xp, yp, iterations;
@@ -2800,22 +2800,43 @@ int main(int argc, char *argv[])
   COMPLEX_T z, p;
   VIEWPORT_2D_T win;
   PICTURE_T Pic;
+  long max_iterations;
   REAL_T k=1.5, x_center, y_center, size;
-
-  lb_gr_SDL_init("DEMO_MANDELBROT", SDL_INIT_VIDEO, 600,400, 0, 0, 0);
+  
+  lb_gr_SDL_init("DEMO_MANDELBROT", SDL_INIT_VIDEO, 1920,1080, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_BLACK));
   
+  win.xp_min=0;
   win.yp_min=0;
-  win.yp_max=400;
+  
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
+
   //win.yp_max=11020;
 
-  win.xp_min=0;
-  win.xp_max=k*win.yp_max;
-
+  
   Pic.w=win.xp_max;
   Pic.h=win.yp_max;
 
   lb_gr_create_picture(&Pic,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
+
+  x_center =0.358406523810;
+  y_center =0.647235573237;
+  size = 0.00001;
+  max_iterations=2048;
+
+
+  //x_center =0.358406523810;
+  //y_center =0.647235573237;
+  //size = 0.000000009289;
+  //max_iterations=32768;
+
+
+  
+  //x_center =0.352477;
+  //y_center =0.582358;
+  //size = 0.000001;
+
   
   //x_center =-1.155176;
   //y_center =0.279934;
@@ -2825,15 +2846,16 @@ int main(int argc, char *argv[])
   //y_center =0.285082;
   //size = 0.001552;
 
-  x_center =0.337700;
-  y_center =0.573170;
-  size = 0.009610;
+  //x_center =0.337700;
+  //y_center =0.573170;
+  //size = 0.009610;
 
   SINT8_T flag_exit, flag_changed;
+  PIXEL_T pix;
 
   flag_exit=FALSE;
   flag_changed=TRUE;
-
+  
   while (!flag_exit)
     {
       if (flag_changed)
@@ -2846,29 +2868,42 @@ int main(int argc, char *argv[])
 	  win.yr_max=y_center+size/k;
 	  for(xp=0;xp<win.xp_max;xp++)
 	    {
-	      printf("Processing: %0.2f\r",100.0*xp/win.xp_max); 
+	      if ((xp % 100)==0)
+		{
+		  printf("\rProcessing: %0.2f %\r",100.0*xp/win.xp_max);
+		  fflush(stdout);
+		}
 	      for(yp=0;yp<win.yp_max;yp++)
 		{
 		  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
 		  iterations=0;
 		  z.r=xr;
 		  z.i=yr;
-		  while ((lb_cp_abs(z)<=2.0) && (iterations<255)) 
+		  while ((lb_cp_abs(z)<=2.0) && (iterations<max_iterations)) 
 		    {
 		      p.r=xr;
 		      p.i=yr;
 		      z=lb_cp_add(lb_cp_multiply(z,z),p);
 		      iterations++;
 		    }
-		  PIXEL_T pix;
-
-		  pix.b=iterations;
-		  pix.g=256-iterations;
-		  pix.r=0;
+		  if (iterations>=max_iterations)
+		    {
+		      pix.b=0;
+		      pix.g=0;
+		      pix.r=0;
+		    }
+		  else
+		    {
+		      pix.b=0;
+		      pix.g=127;
+		      pix.r=0;
+		    }
+		    
 		  lb_gr_draw_pixel(&Pic, xp, yp, pix, COPYMODE_COPY);
 		}
 	    }
-
+	  printf("\rProcessing: %0.2f\r",100.0);
+	  fflush(stdout);
 	  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
 	  lb_gr_refresh();
 	}
@@ -2881,30 +2916,38 @@ int main(int argc, char *argv[])
 	    {
 	      switch(event.key.keysym.sym)
 		{
+		case SDLK_F1:
+		  max_iterations*=2;
+		  flag_changed=TRUE;
+		  break;
+		case SDLK_F2:
+		  max_iterations/=2;
+		  if(max_iterations<4)
+		    max_iterations=4;
+		  flag_changed=TRUE;
+		  break;
 		case SDLK_PAGEUP:
-		  size/=powf(2.0,0.25);
-		  printf("size=%f\r\n",size);
+		  size/=powf(10.0,1.0/4.0);
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_PAGEDOWN:
-		  size*=powf(2.0,0.25);;
-		  printf("size=%f\r\n",size);
+		  size*=powf(10.0,1.0/4.0);;
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_LEFT:
-		  x_center-=size/16.0;
+		  x_center-=size/8.0;
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_RIGHT:
-		  x_center+=size/16.0;
+		  x_center+=size/8.0;
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_UP:
-		  y_center+=size/16.0;
+		  y_center+=size/8.0;
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_DOWN:
-		  y_center-=size/16.0;
+		  y_center-=size/8.0;
 		  flag_changed=TRUE;
 		  break;
 		case SDLK_ESCAPE:
@@ -2921,14 +2964,14 @@ int main(int argc, char *argv[])
 		  printf("File saved\r\n");
 		  break;
 		}
-	      printf("x_center =%f;\r\n",x_center);
-	      printf("y_center =%f;\r\n",y_center);
-	      printf("size = %f;\r\n",size);
-
+	      printf("x_center =%.12f;\r\n",x_center);
+	      printf("y_center =%.12f;\r\n",y_center);
+	      printf("size = %.12f;\r\n",size);
+	      printf("max_iterations=%ld;\r\n",max_iterations);
 	     
 	      
-	      printf("x: [%f ; %f]\r\n",x_center-size/2,x_center+size/2);
-	      printf("y: [%f ; %f]\r\n",y_center-size/2,y_center+size/2);
+	      printf("x: [%.12f ; %.12f]\r\n",x_center-size/2,x_center+size/2);
+	      printf("y: [%.12f ; %.12f]\r\n",y_center-size/2,y_center+size/2);
 	    }
 	}
     }
@@ -2954,7 +2997,7 @@ int main(int argc, char *argv[])
 
   lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
 
-  z_zoom=0.1;
+  z_zoom=0.5;
   win.xp_min=0;
   win.yp_min=0;
   win.xp_max=ty_screen.w;
@@ -2964,8 +3007,8 @@ int main(int argc, char *argv[])
   /* 24 frames per second, 3 minutes long */
   for(k=0;k<3*60*24;k++)
     {
-      win.xr_min=0.32-1.00*(320.0/200.0)/z_zoom;
-      win.xr_max=0.32+1.00*(320.0/200.0)/z_zoom;
+      win.xr_min=0.25-1.00*(320.0/200.0)/z_zoom;
+      win.xr_max=0.25+1.00*(320.0/200.0)/z_zoom;
       win.yr_min=-1/z_zoom; 
       win.yr_max=1/z_zoom;
 
@@ -2976,7 +3019,7 @@ int main(int argc, char *argv[])
 	    iterations=0;
 	    z.r=xr;
 	    z.i=yr;
-	    while ((lb_cp_abs(z)<2.0) && (iterations<255)) 
+	    while ((lb_cp_abs(z)<2.0) && (iterations<1024)) 
 	      {
 		p.r=xr;
 		p.i=yr;
