@@ -42,7 +42,7 @@ void lb_co_color_bg_216(SINT16_T r, SINT16_T g, SINT16_T b)
 {
   if ((r>5) || (g>5) || (b>5))
     {
-      printf("Error: lb_co_textcolorRGB --> value higher than 5\r\n");
+      printf("Error: lb_co_color_bg_216() --> value higher than 5\r\n");
       exit(1);
     }  
   printf("\x1b[48;5;%dm",16+36*r+6*g+b);
@@ -52,7 +52,7 @@ void lb_co_color_fg_216(SINT16_T r, SINT16_T g, SINT16_T b)
 {
   if ((r>5) || (g>5) || (b>5))
     {
-      printf("Error: lb_co_textcolorRGB --> value higher than 5\r\n");
+      printf("Error: lb_co_color_fg_216() --> value higher than 5\r\n");
       exit(1);
     }  
   printf("\x1b[38;5;%dm",16+36*r+6*g+b);

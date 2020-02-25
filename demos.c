@@ -2792,7 +2792,7 @@ int main(int argc, char *argv[])
   /* Later on, zoom and shifts were added to explore any section of the Set.    */
   /******************************************************************************/
 
-  #define DEMO_MANDELBROT
+  // #define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
   SINT32_T xp, yp, iterations;
@@ -4317,11 +4317,11 @@ int main(int argc, char *argv[])
   vp3d.xp_max=Pic.w;
   vp3d.yp_max=Pic.h;
   vp3d.scale =200.0;    /* Zoom */
-  vp3d.cam_d= 0.0;   /* Stereoscopic */
-  vp3d.cam_h=10.0;    /* Depth */
-  vp3d.cam.x=0.0;   /* Camera's location */
-  vp3d.cam.y=0.0;   /* Camera's location */
-  vp3d.cam.z=40.0;   /* Camera's location */
+  vp3d.cam_d= 0.0;      /* Stereoscopic */
+  vp3d.cam_h=10.0;      /* Depth */
+  vp3d.cam.x=0.0;       /* Camera's location */
+  vp3d.cam.y=0.0;       /* Camera's location */
+  vp3d.cam.z=40.0;      /* Camera's location */
       
   lb_al_fill_rotation_matrix33_Z(Rz_p, M_PI/90);
   lb_al_fill_rotation_matrix33_Z(Rz_n,-M_PI/90);
@@ -4348,11 +4348,8 @@ int main(int argc, char *argv[])
   //v_a=0;
   //v_b=5.0;
 
-
   /* Z-buffer */
   lb_gr_create_zbuffer(NULL, &Z);
-
-
     
   //for (i=0;i<S.rows;i++)
   //  for (j=0;j<S.cols;j++)
@@ -5282,9 +5279,11 @@ int main(int argc, char *argv[])
       }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Characterization of a Demodulation using a Montecarlo Analysis       */
+  /* This Case Study is explained in detail in the Thesis Document              */
+  /******************************************************************************/
 
-  /* BER vs Noise using a Montecarlo simulation */
-  
   //#define DEMO_ZERO_CROSSING
 #ifdef DEMO_ZERO_CROSSING
   VECTOR_R_T Signal, Noise_mag, Noise_phase;
@@ -5604,15 +5603,17 @@ int main(int argc, char *argv[])
 
 #endif
 
-  /*******************************************************************************************************************/
-  /* Time Functions */
-  /******************************************************************************************************************/
+
+  /******************************************************************************/
+  /* Demo: Time Delay Functions                                                 */
+  /* These functions provide reasonably accurate delays                         */
+  /******************************************************************************/
 
   /* Test for the time delay funcions with milli and micro-second resolution */
   /* Status: Pass */
   //#define DEMO_TIME
 #ifdef DEMO_TIME
-  SINT16_T temp,i=0;
+  SINT16_T i=0;
   while (1)
     {
       printf("Sec: %d, P=%02.1f\r\n",i,100.0*(REAL_T)clock()/(REAL_T)0xFFFFFFFF);
@@ -5623,6 +5624,17 @@ int main(int argc, char *argv[])
     }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Keyboard support functions                                           */
+  /* The idea is to make easier reading the keyboard, including the special     */
+  /* keys under Linux/Unix. We do so by using the non-printable ASCII           */
+  /* as codes for the most important special keys (PCKEY_XXX).                  */
+  /* There are two support functions, which are not part of the standard 'c':   */
+  /*    ln_co_kbhit()    --> checks whether a key has been pressed              */
+  /*    ln_co_getch_pc() --> gets the first key which was pressed               */
+  /* to_do: this would be a nice place to include the "cancel" (CRL-C)          */
+  /* redirection code which written in the now-deprecated 'framebuffer' section */
+  /******************************************************************************/
   
   //#define DEMO_KEYBOARD
 #ifdef DEMO_KEYBOARD
@@ -5682,10 +5694,17 @@ int main(int argc, char *argv[])
   exit(1);
 #endif
 
-   
+  /******************************************************************************/
+  /* Demo: Console support functions                                            */
+  /* These functions aim to provide utilities for console-only programs,        */
+  /* under Linux/Unix such as printing in colors, moving the cursor,            */
+  /* setting the background color, clearing screen, a row, etc.                 */
+  /******************************************************************************/
+
   //#define DEMO_CONSOLE
 #ifdef DEMO_CONSOLE
-  lb_co_cls();
+   char text[40];
+lb_co_cls();
   printf("hello world\r\n"); 
   lb_co_gotoxy(1,1);
   printf("1"); 
@@ -5705,10 +5724,10 @@ int main(int argc, char *argv[])
   lb_co_gotoxy(20,20);
   lb_co_cursor_shift(-1,0);
   printf("-\r\n");
-  //lb_co_printf_block("DIEGO ALBERTO VELEZ HENAO", 1, 3);
-  char text[40];
-
+  lb_co_printf_block("DIEGO ALBERTO VELEZ HENAO", 1, 3);
   strcpy(text,"DON DIEGO VELEZ");
+
+
   lb_co_printf_lastn(text, 5);
   lb_co_gotoxy(2,2);
   lb_co_color(TEXT_COLOR_BLUE);
@@ -5720,6 +5739,8 @@ int main(int argc, char *argv[])
 
   //lb_co_color(TEXT_COLOR_DEFAULT);
   //lb_co_color(TEXT_COLOR_DEFAULT + TEXT_COLOR_BACKGROUND);
+
+  lb_ti_delay_ms(10000);
   lb_co_cls();
   lb_co_reset();
   char r, g, b;
@@ -5738,98 +5759,135 @@ int main(int argc, char *argv[])
 	  }
 	lb_co_color_bg_RGB(lb_gr_12RGB(0x0000));
 	printf("\r\n");
-	lb_gr_delay(1000);
+	lb_ti_delay_ms(1000);
       }
   printf("TEXT_COLOR_0x00f\r\n");
   printf("\a");
 
-
   //lb_co_cls();
-  lb_fb_exit(1);
 #endif
 
-  /*******************************************************************************************************************/
-  /* Audio DEMOS */
-  /******************************************************************************************************************/
 
+  /******************************************************************************/
+  /* Demo: Audio Demos                                                          */
+  /* Audio is still an experimental matter.  Audio support relies  heavily on   */
+  /* SDL's capabilities.                                                        */
+  /* Additional work is needed to simplify it and make it friendlier.           */
+  /* One of the items than need to be reexamined is how to handle the           */
+  /* wide range of formats with different number of bits, frequencies, and      */
+  /* Another one is how to explore the recording capabilities and, better,      */
+  /* simultaneous recording and playback.                                       */
+  /* Nevertheless, several applications can be implemented right now.           */
+  /******************************************************************************/
+
+
+  /******************************************************************************/
+  /* Demo: DTMF                                                                 */
+  /* Shows an application where Dual-Tone-Multi-Frequency signals are           */
+  /* synthetized in real-time.                                                  */
+  /******************************************************************************/
+  
   //#define DEMO_DTMF
 #ifdef DEMO_DTMF
   lb_au_SDL_audio_init_DTMF();
   lb_au_SDL_audio_start();
 
   lb_au_freq_DTMF('4', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
+  lb_ti_delay_ms(200);
+  
   lb_au_freq_DTMF('0', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
-  lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
-  _lb_au_f0=0.0;
-  _lb_au_f1=0.0;
-  SDL_Delay(200);
-
-  lb_au_freq_DTMF('5', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
-  _lb_au_f0=0.0;
-  _lb_au_f1=0.0;
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   
   lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
+  lb_ti_delay_ms(200);
+  
+  lb_au_freq_DTMF('5', &_lb_au_f0, &_lb_au_f1);
+  lb_ti_delay_ms(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  lb_ti_delay_ms(200);
+  
+  lb_au_freq_DTMF('3', &_lb_au_f0, &_lb_au_f1);
+  lb_ti_delay_ms(200);
+  _lb_au_f0=0.0;
+  _lb_au_f1=0.0;
+  lb_ti_delay_ms(200);
+  
   lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
+  lb_ti_delay_ms(200);
+  
   lb_au_freq_DTMF('2', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
+  lb_ti_delay_ms(200);
+  
   lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
+  lb_ti_delay_ms(200);
+  
   lb_au_freq_DTMF('1', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
+  lb_ti_delay_ms(200);
+  
   lb_au_freq_DTMF('6', &_lb_au_f0, &_lb_au_f1);
-  SDL_Delay(200);
+  lb_ti_delay_ms(200);
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
-  SDL_Delay(200);
-
-
+  lb_ti_delay_ms(200);
+  
   _lb_au_f0=0.0;
   _lb_au_f1=0.0;
 
   lb_au_SDL_audio_close_DTMF();
 
-  exit(1);
+#endif
+
+  /******************************************************************************/
+  /* Demo: Writting a standard Wave-File                                        */
+  /* A synthetized audio signal is saved to a file.                             */
+  /******************************************************************************/
+
+  //#define DEMO_WAV
+#ifdef DEMO_WAV
+  VECTOR_R_T V;
+  UINT16_T i;
+  V.items=VECTOR_MAX_ITEMS;
+  lb_al_create_vector_r(&V);
+
+  for (i=0;i<V.items;i++)
+    V.array[i]=sin(2*M_PI*500.0*i/11025);
+  lb_au_wave_write_from_vector_r("./media/audio/wav2.wav",&V, 11025,8);
+
+  lb_al_release_vector_r(&V);
 #endif
 
   
-#define SAMPLES 22050
+  /******************************************************************************/
+  /* Demo: Writting a standard Wave-File                                        */
+  /* A synthetized audio signal is saved to a file.  If the file already        */
+  /* exists, data gets appended to the file.                                    */
+  /******************************************************************************/
+
   //#define DEMO_WAV_WRITE
 #ifdef DEMO_WAV_WRITE
+#define SAMPLES 22050
   VECTOR_R_T V;
   UINT16_T i;
   REAL_T f1,f2;
@@ -5841,13 +5899,17 @@ int main(int argc, char *argv[])
   for (i=0;i<SAMPLES;i++)
     V.array[i]=0.5*sin(2*M_PI*f1*i/SAMPLES) + 0.5*sin(2*M_PI*f2*i/SAMPLES);
       
-  lb_au_wave_write_or_append_from_vector_r("test2.wav", &V, SAMPLES, 8);
-
+  lb_au_wave_write_or_append_from_vector_r("./media/audio/test2.wav", &V, SAMPLES, 8);
   lb_al_release_vector_r(&V);
-  
-  lb_fb_exit(1);
 #endif
 
+  /******************************************************************************/
+  /* Demo: Playing a Wave-format audio file                                     */
+  /* A synthetized audio signal is saved to a file.                             */
+  /* This is really more an SDL example than anything else.  It is kept as it   */
+  /* may become handy as more progress is made in the audio module.             */
+  /******************************************************************************/
+  
   //#define PLAY_WAVE
 #ifdef PLAY_WAVE
   // Initialize SDL.
@@ -5865,10 +5927,10 @@ int main(int argc, char *argv[])
 	
   /* Load the WAV */
   // the specs, length and buffer of our wav are filled
-  if( SDL_LoadWAV("toto.wav", &wav_spec, &wav_buffer, &wav_length) == NULL )
+  if( SDL_LoadWAV("./media/audio/toto.wav", &wav_spec, &wav_buffer, &wav_length) == NULL )
     {
       printf("Error loading wav file\r\n");
-      lb_fb_exit(1);
+      exit(1);
     }
   // set the callback function
   wav_spec.callback = lb_au_callback_copy;
@@ -5882,7 +5944,7 @@ int main(int argc, char *argv[])
   if ( SDL_OpenAudio(&wav_spec, NULL) < 0 )
     {
       fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-      lb_fb_exit(-1);
+      exit(-1);
     }
 	
   /* Start playing */
@@ -5895,30 +5957,20 @@ int main(int argc, char *argv[])
     }
 	
   // shut everything down
+  
   SDL_CloseAudio();
   SDL_FreeWAV(wav_buffer);
 #endif
 
-  
-  //#define DEMO_WAV
-#ifdef DEMO_WAV
-  VECTOR_R_T V;
-  UINT16_T i;
-  V.items=VECTOR_MAX_ITEMS;
-  lb_al_create_vector_r(&V);
-
-  for (i=0;i<V.items;i++)
-    V.array[i]=sin(2*M_PI*500.0*i/11025);
-  lb_au_wave_write_from_vector_r("wav2.wav",&V, 11025,8);
-
-  lb_al_release_vector_r(&V);
-  lb_fb_exit(1);
-#endif
-
-
+  /******************************************************************************/
+  /* Demo: Exploring Unicode Support                                            */
+  /* This test shows, if supported by the current console, how to print Unicode */
+  /* characters.                                                                */
+  /******************************************************************************/
 
   //#define DEMO_UNICODE
 #ifdef DEMO_UNICODE
+  
   //https://stackoverflow.com/questions/34937375/printing-a-unicode-box-in-c
   setlocale(LC_ALL, "");
   //setlocale(LC_ALL, "en_US.UTF-8");
@@ -5933,7 +5985,7 @@ int main(int argc, char *argv[])
       if ((i % 16) == 0)
 	{
 	  printf("\n0x%x\t",i);
-	  lb_gr_delay(250);
+	  lb_ti_delay_ms(250);
 	}
       printf("%lc", i);
  	
@@ -5943,7 +5995,12 @@ int main(int argc, char *argv[])
 
 #endif
 
-  //#define DEMO_SERIAL
+  /******************************************************************************/
+  /* Demo: Using RS-232 serial ports                                            */
+  /* I'm currently working on this.  Because of that, it is not yet functional  */
+  /******************************************************************************/
+  
+#define DEMO_SERIAL
 #ifdef DEMO_SERIAL
 
   COMM_PORT_T port1;
@@ -5971,11 +6028,11 @@ int main(int argc, char *argv[])
       lb_se_tx_byte(&port2, a);
       lb_se_process_rx(&port1);
       lb_se_process_rx(&port2);
-      lb_co_textcolor(TEXT_COLOR_WHITE);
+      lb_co_color(TEXT_COLOR_WHITE);
       fflush(stdout);
 
       lb_se_print_buffer(&port1);
-      lb_co_textcolor(TEXT_COLOR_YELLOW);
+      lb_co_color(TEXT_COLOR_YELLOW);
       fflush(stdout);
       lb_se_print_buffer(&port2);
       a++;
