@@ -3431,8 +3431,8 @@ int main(int argc, char *argv[])
   /* This case is presented with detail in the Thesis Document.                 */
   /******************************************************************************/
 
-  //#define DEMO_LEVER
-#ifdef DEMO_LEVER
+  //#define CASE_LEVER
+#ifdef CASE_LEVER
 #define N_DISK 4000
   /* Graphical variables */
   REAL_T bar_radius=0.05;
@@ -3477,7 +3477,7 @@ int main(int argc, char *argv[])
   lb_al_create_vector_r(&R);
   lb_al_create_vector_r(&T);
   
-  lb_gr_SDL_init("DEMO_LEVER", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
+  lb_gr_SDL_init("CASE_LEVER", SDL_INIT_VIDEO, 1900,1000, 0, 0, 0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(COLOR_SOLID | COLOR_WHITE));
 
   Pic_Vel.w = ty_screen.w/2-15;
@@ -3697,12 +3697,12 @@ int main(int argc, char *argv[])
 
   
   /******************************************************************************/
-  /* Case  Study: N_BODY_PROBLEM                                                */
+  /* Case  Study: CASE_N_BODY_PROBLEM                                           */
   /* This case is presented with detail in the Thesis Document.                 */
   /******************************************************************************/
 
-  //#define N_BODY_PROBLEM
-#ifdef  N_BODY_PROBLEM
+  //#define CASE_N_BODY_PROBLEM
+#ifdef  CASE_N_BODY_PROBLEM
 #define G 6.674e-11
 #define N_OBJECTS 2
     
@@ -3787,7 +3787,7 @@ int main(int argc, char *argv[])
   SINT8_T flag_paused=FALSE;
   const SINT8_T skip_steps=50;
 
-  lb_gr_SDL_init("N_BODY_PROBLEM", SDL_INIT_VIDEO, 1600, 1200, 0xFF, 0xFF, 0xFF);
+  lb_gr_SDL_init("CASE_N_BODY_PROBLEM", SDL_INIT_VIDEO, 1600, 1200, 0xFF, 0xFF, 0xFF);
    
   win.xp_min=0;
   win.yp_min=0;
@@ -5284,8 +5284,8 @@ int main(int argc, char *argv[])
   /* This Case Study is explained in detail in the Thesis Document              */
   /******************************************************************************/
 
-  //#define DEMO_ZERO_CROSSING
-#ifdef DEMO_ZERO_CROSSING
+  //#define CASE_DEMODULATION_MONTECARLO
+#ifdef CASE_DEMODULATION_MONTECARLO
   VECTOR_R_T Signal, Noise_mag, Noise_phase;
   SDL_Event event;
   
