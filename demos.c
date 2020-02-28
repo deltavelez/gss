@@ -3019,7 +3019,7 @@ int main(int argc, char *argv[])
 	    iterations=0;
 	    z.r=xr;
 	    z.i=yr;
-	    while ((lb_cp_abs(z)<2.0) && (iterations<1024)) 
+	    while ((lb_cp_abs(z)<2.0) && (iterations<255)) 
 	      {
 		p.r=xr;
 		p.i=yr;
@@ -3029,7 +3029,7 @@ int main(int argc, char *argv[])
 	    pix.r=0;
 	    pix.g=0;
 	    pix.b=iterations;
-	    
+
 	    lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
 	  }
       lb_gr_refresh();
@@ -3042,6 +3042,76 @@ int main(int argc, char *argv[])
   return EXIT_SUCCESS;
 #endif
 
+
+  /******************************************************************************/
+  /* Demo: generating videos using ffmpeg                                       */
+  /* This shows how to open a pipe in ffmpeg to buffer data from our programs!  */
+  /* Writing to files to concatenate is no longer needed !!!                    */
+  /******************************************************************************/
+
+#define DEMO_VIDEO_MANDELBROT2
+#ifdef DEMO_VIDEO_MANDELBROT2
+  int xp, yp, iterations, max_iterations=1024;
+  int k;
+  REAL_T xr, yr, z_zoom;
+  COMPLEX_T z, p;
+  VIEWPORT_2D_T win;
+  PIXEL_T pix;
+ 
+  lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
+  FILE *pipeout = popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1920x1080 -r 30 -i - -f mp4 -q:v 0 -an -vcodec mpeg4 output.mp4", "w");
+  unsigned char frame[1080][1920][3] = {0};
+
+  z_zoom=0.5;
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
+  
+  /* 30 frames per second, 1 minutes long */
+  for(k=0;k<1*60*30;k++)
+    {
+      win.xr_min=0.25-1.00*(320.0/200.0)/z_zoom;
+      win.xr_max=0.25+1.00*(320.0/200.0)/z_zoom;
+      win.yr_min=-1/z_zoom; 
+      win.yr_max=1/z_zoom;
+
+      for(xp=0;xp<win.xp_max;xp++)
+	for(yp=0;yp<win.yp_max;yp++)
+	  {
+	    lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+	    iterations=0;
+	    z.r=xr;
+	    z.i=yr;
+	    while ((lb_cp_abs(z)<2.0) && (iterations<max_iterations)) 
+	      {
+		p.r=xr;
+		p.i=yr;
+		z=lb_cp_add(lb_cp_multiply(z,z),p);
+		iterations++;
+	      }
+	    pix.r=0;
+	    pix.g=0;
+	    pix.b=255*iterations/max_iterations;
+	    
+	    lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
+
+	    frame[yp][xp][0]=pix.r;
+	    frame[yp][xp][1]=pix.g;
+	    frame[yp][xp][2]=pix.b;
+	  }
+      lb_gr_refresh();
+      z_zoom*=1.01;
+      fwrite(frame, 1, ty_screen.w*ty_screen.h*3, pipeout);
+    }
+    fflush(pipeout);
+    pclose(pipeout);
+  lb_gr_SDL_close();
+  SDL_Quit();
+  return EXIT_SUCCESS;
+#endif
+
+  
   /******************************************************************************/
   /* Demo: GPIO                                                                 */
   /* This is a complete application which was put together to evaluate the      */
