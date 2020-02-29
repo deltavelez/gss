@@ -321,11 +321,11 @@ int main(int argc, char *argv[])
   
   /******************************************************************************/
   /* Demo: Exploring paralelism                                                 */
-  /* Shows the basis of multi-threading processing.                             */
+  /* Shows the basics of multi-threading processing.                             */
   /******************************************************************************/
 
-  //#define DEMO_PARALELL
-#ifdef DEMO_PARALELL
+  //#define DEMO_THREADS
+#ifdef DEMO_THREADS
   
   pthread_t threads[4];
   int rc;
@@ -374,6 +374,82 @@ int main(int argc, char *argv[])
   
 #endif
 
+
+  /******************************************************************************/
+  /* Demo: Exploring paralelism - part 2                                        */
+  /* We now perform an actual useful task, such as adding up n-numbers          */
+  /* dividing the work between N_THREADS, topping the processor                 */
+  /******************************************************************************/
+
+#define DEMO_THREADS2
+#ifdef DEMO_THREADS2
+  #define N_THREADS 8
+#define VECTOR_SIZE 1024
+
+  SINT16_T Vec[VECTOR_SIZE];
+  int i;
+
+  typedef struct 
+  {
+    SINT16_T a, b;
+  } ARGS_T;
+
+  pthread_t threads[N_THREADS];
+  ARGS_T arguments[N_THREADS];
+  
+  for (i=0;i<VECTOR_SIZE;i++)
+    Vec[i]=i;
+
+  void *int_sum(void *args)
+  {
+    
+    /* It is simpler to first de-reference the arguments from the structrure, then use them */
+
+    SINT16_T _a, _b, k;
+    REAL_T total=0;
+    _a=(*(ARGS_T *)args).a;
+    _b=(*(ARGS_T *)args).b;
+
+    
+    //printf("a = %d\r\n",_a);
+    //printf("b = %d\r\n",_b);
+    for (k=_a;k<=_b;k++)
+      {
+    	total+=Vec[k];
+	//printf("*");
+	//fflush(stdout);
+    	lb_ti_delay_ms(1000);
+    }
+    printf("Total = %f, theoretical = %f\r\n",total,0.5*_b*(_b+1)-0.5*_a*(_a+1));
+    fflush(stdout);
+    return 0;
+  }
+
+  ARGS_T my_arg;
+  my_arg.a=0;
+  my_arg.b=VECTOR_SIZE;
+
+  //pthread_t my_thread;
+  //pthread_create(&my_thread,NULL, int_sum, (void *) &my_arg);
+    
+  for (i=0;i<N_THREADS;i++)
+  {
+     arguments[i].a=i*VECTOR_SIZE/N_THREADS;
+     arguments[i].b=(i+1)*VECTOR_SIZE/N_THREADS-1;
+     printf("a= %d, b=%d\r\n",arguments[i].a,arguments[i].b);
+     pthread_create(&threads[i],NULL, int_sum, (void *) &arguments[i]);
+  }
+ 
+  for (i=0;i<N_THREADS;i++)
+    pthread_join(threads[i],NULL);
+
+  printf("Ended\r\n");
+  exit(1);
+  //(*int_sum)(&my_arg);
+  
+#endif
+
+  
   /******************************************************************************/
   /* Vectors and Matrices.                                                      */
   /******************************************************************************/
@@ -3049,13 +3125,14 @@ int main(int argc, char *argv[])
   /* Writing to files to concatenate is no longer needed !!!                    */
   /******************************************************************************/
 
-#define DEMO_VIDEO_MANDELBROT2
+  //#define DEMO_VIDEO_MANDELBROT2
 #ifdef DEMO_VIDEO_MANDELBROT2
-  int xp, yp, iterations, max_iterations=1024;
+  int xp, yp, iterations, max_iterations=2048;
   int k;
   REAL_T xr, yr, z_zoom;
   COMPLEX_T z, p;
   VIEWPORT_2D_T win;
+  
   PIXEL_T pix;
  
   lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
@@ -3069,7 +3146,7 @@ int main(int argc, char *argv[])
   win.yp_max=ty_screen.h;
   
   /* 30 frames per second, 1 minutes long */
-  for(k=0;k<1*60*30;k++)
+  for(k=0;k<3*60*30;k++)
     {
       win.xr_min=0.25-1.00*(320.0/200.0)/z_zoom;
       win.xr_max=0.25+1.00*(320.0/200.0)/z_zoom;
@@ -3091,8 +3168,8 @@ int main(int argc, char *argv[])
 		iterations++;
 	      }
 	    pix.r=0;
-	    pix.g=0;
-	    pix.b=255*iterations/max_iterations;
+	    pix.g=127*(max_iterations-iterations)/max_iterations;
+	    pix.b=160*iterations/max_iterations;
 	    
 	    lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
 
@@ -3101,7 +3178,7 @@ int main(int argc, char *argv[])
 	    frame[yp][xp][2]=pix.b;
 	  }
       lb_gr_refresh();
-      z_zoom*=1.01;
+      z_zoom*=1.005;
       fwrite(frame, 1, ty_screen.w*ty_screen.h*3, pipeout);
     }
     fflush(pipeout);
@@ -6070,7 +6147,7 @@ lb_co_cls();
   /* I'm currently working on this.  Because of that, it is not yet functional  */
   /******************************************************************************/
   
-#define DEMO_SERIAL
+  //#define DEMO_SERIAL
 #ifdef DEMO_SERIAL
 
   COMM_PORT_T port1;
