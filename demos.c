@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
   /* dividing the work between N_THREADS, topping the processor                 */
   /******************************************************************************/
 
-#define DEMO_THREADS2
+  //#define DEMO_THREADS2
 #ifdef DEMO_THREADS2
   #define N_THREADS 8
 #define VECTOR_SIZE 1024
@@ -402,14 +402,12 @@ int main(int argc, char *argv[])
 
   void *int_sum(void *args)
   {
-    
     /* It is simpler to first de-reference the arguments from the structrure, then use them */
 
     SINT16_T _a, _b, k;
     REAL_T total=0;
     _a=(*(ARGS_T *)args).a;
     _b=(*(ARGS_T *)args).b;
-
     
     //printf("a = %d\r\n",_a);
     //printf("b = %d\r\n",_b);
@@ -420,17 +418,10 @@ int main(int argc, char *argv[])
 	//fflush(stdout);
     	lb_ti_delay_ms(1000);
     }
-    printf("Total = %f, theoretical = %f\r\n",total,0.5*_b*(_b+1)-0.5*_a*(_a+1));
+    printf("Total = %f, theoretical = %f\r\n",total,0.5*_b*(_b+1)-0.5*(_a-1)*_a);
     fflush(stdout);
     return 0;
   }
-
-  ARGS_T my_arg;
-  my_arg.a=0;
-  my_arg.b=VECTOR_SIZE;
-
-  //pthread_t my_thread;
-  //pthread_create(&my_thread,NULL, int_sum, (void *) &my_arg);
     
   for (i=0;i<N_THREADS;i++)
   {
@@ -444,9 +435,6 @@ int main(int argc, char *argv[])
     pthread_join(threads[i],NULL);
 
   printf("Ended\r\n");
-  exit(1);
-  //(*int_sum)(&my_arg);
-  
 #endif
 
   
@@ -900,7 +888,7 @@ int main(int argc, char *argv[])
       end=clock();
       time_total+=(REAL_T)end-(REAL_T)begin;
       frames_count++;
-      printf("FPS = %f\n",(double)CLOCKS_PER_SEC*frames_count/time_total);
+      //printf("FPS = %f\n",(double)CLOCKS_PER_SEC*frames_count/time_total);
     }
   SDL_Quit();
   return EXIT_SUCCESS;
@@ -3162,6 +3150,7 @@ int main(int argc, char *argv[])
 	    z.i=yr;
 	    while ((lb_cp_abs(z)<2.0) && (iterations<max_iterations)) 
 	      {
+		
 		p.r=xr;
 		p.i=yr;
 		z=lb_cp_add(lb_cp_multiply(z,z),p);
@@ -3187,6 +3176,119 @@ int main(int argc, char *argv[])
   SDL_Quit();
   return EXIT_SUCCESS;
 #endif
+
+
+  /******************************************************************************/
+  /* Demo: Mandelbrot sets with multi-threading                                 */
+  /* New !!!! This program plots the Mandelbrot set performing multi-threaded   */
+  /* processing AND records a video using ffmpeg.                               */
+  /******************************************************************************/
+
+#define DEMO_MANDELBROT_THREADS
+#ifdef DEMO_MANDELBROT_THREADS
+  #define N_THREADS 8
+ 
+  typedef struct 
+  {
+    int _yp_a, _yp_b;
+  } ARGS_T;
+
+  int i, k, max_iterations=16;
+  REAL_T z_zoom;
+  VIEWPORT_2D_T win;
+  pthread_t threads[N_THREADS];
+  ARGS_T arguments[N_THREADS];
+  unsigned char frame[1080][1920][3] = {0};
+  clock_t begin, end;
+ 
+  
+  void *mandelbrot(void *args)
+  {
+    UINT16_T xp, yp, yp_a, yp_b;
+    REAL_T xr, yr;
+    COMPLEX_T z, p;
+    PIXEL_T pix;
+    int iterations;
+
+    /* It is simpler to first de-reference the arguments from the structure, then use them */
+    yp_a=(*(ARGS_T *)args)._yp_a;
+    yp_b=(*(ARGS_T *)args)._yp_b;
+
+    for(yp=yp_a;yp<=yp_b;yp++)
+      for(xp=0;xp<win.xp_max;xp++)
+	{
+	  lb_gr_project_2d_inv(win, xp, yp, &xr, &yr);
+	  iterations=0;
+	  z.r=xr;
+	  z.i=yr;
+	  while ((lb_cp_abs(z)<2.0) && (iterations<max_iterations)) 
+	    {
+	      p.r=xr;
+	      p.i=yr;
+	      z=lb_cp_add(lb_cp_multiply(z,z),p);
+	      iterations++;
+	    }
+	  pix.r=0;
+	  pix.g=127*(max_iterations-iterations)/max_iterations;
+	  pix.b=160*iterations/max_iterations;
+	  
+	  lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
+
+	  frame[yp][xp][0]=pix.r;
+	  frame[yp][xp][1]=pix.g;
+	  frame[yp][xp][2]=pix.b;
+	}
+    return 0;
+  }
+    
+  lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
+  FILE *pipeout = popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1920x1080 -r 30 -i - -f mp4 -q:v 0 -an -vcodec mpeg4 output.mp4", "w");
+
+  z_zoom=1.0;
+  win.xp_min=0;
+  win.yp_min=0;
+  win.xp_max=ty_screen.w;
+  win.yp_max=ty_screen.h;
+
+  begin=clock();
+  /* 30 frames per second, 1 minutes long */
+  for(k=0;k<3*60*30;k++)
+    {
+      max_iterations=16*pow(10.0,z_zoom);
+
+      win.xr_min=0.25-2.00*((double)ty_screen.w/ty_screen.h)/z_zoom;
+      win.xr_max=0.25+2.00*((double)ty_screen.w/ty_screen.h)/z_zoom;
+      win.yr_min=-2.0/z_zoom; 
+      win.yr_max=2.0/z_zoom;
+
+      for (i=0;i<N_THREADS;i++)
+	{
+	  arguments[i]._yp_a=i*win.yp_max/N_THREADS;
+	  arguments[i]._yp_b=(i+1)*win.yp_max/N_THREADS-1;
+	  //printf("a=%d, b=%d\r\n\r\n",arguments[i]._yp_a,arguments[i]._yp_b);
+	  fflush(stdout);
+	  pthread_create(&threads[i],NULL, mandelbrot, (void *) &arguments[i]);
+	}
+      for (i=0;i<N_THREADS;i++)
+	pthread_join(threads[i],NULL);
+
+      lb_gr_refresh();
+      z_zoom*=1.005;
+      fwrite(frame, 1, ty_screen.w*ty_screen.h*3, pipeout);
+      end=clock();
+      if (k!=0)
+	printf("\r\nFPS = %f\r\n", (double)k*CLOCKS_PER_SEC/(end-begin));
+      //oxo
+    }
+    fflush(pipeout);
+    pclose(pipeout);
+  lb_gr_SDL_close();
+  SDL_Quit();
+  return EXIT_SUCCESS;
+
+  printf("Ended\r\n");
+#endif
+
 
   
   /******************************************************************************/
