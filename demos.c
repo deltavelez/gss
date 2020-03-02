@@ -3186,7 +3186,7 @@ int main(int argc, char *argv[])
 
 #define DEMO_MANDELBROT_THREADS
 #ifdef DEMO_MANDELBROT_THREADS
-  #define N_THREADS 8
+  #define N_THREADS 4
  
   typedef struct 
   {
@@ -3198,7 +3198,7 @@ int main(int argc, char *argv[])
   VIEWPORT_2D_T win;
   pthread_t threads[N_THREADS];
   ARGS_T arguments[N_THREADS];
-  unsigned char frame[1080][1920][3] = {0};
+  unsigned char frame[720][1280][3] = {0};
   clock_t begin, end;
  
   
@@ -3228,9 +3228,11 @@ int main(int argc, char *argv[])
 	      z=lb_cp_add(lb_cp_multiply(z,z),p);
 	      iterations++;
 	    }
-	  pix.r=0;
-	  pix.g=127*(max_iterations-iterations)/max_iterations;
-	  pix.b=160*iterations/max_iterations;
+	  REAL_T L;
+	  L=iterations/max_iterations;
+	  pix.r=255*(1.0-L);
+	  pix.g=255*(1.0-L);
+	  pix.b=127+127*(1.0-L);
 	  
 	  lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
 
@@ -3241,8 +3243,8 @@ int main(int argc, char *argv[])
     return 0;
   }
     
-  lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1920, 1080, 0, 0, 0);
-  FILE *pipeout = popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1920x1080 -r 30 -i - -f mp4 -q:v 0 -an -vcodec mpeg4 output.mp4", "w");
+  lb_gr_SDL_init("DEMO_VIDEO_MANDELBROT", SDL_INIT_VIDEO, 1280, 720, 0, 0, 0);
+  FILE *pipeout = popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1280x720 -r 30 -i - -f mp4 -q:v 0 -an -vcodec mpeg4 output.mp4", "w");
 
   z_zoom=1.0;
   win.xp_min=0;
@@ -3252,10 +3254,10 @@ int main(int argc, char *argv[])
 
   begin=clock();
   /* 30 frames per second, 1 minutes long */
-  for(k=0;k<3*60*30;k++)
+  for(k=0;k<1*60*30;k++)
     {
       //      max_iterations=1.6*pow(10.0,z_zoom);
-      max_iterations=256*pow(2048.0/256.0,k/(3.0*60*30));
+      max_iterations=32*pow(256.0/32.0,k/(1.0*60*30));
       printf("\r\nmax_iterations = %d",(int)max_iterations);
 
       win.xr_min=0.25-2.00*((double)ty_screen.w/ty_screen.h)/z_zoom;

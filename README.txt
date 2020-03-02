@@ -29,6 +29,10 @@ If you wish to export any generated graphics to JPG files, install the JPG libra
 
 sudo apt-get install libjpeg-dev
 
+You may want to install ffmpeg if you wish to buffer images to assemble videos:
+
+sudo apt install ffmpeg
+
 The recommended development system is emacs:
 
 sudo apt-get install emacs.
