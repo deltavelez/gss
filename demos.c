@@ -3254,7 +3254,9 @@ int main(int argc, char *argv[])
   /* 30 frames per second, 1 minutes long */
   for(k=0;k<3*60*30;k++)
     {
-      max_iterations=16*pow(10.0,z_zoom);
+      //      max_iterations=1.6*pow(10.0,z_zoom);
+      max_iterations=256*pow(2048.0/256.0,k/(3.0*60*30));
+      printf("\r\nmax_iterations = %d",(int)max_iterations);
 
       win.xr_min=0.25-2.00*((double)ty_screen.w/ty_screen.h)/z_zoom;
       win.xr_max=0.25+2.00*((double)ty_screen.w/ty_screen.h)/z_zoom;
@@ -3273,7 +3275,7 @@ int main(int argc, char *argv[])
 	pthread_join(threads[i],NULL);
 
       lb_gr_refresh();
-      z_zoom*=1.005;
+      z_zoom*=1.003;
       fwrite(frame, 1, ty_screen.w*ty_screen.h*3, pipeout);
       end=clock();
       if (k!=0)
