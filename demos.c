@@ -3184,7 +3184,7 @@ int main(int argc, char *argv[])
   /* processing AND records a video using ffmpeg.                               */
   /******************************************************************************/
 
-#define DEMO_MANDELBROT_THREADS
+  //#define DEMO_MANDELBROT_THREADS
 #ifdef DEMO_MANDELBROT_THREADS
   #define N_THREADS 4
  
@@ -3293,7 +3293,67 @@ int main(int argc, char *argv[])
   printf("Ended\r\n");
 #endif
 
+  /******************************************************************************/
+  /* Demo: ACTIVE_SHUTTER                                                       */
+  /******************************************************************************/
+#define DEMO_ACTIVE_SHUTTER
+#ifdef DEMO_ACTIVE_SHUTTER
 
+  /* 8: Marked as CE0 in breakout */
+  /* 9: Marked as MISO in breakout */
+  /* 10: Marked as MOSI in breakout */
+  /* 11: Marked as SCLK in breakout */
+#define PIN_LA     8 
+#define PIN_LB     9
+#define PIN_RA     11
+#define PIN_RB     12
+  SDL_Event event;
+  
+  lb_gr_SDL_init("DEMO_ACTIVE_SHUTTER",SDL_INIT_VIDEO, 320, 200, 0, 0, 0);
+
+  lb_gp_gpio_open();
+  lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_LB, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RA, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RB, GPIO_OUTPUT);
+
+  
+  while (1)
+    {
+      /* Positive Polarity */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      printf("\r\nhigh");
+      lb_ti_delay_ms(20);
+
+      /* Blank */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      printf("\r\nlow");
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      lb_ti_delay_ms(20);
+
+      /* Negative Polarity */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
+      lb_ti_delay_ms(20);
+
+      /* Blank */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      lb_ti_delay_ms(20);
+    
+      while (SDL_PollEvent(&event))
+	{
+	  if (event.type == SDL_QUIT)
+	    {
+	      lb_gp_gpio_close();
+	      lb_gr_SDL_close();
+	      SDL_Quit();
+	    }
+	}
+    }
+  return EXIT_SUCCESS;
+#endif
   
   /******************************************************************************/
   /* Demo: GPIO                                                                 */
