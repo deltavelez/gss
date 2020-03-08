@@ -3305,8 +3305,8 @@ int main(int argc, char *argv[])
   /* 11: Marked as SCLK in breakout */
 #define PIN_LA     8 
 #define PIN_LB     9
-#define PIN_RA     11
-#define PIN_RB     12
+#define PIN_RA     10
+#define PIN_RB     11
   SDL_Event event;
   
   lb_gr_SDL_init("DEMO_ACTIVE_SHUTTER",SDL_INIT_VIDEO, 320, 200, 0, 0, 0);
@@ -3323,25 +3323,46 @@ int main(int argc, char *argv[])
       /* Positive Polarity */
       lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
       lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
-      printf("\r\nhigh");
-      lb_ti_delay_ms(20);
+      lb_ti_delay_ms(1000);
 
       /* Blank */
       lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-      printf("\r\nlow");
       lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
-      lb_ti_delay_ms(20);
+      lb_ti_delay_ms(1000);
 
       /* Negative Polarity */
       lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
-      lb_ti_delay_ms(20);
-
+      lb_ti_delay_ms(1000);
+      
       /* Blank */
       lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
-      lb_ti_delay_ms(20);
-    
+      lb_ti_delay_ms(1000);
+
+      /**************************************/
+      
+      /* Positive Polarity */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /* Blank */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /* Negative Polarity */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
+      lb_ti_delay_ms(1000);
+      
+      /* Blank */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      
       while (SDL_PollEvent(&event))
 	{
 	  if (event.type == SDL_QUIT)
