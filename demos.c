@@ -3347,7 +3347,7 @@ int main(int argc, char *argv[])
   
   lb_gr_render_picture(&Pic_R, &screen2, 0, 0, COPYMODE_COPY, 0);
 
-  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
+  //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
   clock_t begin, end;
 
   begin=clock();
