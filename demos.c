@@ -819,9 +819,9 @@ int main(int argc, char *argv[])
 	    flag_console_changed=FALSE;
 	    
 	    lb_ft_draw_console(&Pic_console, &font_console, &Con, COPYMODE_COPY);
-	    lb_gr_render_picture(&Pic_console, 0, 0, COPYMODE_COPY,
+	    lb_gr_render_picture(&Pic_console, &ty_screen, 0, 0, COPYMODE_COPY,
 				 RENDERMODE_BGCOLOR(0x0Fabc) | RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(1) |  RENDERMODE_SCALE_Y(1));
-	    lb_gr_refresh();
+	    lb_gr_refresh(&ty_screen);
 	  }
       }
   lb_gr_SDL_close();
@@ -1024,7 +1024,7 @@ int main(int argc, char *argv[])
   /* Shows the use and advantages of the Antialiasing primitives.        */
   /******************************************************************************/
 
-  //#define DEMO_LINE_ANTIALIASING
+#define DEMO_LINE_ANTIALIASING
 #ifdef DEMO_LINE_ANTIALIASING
   SDL_Event event;
   REAL_T angle;
@@ -1046,7 +1046,7 @@ int main(int argc, char *argv[])
 				   0.5*Pic.w  + 0.5*Pic.h*cos(angle),
 				   0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
 				   1, lb_gr_12RGB(0xF090));
-      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
       lb_gr_refresh();
 
       angle+=M_PI/180;
@@ -3296,7 +3296,7 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: ACTIVE_SHUTTER                                                       */
   /******************************************************************************/
-#define DEMO_ACTIVE_SHUTTER
+  //#define DEMO_ACTIVE_SHUTTER
 #ifdef DEMO_ACTIVE_SHUTTER
 
   /* 8: Marked as CE0 in breakout */
