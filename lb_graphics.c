@@ -11,6 +11,8 @@
 #include "lb_types.h"
 #include "lb_numer.h"
 #include "lb_fonts.h"
+#include "lb_time.h"
+
 #include <SDL2/SDL.h>
 
 #define TEXTUREMODE_SOFTWARE
@@ -843,7 +845,85 @@ void lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic)
   fclose(outfile);
 }
 
+
+void     lb_gr_JPGfile_getsize(const char *filename, SINT16_T *width, SINT16_T *height, SINT8_T *channels)
+{
+  struct jpeg_decompress_struct info; //for our jpeg info
+  struct jpeg_error_mgr err;          //the error handler
+
+  FILE* file = fopen(filename, "rb");  //open the file
+
+  info.err = jpeg_std_error(& err);     
+  jpeg_create_decompress(& info);   //fills info structure
+
+  /* if the jpeg file doesn't load */
+  if(!file)
+    {
+      fprintf(stderr, "Error reading JPEG file %s!", filename);
+      return;
+    }
+
+  jpeg_stdio_src(&info, file);    
+  jpeg_read_header(&info, TRUE);   // read jpeg file header
+
+  jpeg_start_decompress(&info);    // decompress the file
+
+  //set width and height
+  *width = info.output_width;
+  *height = info.output_height;
+  *channels = info.num_components;
+
+  fclose(file);                    //close the file
+  return;
+}
+
   
+SINT8_T lb_gr_JPGfile_load(const char *filename, PICTURE_T *Pic)
+{
+  unsigned char * data;        // data for the image
+  struct jpeg_decompress_struct info; //for our jpeg info
+  struct jpeg_error_mgr err;          //the error handler
+  SINT16_T j;
+ 
+  FILE* file = fopen(filename, "rb");  //open the file
+
+  info.err = jpeg_std_error(& err);     
+  jpeg_create_decompress(& info);   //fills info structure
+
+  //if the jpeg file doesn't load
+  if(!file)
+    {
+      fprintf(stderr, "Error reading JPEG file %s!", filename);
+      return 0;
+    }
+
+  jpeg_stdio_src(&info, file);    
+  jpeg_read_header(&info, TRUE);   // read jpeg file header
+  jpeg_start_decompress(&info);    // decompress the file
+
+
+  data = (unsigned char *)malloc(3*info.output_width);
+  while (info.output_scanline < info.output_height) // loop
+    {
+      jpeg_read_scanlines(&info, &data, 1);
+      fflush(stdout);
+      if (info.output_scanline!=info.output_height)
+      for (j=0; j<info.output_width; j++)
+	{
+	  (*Pic).pic[info.output_scanline][j].r = data[3*j + 0]*MAX_B/255;
+	  (*Pic).pic[info.output_scanline][j].g = data[3*j + 1]*MAX_G/255;
+	  (*Pic).pic[info.output_scanline][j].b = data[3*j + 2]*MAX_R/255;
+	}
+    }
+
+  jpeg_finish_decompress(&info);   //finish decompressing
+  jpeg_destroy_decompress(&info);
+  fclose(file);                    //close the file
+  free(data);
+
+  return 0; 
+}
+
 SINT8_T lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T quality)
 {
   FILE* outfile;

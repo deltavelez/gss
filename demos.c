@@ -3308,8 +3308,47 @@ int main(int argc, char *argv[])
 #define PIN_RA     10
 #define PIN_RB     11
   SDL_Event event;
+  PICTURE_T Pic_L, Pic_R;
   
-  lb_gr_SDL_init("DEMO_ACTIVE_SHUTTER",SDL_INIT_VIDEO, 320, 200, 0, 0, 0);
+  
+  /* Load Left and Right Images */
+  SINT16_T width, height;
+  SINT8_T channels;
+
+  lb_gr_JPGfile_getsize("./media/images/stereo_left.jpg", &width, &height, &channels);
+  Pic_L.w=width;
+  Pic_L.h=height;
+  lb_gr_JPGfile_getsize("./media/images/stereo_right.jpg", &width, &height, &channels);
+  Pic_R.w=width;
+  Pic_R.h=height;
+  if ( (Pic_L.w!=Pic_R.w) || (Pic_L.h!=Pic_R.h) )
+    {
+      printf("Error: Left and Right images have different sizes\r\n");
+      exit(1);
+    }
+  
+  lb_gr_SDL_init("DEMO_ACTIVE_SHUTTER",SDL_INIT_VIDEO, Pic_L.w, Pic_L.h, 0, 0, 0);
+  
+  lb_gr_create_picture(&Pic_L,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
+  lb_gr_create_picture(&Pic_R,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
+
+  lb_gr_JPGfile_load("./media/images/stereo_left.jpg",&Pic_L);
+  lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
+
+  int k;
+  for (k=0;k<10000;k++)
+    {
+      lb_gr_render_picture(&Pic_L, 0, 0, COPYMODE_COPY, 0);
+      lb_gr_refresh();
+      lb_gr_render_picture(&Pic_R, 0, 0, COPYMODE_COPY, 0);
+      lb_gr_refresh();
+    }
+  
+  exit(1);
+
+
+
+  
 
   lb_gp_gpio_open();
   lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);

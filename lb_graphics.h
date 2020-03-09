@@ -35,11 +35,16 @@ void       lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, 
 					PIXEL_T default_color);
 
 void       lb_gr_BMPfile_getsize(const char *filename, SINT16_T *width, SINT16_T *height);
+
 void       lb_gr_BMPfile_load_to_pic(const char *filename, PICTURE_T *Pic, UINT8_T alpha);
 void       lb_gr_BMPfile_load_to_matrix(const char *filename, MATRIX_R_T *R, MATRIX_R_T *G, MATRIX_R_T *B);
 
 SINT8_T  lb_gr_BMPfile_load_to_matrix_gs(const char *filename, MATRIX_R_T *P);
 void       lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic);
+
+SINT8_T lb_gr_JPGfile_load(const char *filename, PICTURE_T *Pic);
+  
+void     lb_gr_JPGfile_getsize(const char *filename, SINT16_T *width, SINT16_T *height, SINT8_T *channels);
 SINT8_T  lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T quality);
 
 void       lb_gr_clear_picture(PICTURE_T *Pic, PIXEL_T default_color);
