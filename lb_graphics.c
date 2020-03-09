@@ -75,10 +75,10 @@ void lb_gr_SDL_init(const char *title, Uint32 flags, SINT16_T width, SINT16_T he
     printf("Warning: Native window Format = %s\r\n",SDL_GetPixelFormatName(SDL_GetWindowPixelFormat(window)));
   
   /* The renderer is created as "Software" since it is actually faster both in the Raspberry Pi as well as in a Desktop */
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE | 0*SDL_RENDERER_PRESENTVSYNC);
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE | SDL_RENDERER_PRESENTVSYNC);
   if (renderer == NULL)
     {
-      printf("Error: lb_gr_SDL_init() --> renderer could not be created");
+      printf("Error: lb_gr_SDL_init() --> renderer could not be created, SDL_Error: %s\r\n",SDL_GetError());
       exit(1);
     }
   //SDL_SetRenderDradwColor(renderer, r, g, b, 255);
