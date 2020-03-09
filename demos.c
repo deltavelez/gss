@@ -3309,6 +3309,7 @@ int main(int argc, char *argv[])
 #define PIN_RB     11
   SDL_Event event;
   PICTURE_T Pic_L, Pic_R;
+  SCREEN_T screen2;
   
   
   /* Load Left and Right Images */
@@ -3336,13 +3337,33 @@ int main(int argc, char *argv[])
   lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
 
   int k;
-  for (k=0;k<10000;k++)
+
+  lb_gr_render_picture(&Pic_L, &ty_screen, 0, 0, COPYMODE_COPY, 0);
+
+
+  screen2.w=width;
+  screen2.h=height;
+  lb_gr_create_screen(&screen2,0,0,0,0);
+  
+  lb_gr_render_picture(&Pic_R, &screen2, 0, 0, COPYMODE_COPY, 0);
+
+  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
+  clock_t begin, end;
+
+  begin=clock();
+  int k_max=500;
+  for (k=0;k<k_max;k++)
     {
-      lb_gr_render_picture(&Pic_L, 0, 0, COPYMODE_COPY, 0);
-      lb_gr_refresh();
-      lb_gr_render_picture(&Pic_R, 0, 0, COPYMODE_COPY, 0);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
+      //lb_ti_delay_ms(10);
+      lb_gr_refresh(&screen2);
+      //lb_ti_delay_ms(10);
     }
+  end=clock();
+  printf("FPS= %f\r\n",(double)500.0*CLOCKS_PER_SEC/(end - begin));
+
+
+  lb_gr_release_screen(&screen2);
   
   exit(1);
 

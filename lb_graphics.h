@@ -6,30 +6,30 @@
 #define LB_GRAPHICS_H
 
 
-void lb_gr_SDL_init(const char *title, Uint32 flags, SINT16_T width, SINT16_T height,  UINT8_T r, UINT8_T g, UINT8_T b);
+void       lb_gr_SDL_init(const char *title, Uint32 flags, SINT16_T width, SINT16_T height,  UINT8_T r, UINT8_T g, UINT8_T b);
 
-void lb_gr_SDL_close();
-void lb_gr_refresh();
+void       lb_gr_SDL_close();
+void       lb_gr_refresh(SCREEN_T *screen);
 
-void lb_gr_fb_line_h(SCREEN_T *screen, SINT16_T y0, SINT16_T x0, SINT16_T x1, UINT8_T r, UINT8_T g, UINT8_T b);
-void lb_gr_fb_line_h_copymode(SCREEN_T *screen, SINT16_T y0, SINT16_T x0, SINT16_T x1, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a, COPYMODE_T copymode);
-void lb_gr_fb_line_v(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b);
-void lb_gr_fb_line_v_copymode(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a, COPYMODE_T copymode);
+void       lb_gr_fb_line_h(SCREEN_T *screen, SINT16_T y0, SINT16_T x0, SINT16_T x1, UINT8_T r, UINT8_T g, UINT8_T b);
+void       lb_gr_fb_line_h_copymode(SCREEN_T *screen, SINT16_T y0, SINT16_T x0, SINT16_T x1, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a, COPYMODE_T copymode);
+void       lb_gr_fb_line_v(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b);
+void       lb_gr_fb_line_v_copymode(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a, COPYMODE_T copymode);
 
-void  lb_gr_fb_rectangle(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b);
-void  lb_gr_fb_rectangle_copymode(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a, COPYMODE_T copymode);
-void _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a);
-void  lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a);
-void _lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b);
-void  lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b);
-void lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T src_r, UINT8_T src_g, UINT8_T src_b, UINT8_T src_a, COPYMODE_T copymode);
+void       lb_gr_fb_rectangle(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b);
+void       lb_gr_fb_rectangle_copymode(SCREEN_T *screen, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a, COPYMODE_T copymode);
+void      _lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a);
+void       lb_gr_fb_setpixel_ARGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a);
+void      _lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b);
+void       lb_gr_fb_setpixel_XRGB(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T r, UINT8_T g, UINT8_T b);
+void       lb_gr_fb_setpixel_ARGB_copymode(SCREEN_T *screen, SINT16_T x, SINT16_T y, UINT8_T src_r, UINT8_T src_g, UINT8_T src_b, UINT8_T src_a, COPYMODE_T copymode);
 
 
 PIXEL_T    lb_gr_12RGB(UINT16_T number);
-SINT8_T  lb_gr_assert_dimensions_line2d_i(LINE_2D_SINT16_T *L);
-SINT8_T  lb_gr_assert_dimensions_line2d_f(LINE_2D_REAL_T *L);
-SINT8_T  lb_gr_assert_dimensions_line3d_f(LINE_3D_REAL_T *L);
-SINT8_T  lb_gr_assert_dimensions_picture(PICTURE_T *Pic);
+SINT8_T    lb_gr_assert_dimensions_line2d_i(LINE_2D_SINT16_T *L);
+SINT8_T    lb_gr_assert_dimensions_line2d_f(LINE_2D_REAL_T *L);
+SINT8_T    lb_gr_assert_dimensions_line3d_f(LINE_3D_REAL_T *L);
+SINT8_T    lb_gr_assert_dimensions_picture(PICTURE_T *Pic);
 void       lb_gr_bitmap_rotate(PICTURE_T *pic_src, PICTURE_T *pic_dst, REAL_T angle, PIXEL_T default_color);
 void       lb_gr_bitmap_rotate_sampling(PICTURE_T *pic_src, PICTURE_T *pic_dst, REAL_T angle, UINT8_T n_samples,
 					PIXEL_T default_color);
@@ -39,22 +39,24 @@ void       lb_gr_BMPfile_getsize(const char *filename, SINT16_T *width, SINT16_T
 void       lb_gr_BMPfile_load_to_pic(const char *filename, PICTURE_T *Pic, UINT8_T alpha);
 void       lb_gr_BMPfile_load_to_matrix(const char *filename, MATRIX_R_T *R, MATRIX_R_T *G, MATRIX_R_T *B);
 
-SINT8_T  lb_gr_BMPfile_load_to_matrix_gs(const char *filename, MATRIX_R_T *P);
+SINT8_T    lb_gr_BMPfile_load_to_matrix_gs(const char *filename, MATRIX_R_T *P);
 void       lb_gr_BMPfile_save(const char *filename, PICTURE_T *Pic);
 
-SINT8_T lb_gr_JPGfile_load(const char *filename, PICTURE_T *Pic);
+SINT8_T    lb_gr_JPGfile_load(const char *filename, PICTURE_T *Pic);
   
-void     lb_gr_JPGfile_getsize(const char *filename, SINT16_T *width, SINT16_T *height, SINT8_T *channels);
-SINT8_T  lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T quality);
+void       lb_gr_JPGfile_getsize(const char *filename, SINT16_T *width, SINT16_T *height, SINT8_T *channels);
+SINT8_T    lb_gr_JPGfile_save(const char *filename, PICTURE_T *Pic, UINT8_T quality);
 
 void       lb_gr_clear_picture(PICTURE_T *Pic, PIXEL_T default_color);
-SINT16_T lb_gr_check_left_i(POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P);
-SINT16_T lb_gr_check_left_r(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P);
+SINT16_T   lb_gr_check_left_i(POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P);
+SINT16_T   lb_gr_check_left_r(POINT_2D_REAL_T P0, POINT_2D_REAL_T P1, POINT_2D_REAL_T P);
 
 void       lb_gr_create_line2d_i(LINE_2D_SINT16_T *L);
 void       lb_gr_create_line2d_r(LINE_2D_REAL_T *L);
 //void       lb_gr_create_line3d_r(LINE_3D_REAL_T *L);
 void       lb_gr_create_picture(PICTURE_T *Pic, PIXEL_T default_color );
+void       lb_gr_create_screen(SCREEN_T *screen, UINT8_T r, UINT8_T g, UINT8_T b, UINT8_T a);
+void       lb_gr_release_screen(SCREEN_T *screen);
 void       lb_gr_create_zbuffer(PICTURE_T *Pic, MATRIX_R_T *Z);
 void       lb_gr_reset_zbuffer(MATRIX_R_T *Z);
 void       lb_gr_plot_zbuffer_line_1(PICTURE_T *Pic, VIEWPORT_3D_T vp3d, REAL_T Rot[3][3], MATRIX_R_T *Z,
@@ -94,7 +96,7 @@ void       lb_gr_draw_ellipse(PICTURE_T *Pic, SINT32_T xc, SINT32_T yc, SINT32_T
 
 void       lb_gr_draw_ellipse_rotated(PICTURE_T *Pic, SINT16_T xc, SINT16_T yc, SINT16_T a, SINT16_T b, REAL_T angle, PIXEL_T color, COPYMODE_T copymode);
 
-void lb_gr_draw_ellipse_rotated_aspolygon(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T a, REAL_T b, REAL_T angle,
+void       lb_gr_draw_ellipse_rotated_aspolygon(PICTURE_T *Pic, REAL_T xc, REAL_T yc, REAL_T a, REAL_T b, REAL_T angle,
 					  REAL_T w, SINT16_T n_q1, PIXEL_T color, COPYMODE_T copymode, LINEMODE_T linemode);
 
 
@@ -181,12 +183,12 @@ void       lb_gr_draw_rectangle_line(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, S
 
 void       lb_gr_draw_rectangle_solid(PICTURE_T *Pic, SINT16_T x0, SINT16_T y0, SINT16_T x1, SINT16_T y1, PIXEL_T color);
 
-void        lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P2,
+void       lb_gr_draw_triangle_fill_i(PICTURE_T *Pic, POINT_2D_SINT16_T P0, POINT_2D_SINT16_T P1, POINT_2D_SINT16_T P2,
 				PIXEL_T color, COPYMODE_T copymode);
 
-SINT8_T lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P);
-SINT8_T lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P);
-SINT8_T  lb_gr_matrix_gs_to_pic(MATRIX_R_T *A, PICTURE_T *Pic);
+SINT8_T    lb_gr_is_in_polygon_i(LINE_2D_SINT16_T *L, POINT_2D_SINT16_T P);
+SINT8_T    lb_gr_is_in_polygon_f(LINE_2D_REAL_T *L, POINT_2D_REAL_T P);
+SINT8_T    lb_gr_matrix_gs_to_pic(MATRIX_R_T *A, PICTURE_T *Pic);
 
 void       lb_gr_plot_continuous_fn_2d(PICTURE_T *Pic, VIEWPORT_2D_T vp2d, FUNCTION_X fx_t, FUNCTION_X fy_t,
 				       REAL_T t0, REAL_T t1, REAL_T delta,
@@ -213,9 +215,9 @@ void       lb_gr_project_2d(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp
 void       lb_gr_project_2d_inv(VIEWPORT_2D_T vp2d, REAL_T xp, REAL_T yp, REAL_T *xr, REAL_T *yr);
 SINT8_T       lb_gr_project_2d_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T yr, REAL_T *xp, REAL_T *yp);
 void       lb_gr_project_2d_x(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp);
-SINT8_T      lb_gr_project_2d_x_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp);
+SINT8_T    lb_gr_project_2d_x_log(VIEWPORT_2D_T vp2d, REAL_T xr, REAL_T *xp);
 void       lb_gr_project_2d_y(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp);
-SINT8_T      lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp);
+SINT8_T    lb_gr_project_2d_y_log(VIEWPORT_2D_T vp2d, REAL_T yr, REAL_T *yp);
 
 void       lb_gr_project_2d_vector_c_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_C_T *V, LINE_2D_SINT16_T *L);
 void       lb_gr_project_2d_vector_r_to_line_int(VIEWPORT_2D_T vp2d, VECTOR_R_T *X, VECTOR_R_T *Y, LINE_2D_SINT16_T *L);
@@ -227,7 +229,7 @@ void       lb_gr_release_line2d_i(LINE_2D_SINT16_T *L);
 void       lb_gr_release_line2d_f(LINE_2D_REAL_T *L);
 void       lb_gr_release_line3d_f(LINE_3D_REAL_T *L);
 void       lb_gr_release_picture(volatile PICTURE_T *Pic);
-void lb_gr_render_picture(PICTURE_T *Pic, SINT16_T x, SINT16_T y, COPYMODE_T copymode, RENDERMODE_T rendermode);
+void       lb_gr_render_picture(PICTURE_T *Pic, SCREEN_T *screen, SINT16_T x, SINT16_T y, COPYMODE_T copymode, RENDERMODE_T rendermode);
 PIXEL_T    lb_gr_value_to_color(SINT8_T value);
 
 
