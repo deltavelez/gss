@@ -857,7 +857,7 @@ int main(int argc, char *argv[])
   for(y=0;y<ty_screen.h;y++)
     {
       lb_gr_fb_line_h(&ty_screen, y, 0, ty_screen.h, y % 255, 0, 0);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
  
   lb_ti_delay_ms(4000);
@@ -867,7 +867,7 @@ int main(int argc, char *argv[])
       lb_gr_draw_rectangle_solid(NULL, rand() % ty_screen.w, rand() % ty_screen.h,
 				 rand() % ty_screen.h, rand() % ty_screen.h,
 				 lb_gr_12RGB(rand() % 0xFFFF));
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
   lb_ti_delay_ms(4000);
   
@@ -884,7 +884,7 @@ int main(int argc, char *argv[])
 	    lb_gr_draw_pixel(NULL, x, y, color, COPYMODE_COPY);
 	    //lb_gr_draw_pixel_fast(x, y,  255, 155, 55);
 	  }
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       end=clock();
       time_total+=(REAL_T)end-(REAL_T)begin;
       frames_count++;
@@ -922,7 +922,7 @@ int main(int argc, char *argv[])
 	lb_gr_draw_line1(NULL, ty_screen.w/2, ty_screen.h/2,
 			 rand() % ty_screen.w, rand() % ty_screen.h,lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID),COPYMODE_COPY);
       }
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       end=clock();
       printf("FPS = %f\n",(double)CLOCKS_PER_SEC/(double)(end - begin)  );
     }
@@ -954,7 +954,7 @@ int main(int argc, char *argv[])
       lb_gr_draw_line2(NULL, rand() % ty_screen.w, rand() % ty_screen.h,
 		       rand() % ty_screen.w, rand() % ty_screen.h,
 		       lb_gr_12RGB(rand() % 0x0FFF), COPYMODE_COPY);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
   while (1)
     {
@@ -981,7 +981,7 @@ int main(int argc, char *argv[])
       lb_gr_draw_line3(NULL, rand() % ty_screen.w, rand() % ty_screen.h,
 		       rand() % ty_screen.w, rand() % ty_screen.h,
 		       lb_gr_12RGB(rand() % 0x0FFF), COPYMODE_COPY);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
   while (1)
     {
@@ -1007,7 +1007,7 @@ int main(int argc, char *argv[])
     {
       lb_gr_draw_line1(NULL, ty_screen.w/2, ty_screen.h/2, rand() % ty_screen.w , rand() % ty_screen.h,
 		       lb_gr_12RGB(rand() % 0xFFF |0xF000),COPYMODE_COPY);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
 
   while (1)
@@ -1024,7 +1024,7 @@ int main(int argc, char *argv[])
   /* Shows the use and advantages of the Antialiasing primitives.        */
   /******************************************************************************/
 
-#define DEMO_LINE_ANTIALIASING
+  //#define DEMO_LINE_ANTIALIASING
 #ifdef DEMO_LINE_ANTIALIASING
   SDL_Event event;
   REAL_T angle;
@@ -1047,7 +1047,7 @@ int main(int argc, char *argv[])
 				   0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
 				   1, lb_gr_12RGB(0xF090));
       lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
 
       angle+=M_PI/180;
       lb_ti_delay_ms(100);
@@ -1094,8 +1094,8 @@ int main(int argc, char *argv[])
       //				    0.5*Pic.w  + 0.5*Pic.h*cos(angle),
       //			    0.5*Pic.h  - 0.5*Pic.h*sin(angle), 
       //			    lb_gr_12RGB(0xF900));
-      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-      lb_gr_refresh();
+      lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_refresh(&ty_screen);
 
       angle+=M_PI/180;
       lb_ti_delay_ms(500);
@@ -1121,22 +1121,22 @@ int main(int argc, char *argv[])
   /* line widths larger than 3                                                  */
   /******************************************************************************/
   
-  //Define DEMO_LINE_GENERAL
+  //#define DEMO_LINE_GENERAL
 #ifdef DEMO_LINE_GENERAL
   SDL_Event event;
   
   lb_gr_SDL_init("DEMO_LINE_GENERAL", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
       
   lb_gr_draw_line(NULL, 0, 0, ty_screen.w, ty_screen.h, 30,
-		  lb_gr_12RGB(COLOR_BLUE | 0*COLOR_SOLID), COPYMODE_COPY, LINEMODE_SOLID);
+		  lb_gr_12RGB(COLOR_BLUE | 0*COLOR_SOLID), COPYMODE_COPY, LINEMODE_FILTERED);
 
   lb_gr_draw_line(NULL, ty_screen.w, 0,  0, ty_screen.h, 50,
-		  lb_gr_12RGB(COLOR_RED | 0*COLOR_SOLID), COPYMODE_ADD, LINEMODE_SOLID);
+		  lb_gr_12RGB(COLOR_RED | 0*COLOR_SOLID), COPYMODE_ADD, LINEMODE_FILTERED);
 	
   lb_gr_draw_line(NULL, ty_screen.w/2,0, ty_screen.h/2, ty_screen.h, 40,
-		  lb_gr_12RGB(COLOR_GREEN | 0*COLOR_SOLID), COPYMODE_XOR, LINEMODE_SOLID);
+		  lb_gr_12RGB(COLOR_GREEN | 0*COLOR_SOLID), COPYMODE_XOR, LINEMODE_FILTERED);
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
   while (1)
     while (SDL_PollEvent(&event))
@@ -1161,7 +1161,7 @@ int main(int argc, char *argv[])
   lb_gr_SDL_init("DEMO_CIRCLE", SDL_INIT_VIDEO, 1920*0.9, 1080*0.9, 0,0,0);
   lb_gr_clear_picture(NULL, lb_gr_12RGB(0x333 | COLOR_SOLID));
   lb_gr_draw_circle(NULL, ty_screen.w/2, ty_screen.h/2, ty_screen.h/2-1, lb_gr_12RGB(0x100F), COPYMODE_COPY);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   
   while (1)
     while (SDL_PollEvent(&event))
@@ -1191,7 +1191,7 @@ int main(int argc, char *argv[])
 
   lb_gr_BMPfile_save("circle.bmp", NULL);
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
   while (1)
     while (SDL_PollEvent(&event))
@@ -1221,9 +1221,9 @@ int main(int argc, char *argv[])
 
   lb_gr_create_picture(&Pic,lb_gr_12RGB(0xFFFF));
   lb_gr_draw_circle_antialiasing3(&Pic, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(3*pix_y), lb_gr_12RGB(0xFF00));
-  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
+  lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
   
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_ti_delay_ms(1000);
   lb_gr_BMPfile_save("circle2.bmp", NULL);
 
@@ -1258,9 +1258,9 @@ int main(int argc, char *argv[])
   lb_gr_draw_circle_antialiasing(NULL, ty_screen.w*2/(3*pix_x), ty_screen.h/(3*pix_y), 0.15*ty_screen.h/pix_y, 10, lb_gr_12RGB(0xf00F));
   
   // --> This should be improved:
-  //     lb_gr_render_picture(NULL, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
+  //     lb_gr_render_picture(NULL, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y) | RENDERMODE_PIXELMODE_1);
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -1290,7 +1290,7 @@ int main(int argc, char *argv[])
 
   lb_gr_draw_circle_filled_slow(NULL, ty_screen.w/(2*pix_x), ty_screen.h/(2*pix_y), ty_screen.h/(2*pix_y), lb_gr_12RGB(0xF00F), COPYMODE_COPY);
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -1320,7 +1320,7 @@ int main(int argc, char *argv[])
 					  lb_gr_12RGB(COLOR_LIME  | COLOR_SOLID));
   lb_gr_draw_circle_filled_antialiasing_r(NULL, ty_screen.w/(2*pix_x), 2*ty_screen.h/(3*pix_y), ty_screen.h/(4*pix_y),
 					  lb_gr_12RGB(COLOR_BLUE  | COLOR_SOLID));
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -1347,7 +1347,7 @@ int main(int argc, char *argv[])
   lb_gr_draw_circle_filled_antialiasing(NULL, 2*ty_screen.w/3, ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xf0F0));
   lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xfF00));
   lb_gr_draw_circle_filled_antialiasing(NULL, ty_screen.w/2, 2*ty_screen.h/3, ty_screen.h/4, lb_gr_12RGB(0xfF00));
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_gr_BMPfile_save("filled_circles.bmp", NULL);
 
   while (1)
@@ -1375,7 +1375,7 @@ int main(int argc, char *argv[])
 
   lb_gr_draw_circle_arc(NULL, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.h/(pix_y*2)-1,
 			0, M_PI/3,lb_gr_12RGB(0xFfff), COPYMODE_COPY);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
 
   while (1)
@@ -1409,7 +1409,7 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&Pic,lb_gr_12RGB(0x0000));
   
   angle=0.0;
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   for (angle=0;angle<=M_PI/2;angle+=1.0*M_PI/180.0)
     {
       lb_gr_clear_picture(&Pic, lb_gr_12RGB(COLOR_WHITE));
@@ -1417,10 +1417,10 @@ int main(int argc, char *argv[])
       lb_gr_draw_ellipse_rotated(&Pic, ty_screen.w/(pix_x*2), ty_screen.h/(pix_y*2), ty_screen.w*0.45/pix_x,ty_screen.w*0.10/pix_y, angle, 
 				 lb_gr_12RGB(COLOR_BLACK), COPYMODE_COPY);
 	     
-      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
       lb_gr_BMPfile_save("rotated_ellipse.bmp", NULL);
 	     
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       lb_ti_delay_ms(500);
       printf("Angle=%f\r\n",angle);
     }
@@ -1468,7 +1468,7 @@ int main(int argc, char *argv[])
       //lb_gr_draw_triangle_fill_i(NULL, A, B, C, lb_gr_12RGB(COLOR_SOLID | rand()%0x0FFF), COPYMODE_BLEND |  COPYMODE_SCALE_X(pix_x) |  COPYMODE_SCALE_Y(pix_y));
       lb_gr_draw_triangle_fill_i(NULL, A, B, C, lb_gr_12RGB(COLOR_SOLID | rand()%0x0FFF), 0);
       if (!(i % 100))
-	lb_gr_refresh();
+	lb_gr_refresh(&ty_screen);
     }
   end=clock();
   printf("time elapsed = %f\n",(double)(end - begin) / CLOCKS_PER_SEC);
@@ -1515,7 +1515,7 @@ int main(int argc, char *argv[])
 	}
       lb_gr_draw_polygon_i(NULL,&myPol,3,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND, LINEMODE_DOTS_FILTERED);
       lb_gr_draw_polygon_i(NULL,&myPol,3,lb_gr_12RGB(COLOR_RED|COLOR_SOLID), COPYMODE_BLEND, LINEMODE_FILTERED);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
 		 
       lb_ti_delay_ms(500);
     }
@@ -1563,7 +1563,7 @@ int main(int argc, char *argv[])
       lb_gr_draw_polygon_antialiasing(NULL,&myPol,6.1,lb_gr_12RGB(COLOR_BLUE));
       printf("hi\r\n");
       //lb_ti_delay_ms(50);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
   lb_gr_release_line2d_f(&myPol);
   while (1)
@@ -1604,7 +1604,7 @@ int main(int argc, char *argv[])
   Poly_int.array[Poly_int.items-1] = Poly_int.array[0]; /* This ensures the polygon is "closed" */
       
   lb_gr_draw_polygon_i(NULL,&Poly_int,4,lb_gr_12RGB(COLOR_BLUE), COPYMODE_BLEND, LINEMODE_FILTERED);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_ti_delay_ms(500);
 
   for(i=0;i<ty_screen.h/pix_y;i++)
@@ -1617,7 +1617,7 @@ int main(int argc, char *argv[])
 	else
 	  lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_PINK), COPYMODE_COPY);
       }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
   while (1)
     while (SDL_PollEvent(&event))
@@ -1677,7 +1677,7 @@ int main(int argc, char *argv[])
 	else
 	  lb_gr_draw_pixel(NULL, j, i, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_BLEND);
       }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
   lb_gr_release_line2d_f(&Poly_f);
   while (1)
@@ -1718,7 +1718,7 @@ int main(int argc, char *argv[])
   lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xFF00),COPYMODE_BLEND);
   lb_gr_draw_polygon_fill_i(NULL,&myPol,lb_gr_12RGB(0xF0F0),COPYMODE_BLEND);
   lb_gr_draw_polygon_i(NULL,&myPol, 4,lb_gr_12RGB(0xF00F),COPYMODE_BLEND,LINEMODE_FILTERED);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
   lb_gr_release_line2d_i(&myPol);
   while (1)
@@ -1788,13 +1788,13 @@ int main(int argc, char *argv[])
   lb_gr_BMPfile_load_to_pic(filename,&pic1,alpha);
   printf("1. alpha=%d\r\n",alpha);
   lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
-  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_render_picture(&pic1, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
   
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_ti_delay_ms(3000);
   lb_gr_draw_polygon_fill_i(&pic1,&myPol,lb_gr_12RGB(0xFFFF), COPYMODE_XOR);
-  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-  lb_gr_refresh();
+  lb_gr_render_picture(&pic1, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_refresh(&ty_screen);
   lb_ti_delay_ms(3000);
      
   lb_gr_release_line2d_i(&myPol);
@@ -1845,9 +1845,9 @@ int main(int argc, char *argv[])
 
   lb_gr_plot2d(&Pic, vp2d, 0, 0, 4, lb_gr_12RGB(COLOR_RED), COPYMODE_COPY, LINEMODE_DOTS_SOLID);
   lb_gr_plot2d(&Pic, vp2d, 1.5, 0, 4, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY, LINEMODE_DOTS_FILTERED);
-  lb_gr_render_picture(&Pic, 0,0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_render_picture(&Pic, &ty_screen, 0,0, COPYMODE_COPY, RENDERMODE_PIXELMODE_1 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (flag_running)
     while (SDL_PollEvent(&event))
       if (event.type == SDL_QUIT)
@@ -1865,7 +1865,7 @@ int main(int argc, char *argv[])
   /* https://www.ocf.berkeley.edu/~fricke/projects/israel/paeth/rotation_by_shearing.html    */
   /******************************************************************************/
 
-  //  #define DEMO_ROTATE_ALGORITHM
+  //#define DEMO_ROTATE_ALGORITHM
 #ifdef DEMO_ROTATE_ALGORITHM
   SDL_Event event;
   PICTURE_T Pic;
@@ -1924,8 +1924,8 @@ int main(int argc, char *argv[])
       lb_gr_plot2d_line(&Pic, win, &P2, 3, lb_gr_12RGB(COLOR_LIME | COLOR_SOLID), COPYMODE_BLEND, LINEMODE_FILTERED);
       lb_gr_plot2d_line(&Pic, win, &P3, 3, lb_gr_12RGB(COLOR_WHITE | COLOR_SOLID), COPYMODE_BLEND, LINEMODE_FILTERED);
 
-      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0);
-      lb_gr_refresh();
+      lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0);
+      lb_gr_refresh(&ty_screen);
       lb_ti_delay_ms(1000);
     }
 
@@ -1974,8 +1974,8 @@ int main(int argc, char *argv[])
   for(angle=0;angle<2*M_PI;angle+=M_PI/180)
     {
       lb_gr_bitmap_rotate(&pic_src, &pic_dst, angle, lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
-      lb_gr_render_picture(&pic_dst, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-      lb_gr_refresh();
+      lb_gr_render_picture(&pic_dst, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+      lb_gr_refresh(&ty_screen);
       printf("\r\nangle= %f",angle);
       lb_ti_delay_ms(500);
     }
@@ -2020,9 +2020,9 @@ int main(int argc, char *argv[])
   for(angle=0.0;angle<2*M_PI;angle+=0.5*M_PI/180)
     {
       lb_gr_bitmap_rotate_sampling(&pic_src, &pic_dst, angle, 10, lb_gr_12RGB(COLOR_LIME));
-      lb_gr_render_picture(&pic_dst, 0, 0, COPYMODE_COPY,
+      lb_gr_render_picture(&pic_dst, &ty_screen, 0, 0, COPYMODE_COPY,
 			   RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
   lb_gr_release_picture(&pic_src);
   lb_gr_release_picture(&pic_dst);
@@ -2045,6 +2045,7 @@ int main(int argc, char *argv[])
   /* In this example, the data is decomposed in their Red, Green, and Blue      */
   /* components.  Each component is plotted separately.  Then, they're again    */
   /* merged.                                                                    */
+  /* to_do: the demo works, but it seems I ahve i and j backwards               */
   /******************************************************************************/
   
   //#define DEMO_BMP_TO_MATRIX
@@ -2059,7 +2060,7 @@ int main(int argc, char *argv[])
   lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_BLACK));
 
   lb_gr_BMPfile_getsize(filename,&i,&j);
-  lb_gr_SDL_init("DEMO_BMP_TO_MATRIX", SDL_INIT_VIDEO, i*3, j*2, 0xaF, 0xaF, 0x8F);
+  lb_gr_SDL_init("DEMO_BMP_TO_MATRIX", SDL_INIT_VIDEO, i*2, j*3, 0xaF, 0xaF, 0x8F);
 
   R.rows=j;
   R.cols=i;
@@ -2098,7 +2099,7 @@ int main(int argc, char *argv[])
 	color.b=B.array[i][j]*MAX_B;
 	lb_gr_draw_pixel(NULL,j+G.cols,2*G.rows-i,color,COPYMODE_COPY);
       }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_ti_delay_ms(10000);
           
   lb_al_release_matrix_r(&R);
@@ -2126,6 +2127,7 @@ int main(int argc, char *argv[])
 #ifdef DEMO_PROJECT_2D
   REAL_T xr, yr, xp, yp;
   VIEWPORT_2D_T win;
+  SDL_Event event;
 
   lb_gr_SDL_init("DEMO_PROJECT_2D", SDL_INIT_VIDEO, 800, 600, 0xaF, 0xaF, 0x8F);
 
@@ -2144,7 +2146,7 @@ int main(int argc, char *argv[])
       lb_gr_project_2d(win, xr, yr, &xp, &yp);
       lb_gr_draw_pixel(NULL, xp, yp, lb_gr_12RGB(COLOR_BLUE), COPYMODE_COPY);
     }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -2200,7 +2202,7 @@ int main(int argc, char *argv[])
       
   lb_al_release_vector_c(&vec);
   lb_gr_release_line2d_i(&vec_i);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -2217,7 +2219,7 @@ int main(int argc, char *argv[])
   /* Demo: Plotting implicit-form functions                                     */
   /* to_do: in lb_gr_BMPfile_save(), an invalid path causes a segmentation      */
   /* fault.                                                                     */
-  /* to_do: it looks like there is a minor glitch at the boundaries.            */
+  /* to_do: it looks like there is a minor glitch at the left boundary.         */
   /******************************************************************************/
 
   //#define DEMO_PLOT_IMPLICIT 
@@ -2257,7 +2259,7 @@ int main(int argc, char *argv[])
       
   lb_gr_clear_picture(NULL,lb_gr_12RGB(COLOR_WHITE));
   lb_gr_implicit_2d(NULL, vp, &A, 3, lb_gr_12RGB(COLOR_RED),COPYMODE_BLEND, LINEMODE_FILTERED);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_gr_BMPfile_save("./media/images/implicit.bmp", NULL);
   lb_al_release_matrix_r(&A);
   lb_gr_SDL_close();
@@ -2321,7 +2323,7 @@ int main(int argc, char *argv[])
       t+=(t1-t0)/(REAL_T)Lx.items;
     }
   lb_gr_plot2d_line_antialiasing_neighbor(NULL, vp, &Lx, &Ly, 12, lb_gr_12RGB(0xf00f));
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   
   lb_gr_BMPfile_save("flower.bmp", NULL);
 
@@ -2392,7 +2394,7 @@ int main(int argc, char *argv[])
     }
 
   lb_gr_plot2d_line_antialiasing_neighbor_slow(NULL, vp, &Lx, &Ly, 1, lb_gr_12RGB(0xfF00));
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
       
   lb_al_release_vector_r(&Lx);
   lb_al_release_vector_r(&Ly);
@@ -2431,13 +2433,13 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&pic1,lb_gr_12RGB(0x1000));
 	    
   lb_gr_BMPfile_load_to_pic("./media/images/sdl24bit.bmp", &pic1, 0xFF);
-  lb_gr_render_picture(&pic1, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-  lb_gr_refresh();
+  lb_gr_render_picture(&pic1, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_refresh(&ty_screen);
 
   lb_ti_delay_ms(1000);
   lb_gr_BMPfile_load_to_pic("./media/images/test.bmp",&pic1,0xFF);
-  lb_gr_render_picture(&pic1, 300, 300, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-  lb_gr_refresh();
+  lb_gr_render_picture(&pic1, &ty_screen, 300, 300, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_refresh(&ty_screen);
 
   pic2.w=pic1.h;
   pic2.h=pic1.w;
@@ -2447,8 +2449,8 @@ int main(int argc, char *argv[])
     for (i=0;i<pic1.h;i++)
       pic2.pic[j][i]=pic1.pic[i][j];
 
-  lb_gr_render_picture(&pic2, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
-  lb_gr_refresh();
+  lb_gr_render_picture(&pic2, &ty_screen, 0, 0, COPYMODE_COPY, RENDERMODE_PIXELMODE_0 | RENDERMODE_SCALE_X(pix_x) |  RENDERMODE_SCALE_Y(pix_y));
+  lb_gr_refresh(&ty_screen);
 	    
   lb_gr_JPGfile_save("./media/images/delete_me.jpg", &pic1, 40);
 
@@ -2535,7 +2537,7 @@ int main(int argc, char *argv[])
 		     0*AXIS_DRAW_X_GRID_LOG | 0*AXIS_DRAW_Y_GRID_LOG,
 		     COPYMODE_BLEND, LINEMODE_FILTERED);
   
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_gr_BMPfile_save("axis_2d.bmp", NULL);
 
   while (1)
@@ -2615,7 +2617,7 @@ int main(int argc, char *argv[])
       xr=xr*pow(10.0,1.0/4.0);
     } 
      
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_gr_BMPfile_save("axis_2d_semilog.bmp", NULL);
 
   while (1)
@@ -2672,7 +2674,7 @@ int main(int argc, char *argv[])
   lg_gr_draw_axis_2d_polar(NULL, win, &my_font, 0, 4, 0.1, lb_gr_12RGB(COLOR_BLUE),
 			   0, 2*M_PI, 30*M_PI/180,
 			   lb_gr_12RGB(COLOR_RED | COLOR_SOLID), 0, COPYMODE_COPY );
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
 
   while (1)
     while (SDL_PollEvent(&event))
@@ -2753,7 +2755,7 @@ int main(int argc, char *argv[])
 			      0, 2*10*M_PI, 1,
 			      20, lb_gr_12RGB(COLOR_BLUE | COLOR_SOLID), COPYMODE_COPY);
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -2831,7 +2833,7 @@ int main(int argc, char *argv[])
   lb_gr_plot_continuous_fn_2d_antialiasing(NULL, win, fn_x, fn_y,
 					   0, 2*M_PI, 0.1, 32,
 					   16, lb_gr_12RGB(COLOR_BLUE|COLOR_SOLID));
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -2856,7 +2858,7 @@ int main(int argc, char *argv[])
   /* Later on, zoom and shifts were added to explore any section of the Set.    */
   /******************************************************************************/
 
-  // #define DEMO_MANDELBROT
+  //#define DEMO_MANDELBROT
 #ifdef DEMO_MANDELBROT
   SDL_Event event;
   SINT32_T xp, yp, iterations;
@@ -2968,8 +2970,8 @@ int main(int argc, char *argv[])
 	    }
 	  printf("\rProcessing: %0.2f\r",100.0);
 	  fflush(stdout);
-	  lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
-	  lb_gr_refresh();
+	  lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, 0);
+	  lb_gr_refresh(&ty_screen);
 	}
 
       while (SDL_PollEvent(&event))
@@ -3069,7 +3071,8 @@ int main(int argc, char *argv[])
 
   
   /* 24 frames per second, 3 minutes long */
-  for(k=0;k<3*60*24;k++)
+  //for(k=0;k<3*60*24;k++)
+  for(k=0;k<10*24;k++)
     {
       win.xr_min=0.25-1.00*(320.0/200.0)/z_zoom;
       win.xr_max=0.25+1.00*(320.0/200.0)/z_zoom;
@@ -3096,7 +3099,7 @@ int main(int argc, char *argv[])
 
 	    lb_gr_draw_pixel(NULL, xp, yp, pix, COPYMODE_COPY);
 	  }
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       z_zoom*=1.01;
       sprintf(filename,"./media/videos/man%06d.jpg",k);
       lb_gr_JPGfile_save(filename, NULL, 100);
@@ -3166,7 +3169,7 @@ int main(int argc, char *argv[])
 	    frame[yp][xp][1]=pix.g;
 	    frame[yp][xp][2]=pix.b;
 	  }
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       z_zoom*=1.005;
       fwrite(frame, 1, ty_screen.w*ty_screen.h*3, pipeout);
     }
@@ -3276,7 +3279,7 @@ int main(int argc, char *argv[])
       for (i=0;i<N_THREADS;i++)
 	pthread_join(threads[i],NULL);
 
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       z_zoom*=1.003;
       fwrite(frame, 1, ty_screen.w*ty_screen.h*3, pipeout);
       end=clock();
@@ -3825,7 +3828,7 @@ int main(int argc, char *argv[])
   /* This case is presented with detail in the Thesis Document.                 */
   /******************************************************************************/
 
-  //#define CASE_LEVER
+#define CASE_LEVER
 #ifdef CASE_LEVER
 #define N_DISK 4000
   /* Graphical variables */
@@ -4053,13 +4056,13 @@ int main(int argc, char *argv[])
       lb_gr_project_2d(win_v, t, Vel_y, &xp, &yp);
       //lb_gr_draw_pixel(&Pic_Vel,round(xp),round(yp),lb_gr_12RGB(COLOR_RED),COPYMODE_COPY);
       lb_gr_draw_circle_filled_antialiasing(&Pic_Vel, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_RED));
-      lb_gr_render_picture(&Pic_Vel, 10, ty_screen.h*2/3+5, COPYMODE_COPY, 0);
+      lb_gr_render_picture(&Pic_Vel, &ty_screen, 10, ty_screen.h*2/3+5, COPYMODE_COPY, 0);
 		    
 
       lb_gr_project_2d(win_a, t, Acc_y, &xp, &yp);
       //lb_gr_draw_pixel(&Pic_Acc,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
       lb_gr_draw_circle_filled_antialiasing(&Pic_Acc, round(xp), round(yp), 2, lb_gr_12RGB(COLOR_BLUE));
-      lb_gr_render_picture(&Pic_Acc, ty_screen.w/2+5, ty_screen.h*2/3+5, COPYMODE_COPY,0);
+      lb_gr_render_picture(&Pic_Acc, &ty_screen, ty_screen.w/2+5, ty_screen.h*2/3+5, COPYMODE_COPY,0);
 
       Pos_x_prev = Pos_x;
       Pos_y_prev = Pos_y;
@@ -4069,7 +4072,7 @@ int main(int argc, char *argv[])
 
       t+=dt;
 
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
     }
   lb_gr_BMPfile_save("leva.bmp", NULL);
   
@@ -4414,7 +4417,7 @@ int main(int argc, char *argv[])
 		      //printf("\n RK: r= %4.9f %%", 100*fabs(sqrt(M_rk4[i].p.x*M_rk4[i].p.x+M_rk4[i].p.y*M_rk4[i].p.y)-1.496e11)/1.496e11);
 		      //printf("\n\n");
 		      //delay(200);
-		      lb_gr_refresh();
+		      lb_gr_refresh(&ty_screen);
 		    }
 		}
 	    }
@@ -4548,7 +4551,7 @@ int main(int argc, char *argv[])
 			 0*AXIS_DRAW_X_GRID | 0*AXIS_DRAW_Y_GRID | 0*AXIS_DRAW_Z_GRID,
 			 "O","X","Y","Z",
 			 COPYMODE_BLEND, LINEMODE_FILTERED);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
 	
       // Wait for the user to press a character.
       flag_paused=TRUE;
@@ -4799,8 +4802,8 @@ int main(int argc, char *argv[])
 			 "O","X","Y","Z",
 			 COPYMODE_BLEND, LINEMODE_FILTERED);
 
-      lb_gr_render_picture(&Pic, 0, 0, COPYMODE_COPY, 0);
-      lb_gr_refresh();
+      lb_gr_render_picture(&Pic, &ty_screen, 0, 0, COPYMODE_COPY, 0);
+      lb_gr_refresh(&ty_screen);
 
       flag_paused=TRUE;
       while (flag_paused && !flag_exit)
@@ -4935,7 +4938,7 @@ int main(int argc, char *argv[])
     {
       sprintf(text,"%02.1f",x);
       lb_ft_draw_text(NULL, &my_font, ty_screen.w/2, ty_screen.h/2, text, COPYMODE_COPY);
-      lb_gr_refresh();
+      lb_gr_refresh(&ty_screen);
       lb_ti_delay_ms(200);
     } 
 
@@ -4944,7 +4947,7 @@ int main(int argc, char *argv[])
   lb_ft_draw_text_centered(NULL, &my_font, 20, 70, 200, 50,  text, COPYMODE_COPY);
   lb_gr_draw_rectangle(NULL, 20, 70, 200, 50, lb_gr_12RGB(COLOR_WHITE), COPYMODE_COPY);
   lb_ft_release_GLCDfont(&my_font);
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
     
   while (1)
     while (SDL_PollEvent(&event))
@@ -5300,7 +5303,7 @@ int main(int argc, char *argv[])
 
   lb_gr_BMPfile_save("histogram.bmp", NULL);
 
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   
   lb_ft_release_GLCDfont(&my_font);
   lb_al_release_vector_r(&Data);
@@ -5326,7 +5329,7 @@ int main(int argc, char *argv[])
   /* - Prime numbers don't like repeating their last digit                      */
   /******************************************************************************/
 
-  // #define DEMO_PRIMES
+  //#define DEMO_PRIMES
 #ifdef DEMO_PRIMES
   SDL_Event event;
   VIEWPORT_2D_T win;
@@ -5385,7 +5388,7 @@ int main(int argc, char *argv[])
       lb_gr_project_2d(win, x, y, &xp, &yp);
       lb_gr_draw_pixel(NULL,round(xp),round(yp),lb_gr_12RGB(COLOR_BLUE),COPYMODE_COPY);
     }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_al_release_vector_si16(&P);
 
   while (1)
@@ -5495,7 +5498,7 @@ int main(int argc, char *argv[])
       rk4(&t_n, &y_rk4, 0.1, &error, fn);
       rk4(&t_n, &y_euler, 0.1, &error, fn);
     }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   while (1)
     while (SDL_PollEvent(&event))
       {
@@ -5656,7 +5659,7 @@ int main(int argc, char *argv[])
       y_n=y_next;
       t_n+=h;
     }
-  lb_gr_refresh();
+  lb_gr_refresh(&ty_screen);
   lb_al_release_matrix_r(&A);
   lb_al_release_vector_r(&B);
   lb_al_release_vector_r(&C);
@@ -5914,7 +5917,7 @@ int main(int argc, char *argv[])
 	    errors_count_threshold_02++;
 
 
-	  lb_gr_refresh();
+	  lb_gr_refresh(&ty_screen);
 	  while (SDL_PollEvent(&event))
 	    {
 	      if (event.type == SDL_QUIT)
@@ -5966,7 +5969,7 @@ int main(int argc, char *argv[])
 	  printf("Noise=%f x=%f dB, BER_00=%f, BER_01=%f, BER_02=%f, BER_FSK=%f\r\n",
 		 N_experiment, 10.0*log10(N_experiment), temp_00, temp_01, temp_02, temp);
 	      
-	  lb_gr_refresh();
+	  lb_gr_refresh(&ty_screen);
 	}
       sprintf(file_name,"zero_mod_%03d",file_counter);
       lb_gr_BMPfile_save(file_name, NULL);
