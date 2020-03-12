@@ -3438,7 +3438,164 @@ int main(int argc, char *argv[])
     }
   return EXIT_SUCCESS;
 #endif
+
+
+  /******************************************************************************/
+  /* Demo: ACTIVE_SHUTTER_THREADS                                               */
+  /******************************************************************************/
+#define DEMO_ACTIVE_SHUTTER_THREADS
+#ifdef DEMO_ACTIVE_SHUTTER_THREADS
+
+  /* 8: Marked as CE0 in breakout */
+  /* 9: Marked as MISO in breakout */
+  /* 10: Marked as MOSI in breakout */
+  /* 11: Marked as SCLK in breakout */
+#define PIN_LA     8 
+#define PIN_LB     9
+#define PIN_RA     10
+#define PIN_RB     11
+  SDL_Event event;
+  SINT8_T flag_terminate=FALSE;
+  pthread_t thread_id; 
+  PICTURE_T Pic_L, Pic_R;
+  SCREEN_T screen2;
   
+   /* Load Left and Right Images */
+  SINT16_T width, height;
+  SINT8_T channels;
+
+  void *shutter_thread(void *vargp) 
+  {
+    while(1)
+      {
+	lb_gr_refresh(&ty_screen);
+	lb_ti_delay_ms(5);
+	lb_gr_refresh(&screen2);
+	lb_ti_delay_ms(5);
+      }
+  }
+  
+  
+  lb_gr_JPGfile_getsize("./media/images/stereo_left.jpg", &width, &height, &channels);
+  Pic_L.w=width;
+  Pic_L.h=height;
+  lb_gr_JPGfile_getsize("./media/images/stereo_right.jpg", &width, &height, &channels);
+  Pic_R.w=width;
+  Pic_R.h=height;
+  if ( (Pic_L.w!=Pic_R.w) || (Pic_L.h!=Pic_R.h) )
+    {
+      printf("Error: Left and Right images have different sizes\r\n");
+      exit(1);
+    }
+  
+  lb_gr_SDL_init("DEMO_ACTIVE_SHUTTER",SDL_INIT_VIDEO, Pic_L.w, Pic_L.h, 0, 0, 0);
+  
+  lb_gr_create_picture(&Pic_L,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
+  lb_gr_create_picture(&Pic_R,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
+
+  lb_gr_JPGfile_load("./media/images/stereo_left.jpg",&Pic_L);
+  lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
+
+  lb_gr_render_picture(&Pic_L, &ty_screen, 0, 0, COPYMODE_COPY, 0);
+
+
+  screen2.w=width;
+  screen2.h=height;
+  lb_gr_create_screen(&screen2,0,0,0,0);
+  
+  lb_gr_render_picture(&Pic_R, &screen2, 0, 0, COPYMODE_COPY, 0);
+
+  //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
+  clock_t begin, end;
+
+  begin=clock();
+  pthread_create(&thread_id, NULL, shutter_thread, NULL); 
+  
+  printf("Here\r\n");
+  fflush(stdout);
+  
+  while(TRUE)
+    while (SDL_PollEvent(&event))
+      {
+	if (event.type == SDL_QUIT)
+	  {
+	    printf("Here2\r\n");
+	    fflush(stdout);
+	    pthread_exit(NULL);
+	    end=clock();
+	    printf("FPS= %f\r\n",(double)500.0*CLOCKS_PER_SEC/(end - begin));
+	    fflush(stdout);
+	    lb_gr_release_screen(&screen2);
+	    //lb_gp_gpio_close();
+	    lb_gr_SDL_close();
+	    SDL_Quit();
+	    exit(1);
+	  }
+      }
+  
+  
+
+
+
+  
+
+  lb_gp_gpio_open();
+  lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_LB, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RA, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RB, GPIO_OUTPUT);
+
+  
+  while (1)
+    {
+      /* Positive Polarity */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /* Blank */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /* Negative Polarity */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
+      lb_ti_delay_ms(1000);
+      
+      /* Blank */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /**************************************/
+      
+      /* Positive Polarity */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /* Blank */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      /* Negative Polarity */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
+      lb_ti_delay_ms(1000);
+      
+      /* Blank */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      lb_ti_delay_ms(1000);
+
+      
+     
+    }
+  return EXIT_SUCCESS;
+#endif
+
   /******************************************************************************/
   /* Demo: GPIO                                                                 */
   /* This is a complete application which was put together to evaluate the      */
@@ -3828,7 +3985,7 @@ int main(int argc, char *argv[])
   /* This case is presented with detail in the Thesis Document.                 */
   /******************************************************************************/
 
-#define CASE_LEVER
+  //#define CASE_LEVER
 #ifdef CASE_LEVER
 #define N_DISK 4000
   /* Graphical variables */
