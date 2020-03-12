@@ -3466,54 +3466,40 @@ int main(int argc, char *argv[])
 
   /* There are different methods to attempt to keep a constant frame rate.  Here is one: */
 
-    REAL_T start, end;
-    REAL_T FPS=1;
     
-    // while(!flag_exit)
-    //  {
-    //	start = (double)clock();
-    //	end= start + (double)10.0*1000000;
-    //	printf("end-start=%f\r\n",(double)end-start);
-    //	//printf("end=%ld\r\n",end);
-    //	//printf("CLOCKS_PER_SECOND=%ld\r\n",CLOCKS_PER_SEC);
-    //	//lb_gr_refresh(&ty_screen);
-    //	while ((double)clock()<end)
-    //	 {
-    //	   ;
-    //	  }
-    //	printf("*");
-    //	fflush(stdout);
-    //}
-  
 #define METHOD_ONE
 #ifdef METHOD_ONE
   void *shutter_thread(void *vargp) 
   {
-    REAL_T start, end;
-    REAL_T FPS=1;
+    REAL_T r_start, r_end, r_time;
+    REAL_T FPS=60;
+    struct timespec ts_time;
     
      while(!flag_exit)
       {
-	start = (double)clock();
-	end= start + (double)10.0*1000000;
-	printf("end-start=%f\r\n",(double)end-start);
-	//printf("end=%ld\r\n",end);
-	//printf("CLOCKS_PER_SECOND=%ld\r\n",CLOCKS_PER_SEC);
-	//lb_gr_refresh(&ty_screen);
-	while ((double)clock()<end)
-	 {
-	   ;
-	  }
-	printf("*");
-	fflush(stdout);
+	lb_gr_refresh(&ty_screen);
+	clock_gettime(CLOCK_MONOTONIC, &ts_time);
+	r_start= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
+	r_end =  r_start + 1/FPS;
+
+	do
+	  {
+	    clock_gettime(CLOCK_MONOTONIC, &ts_time);
+	    r_time= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
+	  } while (r_time<r_end);
+
 	
-	//start = clock();
-	//end= start + CLOCKS_PER_SEC/FPS;
-	//lb_gr_refresh(&screen2);
-	//while (clock()<end)
-	//  {
-	//    ;
-	//  }
+	lb_gr_refresh(&screen2);
+	clock_gettime(CLOCK_MONOTONIC, &ts_time);
+	r_start= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
+	r_end =  r_start + 1/FPS;
+
+	do
+	  {
+	    clock_gettime(CLOCK_MONOTONIC, &ts_time);
+	    r_time= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
+	  } while (r_time<r_end);
+
       }
     return NULL;
   }
@@ -3539,7 +3525,7 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&Pic_R,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
 
   lb_gr_JPGfile_load("./media/images/stereo_left.jpg",&Pic_L);
-  lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
+  // lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
 
   lb_gr_render_picture(&Pic_L, &ty_screen, 0, 0, COPYMODE_COPY, 0);
 
