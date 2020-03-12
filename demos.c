@@ -3455,7 +3455,7 @@ int main(int argc, char *argv[])
 #define PIN_RA     10
 #define PIN_RB     11
   SDL_Event event;
-  SINT8_T flag_terminate=FALSE;
+  SINT8_T flag_exit=FALSE;
   pthread_t thread_id; 
   PICTURE_T Pic_L, Pic_R;
   SCREEN_T screen2;
@@ -3463,16 +3463,18 @@ int main(int argc, char *argv[])
    /* Load Left and Right Images */
   SINT16_T width, height;
   SINT8_T channels;
+  REAL_T desired_fps=15; 
 
   void *shutter_thread(void *vargp) 
   {
-    while(1)
+     while(!flag_exit)
       {
 	lb_gr_refresh(&ty_screen);
-	lb_ti_delay_ms(5);
+	lb_ti_delay_ms(50);
 	lb_gr_refresh(&screen2);
-	lb_ti_delay_ms(5);
+	lb_ti_delay_ms(50);
       }
+    return NULL;
   }
   
   
@@ -3519,9 +3521,10 @@ int main(int argc, char *argv[])
       {
 	if (event.type == SDL_QUIT)
 	  {
+	    flag_exit=TRUE;
+	    pthread_join(thread_id, NULL);
 	    printf("Here2\r\n");
 	    fflush(stdout);
-	    pthread_exit(NULL);
 	    end=clock();
 	    printf("FPS= %f\r\n",(double)500.0*CLOCKS_PER_SEC/(end - begin));
 	    fflush(stdout);
