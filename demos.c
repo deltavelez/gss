@@ -3463,20 +3463,63 @@ int main(int argc, char *argv[])
    /* Load Left and Right Images */
   SINT16_T width, height;
   SINT8_T channels;
-  REAL_T desired_fps=15; 
 
+  /* There are different methods to attempt to keep a constant frame rate.  Here is one: */
+
+    REAL_T start, end;
+    REAL_T FPS=1;
+    
+    // while(!flag_exit)
+    //  {
+    //	start = (double)clock();
+    //	end= start + (double)10.0*1000000;
+    //	printf("end-start=%f\r\n",(double)end-start);
+    //	//printf("end=%ld\r\n",end);
+    //	//printf("CLOCKS_PER_SECOND=%ld\r\n",CLOCKS_PER_SEC);
+    //	//lb_gr_refresh(&ty_screen);
+    //	while ((double)clock()<end)
+    //	 {
+    //	   ;
+    //	  }
+    //	printf("*");
+    //	fflush(stdout);
+    //}
+  
+#define METHOD_ONE
+#ifdef METHOD_ONE
   void *shutter_thread(void *vargp) 
   {
+    REAL_T start, end;
+    REAL_T FPS=1;
+    
      while(!flag_exit)
       {
-	lb_gr_refresh(&ty_screen);
-	lb_ti_delay_ms(50);
-	lb_gr_refresh(&screen2);
-	lb_ti_delay_ms(50);
+	start = (double)clock();
+	end= start + (double)10.0*1000000;
+	printf("end-start=%f\r\n",(double)end-start);
+	//printf("end=%ld\r\n",end);
+	//printf("CLOCKS_PER_SECOND=%ld\r\n",CLOCKS_PER_SEC);
+	//lb_gr_refresh(&ty_screen);
+	while ((double)clock()<end)
+	 {
+	   ;
+	  }
+	printf("*");
+	fflush(stdout);
+	
+	//start = clock();
+	//end= start + CLOCKS_PER_SEC/FPS;
+	//lb_gr_refresh(&screen2);
+	//while (clock()<end)
+	//  {
+	//    ;
+	//  }
       }
     return NULL;
   }
-  
+#endif
+
+
   
   lb_gr_JPGfile_getsize("./media/images/stereo_left.jpg", &width, &height, &channels);
   Pic_L.w=width;
@@ -3508,34 +3551,28 @@ int main(int argc, char *argv[])
   lb_gr_render_picture(&Pic_R, &screen2, 0, 0, COPYMODE_COPY, 0);
 
   //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
-  clock_t begin, end;
-
-  begin=clock();
+  
   pthread_create(&thread_id, NULL, shutter_thread, NULL); 
   
   printf("Here\r\n");
   fflush(stdout);
-  
+
   while(TRUE)
-    while (SDL_PollEvent(&event))
-      {
-	if (event.type == SDL_QUIT)
-	  {
-	    flag_exit=TRUE;
-	    pthread_join(thread_id, NULL);
-	    printf("Here2\r\n");
-	    fflush(stdout);
-	    end=clock();
-	    printf("FPS= %f\r\n",(double)500.0*CLOCKS_PER_SEC/(end - begin));
-	    fflush(stdout);
-	    lb_gr_release_screen(&screen2);
-	    //lb_gp_gpio_close();
-	    lb_gr_SDL_close();
-	    SDL_Quit();
-	    exit(1);
-	  }
-      }
-  
+    {
+      while (SDL_PollEvent(&event))
+	{
+	  if (event.type == SDL_QUIT)
+	    {
+	      flag_exit=TRUE;
+	      pthread_join(thread_id, NULL);
+	      lb_gr_release_screen(&screen2);
+	      //lb_gp_gpio_close();
+	      lb_gr_SDL_close();
+	      SDL_Quit();
+	      exit(1);
+	    }
+	}
+    }
   
 
 
