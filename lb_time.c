@@ -29,7 +29,7 @@ void lb_ti_delay_ms(UINT32_T delay_ms)
     } while (time<time_b);
 }
 
-
+ 
 void lb_ti_delay_us(UINT32_T delay_us)
 {
   clock_t time_a, time_b, time;
@@ -41,6 +41,21 @@ void lb_ti_delay_us(UINT32_T delay_us)
     } while (time<time_b);
 }
 #endif
+
+void lb_ti_delay_wall_ms(UINT32_T delay_ms)
+{
+  struct timespec ts_time;
+  UINT64_T end_u64, time_u64;
+
+  clock_gettime(CLOCK_MONOTONIC, &ts_time);
+  end_u64   = ((UINT64_T)ts_time.tv_sec)*1000000000 + ((UINT64_T)ts_time.tv_nsec) + ((UINT64_T)delay_ms)*1000000;
+  do
+    {
+      clock_gettime(CLOCK_MONOTONIC, &ts_time);
+      time_u64   = ts_time.tv_sec*1000000000 + ts_time.tv_nsec;
+    } while (time_u64<end_u64);
+}
+
 
 /* Functions to be used in systems where sizeof(clock()) = 4 such as the Raspberry Pi */
 /* These functions internally use 64-bit counters */
@@ -107,3 +122,13 @@ void lb_ti_delay_ms(UINT32_T delay_ms)
     } while (time<time_b);
 }
 #endif
+
+REAL_T lb_ti_time_wall(void)
+{
+  struct timespec ts_time;
+  UINT64_T end_u64, time_u64;
+
+  //  clock_gettime(CLOCK_MONOTONIC, &ts_time);
+  clock_gettime(CLOCK_REALTIME, &ts_time);
+  return  ((REAL_T)ts_time.tv_sec) + ((REAL_T)ts_time.tv_nsec*0.000000001);
+}

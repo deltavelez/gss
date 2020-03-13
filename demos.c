@@ -3299,7 +3299,8 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: ACTIVE_SHUTTER                                                       */
   /******************************************************************************/
-  #define DEMO_ACTIVE_SHUTTER
+
+#define DEMO_ACTIVE_SHUTTER
 #ifdef DEMO_ACTIVE_SHUTTER
 
   /* 8: Marked as CE0 in breakout */
@@ -3350,86 +3351,87 @@ int main(int argc, char *argv[])
   
   lb_gr_render_picture(&Pic_R, &screen2, 0, 0, COPYMODE_COPY, 0);
 
-  //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
   clock_t begin, end;
  
-  lb_gp_gpio_open();
-  lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_LB, GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_RA, GPIO_OUTPUT);
-  lb_gp_gpio_setup_pin(PIN_RB, GPIO_OUTPUT);
+  //lb_gp_gpio_open();
+  //lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);
+  //lb_gp_gpio_setup_pin(PIN_LB, GPIO_OUTPUT);
+  //lb_gp_gpio_setup_pin(PIN_RA, GPIO_OUTPUT);
+  //lb_gp_gpio_setup_pin(PIN_RB, GPIO_OUTPUT);
 
+ 
   k=0;
-  while (k<300)
+  while (k<1000)
     {
       /* Positive Polarity Left*/
-      lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
-      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
+      //lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
 
       /* Blank Right */
-      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
 
       lb_gr_refresh(&ty_screen);
-      lb_ti_delay_ms(1);
+      lb_ti_delay_wall_ms(10);
 
       /* Blank Left */
-      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
 
       /* Positive Polarity Right */
-      lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
-      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
+      //lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
 
       lb_gr_refresh(&screen2);
-      lb_ti_delay_ms(1);
+      lb_ti_delay_wall_ms(10);
 
       /* Same, with opposite polarity */
 
       /* Positive Polarity Left*/
-      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
+      //lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
 
       /* Blank Right */
-      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
 
-      lb_gr_refresh(&ty_screen);
-      lb_ti_delay_ms(1);
+      //lb_gr_refresh(&ty_screen);
+      //lb_ti_delay_ms(1);
 
       /* Blank Left */
-      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
 
       /* Positive Polarity Right */
-      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
+      //lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      //lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
 
-      lb_gr_refresh(&screen2);
-      lb_ti_delay_ms(1);
+      //lb_gr_refresh(&screen2);
+      //lb_ti_delay_ms(1);
       k++;
     }
   /* Blank Left */
-  lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-  lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+  //lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+  //lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
 
   /* Blank Right */
-  lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
-  lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+  //lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+  //lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
       
   while (SDL_PollEvent(&event))
     {
       if (event.type == SDL_QUIT)
 	{
 	  /* Blank Left */
-	  lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-	  lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+	  //lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+	  //lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
 
 	  /* Blank Right */
-	  lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
-	  lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+	  //lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+	  //lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
 	  
-	  lb_gp_gpio_close();
+	  //lb_gp_gpio_close();
 	  lb_gr_SDL_close();
 	  lb_gr_release_screen(&screen2);
 
@@ -6252,6 +6254,52 @@ int main(int argc, char *argv[])
     }
 #endif
 
+  /******************************************************************************/
+  /* Demo: Getting the current year, month, day of the week                     */
+  /* This is just standard C stuff but it gets really useful when needed.       */
+  /******************************************************************************/
+    
+  //#define DEMO_TIMEINFO
+#ifdef DEMO_TIMEINFO
+    while (1)
+    {
+      time_t rawtime;
+      struct tm * timeinfo;
+
+      time (&rawtime);
+      timeinfo = localtime (&rawtime);
+      printf ("Current local time and date: %s", asctime(timeinfo));
+      
+      /*******************************/
+
+      //printf("----------------\r\n");
+      //printf("tm.tm_sec   = %d\r\n", (*timeinfo).tm_sec);
+      //printf("tm.tm_min   = %d\r\n", (*timeinfo).tm_mon);
+      //printf("tm.tm_hour  = %d\r\n", (*timeinfo).tm_hour);
+      //printf("tm.tm_mday  = %d\r\n", (*timeinfo).tm_mday);
+      //printf("tm.tm_mon   = %d\r\n", (*timeinfo).tm_mon);
+      //printf("tm.tm_year  = %d\r\n", (*timeinfo).tm_year);
+      //printf("tm.tm_wday  = %d\r\n", (*timeinfo).tm_wday);
+      //printf("tm.tm_yday  = %d\r\n", (*timeinfo).tm_yday);
+      //printf("tm.tm_isdst = %d\r\n", (*timeinfo).tm_isdst);
+
+      lb_ti_delay_wall_ms(5000);
+    }
+#endif
+
+    /******************************************************************************/
+    /* Demo: Time as a real number since the epoch                                */
+    /******************************************************************************/
+    
+    //#define DEMO_TIME_REAL
+#ifdef DEMO_TIME_REAL
+    while (1)
+      {
+	  printf("Time = %f\r\n", lb_ti_time_wall());
+	}
+#endif
+
+    
   /******************************************************************************/
   /* Demo: Keyboard support functions                                           */
   /* The idea is to make easier reading the keyboard, including the special     */
