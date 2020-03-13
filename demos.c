@@ -3299,7 +3299,7 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: ACTIVE_SHUTTER                                                       */
   /******************************************************************************/
-  //#define DEMO_ACTIVE_SHUTTER
+#define DEMO_ACTIVE_SHUTTER
 #ifdef DEMO_ACTIVE_SHUTTER
 
   /* 8: Marked as CE0 in breakout */
@@ -3355,7 +3355,7 @@ int main(int argc, char *argv[])
 
   begin=clock();
   int k_max=500;
-  for (k=0;k<k_max;k++)
+  if (0) for (k=0;k<k_max;k++)
     {
       lb_gr_refresh(&ty_screen);
       //lb_ti_delay_ms(10);
@@ -3368,7 +3368,6 @@ int main(int argc, char *argv[])
 
   lb_gr_release_screen(&screen2);
   
-  exit(1);
 
 
 
@@ -3383,57 +3382,63 @@ int main(int argc, char *argv[])
   
   while (1)
     {
-      /* Positive Polarity */
+      /* Positive Polarity Left*/
       lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
       lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
-      lb_ti_delay_ms(1000);
 
-      /* Blank */
+      /* Blank Right */
+      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+      
+      lb_ti_delay_ms(100);
+
+      /* Blank Left */
       lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
-      lb_ti_delay_ms(1000);
 
-      /* Negative Polarity */
-      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
-      lb_ti_delay_ms(1000);
-      
-      /* Blank */
-      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
-      lb_ti_delay_ms(1000);
-
-      /**************************************/
-      
-      /* Positive Polarity */
+      /* Positive Polarity Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
       lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
-      lb_ti_delay_ms(1000);
+      
+      lb_ti_delay_ms(100);
 
-      /* Blank */
+      /* Same, with opposite polarity */
+
+      /* Positive Polarity Left*/
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
+
+      /* Blank Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
-      lb_ti_delay_ms(1000);
+      lb_ti_delay_ms(100);
 
-      /* Negative Polarity */
+      /* Blank Left */
+      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+
+      /* Positive Polarity Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
-      lb_ti_delay_ms(1000);
       
-      /* Blank */
-      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
-      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
-      lb_ti_delay_ms(1000);
-
+      lb_ti_delay_ms(100);
+    }
       
-      while (SDL_PollEvent(&event))
+  while (SDL_PollEvent(&event))
+    {
+      if (event.type == SDL_QUIT)
 	{
-	  if (event.type == SDL_QUIT)
-	    {
-	      lb_gp_gpio_close();
-	      lb_gr_SDL_close();
-	      SDL_Quit();
-	    }
+	  /* Blank Left */
+	  lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+	  lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+
+	  /* Blank Right */
+	  lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+	  lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+	  
+	  lb_gp_gpio_close();
+	  lb_gr_SDL_close();
+	  SDL_Quit();
 	}
     }
   return EXIT_SUCCESS;
@@ -3443,7 +3448,7 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: ACTIVE_SHUTTER_THREADS                                               */
   /******************************************************************************/
-#define DEMO_ACTIVE_SHUTTER_THREADS
+  //#define DEMO_ACTIVE_SHUTTER_THREADS
 #ifdef DEMO_ACTIVE_SHUTTER_THREADS
 
   /* 8: Marked as CE0 in breakout */
