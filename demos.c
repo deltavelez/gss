@@ -3299,17 +3299,17 @@ int main(int argc, char *argv[])
   /******************************************************************************/
   /* Demo: ACTIVE_SHUTTER                                                       */
   /******************************************************************************/
-#define DEMO_ACTIVE_SHUTTER
+  #define DEMO_ACTIVE_SHUTTER
 #ifdef DEMO_ACTIVE_SHUTTER
 
   /* 8: Marked as CE0 in breakout */
   /* 9: Marked as MISO in breakout */
   /* 10: Marked as MOSI in breakout */
   /* 11: Marked as SCLK in breakout */
-#define PIN_LA     8 
-#define PIN_LB     9
-#define PIN_RA     10
-#define PIN_RB     11
+#define PIN_RA     8 
+#define PIN_RB     9
+#define PIN_LA     10
+#define PIN_LB     11
   SDL_Event event;
   PICTURE_T Pic_L, Pic_R;
   SCREEN_T screen2;
@@ -3352,35 +3352,15 @@ int main(int argc, char *argv[])
 
   //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
   clock_t begin, end;
-
-  begin=clock();
-  int k_max=500;
-  if (0) for (k=0;k<k_max;k++)
-    {
-      lb_gr_refresh(&ty_screen);
-      //lb_ti_delay_ms(10);
-      lb_gr_refresh(&screen2);
-      //lb_ti_delay_ms(10);
-    }
-  end=clock();
-  printf("FPS= %f\r\n",(double)500.0*CLOCKS_PER_SEC/(end - begin));
-
-
-  lb_gr_release_screen(&screen2);
-  
-
-
-
-  
-
+ 
   lb_gp_gpio_open();
   lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_LB, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_RA, GPIO_OUTPUT);
   lb_gp_gpio_setup_pin(PIN_RB, GPIO_OUTPUT);
 
-  
-  while (1)
+  k=0;
+  while (k<300)
     {
       /* Positive Polarity Left*/
       lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
@@ -3389,8 +3369,9 @@ int main(int argc, char *argv[])
       /* Blank Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
-      
-      lb_ti_delay_ms(100);
+
+      lb_gr_refresh(&ty_screen);
+      lb_ti_delay_ms(1);
 
       /* Blank Left */
       lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
@@ -3399,8 +3380,9 @@ int main(int argc, char *argv[])
       /* Positive Polarity Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
       lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
-      
-      lb_ti_delay_ms(100);
+
+      lb_gr_refresh(&screen2);
+      lb_ti_delay_ms(1);
 
       /* Same, with opposite polarity */
 
@@ -3411,7 +3393,9 @@ int main(int argc, char *argv[])
       /* Blank Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
-      lb_ti_delay_ms(100);
+
+      lb_gr_refresh(&ty_screen);
+      lb_ti_delay_ms(1);
 
       /* Blank Left */
       lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
@@ -3420,9 +3404,18 @@ int main(int argc, char *argv[])
       /* Positive Polarity Right */
       lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
       lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
-      
-      lb_ti_delay_ms(100);
+
+      lb_gr_refresh(&screen2);
+      lb_ti_delay_ms(1);
+      k++;
     }
+  /* Blank Left */
+  lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+  lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+
+  /* Blank Right */
+  lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+  lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
       
   while (SDL_PollEvent(&event))
     {
@@ -3438,6 +3431,8 @@ int main(int argc, char *argv[])
 	  
 	  lb_gp_gpio_close();
 	  lb_gr_SDL_close();
+	  lb_gr_release_screen(&screen2);
+
 	  SDL_Quit();
 	}
     }
@@ -3482,28 +3477,63 @@ int main(int argc, char *argv[])
     
      while(!flag_exit)
       {
-	lb_gr_refresh(&ty_screen);
-	clock_gettime(CLOCK_MONOTONIC, &ts_time);
-	r_start= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
-	r_end =  r_start + 1/FPS;
+	/* Positive Polarity Left*/
+	lb_gp_gpio_wr(PIN_LA,   GPIO_HIGH);
+	lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
 
-	do
-	  {
-	    clock_gettime(CLOCK_MONOTONIC, &ts_time);
-	    r_time= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
-	  } while (r_time<r_end);
+	/* Blank Right */
+	lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+	lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+
+      	lb_gr_refresh(&ty_screen);
+	lb_ti_delay_ms(10);
+
+	/* Blank Left */
+	lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+	lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+
+	/* Positive Polarity Right */
+	lb_gp_gpio_wr(PIN_RA,   GPIO_HIGH);
+	lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+
+       	lb_gr_refresh(&screen2);
+	lb_ti_delay_ms(10);
+
+	/* Same, with opposite polarity */
+
+	/* Positive Polarity Left*/
+	lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+	lb_gp_gpio_wr(PIN_LB,   GPIO_HIGH);
+
+      /* Blank Right */
+	lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+	lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+
+	lb_gr_refresh(&ty_screen);
+	lb_ti_delay_ms(10);
+
+	/* Blank Left */
+	lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+	lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+	
+	/* Positive Polarity Right */
+	lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+	lb_gp_gpio_wr(PIN_RB,   GPIO_HIGH);
+
+	lb_gr_refresh(&screen2);
+	lb_ti_delay_ms(10);
 
 	
-	lb_gr_refresh(&screen2);
-	clock_gettime(CLOCK_MONOTONIC, &ts_time);
-	r_start= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
-	r_end =  r_start + 1/FPS;
+      //lb_gr_refresh(&ty_screen);
+      //clock_gettime(CLOCK_MONOTONIC, &ts_time);
+      //r_start= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
+      //r_end =  r_start + 1/FPS;
 
-	do
-	  {
-	    clock_gettime(CLOCK_MONOTONIC, &ts_time);
-	    r_time= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
-	  } while (r_time<r_end);
+      //do
+      //  {
+      //    clock_gettime(CLOCK_MONOTONIC, &ts_time);
+      //    r_time= ts_time.tv_sec + ts_time.tv_nsec/1000000000.0;
+      //  } while (r_time<r_end);
 
       }
     return NULL;
@@ -3530,23 +3560,27 @@ int main(int argc, char *argv[])
   lb_gr_create_picture(&Pic_R,lb_gr_12RGB(COLOR_BLACK | COLOR_SOLID));
 
   lb_gr_JPGfile_load("./media/images/stereo_left.jpg",&Pic_L);
-  // lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
+  lb_gr_JPGfile_load("./media/images/stereo_right.jpg",&Pic_R);
 
-  lb_gr_render_picture(&Pic_L, &ty_screen, 0, 0, COPYMODE_COPY, 0);
-
-
+  
   screen2.w=width;
   screen2.h=height;
   lb_gr_create_screen(&screen2,0,0,0,0);
   
-  lb_gr_render_picture(&Pic_R, &screen2, 0, 0, COPYMODE_COPY, 0);
-
-  //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
   
+  //  SDL_SetHint(SDL_HINT_RENDER_VSYNC,"1");
+
+    lb_gp_gpio_open();
+  lb_gp_gpio_setup_pin(PIN_LA, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_LB, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RA, GPIO_OUTPUT);
+  lb_gp_gpio_setup_pin(PIN_RB, GPIO_OUTPUT);
+
   pthread_create(&thread_id, NULL, shutter_thread, NULL); 
   
   printf("Here\r\n");
   fflush(stdout);
+
 
   while(TRUE)
     {
@@ -3557,7 +3591,16 @@ int main(int argc, char *argv[])
 	      flag_exit=TRUE;
 	      pthread_join(thread_id, NULL);
 	      lb_gr_release_screen(&screen2);
-	      //lb_gp_gpio_close();
+
+	      /* Blank Left */
+	      lb_gp_gpio_wr(PIN_LA,   GPIO_LOW);
+	      lb_gp_gpio_wr(PIN_LB,   GPIO_LOW);
+
+	      /* Blank Right */
+	      lb_gp_gpio_wr(PIN_RA,   GPIO_LOW);
+	      lb_gp_gpio_wr(PIN_RB,   GPIO_LOW);
+
+	      lb_gp_gpio_close();
 	      lb_gr_SDL_close();
 	      SDL_Quit();
 	      exit(1);
