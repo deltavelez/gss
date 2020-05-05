@@ -3300,7 +3300,7 @@ int main(int argc, char *argv[])
   /* Demo: ACTIVE_SHUTTER                                                       */
   /******************************************************************************/
 
-#define DEMO_ACTIVE_SHUTTER
+  //#define DEMO_ACTIVE_SHUTTER
 #ifdef DEMO_ACTIVE_SHUTTER
 
   /* 8: Marked as CE0 in breakout */
@@ -5273,7 +5273,7 @@ int main(int argc, char *argv[])
   /* Any of the expressions commenetd our below can be tried                    */
   /******************************************************************************/
 
-  //  #define DEMO_PARSER_REAL
+  //#define DEMO_PARSER_REAL
 #ifdef DEMO_PARSER_REAL
   MATHERROR_T e_code;
   REAL_T x,y,z,result;
@@ -5362,7 +5362,7 @@ int main(int argc, char *argv[])
   /* Any of the expressions commented our below can be tried                    */
   /******************************************************************************/
   
-  //#define DEMO_PARSER_COMPLEX
+#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
   MATHERROR_T e_code;
   COMPLEX_T var1,var2,imag,result;
@@ -5374,8 +5374,8 @@ int main(int argc, char *argv[])
   imag.i=1;
 
   /* Example: pi as a product */
-  char variables[]="x,k,i";
-  char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k,1)";   
+  char variables[]="x,y,i";
+  //char expression[]="2*PROD(1,10000,4*k^2/(4*k^2-1),k,1)";   
     
   /* Example: Gauss'childhood sum, using complex numbers  */
   //  char expression[]="sigma(100,1,0.5*k+k*i,K,-1)";   
@@ -5390,7 +5390,7 @@ int main(int argc, char *argv[])
   //char expression[]="idef(0,pi*30/180,abs(sin(x)+cos(x)*i),x,100)";   
      
   /* Example: double integral */
-  //char expression[]="idef2(0,pi/4,0,pi/2,sin(x+y*i),x,y,1.1)"; 
+  char expression[]="idef2(0,pi/4,0,pi/2,sin(x+y*i),x,y,101)"; 
 
   /* Example: integral */
   //char expression[]="idef(i,pi/4+i/3,cos(x)+sin(x)*i,x,10)"; 
@@ -5441,7 +5441,7 @@ int main(int argc, char *argv[])
      
   result=lb_pa_formula_complex(expression,variables,var1,var2,imag,&e_code);
   printf("Error: %s\r\n", errors[e_code].msg);
-  printf("Result= [%0.8f , %0.8f] \r\n",result.r, result.i);
+  printf("Result= [%0.9f , %0.9f] \r\n",result.r, result.i);
   exit(1);
 #endif
 
