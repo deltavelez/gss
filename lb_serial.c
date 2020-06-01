@@ -247,12 +247,6 @@ void lb_se_copy_buffer(COMM_PORT_T *port, char *str)
 }
 
 
-float  lb_se_get_timestamp()
-{
-  struct timeval t_now;
-  gettimeofday(&t_now, NULL);
-  return (t_now.tv_sec-t_initial.tv_sec) + 1.0e-6*(t_now.tv_usec-t_initial.tv_usec);
-}
 #define _POSIX_SOURCE 1         /* POSIX compliant source */
 #define CIRC_BUFFER_SIZE 40
 

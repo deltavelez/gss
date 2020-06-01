@@ -5,6 +5,7 @@
 #define CIRC_BUFFER_SIZE 40
 
 #include <signal.h>
+#include <termios.h>
 
 typedef struct
 {
@@ -40,7 +41,7 @@ struct termios oldtio, newtio;       /* Place for old and new port settings for 
 struct sigaction saio;               /* definition of signal action  */
 
 char buf[255];                       /* buffer for where data is put */
-struct timeval t_initial;
+//struct timeval t_initial;
 
 /* Info on the structure of termios
 struct termios 
@@ -67,8 +68,5 @@ void lb_se_clear_buffer(COMM_PORT_T *port);
 void lb_se_copy_buffer(COMM_PORT_T *port, char *str);
 float  lb_se_get_timestamp();
 void lb_se_signal_handler_IO (int status);
-
-
-
 
 #endif /* LB_SERIAL_H */

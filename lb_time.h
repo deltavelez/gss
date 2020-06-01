@@ -11,5 +11,6 @@ void lb_ti_delay_wall_ms(UINT32_T delay_ms);
 void lb_ti_delay_ms(UINT32_T delay);
 void lb_ti_delay_us(UINT32_T delay);
 REAL_T lb_ti_time_wall(void);
+void lb_ti_wait_interval(REAL_T time_initial, REAL_T interval);
 
 #endif

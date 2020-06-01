@@ -126,9 +126,27 @@ void lb_ti_delay_ms(UINT32_T delay_ms)
 REAL_T lb_ti_time_wall(void)
 {
   struct timespec ts_time;
-  UINT64_T end_u64, time_u64;
-
-  //  clock_gettime(CLOCK_MONOTONIC, &ts_time);
+ 
   clock_gettime(CLOCK_REALTIME, &ts_time);
   return  ((REAL_T)ts_time.tv_sec) + ((REAL_T)ts_time.tv_nsec*0.000000001);
 }
+
+void lb_ti_wait_interval(REAL_T time_initial, REAL_T interval)
+{
+  REAL_T fraction, fraction_previous, time_elapsed;
+  SINT8_T flag;
+  flag=FALSE;
+  while(!flag)
+    {
+      time_elapsed=lb_ti_time_wall()-time_initial;
+      fraction=time_elapsed/interval;
+      fraction=fraction-(SINT8_T)fraction;
+      if (fraction<fraction_previous)
+	{
+	  fraction_previous=fraction;
+	  flag=TRUE;
+	}
+    }
+  return;
+}
+

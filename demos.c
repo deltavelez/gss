@@ -29,7 +29,8 @@
 #include "lb_numer.h"
 #include "lb_serial.h"
 #include "lb_gpio.h"
-#include "lb_time.h" 
+#include "lb_time.h"
+#include "lb_hp6600.h"
 
   
 int main(int argc, char *argv[])
@@ -6676,7 +6677,7 @@ lb_co_cls();
   /* I'm currently working on this.  Because of that, it is not yet functional  */
   /******************************************************************************/
   
- #define DEMO_SERIAL
+  // #define DEMO_SERIAL
 #ifdef DEMO_SERIAL
 
   COMM_PORT_T port1;
@@ -6691,13 +6692,173 @@ lb_co_cls();
   char a=0;
   while(1)
     {
-       lb_se_tx_str(&port1, "*IDN?\r\n");
+       lb_se_tx_str(&port1, "OUTPUT ON\r\n");
      
       lb_se_process_rx(&port1);
       //fflush(stdout);
       lb_se_print_buffer(&port1);
       lb_ti_delay_ms(2000);
     }
+  lb_se_close(&port1);
+#endif
+
+
+#define DEMO_BATTERY
+#ifdef DEMO_BATTERY
+  COMM_PORT_T port1;
+  char str[40];
+ 
+  port1.device=dev_S0;
+  port1.baud_rate=B9600;
+  port1.data_bits = CS8;
+  port1.stop_bits =SB_2;
+  port1.parity=PA_none;
+  port1.flow_control=FC_none;
+  lb_se_init(&port1);
+
+
+  FILE *text_file=NULL;
+  text_file=fopen("./charge_data.txt", "w");
+  if (text_file== NULL)
+    { 
+      fprintf(stderr,"Error in opening text file..\r\n");
+      return 1;
+    }
+
+ 
+  /* First, we check the cell's battery */
+
+  REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=5.0, current_recovery=0.07, current_charge=2.0, current_discharge=2.0;
+  
+  time_initial=lb_ti_time_wall();
+  time_elapsed=0;
+
+  lb_se_tx_str(&port1, "OUTPUT OFF\r\n");
+  lb_ti_delay_ms(100);
+ 
+  lb_se_tx_str(&port1, "MEAS:VOLT?\r\n");
+  lb_ti_delay_ms(100);
+ 
+  lb_se_process_rx(&port1);
+  lb_se_copy_buffer(&port1, str);
+  lb_se_clear_buffer(&port1);
+  voltage=atof(str);
+  printf("Voltage = %4.4f\r\n",voltage);
+
+
+  /* Recovery */
+  if (voltage<3.00)
+    {
+      sprintf(str,"CURR %2.2f\r\n",current_recovery);
+      
+      lb_se_tx_str(&port1, str);
+      printf("%s\r\n",str);
+      lb_ti_delay_ms(200);
+     
+      lb_se_tx_str(&port1, "VOLT 4.3\r\n");
+      printf("VOLT 4.3\r\n");
+      lb_ti_delay_ms(200);
+
+      lb_se_tx_str(&port1, "OUTPUT ON\r\n");
+      printf("OUTPUT ON\r\n");
+      lb_ti_delay_ms(200);
+
+      while(time_elapsed<12*3600.0 || (voltage<3.0))
+	{
+	  lb_se_tx_str(&port1, "MEAS:VOLT?\r\n");
+	  lb_ti_delay_ms(100);
+	  lb_se_process_rx(&port1);
+	  lb_se_copy_buffer(&port1, str);
+	  lb_se_clear_buffer(&port1);
+	  voltage=atof(str);
+ 
+	  time_elapsed=lb_ti_time_wall()-time_initial;
+	  lb_ti_wait_interval(time_initial, interval);
+
+	  time_elapsed=lb_ti_time_wall()-time_initial;
+	  printf("Recovery: %4.2f,  %6.3f\r\n",time_elapsed,voltage);
+	  fprintf(text_file,"Recovery:, %4.2f,  %6.3f\r\n",time_elapsed,voltage);
+	  fflush(text_file);
+	}
+    }
+
+  /* Full charge */
+  lb_se_tx_str(&port1, "VOLT 4.3\r\n");
+  printf("VOLT 4.3\r\n");
+
+  lb_ti_delay_ms(200);
+
+  lb_se_tx_str(&port1, "OUTPUT ON\r\n");
+  printf("OUTPUT ON\r\n");
+  lb_ti_delay_ms(200);
+
+  sprintf(str,"CURR %2.2f\r\n",current_charge);
+  printf("%s\r\n",str);
+  lb_se_tx_str(&port1, str);
+  
+  lb_ti_delay_ms(100);
+  energy_in=0;
+
+  while(time_elapsed<24*3600.0 || (voltage<4.2))
+    {
+
+      lb_se_tx_str(&port1, "MEAS:VOLT?\r\n");
+      lb_ti_delay_ms(100);
+      lb_se_process_rx(&port1);
+      lb_se_copy_buffer(&port1, str);
+      lb_se_clear_buffer(&port1);
+      voltage=atof(str);
+      printf("string= %s\r\n",str);
+ 
+      time_elapsed=lb_ti_time_wall()-time_initial;
+      lb_ti_wait_interval(time_initial, interval);
+
+      energy_in+=0.05*voltage*interval/3600.0; /* Measured in watts*hour */
+      time_elapsed=lb_ti_time_wall()-time_initial;
+      printf("Charging: %4.2f,   %6.3f, %6.3f\r\n",time_elapsed,voltage,energy_in);
+      fprintf(text_file,"Charging:, %4.2f,   %6.3f, %6.3f\r\n",time_elapsed,voltage,energy_in);
+      fflush(text_file);
+    }
+
+
+  /* Full discharge */
+  lb_se_tx_str(&port1, "VOLT 2.9\r\n");
+  printf("VOLT 2.9\r\n");
+  lb_ti_delay_ms(200);
+
+  lb_se_tx_str(&port1, "OUTPUT ON\r\n");
+  printf("OUTPUT ON\r\n");
+  lb_ti_delay_ms(200);
+
+  sprintf(str,"CURR %2.2f\r\n",current_discharge);
+  printf("%s\r\n",str);
+  lb_se_tx_str(&port1, str);
+  lb_ti_delay_ms(100);
+  energy_out=0;
+
+  while(time_elapsed<36*3600.0 || (voltage>3.0))
+    {
+      lb_se_tx_str(&port1, "MEAS:VOLT?\r\n");
+      lb_ti_delay_ms(100);
+      lb_se_process_rx(&port1);
+      lb_se_copy_buffer(&port1, str);
+      lb_se_clear_buffer(&port1);
+      voltage=atof(str);
+      printf("string= %s\r\n",str);
+ 
+      time_elapsed=lb_ti_time_wall()-time_initial;
+      lb_ti_wait_interval(time_initial, interval);
+
+      energy_out-=0.05*voltage*interval/3600.0; /* Measured in watts*hour */
+      time_elapsed=lb_ti_time_wall()-time_initial;
+      printf("Discharging: %4.2f,   %6.3f, %6.3f\r\n",time_elapsed,voltage,energy_out);
+      fprintf(text_file,"Discharging:, %4.2f,   %6.3f, %6.3f\r\n",time_elapsed,voltage,energy_out);
+      fflush(text_file);
+    }
+
+  fclose(text_file);  
+ 
+  lb_se_tx_str(&port1, "OUTPUT OFF\r\n");
   lb_se_close(&port1);
 #endif
 

@@ -1,5 +1,223 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+#include "lb_hp6600.h"
 
-void UpdateStageOnce(float t1, float t2, float dt, float t, float v,float i,int *flag_already_updated, int *stage_changed)
+
+/*****************************************************************************************************/
+/* BATTERY PROFILE DEFINITIONS                                                                       */ 
+/*****************************************************************************************************/
+//#define LEAD_ACID_DISCHARGE            */
+//#define LEAD_ACID_RECOVERY_AND_CHARGE  */
+#define LITHIUM_TEST                   */
+//#define LEAD_ACID_TEST                 
+/*****************************************************************************************************/
+
+#ifdef BATTERY_TEST
+#define N_STAGES 3
+
+t_charge_stage stages[N_STAGES] = {
+  /* STAGE No. 0 sampe charge cycle at constant current */
+  { "Rvy Chg",
+    14.0, 0.1, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    12.0, TRUE,  1,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    86400.0, TRUE, 3, /* t_max settings */
+    0,0 },          /* always zero */
+
+  { "Fst Chg",
+    14.4, 1.5, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    12.5, TRUE,  2,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_HOUR*2.0, TRUE, 3, /* t_max settings */
+    0,0 },          /* always zero */
+
+  /* STAGE No. 0: sample discharge cycle at constant current */
+  { "Discharge", 
+    11.0, -1.25, TRUE,       /* nominal v and i */
+    11.95, TRUE,  3,   /* v_min settings */
+    0.0, FALSE,  0,   /* v_max settings */
+    0.0, FALSE, 0,    /* i_min settings */
+    0.0, FALSE, 0,    /* i_max settings */
+    86400.0, TRUE, 3, /* t_max settings */
+    0,0 }};          /* always zero */
+#endif
+
+
+#ifdef LEAD_ACID_RECOVERY_AND_CHARGE
+#define N_STAGES 3
+
+t_charge_stage stages[N_STAGES] = {
+  { "Rvy Chg",
+    12.5, 0.05, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    10.5, TRUE,  1,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY*5.0, TRUE, 3, /* t_max settings */
+    0,0 },          /* always zero */
+
+  { "Fst Chg",
+    14.4, 5.0, TRUE,      /* nominal v and i */
+    11.5, TRUE,  0,   /* v_min settings */
+    13.65, TRUE,  2,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, 3, /* t_max settings */
+    0,0 },          /* always zero */
+
+  { "Top Chg",
+    14.4, 5.0, TRUE,      /* nominal v and i */
+    13.0, TRUE,  1,   /* v_min settings */
+    0.0, FALSE, 3,  /* v_max settings */
+    0.5, TRUE, 3,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, 3, /* t_max settings */
+    0,0 },          /* always zero */
+};
+#endif
+
+#ifdef LEAD_ACID_TEST
+#define N_STAGES 7
+#define N_CELLS 6
+#define LEAD_VOLT_UCH 1.67
+#define LEAD_VOLT_OCH 2.4
+#define LEAD_NOM_CURR 2.5 
+
+t_charge_stage stages[N_STAGES] = {
+  { "Rvy Chg",
+    LEAD_VOLT_OCH*N_CELLS, 0.025*LEAD_NOM_CURR, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    LEAD_VOLT_UCH*N_CELLS, TRUE,  1,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY*3.0, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+  
+  { "Fst Chg",
+    LEAD_VOLT_OCH*N_CELLS, LEAD_NOM_CURR, TRUE,      /* nominal v and i */
+    LEAD_VOLT_UCH*N_CELLS, TRUE,  0,   /* v_min settings */
+    0, FALSE,  0,  /* v_max settings */
+    0.1*LEAD_NOM_CURR, TRUE, 2,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+  
+  { "Discharge", 
+    0.8*LEAD_VOLT_UCH*N_CELLS, 5.0, TRUE,       /* nominal v and i */
+    LEAD_VOLT_UCH*N_CELLS, TRUE,  3,   /* v_min settings */
+    0.0, FALSE,  0,   /* v_max settings */
+    0.0, FALSE, 0,    /* i_min settings */
+    0.0, FALSE, 0,    /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+  
+  { "Rvy Chg",
+    LEAD_VOLT_OCH*N_CELLS, 0.025*LEAD_NOM_CURR, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    LEAD_VOLT_UCH*N_CELLS, TRUE,  4,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY*3.0, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+  
+  { "Fst Chg",
+    LEAD_VOLT_OCH*N_CELLS, LEAD_NOM_CURR, TRUE,      /* nominal v and i */
+    LEAD_VOLT_UCH*N_CELLS, TRUE,  0,   /* v_min settings */
+    0, FALSE,  0,  /* v_max settings */
+    0.1*LEAD_NOM_CURR, TRUE, N_STAGES,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+  
+};
+#endif
+
+
+#ifdef LEAD_ACID_DISCHARGE
+#define N_STAGES 1
+
+t_charge_stage stages[N_STAGES] = 
+  { "Discharge", 
+    7.0, -2.0, TRUE,       /* nominal v and i */
+    10.5, TRUE,  1,   /* v_min settings */
+    0.0, FALSE,  0,   /* v_max settings */
+    0.0, FALSE, 0,    /* i_min settings */
+    0.0, FALSE, 0,    /* i_max settings */
+    ONE_DAY, TRUE, 1, /* t_max settings */
+    0,0 };          /* always zero */
+#endif
+
+
+#ifdef LITHIUM_TEST
+#define N_STAGES 5
+#define N_CELLS 1.0
+#define LI_VOLT_CHG 4.2
+#define LI_VOLT_DCH 2.8
+#define LI_NOM_CURR 1.0 
+
+t_charge_stage stages[N_STAGES] = {
+  { "Rvy Chg",
+    N_CELLS*LI_VOLT_CHG, LI_NOM_CURR*0.05, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    N_CELLS*LI_VOLT_DCH, TRUE,  1,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+
+  { "Fst Chg",
+    N_CELLS*LI_VOLT_CHG, LI_NOM_CURR, TRUE,      /* nominal v and i */
+    N_CELLS*LI_VOLT_DCH, TRUE,  0,   /* v_min settings */
+    0.0, FALSE,  0,  /* v_max settings */
+    LI_NOM_CURR*0.05, TRUE, 2,   /* i_min settings */
+    0.0, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+
+  { "Dis Chg", 
+    N_CELLS*0.9*LI_VOLT_DCH, LI_NOM_CURR, TRUE,       /* nominal v and i */
+    N_CELLS*LI_VOLT_DCH, TRUE,  3,   /* v_min settings */
+    0.0, FALSE,  0,   /* v_max settings */
+    0.0, FALSE, 0,    /* i_min settings */
+    0.0, FALSE, 0,    /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },
+  
+  { "Rvy Chg",
+    N_CELLS*LI_VOLT_CHG, 0.1, TRUE,      /* nominal v and i */
+    0.0, FALSE,  0,   /* v_min settings */
+    N_CELLS*LI_VOLT_DCH, TRUE,  4,  /* v_max settings */
+    0.00, FALSE, 0,   /* i_min settings */
+    0.00, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+
+  { "Fst Chg",
+    N_CELLS*LI_VOLT_CHG, LI_NOM_CURR, TRUE,      /* nominal v and i */
+    N_CELLS*LI_VOLT_DCH, TRUE,  3,   /* v_min settings */
+    0.0, FALSE,  0,  /* v_max settings */
+    LI_NOM_CURR*0.2, TRUE, 5,   /* i_min settings */
+    0.0, FALSE, 0,   /* i_max settings */
+    ONE_DAY, TRUE, N_STAGES, /* t_max settings */
+    0,0 },          /* always zero */
+  
+};          /* always zero */
+#endif
+
+
+float t_previous, t_delta;
+float volt, curr;
+int current_stage=0;
+int flag_volt_sent=FALSE, flag_volt_parsed=FALSE, flag_curr_sent=FALSE, flag_curr_parsed=FALSE, 
+    flag_record_printed=FALSE, flag_stage_checked=FALSE, flag_stage_changed=FALSE;
+
+void UpdateStageOnce(COMM_PORT_T *port, float t1, float t2, float dt, float t, float v,float i,int *flag_already_updated, int *stage_changed)
 {
   if ((t1 <= dt) && (dt < t2) && !(*flag_already_updated))
     {
@@ -23,7 +241,7 @@ void UpdateStageOnce(float t1, float t2, float dt, float t, float v,float i,int 
 		*stage_changed=FALSE;
   
       if (*stage_changed && (current_stage!=N_STAGES))
-	  SetupPSU(current_stage);
+	SetupPSU(port, current_stage);
      
      else
 	{
@@ -35,23 +253,23 @@ void UpdateStageOnce(float t1, float t2, float dt, float t, float v,float i,int 
 }
 
 
-void RunProcess()
+void RunProcess(COMM_PORT_T *port, FILE *text_file)
 {
   float t;
   int f_conv_volt, f_conv_curr;
  
-  t=GetTimeStamp();
+  t=lb_ti_time_wall();
   t_delta+=t-t_previous;
 
-  SERCOM_ProcessRx();
+  lb_se_process_rx(port);
 
-  SendCmdOnce(0.0, T_INTERVAL, t_delta,"MEAS:VOLT?\r\n", &flag_volt_sent); 
-  ParseBufferOnce(1.0,T_INTERVAL, t_delta, t, &flag_volt_parsed, &volt,  &f_conv_volt);  
-  SendCmdOnce(2.0, T_INTERVAL, t_delta,"MEAS:CURR?\r\n", &flag_curr_sent); 
-  ParseBufferOnce(3.0, T_INTERVAL, t_delta, t, &flag_curr_parsed, &curr, &f_conv_curr);
+  SendCmdOnce(port, 0.0, T_INTERVAL, t_delta,"MEAS:VOLT?\r\n", &flag_volt_sent); 
+  ParseBufferOnce(port, 1.0,T_INTERVAL, t_delta, t, &flag_volt_parsed, &volt,  &f_conv_volt);  
+  SendCmdOnce(port, 2.0, T_INTERVAL, t_delta,"MEAS:CURR?\r\n", &flag_curr_sent); 
+  ParseBufferOnce(port, 3.0, T_INTERVAL, t_delta, t, &flag_curr_parsed, &curr, &f_conv_curr);
   
-  PrintRecordOnce(4.0, T_INTERVAL, t_delta, t-4.0,volt,curr,&flag_record_printed); 
-  UpdateStageOnce(4.5, T_INTERVAL, t_delta, t,volt,curr,&flag_stage_checked,&flag_stage_changed);
+  PrintRecordOnce(text_file, 4.0, T_INTERVAL, t_delta, t-4.0,volt,curr,&flag_record_printed); 
+  UpdateStageOnce(port, 4.5, T_INTERVAL, t_delta, t,volt,curr,&flag_stage_checked,&flag_stage_changed);
   
   if (t_delta>T_INTERVAL)
     {
@@ -66,43 +284,43 @@ void RunProcess()
   t_previous=t;
 }
 
-void PrintRecordOnce(float t1, float t2, float dt, float t, float v,float i,int *flag_already_printed)
+void PrintRecordOnce(FILE *text_file, float t1, float t2, float dt, float t, float v,float i,int *flag_already_printed)
 {
   if ((t1 <= dt) && (dt < t2) && !(*flag_already_printed))
     {
-      fprintf(output,"S:%d [",current_stage);
+      printf("S:%d [",current_stage);
       fprintf(text_file,"%d\t",current_stage);
      
-      fprintf(output,"%s]",stages[current_stage].label);
+      printf("%s]",stages[current_stage].label);
       fprintf(text_file,"%s\t",stages[current_stage].label);
     
-      Gotox(15);
+      //Gotox(15);
       
-      fprintf(output,"t= %2.4f",t/3600.0);
+      printf("t= %2.4f",t/3600.0);
       fprintf(text_file,"%2.4f\t",t/3600.0);
       
-      Gotox(25);
+      //Gotox(25);
       
-      fprintf(output,"dt= %2.4f",stages[current_stage].t_cycle/3600.0);
+      printf("dt= %2.4f",stages[current_stage].t_cycle/3600.0);
       fprintf(text_file,"%2.4f\t",stages[current_stage].t_cycle/3600.0);
       
-      Gotox(37);
+      //Gotox(37);
       
-      fprintf(output,"V=%2.2f",v);
+      printf("V=%2.2f",v);
       fprintf(text_file,"%2.2f\t",v);
       
-      Gotox(45);
+      //Gotox(45);
       
-      fprintf(output,"I= %2.3f",i);
+      printf("I= %2.3f",i);
       fprintf(text_file,"%2.3f\t",i);
       
-      Gotox(55);
+      //Gotox(55);
 
-      fprintf(output,"P= %2.2f",v*i);
+      printf("P= %2.2f",v*i);
       fprintf(text_file,"%2.2f\t",v*i);
 
-      Gotox(65);
-      fprintf(output,"W*H= %2.3f\r\n",stages[current_stage].watt_hour);
+      //Gotox(65);
+      printf("W*H= %2.3f\r\n",stages[current_stage].watt_hour);
       fprintf(text_file,"%2.3f\r\n",stages[current_stage].watt_hour);
 
       *flag_already_printed=TRUE;
@@ -110,39 +328,40 @@ void PrintRecordOnce(float t1, float t2, float dt, float t, float v,float i,int 
 }
 
 
-void SetupPSU(int n)
+void SetupPSU(COMM_PORT_T *port, int n)
 {
   char str[20];
  
   sprintf(str,"VOLT:LEV %f\r\n",stages[n].lim_volt);  
-  SERCOM_TxStr(str);
+  lb_se_tx_str(port,str);
 
   /* fprintf(output,str); */
   sprintf(str,"CURR:LEV %f\r\n",fabs(stages[n].lim_curr)); 
-  SERCOM_TxStr(str);
+  lb_se_tx_str(port,str);
   stages[n].t_cycle=0;
   
   if (stages[n].output_enabled)
-    SERCOM_TxStr("OUTP:STAT 1\r\n");
+    lb_se_tx_str(port,"OUTP:STAT 1\r\n");
   else
-    SERCOM_TxStr("OUTP:STAT 0\r\n");
+    lb_se_tx_str(port,"OUTP:STAT 0\r\n");
 }
-void SendCmdOnce(float t1, float t2, float t, const char *str, int *already_executed_flag)
+
+void SendCmdOnce(COMM_PORT_T *port, float t1, float t2, float t, const char *str, int *already_executed_flag)
 {
   if ((t1 <= t) && (t < t2) && !*already_executed_flag)
     {
-      SERCOM_TxStr(str);
+      lb_se_tx_str(port,str);
       *already_executed_flag=TRUE;
    }
 }
 
-void ParseBufferOnce(float t1, float t2, float dt, float t, int *already_parsed_flag, float *val, int *success)
+void ParseBufferOnce(COMM_PORT_T *port, float t1, float t2, float dt, float t, int *already_parsed_flag, float *val, int *success)
 {
   char str[90];
 
   if ((t1 <= dt) && (dt < t2) && !*already_parsed_flag)
     {
-      SERCOM_DataBufferToStr(str);
+      lb_se_tx_str(port,str);
       
       if (strlen(str)!=0)
 	{
@@ -151,7 +370,7 @@ void ParseBufferOnce(float t1, float t2, float dt, float t, int *already_parsed_
 	} 
       else 
 	*success=FALSE;
-      SERCOM_ClearBuffer();
+      lb_se_clear_buffer(port);
       *already_parsed_flag=TRUE;
     }
 }
