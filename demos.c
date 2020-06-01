@@ -5362,7 +5362,7 @@ int main(int argc, char *argv[])
   /* Any of the expressions commented our below can be tried                    */
   /******************************************************************************/
   
-#define DEMO_PARSER_COMPLEX
+  //#define DEMO_PARSER_COMPLEX
 #ifdef DEMO_PARSER_COMPLEX 
   MATHERROR_T e_code;
   COMPLEX_T var1,var2,imag,result;
@@ -6676,47 +6676,29 @@ lb_co_cls();
   /* I'm currently working on this.  Because of that, it is not yet functional  */
   /******************************************************************************/
   
-  //#define DEMO_SERIAL
+ #define DEMO_SERIAL
 #ifdef DEMO_SERIAL
 
   COMM_PORT_T port1;
   port1.device=dev_S0;
-  port1.baud_rate=B75;
+  port1.baud_rate=B9600;
   port1.data_bits = CS8;
-  port1.stop_bits =SB_1;
+  port1.stop_bits =SB_2;
   port1.parity=PA_none;
   port1.flow_control=FC_none;
   lb_se_init(&port1);
 
-  COMM_PORT_T port2;
-  port2.device=dev_S1;
-  port2.baud_rate=B75;
-  port2.data_bits = CS8;
-  port2.stop_bits =SB_1;
-  port2.parity=PA_none;
-  port2.flow_control=FC_none;
-  lb_se_init(&port2);
-
   char a=0;
   while(1)
     {
-      lb_se_tx_byte(&port1, a);
-      lb_se_tx_byte(&port2, a);
+       lb_se_tx_str(&port1, "*IDN?\r\n");
+     
       lb_se_process_rx(&port1);
-      lb_se_process_rx(&port2);
-      lb_co_color(TEXT_COLOR_WHITE);
-      fflush(stdout);
-
+      //fflush(stdout);
       lb_se_print_buffer(&port1);
-      lb_co_color(TEXT_COLOR_YELLOW);
-      fflush(stdout);
-      lb_se_print_buffer(&port2);
-      a++;
-      if (a==128)
-	a=0;
+      lb_ti_delay_ms(2000);
     }
   lb_se_close(&port1);
-  lb_se_close(&port2);
 #endif
 
 }
