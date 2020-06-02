@@ -18,10 +18,7 @@ void lb_se_init(COMM_PORT_T *port)
 {
   /*******************************************************************************/   
   /* Open the device(com port) to be non-blocking (read will return immediately) */
-  if ((*port).device == dev_S0)
-    (*port).fd = open("/dev/ttyS0",  O_RDWR  | O_NOCTTY );
-  else
-    (*port).fd = open("/dev/ttyS1",  O_RDWR  | O_NOCTTY );
+  (*port).fd = open((*port).device,  O_RDWR  | O_NOCTTY );
 
   if ((*port).fd < 0)
     {

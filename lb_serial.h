@@ -11,10 +11,7 @@ typedef struct
 {
   speed_t  baud_rate; /* Baud Rate Type */
   tcflag_t data_bits;  
-  enum 
-    {
-      dev_S0, dev_S1     
-    } device; /* Device */
+  char device[20];
   enum 
     {
       SB_1, SB_2     

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <math.h>
 #include "lb_time.h"
 
 UINT32_T lb_ti_last_clock;
@@ -133,19 +134,17 @@ REAL_T lb_ti_time_wall(void)
 
 void lb_ti_wait_interval(REAL_T time_initial, REAL_T interval)
 {
-  REAL_T fraction, fraction_previous, time_elapsed;
+  REAL_T time_elapsed, time_max;
   SINT8_T flag;
   flag=FALSE;
+
+  time_max=interval*(1+(UINT32_T)(lb_ti_time_wall()-time_initial)/interval);
+
   while(!flag)
     {
       time_elapsed=lb_ti_time_wall()-time_initial;
-      fraction=time_elapsed/interval;
-      fraction=fraction-(SINT8_T)fraction;
-      if (fraction<fraction_previous)
-	{
-	  fraction_previous=fraction;
+      if (time_elapsed>=time_max)
 	  flag=TRUE;
-	}
     }
   return;
 }
