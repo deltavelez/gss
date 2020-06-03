@@ -6,6 +6,7 @@
 
 #include <signal.h>
 #include <termios.h>
+#include "lb_types.h"
 
 typedef struct
 {
@@ -65,5 +66,6 @@ void lb_se_clear_buffer(COMM_PORT_T *port);
 void lb_se_copy_buffer(COMM_PORT_T *port, char *str);
 float  lb_se_get_timestamp();
 void lb_se_signal_handler_IO (int status);
+REAL_T lb_se_query_instrument(COMM_PORT_T *port, char *command, UINT32_T delay_ms);
 
 #endif /* LB_SERIAL_H */

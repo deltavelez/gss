@@ -10,6 +10,7 @@
 #include <sys/time.h>
 #include "lb_types.h" 
 #include "lb_serial.h"
+#include "lb_time.h" 
 
 
 void lb_se_signal_handler_IO (int status);  /* definition of signal handler */
@@ -241,6 +242,19 @@ void lb_se_copy_buffer(COMM_PORT_T *port, char *str)
     else
       str[k]=(*port).data_buffer[(*port).a+k-CIRC_BUFFER_SIZE];
   str[k]='\0';
+}
+
+REAL_T lb_se_query_instrument(COMM_PORT_T *port, char *command, UINT32_T delay_ms)
+{
+  char response[40];
+  REAL_T value;
+  lb_se_tx_str(port, command);
+  lb_ti_delay_ms(delay_ms);
+  lb_se_process_rx(port);
+  lb_se_copy_buffer(port, response);
+  lb_se_clear_buffer(port);
+  value=atof(response);
+  return value;
 }
 
 

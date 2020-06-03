@@ -134,17 +134,16 @@ REAL_T lb_ti_time_wall(void)
 
 void lb_ti_wait_interval(REAL_T time_initial, REAL_T interval)
 {
-  REAL_T time_elapsed, time_max;
-  SINT8_T flag;
-  flag=FALSE;
+  REAL_T time_max, time_wall;
 
-  time_max=interval*(1+(UINT32_T)(lb_ti_time_wall()-time_initial)/interval);
+  time_wall=lb_ti_time_wall();
+  
+  //  time_max=time_wall+interval-interval*((time_wall-time_initial)/interval-(SINT32_T)((time_wall-time_initial)/interval));
+  time_max=time_wall+interval*(1.0-((time_wall-time_initial)/interval-(UINT32_T)((time_wall-time_initial)/interval)));
 
-  while(!flag)
+  while(lb_ti_time_wall()<time_max)
     {
-      time_elapsed=lb_ti_time_wall()-time_initial;
-      if (time_elapsed>=time_max)
-	  flag=TRUE;
+      ;
     }
   return;
 }
