@@ -6706,9 +6706,71 @@ lb_co_cls();
 
 #define DEMO_BATTERY
 #ifdef DEMO_BATTERY
+  void battery_exit(COMM_PORT_T *port, FILE *file)
+    {
+      lb_se_tx_str(port, "OUTPUT OFF\r\n");
+      printf("OUTPUT Off\r\n");
+      lb_ti_delay_ms(100);
+
+      fclose(file);  
+      lb_se_close(port);
+      return;
+    }
+
+  REAL_T internal_resistance(COMM_PORT_T *port, FILE *file)
+  {
+    char str[40];
+    REAL_T v1, v2, current, internal_resistance;
+    sprintf(str,"---------------------------\r\n");
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   	   
+    sprintf(str,"TESTING INTERNAL RESISTANCE\r\n");
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   
+    v1=lb_se_query_instrument(port, "MEAS:VOLT?\r\n", 100);
+    current=lb_se_query_instrument(port, "MEAS:CURR?\r\n", 100);
+    sprintf(str, "voltage while ON = %7.4f\r\n",v1);
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   
+    sprintf(str,"current=%7.4f\r\n",current);
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   
+    lb_se_tx_str(port, "OUTPUT OFF\r\n");
+    sprintf(str,"OUTPUT OFF\n");
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   
+    lb_ti_delay_ms(5000);
+
+    v2=lb_se_query_instrument(port, "MEAS:VOLT?\r\n", 100);
+    sprintf(str,"voltage while OFF = %7.4f\r\n",v2);
+    printf("%s",str);
+    fprintf(file,"%s",str);
+    
+    internal_resistance=(v1-v2)/current;
+    sprintf(str,"Internal resistance = %7.4f [Ohm]\r\n",internal_resistance);
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   
+    lb_se_tx_str(port, "OUTPUT ON\r\n");
+    sprintf(str,"OUTPUT ON\r\n");
+    printf("%s",str);
+    fprintf(file,"%s",str);
+
+    lb_ti_delay_ms(100);
+    sprintf(str,"---------------------------\r\n");
+    printf("%s",str);
+    fprintf(file,"%s",str);
+   return internal_resistance;
+  }
+
   COMM_PORT_T port1;
   char str[40];
- 
+
   strcpy(port1.device,"/dev/ttyUSB0");
   port1.baud_rate=B9600;
   port1.data_bits = CS8;
@@ -6729,44 +6791,52 @@ lb_co_cls();
  
   /* First, we check the cell's battery */
 
-  REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=15.0, current_recovery=0.05,
-     current, n_cells=1.0,  v_cell_min=3.0, v_cell_max=4.2, i_nom=2.0;
-  
-  time_initial=lb_ti_time_wall();
-  time_elapsed=0;
+  /* Constants for Li-Ion individual Cells */
+  //  REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=15.0, 
+  //   current, n_cells=1.0,  v_cell_min=3.0, v_cell_max=4.2, i_charge=1.0;
 
+  /* Constants for Ni-MH individual cells  */
+  REAL_T time_initial, time_elapsed, voltage, voltage2, energy_in, energy_out, interval=30.0, 
+    current, n_cells=1.0,  v_cell_min=1.0, v_cell_max=1.58, i_charge=0.3333, t_max_cycle;
+
+    /* Constants for Ni-Cd individual cells  */
+  //REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=30.0, 
+  // current, n_cells=1.0,  v_cell_min=1.0, v_cell_max=1.55, i_charge=0.25, t_max_cycle;
+
+  /* The maximum charge/discharge time can be estimated using the nominal capacity and voltage from the cell's datasheet, with an overhead factor */ 
+  t_max_cycle=(2200.0/1000.0)*3600.0/i_charge;
+  printf("t_max_cycle = 1.25*%6.2f [hours]\r\n", t_max_cycle/3600.0);
+  t_max_cycle*=1.25;
+  
   lb_se_tx_str(&port1, "OUTPUT OFF\r\n");
   lb_ti_delay_ms(100);
  
-  lb_se_tx_str(&port1, "MEAS:VOLT?\r\n");
-  lb_ti_delay_ms(100);
- 
-  lb_se_process_rx(&port1);
-  lb_se_copy_buffer(&port1, str);
-  lb_se_clear_buffer(&port1);
-  voltage=atof(str);
+  voltage=lb_se_query_instrument(&port1, "MEAS:VOLT?\r\n", 100);
+  
   printf("Voltage = %4.4f\r\n",voltage);
-
 
   /* Recovery */
   if (voltage<n_cells*v_cell_min)
     {
-      sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_max+0.1);
+      sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_max+0.05);
       lb_se_tx_str(&port1, str);
       printf("%s",str);
-      lb_ti_delay_ms(200);
+      lb_ti_delay_ms(100);
 
-      sprintf(str,"CURR %2.4f\r\n",i_nom*0.05);
+      sprintf(str,"CURR %2.4f\r\n",i_charge*0.05);
       lb_se_tx_str(&port1, str);
       printf("%s",str);
-      lb_ti_delay_ms(200);
-     
+      lb_ti_delay_ms(100);
+
+      voltage=lb_se_query_instrument(&port1, "MEAS:VOLT?\r\n", 100);
+	 
       lb_se_tx_str(&port1, "OUTPUT ON\r\n");
       printf("OUTPUT ON\r\n");
-      lb_ti_delay_ms(200);
-
+      lb_ti_delay_ms(100);
+      time_initial=lb_ti_time_wall();
+      time_elapsed=0;
       energy_in=0.0;
-      while((time_elapsed<12.0*3600.0) && (voltage<3.0))
+      while(voltage<n_cells*v_cell_min)
 	{
 	  voltage=lb_se_query_instrument(&port1, "MEAS:VOLT?\r\n", 100);
 	  current=lb_se_query_instrument(&port1, "MEAS:CURR?\r\n", 100);
@@ -6780,26 +6850,32 @@ lb_co_cls();
 	  fprintf(text_file,"Recovery:\t%08.2f\t%07.4f\t%07.4f\t%09.4f\r\n",time_elapsed,voltage,current,energy_in);
 
 	  fflush(text_file);
+	  if (time_elapsed>t_max_cycle)
+	    battery_exit(&port1, text_file);
 	}
     }
 
   /* Full charge */
-  sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_max+0.1);
+  sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_max+0.05);
   lb_se_tx_str(&port1, str);
   printf("%s",str);
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
 
-  sprintf(str,"CURR %2.4f\r\n",i_nom*0.5);
+  sprintf(str,"CURR %2.4f\r\n",i_charge);
   lb_se_tx_str(&port1, str);
   printf("%s",str);
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
      
   lb_se_tx_str(&port1, "OUTPUT ON\r\n");
   printf("OUTPUT ON\r\n");
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
 
+  internal_resistance(&port1, text_file);
+
+  time_initial=lb_ti_time_wall();
+  time_elapsed=0;
   energy_in=0;
-  while((time_elapsed<12.0*2.0*3600.0) && (voltage<4.2))
+  while(voltage<n_cells*v_cell_max)
     {
       voltage=lb_se_query_instrument(&port1, "MEAS:VOLT?\r\n", 100);
       current=lb_se_query_instrument(&port1, "MEAS:CURR?\r\n", 100);
@@ -6813,27 +6889,31 @@ lb_co_cls();
       fprintf(text_file,"Charging:\t%08.2f\t%07.4f\t%07.4f\t%09.4f\r\n",time_elapsed,voltage,current,energy_in);
 
       fflush(text_file);
+      if (time_elapsed>t_max_cycle)
+	battery_exit(&port1, text_file);
     }
 
   /* Full discharge */
   
-  sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_min-0.1);
+  sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_min-0.05);
   lb_se_tx_str(&port1, str);
   printf("%s",str);
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
 
-  sprintf(str,"CURR %2.4f\r\n",i_nom*0.5);
+  sprintf(str,"CURR %2.4f\r\n",i_charge);
   lb_se_tx_str(&port1, str);
   printf("%s",str);
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
      
   lb_se_tx_str(&port1, "OUTPUT ON\r\n");
   printf("OUTPUT ON\r\n");
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
 
+
+  time_initial=lb_ti_time_wall();
+  time_elapsed=0;
   energy_out=0;
-
-  while((time_elapsed<12.0*3.0*3600.0) && (voltage>3.0))
+  while(voltage>n_cells*v_cell_min)
     {
       voltage=lb_se_query_instrument(&port1, "MEAS:VOLT?\r\n", 100);
       current=lb_se_query_instrument(&port1, "MEAS:CURR?\r\n", 100);
@@ -6847,26 +6927,29 @@ lb_co_cls();
       fprintf(text_file,"Discharging:\t%08.2f\t%07.4f\t%07.4f\t%09.4f\r\n",time_elapsed,voltage,current,energy_out);
 
       fflush(text_file);
+      if (time_elapsed>t_max_cycle)
+	battery_exit(&port1, text_file);
     }
   
   /* Leave battery charged */
-  sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_max+0.1);
+  sprintf(str,"VOLT %2.4f\r\n",n_cells*v_cell_max+0.05);
   lb_se_tx_str(&port1, str);
   printf("%s",str);
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
 
-  sprintf(str,"CURR %2.4f\r\n",i_nom*0.5);
+  sprintf(str,"CURR %2.4f\r\n",i_charge);
   lb_se_tx_str(&port1, str);
   printf("%s",str);
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
      
   lb_se_tx_str(&port1, "OUTPUT ON\r\n");
   printf("OUTPUT ON\r\n");
-  lb_ti_delay_ms(200);
+  lb_ti_delay_ms(100);
 
+  time_initial=lb_ti_time_wall();
+  time_elapsed=0;
   energy_in=0;
-
-  while((time_elapsed<12.0*4.0*3600.0) && (voltage<4.2))
+  while(voltage<n_cells*v_cell_max)
     {
       voltage=lb_se_query_instrument(&port1, "MEAS:VOLT?\r\n", 100);
       current=lb_se_query_instrument(&port1, "MEAS:CURR?\r\n", 100);
@@ -6880,11 +6963,12 @@ lb_co_cls();
       fprintf(text_file,"Recharging:\t%08.2f\t%07.4f\t%07.4f\t%09.4f\r\n",time_elapsed,voltage,current,energy_in);
 
       fflush(text_file);
+      if (time_elapsed>t_max_cycle)
+	battery_exit(&port1, text_file);
     }
 
-  fclose(text_file);  
-  lb_se_tx_str(&port1, "OUTPUT OFF\r\n");
-  lb_se_close(&port1);
+  battery_exit(&port1,text_file);
+
 #endif
 }
 
