@@ -6714,7 +6714,8 @@ lb_co_cls();
 
       fclose(file);  
       lb_se_close(port);
-      return;
+      exit(1);
+      
     }
 
   REAL_T internal_resistance(COMM_PORT_T *port, FILE *file)
@@ -6765,6 +6766,7 @@ lb_co_cls();
     sprintf(str,"---------------------------\r\n");
     printf("%s",str);
     fprintf(file,"%s",str);
+    fflush(file);
    return internal_resistance;
   }
 
@@ -6792,21 +6794,21 @@ lb_co_cls();
   /* First, we check the cell's battery */
 
   /* Constants for Li-Ion individual Cells */
-  //  REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=15.0, 
-  //   current, n_cells=1.0,  v_cell_min=3.0, v_cell_max=4.2, i_charge=1.0;
+    REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=30.0, 
+      current, n_cells=1.0,  v_cell_min=3.0, v_cell_max=4.2, i_charge=1.0, t_max_cycle;
 
   /* Constants for Ni-MH individual cells  */
-  REAL_T time_initial, time_elapsed, voltage, voltage2, energy_in, energy_out, interval=30.0, 
-    current, n_cells=1.0,  v_cell_min=1.0, v_cell_max=1.58, i_charge=0.3333, t_max_cycle;
+  // REAL_T time_initial, time_elapsed, voltage, voltage2, energy_in, energy_out, interval=15.0, 
+  //  current, n_cells=2.0,  v_cell_min=1.0, v_cell_max=1.58, i_charge=0.2, t_max_cycle;
 
-    /* Constants for Ni-Cd individual cells  */
-  //REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=30.0, 
-  // current, n_cells=1.0,  v_cell_min=1.0, v_cell_max=1.55, i_charge=0.25, t_max_cycle;
+    /* Constants for Ni-Cd cells  */
+  //REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=15.0, 
+  //current, n_cells=2.0,  v_cell_min=1.0, v_cell_max=1.55, i_charge=0.1, t_max_cycle;
 
   /* The maximum charge/discharge time can be estimated using the nominal capacity and voltage from the cell's datasheet, with an overhead factor */ 
-  t_max_cycle=(2200.0/1000.0)*3600.0/i_charge;
-  printf("t_max_cycle = 1.25*%6.2f [hours]\r\n", t_max_cycle/3600.0);
-  t_max_cycle*=1.25;
+  t_max_cycle=(3300.0/1000.0)*3600.0/i_charge;
+  printf("t_max_cycle = 2.0*%6.2f [hours]\r\n", t_max_cycle/3600.0);
+  t_max_cycle*=2.0;
   
   lb_se_tx_str(&port1, "OUTPUT OFF\r\n");
   lb_ti_delay_ms(100);
@@ -6870,8 +6872,6 @@ lb_co_cls();
   printf("OUTPUT ON\r\n");
   lb_ti_delay_ms(100);
 
-  internal_resistance(&port1, text_file);
-
   time_initial=lb_ti_time_wall();
   time_elapsed=0;
   energy_in=0;
@@ -6909,6 +6909,7 @@ lb_co_cls();
   printf("OUTPUT ON\r\n");
   lb_ti_delay_ms(100);
 
+  internal_resistance(&port1, text_file);
 
   time_initial=lb_ti_time_wall();
   time_elapsed=0;
