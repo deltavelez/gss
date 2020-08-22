@@ -6795,7 +6795,7 @@ lb_co_cls();
 
   /* Constants for Li-Ion individual Cells */
     REAL_T time_initial, time_elapsed, voltage, energy_in, energy_out, interval=30.0, 
-      current, n_cells=1.0,  v_cell_min=3.0, v_cell_max=4.2, i_charge=1.0, t_max_cycle;
+      current, n_cells=1.0,  v_cell_min=3.0, v_cell_max=4.2, i_charge=0.5, t_max_cycle;
 
   /* Constants for Ni-MH individual cells  */
   // REAL_T time_initial, time_elapsed, voltage, voltage2, energy_in, energy_out, interval=15.0, 
@@ -6825,7 +6825,7 @@ lb_co_cls();
       printf("%s",str);
       lb_ti_delay_ms(100);
 
-      sprintf(str,"CURR %2.4f\r\n",i_charge*0.05);
+      sprintf(str,"CURR %2.4f\r\n",i_charge*0.1);
       lb_se_tx_str(&port1, str);
       printf("%s",str);
       lb_ti_delay_ms(100);
